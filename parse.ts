@@ -21,37 +21,19 @@
  * Optionally run this to capture all tags, but by default it only grabs the information
  * that the DF Wiki deemed important to sidebar on its main pages:
  * 
- * CREATURE:
- *      CREATURE_TILE
- *      PREFSTRING (s)
- *      BIOME (s)
- *      Attributes:
- *          FLIER
- *      Tamed Attributes:
- *          PETVALUE
- *          EGG_LAYER
- *          PET_EXOTIC
- *          TRAINABLE, TRAINABLE_WAR, TRAINABLE_HUNTING
- *          Breeding (has both MALE and FEMALE)
- *      Age:
-    *      Adult at (CHILD)
-    *      Max age (MAXAGE)
- *      Size:
- *          Birth | Mid | Max
- *      Food Products
- *          Eggs (CLUTCH_SIZE)
- *          !! EGG_SIZE
- *      
- *   !? Variations (need to cross reference other results for this)
  */
 
 import * as fs from 'fs';
 import * as path from 'path';
-import * as re from './regular-expressions';
+import { CreatureCaste, CreatureRaw, EggDescription } from './raw_definitions/creature';
 import * as readline from 'readline';
+import { DFRaw } from './raw_definitions/common';
 
 const rawspath = "C:\\Users\\nwesterhausen\\Sync\\Dwarf Fortress Files\\Mods\\vanilla-expanded_primal\\raw"
 const rawspath2 = "C:\\Users\\nwesterhausen\\Sync\\Dwarf Fortress Files\\Mods\\vanilla-expanded_primal\\raw\\objects"
+
+const tokenRE = new RegExp(/(\[(?<key>[^\[:]+):?(?<value>[^\]\[]*)])/, 'g');
+const tokenRegex = /(\[(?<key>[^\[:]+):?(?<value>[^\]\[]*)])/gm;
 
 type rawObject = {
     objectID: string,
@@ -68,132 +50,202 @@ type rawObject = {
 
 function slugify(str: string): string {
     return str.toLowerCase()
-    .replace(/ /g,'-')
-    .replace(/[^\w-]+/g,'');
+        .replace(/ /g, '-')
+        .replace(/[^\w-]+/g, '');
 }
 
-function parseRawsFile(filepath: string): Promise<rawObject[]> {
-    return new Promise(function(resolve, reject) {
-        let results: rawObject[] = [];
+function parseRawsFile(filepath: string): Promise<DFRaw[]> {
+    return new Promise(function (resolve, reject) {
+        let results: DFRaw[] = [];
 
-    let filename = "unknown";
-    let linenumber = 0;
-    
-    let typere: RegExp;
-    let currId = "";
+        let filename = "unknown";
+        let linenumber = 0;
 
-    let currName: string[] = [];
-    let currDesc = "";
-    let currType = "";
-    let currClutch = "";
-    let currSize: string[] = [];
-    let currLitter = "";
-    let currTokens: string[] = [];
+        // let filedata = fs.createReadStream(filepath);
+        // const rl = readline.createInterface({
+        //     input: filedata
+        // });
+        let fdata = fs.readFileSync(filepath, {
+            encoding: 'utf-8',
+            flag: 'r'
+        });
 
-    let filedata = fs.createReadStream(filepath);
-    const rl = readline.createInterface({
-        input: filedata
-    });
+        let currObject: DFRaw | CreatureRaw = new DFRaw(filename, "UNKNOWN", "NULL");
+        let currCasteInd = -1;
 
-    rl.on("line", function(line) {
-        if (linenumber == 0) {
-            filename = line;
-            linenumber++;
-            return;
-        }
-        if (re.objectToken.test(line)) {
-            currType = line.match(re.objectToken)![1];
-            typere = re.typeToken(currType);
-            console.dir(typere)
-            return;
-        }
-        if (currType !== "CREATURE") {
-            return;
-        }
-        if (typere !== undefined && typere.test(line)) {
-            if (currId !== "" && currName.length > 0) {
-                let builtObj: rawObject = {
-                    objectID: `${filename}_${currType}_${slugify(currId)}`,
-                    id: currId,
-                    type: currType,
-                    name_singular: currName![0],
-                    name_plural: currName![1],
-                    name_adjective: currName![2],
-                    description: currDesc,
-                    parentFilename: filename,
-                    sizes: currSize,
-                    allTokens: currTokens
-                };
-                results.push(builtObj);
+        // if (linenumber == 0) {
+        //     filename = line;
+        //     linenumber++;
+        //     return;
+        // }
+        // !!! This should be a yield function?
+        let m: RegExpExecArray | null;
+        while ((m = tokenRegex.exec(fdata)) !== null) {
+            // This is necessary to avoid infinite loops with zero-width matches
+            if (m.index === tokenRegex.lastIndex) {
+                tokenRegex.lastIndex++;
             }
-            currId = line.match(typere)![1];
-            currName = [];
-            currDesc = "";
-            currSize = [];
-            currTokens = [];
-            return;
-        }
-        if (re.descriptionToken.test(line)) {
-            currDesc = line.match(re.descriptionToken)![1];
-            return;
-        }
-        if (re.nameToken.test(line)) {
-            currName = line.match(re.nameToken)![1].split(':');
-            return;
-        }
-        if (re.bodySizeToken.test(line)) {
-            currSize.push(line.match(re.bodySizeToken)![1]);
-            return;
-        }
-        if (re.anyToken.test(line)) {
-            currTokens.push(line.match(re.anyToken)![1]);
-        }
-        // if (re.litterSizeToken.test(line)) {
-        //     currClutch = line.match(re.litterSizeToken)![1];
-        //     return;
-        // }
-        // if (re.clutchSizeToken.test(line)) {
-        //     currLitter = line.match(re.clutchSizeToken)![1];
-        //     return;
-        // }
-    });
+            let key = "", val = "";
+            // The result can be accessed through the `m`-variable.
+            m.forEach((match, groupIndex) => {
+                // Group 2 is key
+                if (groupIndex == 2) {
+                    key = match;
+                }
+                // Group 3 is value
+                if (groupIndex == 3) {
+                    val = match;
+                }
+            });
+            if (key !== "") {
+                console.log(`Parsing ${key}:${val}`);
+                if (val === "" && currObject !== undefined) {
+                    if (key.includes("ATTACK_FLAG")
+                        || key.includes("TL_")) {
+                        return;
+                    }
+                    // catch-all for all attribute tags
+                    if (currObject.type === "CREATURE") {
+                        (currObject as CreatureRaw).attributeTags.push(key);
+                    }
+                    // return;
+                }
 
-    rl.on("close", () => {
-        resolve(results);
-    })
-});
+                    console.log(`Switching on ${key}:${val}`);
+                    switch (key) {
+                        case "CREATURE":
+                            // Start of a creature object
+                            if (currObject !== undefined) {
+                                // if we already had an object, flush it
+                                results.push(currObject);
+                            }
+                            currObject = new CreatureRaw(filename, val);
+                            console.info("resetting currcasteind");
+                            currCasteInd = -1;
+                            break;
+                        case "NAME":
+                            // The name field has 3 values in the value field
+                            let names: string[] = val.split(':');
+                            (currObject as CreatureRaw).name = names[0];
+                            (currObject as CreatureRaw).nameList = names;
+                            break;
+                        case "DESCRIPTION":
+                            // Description is what it says on the tin
+                            (currObject as CreatureRaw).description = val;
+                            break;
+                        case "CHILD":
+                            // The child tag describes when the creature is done being a child
+                            (currObject as CreatureRaw).ageGrown = parseInt(val);
+                            break;
+                        case "MAXAGE":
+                            // The maxage tag describes a min and max for maximum age
+                            let maxageRange: number[] = val.split(':').map((s): number => parseInt(s));
+                            (currObject as CreatureRaw).oldAgeMax = maxageRange[1];
+                            (currObject as CreatureRaw).oldAgeMin = maxageRange[0];
+                            break;
+                        case "PREFSTRING":
+                            // Why is the creature admired
+                            (currObject as CreatureRaw).prefStrings.push(val);
+                            break;
+                        case "PETVALUE":
+                            (currObject as CreatureRaw).petValue = parseInt(val);
+                            break;
+                        case "CREATURE_TILE":
+                            (currObject as CreatureRaw).tile = val;
+                            break;
+                        case "CREATURE_CLASS":
+                            if ((currObject as CreatureRaw).class === "") {
+                                (currObject as CreatureRaw).class = val;
+                            }
+                            break;
+                        case "HOMEOTHERM":
+                            (currObject as CreatureRaw).bodyTemperature = parseInt(val);
+                            break;
+                        case "CLUSTER_SIZE":
+                            let clusterRange: number[] = val.split(':').map((s): number => parseInt(s));
+                            (currObject as CreatureRaw).clusterMin = clusterRange[0];
+                            (currObject as CreatureRaw).clusterMax = clusterRange[1];
+                            break;
+                        case "POPULATION_NUMBER":
+                            let popRange: number[] = val.split(':').map((s): number => parseInt(s));
+                            (currObject as CreatureRaw).populationMin = popRange[0];
+                            (currObject as CreatureRaw).populationMax = popRange[1];
+                            break;
+                        case "DIFFICULTY":
+                            (currObject as CreatureRaw).difficulty = parseInt(val);
+                            break;
+                        case "BIOME":
+                            (currObject as CreatureRaw).biome.push(val);
+                            break;
+                        case "NATURAL_SKILL":
+                            let skillSplit: string[] = val.split(':');
+                            (currObject as CreatureRaw).naturalSkills.push({
+                                skill: skillSplit[0],
+                                value: parseInt(skillSplit[1])
+                            });
+                            break;
+                        case "BODY_SIZE":
+                            let bodySizeSplit: number[] = val.split(':').map((s): number => parseInt(s));
+                            (currObject as CreatureRaw).size.push({
+                                years: bodySizeSplit[0],
+                                days: bodySizeSplit[1],
+                                size: bodySizeSplit[2]
+                            })
+                            break;
+                        case "CASTE":
+                            (currObject as CreatureRaw).castes.push(new CreatureCaste(val));
+                            currCasteInd = (currObject as CreatureRaw).castes.length - 1;
+                            console.log(`[CASTE:${val}] currCasteInd updated to ${currCasteInd}`);
+                            break;
+                        case "SELECT_CASTE":
+                            currCasteInd = (currObject as CreatureRaw).castes.findIndex((c) => c.id === val);
+                            console.log(`[SELECT_CASTE:${val}] currCasteInd updated to ${currCasteInd}`);
+                            break;
+                        case "EGG_SIZE":
+                            if (currCasteInd === -1) {
+                                console.warn(`${(currObject as CreatureRaw).name}: Reached EGG_SIZE outside of Caste definition`);
+                                break;
+                            }
+                            if ((currObject as CreatureRaw).castes[currCasteInd].egg === null) {
+                                (currObject as CreatureRaw).castes[currCasteInd].egg = new EggDescription();
+                            }
+                            (currObject as CreatureRaw).castes[currCasteInd].egg!.eggSize = parseInt(val);
+                            break;
+                        case "CLUTCH_SIZE":
+                            if (currCasteInd < 0) {
+                                console.warn("Reached CLUTCH_SIZE outside of Caste definition");
+                                break;
+                            }
+                            if ((currObject as CreatureRaw).castes[currCasteInd].egg === null) {
+                                (currObject as CreatureRaw).castes[currCasteInd].egg = new EggDescription();
+                            }
+                            let clutchRange: number[] = val.split(':').map((s): number => parseInt(s));
+                            (currObject as CreatureRaw).castes[currCasteInd].egg!.clutchMin = clutchRange[0];
+                            (currObject as CreatureRaw).castes[currCasteInd].egg!.clutchMax = clutchRange[1];
+                            break;
+                        case "CASTE_NAME":
+                            if (currCasteInd < 0) {
+                                console.warn("Reached CASTE_NAME outside of Caste definition");
+                                break;
+                            }
+                            (currObject as CreatureRaw).castes[currCasteInd].names = val.split(':');
+                            break;
+                    }
+                
+            }
+        }
+        console.dir(currObject);
+        
+        if (currObject !== undefined) {
+    results.push(currObject);
+        }
+    // process.exit(1);
+    resolve(results);
+    });
 }
 if (fs.existsSync("out.json"))
     fs.rmSync("out.json");
-let rawfiles = fs.readdirSync(rawspath);
-let parsepromies: Promise<rawObject[]>[] = [];
-for (let fname of rawfiles) {
-    if (fs.statSync(path.join(rawspath, fname)).isFile() && path.extname(fname) === ".txt") {
-        parsepromies.push(parseRawsFile(path.join(rawspath, fname)))
-    }
-}
-Promise.all(parsepromies).then(data => {
-    for (let d of data) {
-        if (d.length > 0) {
-            fs.writeFileSync("out.json",JSON.stringify(d),{
-            flag: "a"
-            })
-        }
-    }
-})
-rawfiles = fs.readdirSync(rawspath2);
-parsepromies = [];
-for (let fname of rawfiles) {
-    if (fs.statSync(path.join(rawspath2, fname)).isFile() && path.extname(fname) === ".txt") {
-        parsepromies.push(parseRawsFile(path.join(rawspath2, fname)))
-    }
-}
-Promise.all(parsepromies).then(data => {
-    for (let d of data) {
-        if (d.length > 0) {
-            fs.writeFileSync("out.json",JSON.stringify(d),{
-            flag: "a"
-            })
-        }
-    }
-})
+
+parseRawsFile('creature_domestic.txt').then(res => {
+    console.log(JSON.stringify(res, null, 2))
+});
