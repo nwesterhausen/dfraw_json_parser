@@ -13,6 +13,7 @@ pub struct Creature {
     pub clutch_size: [u32; 2],
     pub description: String,
     pub max_age: [u32; 2],
+    pub based_on: String,
 }
 
 impl Creature {
@@ -20,13 +21,14 @@ impl Creature {
         Self {
             identifier: String::from(id),
             parent_raw: String::from(raw),
-            name: String::from("unknown"),
-            description: String::from("unknown"),
+            name:  String::new(),
+            description:  String::new(),
             objectId: format!("{}-{}-{}", raw, "CREATURE", slugify(id)),
             lays_eggs: false,
             egg_size: 0,
             clutch_size: [0,0],
             max_age: [0,0],
+            based_on: String::new(),
         }
     }    
 }

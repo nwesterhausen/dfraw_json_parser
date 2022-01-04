@@ -3,6 +3,9 @@ use serde_json::to_string;
 use std::env;
 use std::fs::File;
 use std::io::{BufRead, BufReader};
+use slug::slugify;
+
+use encoding_rs_io::DecodeReaderBytesBuilder;
 
 mod creature;
 
@@ -20,18 +23,27 @@ fn main() {
         return;
     }
 
+    let enc = encoding_rs::Encoding::for_label("latin1".as_bytes());
+
     let n_args = args.len();
     for x in 1..n_args {
         let input_path = ::std::env::args().nth(x).unwrap();
         let file = File::open(&input_path).unwrap();
-        let reader = BufReader::new(file);
+        let decoding_reader = DecodeReaderBytesBuilder::new()
+            .encoding(enc)
+            .build(file);
+        let reader = BufReader::new(decoding_reader);
 
-        let mut creatures = 0;
+        // let mut creatures = 0;
         let mut raw_filename = String::new();
         let mut current_object = RawObjectKind::None;
         let mut creature_temp = creature::Creature::new("None", "None");
 
         for (index, line) in reader.lines().enumerate() {
+            if line.is_err() {
+                eprintln!("Error processing {}:{}", &input_path, index);
+                continue;
+            }
             let line = line.unwrap();
             if index == 0 {
                 raw_filename = String::from(&line);
@@ -41,7 +53,7 @@ fn main() {
                 // println!("Key: {} Value: {}", &cap[2], &cap[3])
                 if &cap[2] == "CREATURE" {
                     // We are starting a creature object capture
-                    creatures += 1;
+                    // creatures += 1;
                     match current_object {
                         RawObjectKind::Creature => {
                             // If we already *were* capturing a creature, export it.
@@ -85,6 +97,10 @@ fn main() {
                         split[0].parse().expect("MAXAGE min should be an integer");
                     creature_temp.max_age[1] =
                         split[1].parse().expect("MAXAGE max should be an integer");
+                    continue;
+                }
+                if &cap[2] == "COPY_TAGS_FROM" {
+                    creature_temp.based_on = format!("{}-{}-{}", raw_filename, "CREATURE", slugify(&cap[3]));
                     continue;
                 }
             }
