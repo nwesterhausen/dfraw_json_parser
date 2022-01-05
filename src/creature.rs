@@ -6,7 +6,8 @@ use serde::{Deserialize, Serialize};
 pub struct Creature {
     identifier: String,
     parent_raw: String,
-    objectId: String,
+    #[serde(rename = "objectId")]
+    object_id: String,
     pub name: String,
     pub lays_eggs: bool,
     pub egg_size: u32,
@@ -23,7 +24,7 @@ impl Creature {
             parent_raw: String::from(raw),
             name:  String::new(),
             description:  String::new(),
-            objectId: format!("{}-{}-{}", raw, "CREATURE", slugify(id)),
+            object_id: format!("{}-{}-{}", raw, "CREATURE", slugify(id)),
             lays_eggs: false,
             egg_size: 0,
             clutch_size: [0,0],
