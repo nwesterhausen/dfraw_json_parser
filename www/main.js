@@ -1,26 +1,38 @@
+// define a database to store all the records in
 let database = [];
+
+// grab the generated .json file to build the list
 fetch("./out.json")
   .then((response) => {
-    setStatus("Ready");
+    // convert from string to json
     return response.json();
   })
   .then((data) => {
-    document.getElementById(
-      "results"
-    ).innerHTML = `<p class="container">${data.length} creatures</p>`;
     database = data;
+    // populate records that have specified a COPY_FROM tag
     database = data.map(copyFromIfNeeded);
+    setStatus("Ready");
+  })
+  .catch((err) => {
+    window.alert(`Unable to grab the out.json or parse it correctly.\n${err.message}`);
   });
+
+// define the search bar and attach a listener
 const searchBar = document.getElementById("searchbar");
-searchBar.addEventListener("keyup", (e) => {
+searchBar.addEventListener("keyup",delay((e) => {
+  // when you type in teh searchbar, it will begin filtering results
   const searchString = e.target.value;
 
   setStatus("Searching");
   new Promise((resolve, reject) => {
+    // perform search filters
     const filteredCreatures = database.filter((creature) => {
       return (
+        // check if the search string is in the name
         creature.name.includes(searchString) ||
+        // check if the search string is in the name
         creature.description.includes(searchString) ||
+        // check if the search string is egg(s) to display all egg_layers
         ((searchString.toLowerCase() === "egg" ||
           searchString.toLowerCase() === "eggs") &&
           creature.lays_eggs)
@@ -32,10 +44,16 @@ searchBar.addEventListener("keyup", (e) => {
       return displayCreatures(filteredCreatures);
     })
     .then((displayCards) => {
+      // after building the HTML to populate the results, insert it into the page
       document.getElementById("results").innerHTML = displayCards;
       setStatus("Ready");
     });
-});
+}), 250);
+
+/**
+ * Change the status banner on the navbar. Displays as "warning" unless message is "Ready"
+ * @param {string} message what status to display
+ */
 function setStatus(message) {
   let statusField = document.getElementById("statusfield");
   if (message !== "Ready") {
@@ -48,49 +66,25 @@ function setStatus(message) {
   console.info(`Current status ${message}`);
   statusField.innerText = message;
 }
-function creatureToHTML(creature) {
-  return `<div class="card" style="width: 20rem;">
-<div class="card-body">
-<h5 class="card-title">${creature.name.split(":")[0]}</h5>
-<p class="text-muted">${creature.name.split(":").splice(0, 1).join(", ")}</p>
-<p class="card-text">${creature.description}</p>
-</div>
-<ul class="list-group list-group-flush">
-<li class="list-group-item">Lives ${creature.max_age.join(" - ")} years</li>
-<li class="list-group-item">${
-    creature.lays_eggs
-      ? "Lays " + creature.clutch_size.join(" - ") + " eggs per clutch"
-      : "Doesn't lay eggs."
-  }</li>
-</ul>
-<div class="card-body text-muted text-small">
-<h6>Rawfile: <strong>${creature.parent_raw}</strong></h6>
-<h6>ID: <strong>${creature.identifier}</strong></h6>
-</div>
-</div>`;
-}
-function displayCreatures(creatureArr) {
-  return `<div class="container"><div class="row row-cols-3">
-      <div class="col">${creatureArr
-        .map(creatureToHTML)
-        .join('</div><div class="col">')}</div>
-      </div></div>`;
-}
-function copyFromIfNeeded(creature) {
-  if (!creature.based_on) {
-    return creature;
-  }
-  let baseCreature = database.find((s) => s.objectId === creature.based_on);
-  if (!baseCreature) {
-    return creature;
-  }
-  console.info(`Copying info from ${baseCreature.name} to ${creature.name}`);
-  if (
-    creature.max_age[0] === creature.max_age[1] &&
-    creature.max_age[0] === 0
-  ) {
-    creature.max_age = baseCreature.max_age;
-  }
 
-  return creature;
+/**
+ * The delay function will return a wrapped function that internally handles an 
+ * individual timer, in each execution the timer is restarted with the time delay 
+ * provided, if multiple executions occur before this time passes, the timer will 
+ * just reset and start again.
+ * 
+ * When the timer finally ends, the callback function is executed, passing the original 
+ * context and arguments (in this example, the jQuery's event object, and the DOM element 
+ * as this).
+ * 
+ * @param {function} callback function to delay calling
+ * @param {number} ms time to delay in ms
+ * @returns {function} wrapped function
+ */
+ function delay(fn, ms) {
+  let timer = 0
+  return function(...args) {
+    clearTimeout(timer)
+    timer = setTimeout(fn.bind(this, ...args), ms || 0)
+  }
 }
