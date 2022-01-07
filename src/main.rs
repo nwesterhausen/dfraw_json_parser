@@ -1,13 +1,25 @@
+use clap::Parser;
+use encoding_rs_io::DecodeReaderBytesBuilder;
 use regex::Regex;
 use serde_json::to_string;
 use slug::slugify;
-use std::env;
 use std::fs::File;
 use std::io::{BufRead, BufReader};
-
-use encoding_rs_io::DecodeReaderBytesBuilder;
+use walkdir::WalkDir;
 
 mod creature;
+
+#[derive(Parser, Debug)]
+#[clap(about, version, author)]
+struct Args {
+    /// Path to raw file directory
+    #[clap(short, long)]
+    raw_dir: String,
+
+    /// Path to save JSON database
+    #[clap(short, long, default_value = "./www/")]
+    out_dir: String,
+}
 
 enum RawObjectKind {
     Creature,
@@ -15,15 +27,24 @@ enum RawObjectKind {
 }
 
 fn main() {
-    let args: Vec<_> = env::args().collect();
-    if args.len() == 1 {
-        println!("Usage: {} raw_file(s)", args[0]);
-        return;
-    }
+    let args = Args::parse();
 
-    let n_args = args.len();
-    for x in 1..n_args {
-        parse_file(::std::env::args().nth(x).unwrap())
+    if !args.raw_dir.is_empty() {
+        parse_directory(args.raw_dir);
+    }
+}
+
+fn parse_directory(directory_path: String) {
+    // Read all the files in the directory, selectively parse the .txt files
+    for entry in WalkDir::new(directory_path)
+        .into_iter()
+        .filter_map(|e| e.ok())
+    {
+        let f_name = entry.file_name().to_string_lossy();
+
+        if f_name.ends_with(".txt") {
+            parse_file(entry.path().to_string_lossy().to_string())
+        }
     }
 }
 
