@@ -4,7 +4,8 @@ use regex::Regex;
 use serde_json::to_string;
 use slug::slugify;
 use std::fs::File;
-use std::io::{BufRead, BufReader};
+use std::io::{BufRead, BufReader, BufWriter, Write};
+use std::path::{Path, PathBuf};
 use walkdir::WalkDir;
 
 mod creature;
@@ -31,11 +32,13 @@ fn main() {
 
     if !args.raw_dir.is_empty() {
         // If a directory for raws was specified, we will parse what raws we find
-        parse_directory(args.raw_dir, args.out_dir);
+        parse_directory(args.raw_dir, Path::new(&args.out_dir).to_path_buf());
     }
 }
 
-fn parse_directory(raws_directory: String, out_directory: String) {
+fn parse_directory(raws_directory: String, out_directory: PathBuf) {
+    let mut json_strings: Vec<String> = Vec::new();
+
     // Read all the files in the directory, selectively parse the .txt files
     for entry in WalkDir::new(raws_directory)
         .into_iter()
@@ -44,12 +47,25 @@ fn parse_directory(raws_directory: String, out_directory: String) {
         let f_name = entry.file_name().to_string_lossy();
 
         if f_name.ends_with(".txt") {
-            parse_file(entry.path().to_string_lossy().to_string())
+            json_strings.append(&mut parse_file(entry.path().to_string_lossy().to_string()))
         }
     }
+    // The destination file is out.json inside the out_directory
+    let out_filepath = out_directory.join("out.json");
+    let out_file =
+        File::create(&out_filepath.as_path()).expect("Unable to open out.json for writing");
+
+    let mut stream = BufWriter::new(out_file);
+    let write_error = &format!("Unable to write to {}", out_filepath.to_string_lossy());
+    write!(stream, "[").expect(write_error);
+
+    write!(stream, "{}", json_strings.join(",")).expect(write_error);
+
+    write!(stream, "]").expect(write_error);
+    stream.flush().expect(write_error);
 }
 
-fn parse_file(input_path: String) {
+fn parse_file(input_path: String) -> Vec<String> {
     let re = Regex::new(r"(\[(?P<key>[^\[:]+):?(?P<value>[^\]\[]*)])").unwrap();
 
     let enc = encoding_rs::Encoding::for_label("latin1".as_bytes());
@@ -62,6 +78,8 @@ fn parse_file(input_path: String) {
     let mut raw_filename = String::new();
     let mut current_object = RawObjectKind::None;
     let mut creature_temp = creature::Creature::new("None", "None");
+
+    let mut results: Vec<String> = Vec::new();
 
     for (index, line) in reader.lines().enumerate() {
         if line.is_err() {
@@ -84,7 +102,9 @@ fn parse_file(input_path: String) {
                             // If we already *were* capturing a creature, export it.
                             // Reset the temp values !!Todo
                             //println!("{:#?}", creature_temp);
-                            println!("{},", to_string(&creature_temp).unwrap());
+                            // writeln!(stream, "{},", to_string(&creature_temp).unwrap())
+                            //  .expect("Unable to write creature info to out.json.");
+                            results.push(format!("{}", to_string(&creature_temp).unwrap()));
                         }
                         RawObjectKind::None => (),
                     }
@@ -139,9 +159,10 @@ fn parse_file(input_path: String) {
             // println!("Finished capturing creature, now finished");
             // Reset the temp values !!Todo
             //println!("{:#?}", creature_temp);
-            println!("{}", to_string(&creature_temp).unwrap());
+            results.push(format!("{}", to_string(&creature_temp).unwrap()));
         }
         RawObjectKind::None => (),
     }
     // println!("{} creatures defined in {}", creatures, &raw_filename);
+    results
 }
