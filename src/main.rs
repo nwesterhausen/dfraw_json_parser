@@ -47,7 +47,9 @@ fn parse_directory(raws_directory: String, out_directory: PathBuf) {
         let f_name = entry.file_name().to_string_lossy();
 
         if f_name.ends_with(".txt") {
-            json_strings.append(&mut parse_file(entry.path().to_string_lossy().to_string()))
+            let entry_path = entry.path().to_string_lossy().to_string();
+            println!("parsing {}", &entry_path);
+            json_strings.append(&mut parse_file(entry_path))
         }
     }
     // The destination file is out.json inside the out_directory
@@ -69,8 +71,6 @@ fn parse_directory(raws_directory: String, out_directory: PathBuf) {
 fn parse_file(input_path: String) -> Vec<String> {
     let re = Regex::new(r"(\[(?P<key>[^\[:]+):?(?P<value>[^\]\[]*)])").unwrap();
     let enc = encoding_rs::Encoding::for_label("latin1".as_bytes());
-
-    println!("Parsing {}", &input_path);
 
     let file = File::open(&input_path).unwrap();
     let decoding_reader = DecodeReaderBytesBuilder::new().encoding(enc).build(file);
@@ -104,23 +104,28 @@ fn parse_file(input_path: String) -> Vec<String> {
                     }
                     &_ => {
                         println!("No support right now for OBJECT:{}", &cap[3]);
-                        current_object = RawObjectKind::None;
+                        return results;
+                        // current_object = RawObjectKind::None;
                     }
                 },
                 "CREATURE" => {
                     // We are starting a creature object capture
-                    // creatures += 1;
-                    if started {
-                        // If we already *were* capturing a creature, export it.
-                        // Reset the temp values !!Todo
-                        //println!("{:#?}", creature_temp);
-                        // writeln!(stream, "{},", to_string(&creature_temp).unwrap())
-                        //  .expect("Unable to write creature info to out.json.");
-                        results.push(format!("{}", to_string(&creature_temp).unwrap()));
-                    } else {
-                        started = true;
+                    match current_object {
+                        RawObjectKind::Creature => {
+                            if started {
+                                // If we already *were* capturing a creature, export it.
+                                // Reset the temp values !!Todo
+                                //println!("{:#?}", creature_temp);
+                                // writeln!(stream, "{},", to_string(&creature_temp).unwrap())
+                                //  .expect("Unable to write creature info to out.json.");
+                                results.push(format!("{}", to_string(&creature_temp).unwrap()));
+                            } else {
+                                started = true;
+                            }
+                            creature_temp = creature::Creature::new(&raw_filename, &cap[3]);
+                        }
+                        RawObjectKind::None => (),
                     }
-                    creature_temp = creature::Creature::new(&raw_filename, &cap[3]);
                     continue;
                 }
                 "NAME" => {
