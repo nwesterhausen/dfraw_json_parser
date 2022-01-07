@@ -13,11 +13,11 @@ mod creature;
 #[clap(about, version, author)]
 struct Args {
     /// Path to raw file directory
-    #[clap(short, long)]
+    #[clap(short, long, default_value_t = String::new())]
     raw_dir: String,
 
     /// Path to save JSON database
-    #[clap(short, long, default_value = "./www/")]
+    #[clap(short, long, default_value_t = String::from("./www/"))]
     out_dir: String,
 }
 
@@ -30,13 +30,14 @@ fn main() {
     let args = Args::parse();
 
     if !args.raw_dir.is_empty() {
-        parse_directory(args.raw_dir);
+        // If a directory for raws was specified, we will parse what raws we find
+        parse_directory(args.raw_dir, args.out_dir);
     }
 }
 
-fn parse_directory(directory_path: String) {
+fn parse_directory(raws_directory: String, out_directory: String) {
     // Read all the files in the directory, selectively parse the .txt files
-    for entry in WalkDir::new(directory_path)
+    for entry in WalkDir::new(raws_directory)
         .into_iter()
         .filter_map(|e| e.ok())
     {
