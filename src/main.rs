@@ -13,9 +13,9 @@ mod creature;
 #[derive(Parser, Debug)]
 #[clap(about, version, author)]
 struct Args {
-    /// Path to raw file directory
+    /// Path to raw files directory
     #[clap(short, long, default_value_t = String::new())]
-    raw_dir: String,
+    raws_dir: String,
 
     /// Path to save JSON database
     #[clap(short, long, default_value_t = String::from("./www/"))]
@@ -30,9 +30,9 @@ enum RawObjectKind {
 fn main() {
     let args = Args::parse();
 
-    if !args.raw_dir.is_empty() {
+    if !args.raws_dir.is_empty() {
         // If a directory for raws was specified, we will parse what raws we find
-        parse_directory(args.raw_dir, Path::new(&args.out_dir).to_path_buf());
+        parse_directory(args.raws_dir, Path::new(&args.out_dir).to_path_buf());
     }
 }
 
@@ -60,6 +60,7 @@ fn parse_directory(raws_directory: String, out_directory: PathBuf) {
     write!(stream, "[").expect(write_error);
 
     write!(stream, "{}", json_strings.join(",")).expect(write_error);
+    stream.flush().expect(write_error);
 
     write!(stream, "]").expect(write_error);
     stream.flush().expect(write_error);
@@ -67,8 +68,9 @@ fn parse_directory(raws_directory: String, out_directory: PathBuf) {
 
 fn parse_file(input_path: String) -> Vec<String> {
     let re = Regex::new(r"(\[(?P<key>[^\[:]+):?(?P<value>[^\]\[]*)])").unwrap();
-
     let enc = encoding_rs::Encoding::for_label("latin1".as_bytes());
+
+    println!("Parsing {}", &input_path);
 
     let file = File::open(&input_path).unwrap();
     let decoding_reader = DecodeReaderBytesBuilder::new().encoding(enc).build(file);
@@ -77,6 +79,7 @@ fn parse_file(input_path: String) -> Vec<String> {
     // let mut creatures = 0;
     let mut raw_filename = String::new();
     let mut current_object = RawObjectKind::None;
+    let mut started = false;
     let mut creature_temp = creature::Creature::new("None", "None");
 
     let mut results: Vec<String> = Vec::new();
@@ -94,21 +97,29 @@ fn parse_file(input_path: String) -> Vec<String> {
         for cap in re.captures_iter(&line) {
             // println!("Key: {} Value: {}", &cap[2], &cap[3])
             match &cap[2] {
+                "OBJECT" => match &cap[3] {
+                    "CREATURE" => {
+                        println!("Discovered raws for creatures.");
+                        current_object = RawObjectKind::Creature;
+                    }
+                    &_ => {
+                        println!("No support right now for OBJECT:{}", &cap[3]);
+                        current_object = RawObjectKind::None;
+                    }
+                },
                 "CREATURE" => {
                     // We are starting a creature object capture
                     // creatures += 1;
-                    match current_object {
-                        RawObjectKind::Creature => {
-                            // If we already *were* capturing a creature, export it.
-                            // Reset the temp values !!Todo
-                            //println!("{:#?}", creature_temp);
-                            // writeln!(stream, "{},", to_string(&creature_temp).unwrap())
-                            //  .expect("Unable to write creature info to out.json.");
-                            results.push(format!("{}", to_string(&creature_temp).unwrap()));
-                        }
-                        RawObjectKind::None => (),
+                    if started {
+                        // If we already *were* capturing a creature, export it.
+                        // Reset the temp values !!Todo
+                        //println!("{:#?}", creature_temp);
+                        // writeln!(stream, "{},", to_string(&creature_temp).unwrap())
+                        //  .expect("Unable to write creature info to out.json.");
+                        results.push(format!("{}", to_string(&creature_temp).unwrap()));
+                    } else {
+                        started = true;
                     }
-                    current_object = RawObjectKind::Creature;
                     creature_temp = creature::Creature::new(&raw_filename, &cap[3]);
                     continue;
                 }
