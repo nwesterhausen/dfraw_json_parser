@@ -1,4 +1,4 @@
-$saveFolder = "C:\Users\nwest\scoop\apps\dwarf-fortress\0.47.05\data\save\region1\raw";
+$saveFolder = "$env:userprofile\scoop\apps\dwarf-fortress\0.47.05\data\save\region1\raw";
 
 $raws = Get-ChildItem -Path $saveFolder -Include *.txt -Recurse | Where-Object { ! $_.PSIsContainer }
 $outPath = '.\www\out.json'

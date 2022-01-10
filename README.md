@@ -25,7 +25,7 @@ animal, if they laid eggs, if they were milkable, and how big they were.
     - egg size
     - clutch size
     - max age
-    - copy tags from (id for what creature the creature is based on)
+    - copy tags from (id for what creature the creature is based on) *handled in the web client*
 
 ## Rust Program
 
@@ -36,6 +36,12 @@ There is a powershell runner `run-rust.ps1` which you can put the directory you 
 and it will create the out.json file.
 
 ### How to use
+
+#### Download Release
+
+1. run the `df-raw-lookup` executable of your choice
+
+#### Build Yourself
 
 (Requires rust and cargo installed on your local machine.)
 
@@ -49,6 +55,8 @@ and it will create the out.json file.
 The web client is just some HTML and javascript (including bootstrap via CDN) to display the raws
 and provide a search box. It won't properly grab the out.json file unless the index.html is being 
 served by a web server (can be done locally by running one).
+
+Right now there is no http-server built into this program, that is an exercise for the reader (at this time).
 
 ## Perl script
 
