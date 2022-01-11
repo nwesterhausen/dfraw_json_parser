@@ -2,6 +2,7 @@ use clap::Parser;
 use std::path::Path;
 
 mod parser;
+mod server;
 
 const HELP_RAWS_DIR: &str = "Specify the directory containing the raw files.
 
@@ -51,10 +52,10 @@ fn main() {
 
     if !args.raws_dir.is_empty() {
         // If a directory for raws was specified, we will parse what raws we find
-        parser::parser::parse_directory(args.raws_dir, Path::new(&args.out_dir).to_path_buf());
+        parser::parse_directory(args.raws_dir, Path::new(&args.out_dir).to_path_buf());
     }
 
     if args.serve {
-        println!("Begin serving the web client! (NOT IMPLEMENTED YET)");
+        server::serve_files(args.out_dir, args.port);
     }
 }

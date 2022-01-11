@@ -11,12 +11,11 @@ was displayed in basically the same format as the raw file itself, so it was har
 
 ## Current Functionality
 
-Both the perl script and the rust program create JSON from Dwarf Fortress raw files. This JSON
-can be used with the small web client to search through, be plopped into Algolia and search or, 
-you could simply CTRL+F or grep for what you are looking for in the file itself. I find the JSON
-easier to read than the RAW txt files, and it currently doesn't include a lot of items that were
-not important to me when looking up creatures. I was most concerned with the description of the 
-animal, if they laid eggs, if they were milkable, and how big they were. 
+Creates JSON from Dwarf Fortress raw files. This JSON can be used with the small web client to search 
+through, be plopped into Algolia and search or, you could simply CTRL+F or grep for what you are looking 
+for in the file itself. I find the JSON easier to read than the RAW txt files, and it currently doesn't 
+include a lot of items that were not important to me when looking up creatures. I was most concerned with 
+the description of the animal, if they laid eggs, if they were milkable, and how big they were. 
 
 - Parses raw files for creatures
 - Saves the following creature information to the JSON databse:
@@ -31,15 +30,62 @@ animal, if they laid eggs, if they were milkable, and how big they were.
 
 A rust program which will parse a directory for DF raw files and then output the raws as JSON
 to be consumed by the simple web client in www/ for simple search and display functionality.
+The rust program is capable of serving the web client itself.
 
-There is a powershell runner `run-rust.ps1` which you can put the directory you want to search into
-and it will create the out.json file.
+```
+USAGE:
+    df-raw-lookup.exe [OPTIONS]
+
+OPTIONS:
+    -h, --help
+            Print help information
+
+    -o, --out-dir <OUT_DIR>
+            Specify the directory that the JSON database should be saved into.
+
+            If raw files are parsed, a JSON database (an array of objects) is
+            saved to disk in a location specified by this argument. This will
+            create an 'out.json' file in the directory specified by this argument.
+
+            [default: ./www/]
+
+    -p, --port <PORT>
+            NOT IMPLEMENTED Specify the port to run the web server on.
+
+            [default: 4501]
+
+    -r, --raws-dir <RAWS_DIR>
+            Specify the directory containing the raw files.
+
+            This usually is a directory named 'raw' in the save or game directory.
+            If this is left unspecified, no raws will be parsed when running.
+
+            [default: ]
+
+    -s, --serve
+            NOT IMPLEMENTED Use this flag to start a web server for the web search client.
+
+            Included in the repository is a 'www' folder with a small web client
+            that will fetch the JSON database created by this program (out.json)
+            and present it in a searchable manner to the user.
+
+            If you include this flag, after any parsing is done, a tiny HTTP server
+            will start server files from the directory specified by 'out-dir' which
+            defaults to ./www
+
+    -V, --version
+            Print version information
+```
 
 ### How to use
 
 #### Download Release
 
-1. run the `df-raw-lookup` executable of your choice
+1. download a build from the [releases]() page
+2. run `df-raw-lookup --raws-dir [DIRECTORY] --serve`
+
+    It will parse your raws in the directory provided, create a JSON file, and then serve
+    a small web client for easy searching.
 
 #### Build Yourself
 
@@ -49,14 +95,6 @@ and it will create the out.json file.
 2. run `cargo build`
 3. edit `run-rust.ps1` to include the correct directory
 4. run `run-rust.ps1` and the `out.json` file will be created in the `www/` directory
-
-## Web Client
-
-The web client is just some HTML and javascript (including bootstrap via CDN) to display the raws
-and provide a search box. It won't properly grab the out.json file unless the index.html is being 
-served by a web server (can be done locally by running one).
-
-Right now there is no http-server built into this program, that is an exercise for the reader (at this time).
 
 ## Perl script
 
