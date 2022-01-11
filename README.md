@@ -50,7 +50,7 @@ OPTIONS:
             [default: ./www/]
 
     -p, --port <PORT>
-            NOT IMPLEMENTED Specify the port to run the web server on.
+            Specify the port to run the web server on.
 
             [default: 4501]
 
@@ -63,7 +63,7 @@ OPTIONS:
             [default: ]
 
     -s, --serve
-            NOT IMPLEMENTED Use this flag to start a web server for the web search client.
+            Use this flag to start a web server for the web search client.
 
             Included in the repository is a 'www' folder with a small web client
             that will fetch the JSON database created by this program (out.json)
