@@ -1,3 +1,4 @@
+use super::raws::names;
 use serde::{Deserialize, Serialize};
 use slug::slugify;
 
@@ -7,7 +8,8 @@ pub struct Creature {
     parent_raw: String,
     #[serde(rename = "objectId")]
     object_id: String,
-    pub name: String,
+    pub names: Vec<names::Name>,
+    pub child_names: Vec<names::ChildName>,
     pub lays_eggs: bool,
     pub egg_size: u32,
     pub clutch_size: [u32; 2],
@@ -21,7 +23,8 @@ impl Creature {
         Self {
             identifier: String::from(id),
             parent_raw: String::from(raw),
-            name: String::new(),
+            names: Vec::new(),
+            child_names: Vec::new(),
             description: String::new(),
             object_id: format!("{}-{}-{}", raw, "CREATURE", slugify(id)),
             lays_eggs: false,

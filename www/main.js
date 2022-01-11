@@ -9,8 +9,13 @@ fetch("./out.json")
   })
   .then((data) => {
     database = data;
+    setStatus("Copying data for COPY_FROM tags")
     // populate records that have specified a COPY_FROM tag
-    database = data.map(copyFromIfNeeded);
+    return data.map(copyFromIfNeeded);
+  })
+  .then((data) => {
+    setStatus("Flattening names")
+    database = data.map(flattenNames);
     setStatus("Ready");
   })
   .catch((err) => {
@@ -29,7 +34,7 @@ searchBar.addEventListener("keyup",delay((e) => {
     const filteredCreatures = database.filter((creature) => {
       return (
         // check if the search string is in the name
-        creature.name.includes(searchString) ||
+        creature.namesFlattened.join("*").includes(searchString) ||
         // check if the search string is in the name
         creature.description.includes(searchString) ||
         // check if the search string is egg(s) to display all egg_layers
@@ -48,7 +53,7 @@ searchBar.addEventListener("keyup",delay((e) => {
       document.getElementById("results").innerHTML = displayCards;
       setStatus("Ready");
     });
-}), 250);
+}), 500);
 
 /**
  * Change the status banner on the navbar. Displays as "warning" unless message is "Ready"

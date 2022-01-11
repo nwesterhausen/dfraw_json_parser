@@ -6,6 +6,7 @@ use std::fs::File;
 use std::io::{BufRead, BufReader};
 
 use super::creature;
+use super::raws::names;
 
 enum RawObjectKind {
     Creature,
@@ -73,7 +74,21 @@ pub fn parse_file(input_path: String) -> Vec<String> {
                     continue;
                 }
                 "NAME" => {
-                    creature_temp.name = String::from(&cap[3]);
+                    creature_temp
+                        .names
+                        .push(names::Name::new(String::from(&cap[3])));
+                    continue;
+                }
+                "CASTE_NAME" => {
+                    creature_temp
+                        .names
+                        .push(names::Name::new(String::from(&cap[3])));
+                    continue;
+                }
+                "GENERAL_CHILD_NAME" => {
+                    creature_temp
+                        .child_names
+                        .push(names::ChildName::new(String::from(&cap[3])));
                     continue;
                 }
                 "EGG_SIZE" => {

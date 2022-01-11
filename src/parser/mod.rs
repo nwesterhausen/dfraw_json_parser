@@ -5,6 +5,7 @@ use walkdir::WalkDir;
 
 mod creature;
 mod raws;
+mod reader;
 
 pub fn parse_directory(raws_directory: String, out_directory: PathBuf) {
     let mut json_strings: Vec<String> = Vec::new();
@@ -19,7 +20,7 @@ pub fn parse_directory(raws_directory: String, out_directory: PathBuf) {
         if f_name.ends_with(".txt") {
             let entry_path = entry.path().to_string_lossy().to_string();
             // println!("parsing {}", &entry_path);
-            json_strings.append(&mut raws::parse_file(entry_path))
+            json_strings.append(&mut reader::parse_file(entry_path))
         }
     }
     // The destination file is out.json inside the out_directory

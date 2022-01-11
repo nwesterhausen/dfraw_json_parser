@@ -1,13 +1,13 @@
 /**
  * Turn a Creature object into a card for display purposes.
- * @param {Creature} creature 
+ * @param {Creature} creature
  * @returns html string of creature card
  */
 function creatureToHTML(creature) {
   return `<div class="card" style="width: 20rem;">
   <div class="card-body">
-  <h5 class="card-title">${creature.name.split(":")[0]}</h5>
-  <p class="text-muted">${creature.name.split(":").splice(0, 1).join(", ")}</p>
+  <h5 class="card-title">${creature.names[0].singular}</h5>
+  <p class="text-muted">${creature.namesFlattened.join(", ")}</p>
   <p class="card-text">${creature.description}</p>
   </div>
   <ul class="list-group list-group-flush">
@@ -40,7 +40,7 @@ function displayCreatures(creatureArr) {
 
 /**
  * Update Creature object with the information stored in the COPY_FROM creature
- * @param {Creature} creature 
+ * @param {Creature} creature
  * @returns creature after copying missing attributes from the database
  */
 function copyFromIfNeeded(creature) {
@@ -60,4 +60,28 @@ function copyFromIfNeeded(creature) {
   }
 
   return creature;
+}
+
+function flattenNames(creature) {
+  if (creature.names.length === 0) {
+    creature.namesFlattened = [];
+    return creature;
+  }
+  if (creature.names.length === 1) {
+    creature.namesFlattened = arrayizeNames(creature.names[0]);
+    return creature;
+  }
+  let tmp = [];
+  for (let names of creature.names) {
+    tmp.push(arrayizeNames(names));
+  }
+  for (let names of creature.child_names) {    
+    tmp.push(arrayizeNames(names));
+  }
+  creature.namesFlattened = [...new Set(tmp.flat(1))];
+  return creature;
+}
+
+function arrayizeNames(names) {
+  return Object.values(names);
 }
