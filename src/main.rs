@@ -15,7 +15,7 @@ If raw files are parsed, a JSON database (an array of objects) is
 saved to disk in a location specified by this argument. This will
 create an 'out.json' file in the directory specified by this argument.";
 
-const HELP_SERVE: &str = "NOT IMPLEMENTED Use this flag to start a web server for the web search client.
+const HELP_SERVE: &str = "Include this flag to start a web server for the web search client.
 
 Included in the repository is a 'www' folder with a small web client
 that will fetch the JSON database created by this program (out.json)
@@ -25,7 +25,7 @@ If you include this flag, after any parsing is done, a tiny HTTP server
 will start server files from the directory specified by 'out-dir' which
 defaults to ./www";
 
-const HELP_PORT: &str = "NOT IMPLEMENTED Specify the port to run the web server on.";
+const HELP_PORT: &str = "Specify the port to run the web server on.";
 
 #[derive(Parser, Debug)]
 #[clap(about, version, author)]
