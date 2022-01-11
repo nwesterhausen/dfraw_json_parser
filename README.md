@@ -60,13 +60,6 @@ Right now there is no http-server built into this program, that is an exercise f
 
 ## Perl script
 
-A perl script to selectively parse raw files. Could be expanded to pull more data out of raw files 
-instead of just creatures.
-
-### How to use
-
-(Requires perl installed on your local machine.)
-
-1. clone this repo
-3. edit `run-perl.ps1` to include the correct directory
-4. run `run-perl.ps1` and the `out.json` file will be created in the `www/` directory 
+This all started with a perl script, I've archived that to a 
+[gist](https://gist.github.com/nwesterhausen/2fe7775aef7d5f40fd0ababf7d711fa7) since it lost feature 
+parity (and object similarity) to this project.
