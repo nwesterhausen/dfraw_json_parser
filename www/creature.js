@@ -4,7 +4,7 @@
  * @returns html string of creature card
  */
 function creatureToHTML(creature) {
-  return `<div class="card" style="width: 20rem;">
+  return `<div class="card m-1" style="width: 20rem;">
   <div class="card-body">
   <h5 class="card-title">${creature.names[0].singular}</h5>
   <p class="text-muted">${creature.namesFlattened.join(", ")}</p>
@@ -31,10 +31,10 @@ function creatureToHTML(creature) {
  * @returns html string of all creatures as cards for display
  */
 function displayCreatures(creatureArr) {
-  return `<div class="container"><div class="row row-cols-3">
-        <div class="col">${creatureArr
+  return `<div class="container-fluid"><div class="d-flex flex-wrap">
+        ${creatureArr
           .map(creatureToHTML)
-          .join('</div><div class="col">')}</div>
+          .join('')}
         </div></div>`;
 }
 
