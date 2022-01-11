@@ -44,7 +44,7 @@ struct Args {
 
     /// Port to serve the web client on
     #[clap(short, long, default_value_t = 4501, long_help = HELP_PORT)]
-    port: u16
+    port: u16,
 }
 
 fn main() {

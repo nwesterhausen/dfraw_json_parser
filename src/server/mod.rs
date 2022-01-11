@@ -1,5 +1,4 @@
 pub fn serve_files(directory: String, port: u16) {
-    
     let server_string = format!("localhost:{}", port);
     println!("Starting server at http://{}", server_string);
 
