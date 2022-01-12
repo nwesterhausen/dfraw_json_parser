@@ -4,12 +4,11 @@ use std::io::{BufWriter, Write};
 use std::path::PathBuf;
 use walkdir::WalkDir;
 
-mod creature;
 mod raws;
 mod reader;
 
 pub fn parse_directory(raws_directory: String, out_directory: PathBuf) {
-    let mut creatures: Vec<creature::Creature> = Vec::new();
+    let mut creatures: Vec<raws::creature::DFCreature> = Vec::new();
 
     // Read all the files in the directory, selectively parse the .txt files
     for entry in WalkDir::new(raws_directory)
@@ -40,7 +39,7 @@ pub fn parse_directory(raws_directory: String, out_directory: PathBuf) {
     stream.flush().expect(write_error);
 }
 
-fn stringify_raw_vec(raws: Vec<creature::Creature>) -> Vec<String> {
+fn stringify_raw_vec(raws: Vec<raws::creature::DFCreature>) -> Vec<String> {
     let mut results: Vec<String> = Vec::new();
     for creature in raws {
         results.push(format!("{}", to_string(&creature).unwrap()));
