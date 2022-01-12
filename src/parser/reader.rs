@@ -1,6 +1,5 @@
 use encoding_rs_io::DecodeReaderBytesBuilder;
 use regex::Regex;
-use serde_json::to_string;
 use slug::slugify;
 use std::fs::File;
 use std::io::{BufRead, BufReader};
@@ -13,7 +12,7 @@ enum RawObjectKind {
     None,
 }
 
-pub fn parse_file(input_path: String) -> Vec<String> {
+pub fn parse_file(input_path: String) -> Vec<creature::Creature> {
     let re = Regex::new(r"(\[(?P<key>[^\[:]+):?(?P<value>[^\]\[]*)])").unwrap();
     let enc = encoding_rs::Encoding::for_label("latin1".as_bytes());
 
@@ -27,7 +26,7 @@ pub fn parse_file(input_path: String) -> Vec<String> {
     let mut started = false;
     let mut creature_temp = creature::Creature::new("None", "None");
 
-    let mut results: Vec<String> = Vec::new();
+    let mut results: Vec<creature::Creature> = Vec::new();
 
     for (index, line) in reader.lines().enumerate() {
         if line.is_err() {
@@ -63,7 +62,7 @@ pub fn parse_file(input_path: String) -> Vec<String> {
                                 //println!("{:#?}", creature_temp);
                                 // writeln!(stream, "{},", to_string(&creature_temp).unwrap())
                                 //  .expect("Unable to write creature info to out.json.");
-                                results.push(format!("{}", to_string(&creature_temp).unwrap()));
+                                results.push(creature_temp);
                             } else {
                                 started = true;
                             }
@@ -88,7 +87,7 @@ pub fn parse_file(input_path: String) -> Vec<String> {
                 "GENERAL_CHILD_NAME" => {
                     creature_temp
                         .child_names
-                        .push(names::ChildName::new(String::from(&cap[3])));
+                        .push(names::SingPlurName::new(String::from(&cap[3])));
                     continue;
                 }
                 "EGG_SIZE" => {
@@ -134,7 +133,7 @@ pub fn parse_file(input_path: String) -> Vec<String> {
             // println!("Finished capturing creature, now finished");
             // Reset the temp values !!Todo
             //println!("{:#?}", creature_temp);
-            results.push(format!("{}", to_string(&creature_temp).unwrap()));
+            results.push(creature_temp);
         }
         RawObjectKind::None => (),
     }

@@ -28,12 +28,12 @@ impl Name {
 }
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
-pub struct ChildName {
+pub struct SingPlurName {
     singular: String,
     plural: String,
 }
 
-impl ChildName {
+impl SingPlurName {
     pub fn new(argument_text: String) -> Self {
         let mut arg_names: Vec<&str> = argument_text.split(":").collect::<Vec<&str>>();
         let mut names: Vec<&str> = Vec::new();
