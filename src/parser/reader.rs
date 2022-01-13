@@ -94,10 +94,10 @@ pub fn parse_file(input_path: String) -> Vec<creature::DFCreature> {
                 "MILKABLE" => {
                     let split = cap[3].split(":").collect::<Vec<&str>>();
                     match split.len() {
-                        2 => {
+                        3 => {
                             caste_temp.milkable = creature::DFMilkable::new(
-                                &split[0],
-                                split[1]
+                                &format!("{}:{}",split[0],split[1]),
+                                split[2]
                                     .parse()
                                     .expect("Bad frequency argument for body size"),
                             )
