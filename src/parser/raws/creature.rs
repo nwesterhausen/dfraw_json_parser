@@ -22,6 +22,7 @@ pub struct DFCreature {
     pub local_pops_controllable: bool,
     pub local_pops_produce_heroes: bool,
     pub loose_clusters: bool,
+    pub mundane: bool,
     pub savage: bool,
     pub ubiquitous: bool,
     pub vermin_eater: bool,
@@ -29,13 +30,14 @@ pub struct DFCreature {
     pub vermin_grounder: bool,
     pub vermin_rotter: bool,
     pub vermin_soil: bool,
+    pub vermin_soil_colony: bool,
 
     // integers
     pub frequency: u16, //Defaults to 50 if not specified
 
     // [min, max] ranges
-    cluster_number: [u16; 2],    //Defaults to 1:1 if not specified.
-    population_number: [u16; 2], //default 1:1
+    pub cluster_number: [u16; 2],    //Defaults to 1:1 if not specified.
+    pub population_number: [u16; 2], //default 1:1
 
     // strings
     pub general_baby_name: SingPlurName,
@@ -99,7 +101,6 @@ pub struct DFCreatureCaste {
     pub mount_exotic: bool,
     pub multipart_full_vision: bool,
     pub multiple_litter_rare: bool,
-    pub mundane: bool,
     pub natural: bool,
     pub no_connections_for_movement: bool,
     pub no_dizziness: bool,
@@ -244,6 +245,7 @@ impl DFCreature {
             local_pops_controllable: false,
             local_pops_produce_heroes: false,
             loose_clusters: false,
+            mundane: false,
             savage: false,
             ubiquitous: false,
             vermin_eater: false,
@@ -251,6 +253,7 @@ impl DFCreature {
             vermin_grounder: false,
             vermin_rotter: false,
             vermin_soil: false,
+            vermin_soil_colony: false,
 
             // integers
             frequency: 50, //Defaults to 50 if not specified
@@ -324,7 +327,6 @@ impl DFCreatureCaste {
             mount_exotic: false,
             multipart_full_vision: false,
             multiple_litter_rare: false,
-            mundane: false,
             natural: false,
             no_connections_for_movement: false,
             no_dizziness: false,
