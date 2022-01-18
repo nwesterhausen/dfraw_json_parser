@@ -26,7 +26,11 @@ impl Name {
         }
     }
     pub fn to_string_vec(&self) -> Vec<String> {
-        vec![String::from(&self.singular), String::from(&self.plural), String::from(&self.adjective)]
+        vec![
+            String::from(&self.singular),
+            String::from(&self.plural),
+            String::from(&self.adjective),
+        ]
     }
 }
 

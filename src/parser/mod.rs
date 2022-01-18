@@ -4,9 +4,9 @@ use std::io::{BufWriter, Write};
 use std::path::PathBuf;
 use walkdir::WalkDir;
 
+mod conversion;
 mod raws;
 mod reader;
-mod conversion;
 
 pub fn parse_directory(raws_directory: String, out_directory: PathBuf) {
     let mut creatures: Vec<raws::creature::DFCreature> = Vec::new();
@@ -43,7 +43,10 @@ pub fn parse_directory(raws_directory: String, out_directory: PathBuf) {
 fn stringify_raw_vec(raws: Vec<raws::creature::DFCreature>) -> Vec<String> {
     let mut results: Vec<String> = Vec::new();
     for creature in raws {
-        results.push(format!("{}", to_string(&conversion::WebCreature::from(creature)).unwrap()));
+        results.push(format!(
+            "{}",
+            to_string(&conversion::WebCreature::from(creature)).unwrap()
+        ));
     }
     results
 }
