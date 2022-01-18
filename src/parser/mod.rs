@@ -1,13 +1,15 @@
+use serde_json::to_string;
 use std::fs::File;
 use std::io::{BufWriter, Write};
 use std::path::PathBuf;
 use walkdir::WalkDir;
 
-mod creature;
+mod conversion;
 mod raws;
+mod reader;
 
 pub fn parse_directory(raws_directory: String, out_directory: PathBuf) {
-    let mut json_strings: Vec<String> = Vec::new();
+    let mut creatures: Vec<raws::creature::DFCreature> = Vec::new();
 
     // Read all the files in the directory, selectively parse the .txt files
     for entry in WalkDir::new(raws_directory)
@@ -19,7 +21,7 @@ pub fn parse_directory(raws_directory: String, out_directory: PathBuf) {
         if f_name.ends_with(".txt") {
             let entry_path = entry.path().to_string_lossy().to_string();
             // println!("parsing {}", &entry_path);
-            json_strings.append(&mut raws::parse_file(entry_path))
+            creatures.append(&mut reader::parse_file(entry_path))
         }
     }
     // The destination file is out.json inside the out_directory
@@ -31,9 +33,20 @@ pub fn parse_directory(raws_directory: String, out_directory: PathBuf) {
     let write_error = &format!("Unable to write to {}", out_filepath.to_string_lossy());
     write!(stream, "[").expect(write_error);
 
-    write!(stream, "{}", json_strings.join(",")).expect(write_error);
+    write!(stream, "{}", stringify_raw_vec(creatures).join(",")).expect(write_error);
     stream.flush().expect(write_error);
 
     write!(stream, "]").expect(write_error);
     stream.flush().expect(write_error);
+}
+
+fn stringify_raw_vec(raws: Vec<raws::creature::DFCreature>) -> Vec<String> {
+    let mut results: Vec<String> = Vec::new();
+    for creature in raws {
+        results.push(format!(
+            "{}",
+            to_string(&conversion::WebCreature::from(creature)).unwrap()
+        ));
+    }
+    results
 }
