@@ -25,6 +25,9 @@ impl Name {
             adjective: String::from(names[2]),
         }
     }
+    pub fn to_string_vec(&self) -> Vec<String> {
+        vec![String::from(&self.singular), String::from(&self.plural), String::from(&self.adjective)]
+    }
 }
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
@@ -47,5 +50,8 @@ impl SingPlurName {
             singular: String::from(names[0]),
             plural: String::from(names[1]),
         }
+    }
+    pub fn to_string_vec(&self) -> Vec<String> {
+        vec![String::from(&self.singular), String::from(&self.plural)]
     }
 }

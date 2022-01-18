@@ -14,8 +14,7 @@ fetch("./out.json")
     return data.map(copyFromIfNeeded);
   })
   .then((data) => {
-    setStatus("Flattening names")
-    database = data.map(flattenNames);
+    database = data;
     setStatus("Ready");
   })
   .catch((err) => {
@@ -34,7 +33,7 @@ searchBar.addEventListener("keyup",delay((e) => {
     const filteredCreatures = database.filter((creature) => {
       return (
         // check if the search string is in the name
-        creature.namesFlattened.join("*").includes(searchString) ||
+        creature.names.join("*").includes(searchString) ||
         // check if the search string is in the name
         creature.description.includes(searchString) ||
         // check if the search string is egg(s) to display all egg_layers

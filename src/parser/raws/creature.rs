@@ -1,3 +1,5 @@
+use std::collections::HashMap;
+
 use serde::{Deserialize, Serialize};
 use slug::slugify;
 
@@ -277,6 +279,64 @@ impl DFCreature {
             // copy_from
             copy_tags_from: Vec::new(), // vec of creature identifiers
         }
+    }
+    pub fn get_identifier(&self) -> String {
+        String::from(&self.identifier)
+    }
+    pub fn get_parent_raw(&self) -> String {
+        String::from(&self.parent_raw)
+    }
+    pub fn get_object_id(&self) -> String {
+        String::from(&self.object_id)
+    }
+    pub fn get_all_names(&self) -> Vec<String> {
+        let mut names: Vec<String> = Vec::new();
+        names.append(&mut self.name.to_string_vec());
+        names.append(&mut self.general_baby_name.to_string_vec());
+        names.append(&mut self.general_child_name.to_string_vec());
+        for self_caste in &self.castes {
+            names.append(&mut self_caste.baby_name.to_string_vec());
+            names.append(&mut self_caste.child_name.to_string_vec());
+        }
+        names.retain(|s| s != "");
+        names.sort_unstable();
+        names.dedup();
+        names
+    }
+    pub fn get_description(&self) -> String {
+        let mut descriptions: Vec<String> = Vec::new();
+        for self_caste in &self.castes {
+            descriptions.push(String::from(&self_caste.description));
+        }
+        descriptions.join(" ")
+    }
+    pub fn get_max_ages(&self) -> HashMap<String, [u16; 2]> {
+        let mut max_ages: HashMap<String, [u16; 2]> = HashMap::new();
+        for self_caste in &self.castes {
+            if self_caste.max_age[0] != self_caste.max_age[1] && self_caste.max_age[1] != 0 {
+                max_ages.insert(String::from(&self_caste.name), self_caste.max_age);
+            }
+        }
+        max_ages
+    }
+    pub fn get_clutch_sizes(&self) -> HashMap<String, [u16; 2]> {
+        let mut clutch_sizes: HashMap<String, [u16; 2]> = HashMap::new();
+        for self_caste in &self.castes {
+            if self_caste.clutch_size[0] != self_caste.clutch_size[1]
+                && self_caste.clutch_size[1] != 0
+            {
+                clutch_sizes.insert(String::from(&self_caste.name), self_caste.clutch_size);
+            }
+        }
+        clutch_sizes
+    }
+    pub fn lays_eggs(&self) -> bool {
+        for self_caste in &self.castes {
+            if self_caste.lays_eggs {
+                return true;
+            }
+        }
+        false
     }
 }
 
