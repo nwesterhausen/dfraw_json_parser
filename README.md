@@ -92,9 +92,10 @@ OPTIONS:
 (Requires rust and cargo installed on your local machine.)
 
 1. clone this repo
-2. run `cargo build`
-3. edit `run-rust.ps1` to include the correct directory
-4. run `run-rust.ps1` and the `out.json` file will be created in the `www/` directory
+2. `cargo run -- --raws-dir [DIRECTORY] --serve`
+
+    It will parse your raws in the directory provided, create a JSON file, and then serve
+    a small web client for easy searching.
 
 ## Perl script
 
