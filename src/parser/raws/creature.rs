@@ -14,24 +14,62 @@ pub struct DFCreature {
     #[serde(rename = "objectId")]
     object_id: String,
     // Boolean Flags
+
+    // Enables the creature to be kept in artificial hives by beekeepers.
     pub artificial_hiveable: bool,
+
+    // Adding this token to a creature prevents it from appearing in generated worlds
     pub does_not_exist: bool,
+
+    // The creature is considered evil and will only show up in evil biomes.
     pub evil: bool,
+
+    // The creature is a thing of legend and known to all civilizations.
     pub fanciful: bool,
+
+    // Found on procedurally generated creatures like forgotten beasts, titans, demons, angels, and night creatures.
     pub generated: bool,
+
+    // Creature is considered good and will only show up in good biomes
     pub good: bool,
+
+    // Creature can spawn as a wild animal in the appropriate biomes.
     pub large_roaming: bool,
+
+    // Allows you to play as a wild animal of this species in adventurer mode.
     pub local_pops_controllable: bool,
+
+    // Wild animals of this species may occasionally join a civilization.
     pub local_pops_produce_heroes: bool,
+
+    // The creatures will scatter if they have this tag, or form tight packs if they don't.
     pub loose_clusters: bool,
+
+    // Marks if the creature is an actual real-life creature. Only used for age-names at present.
     pub mundane: bool,
+
+    // The creature will only show up in "savage" biomes.
     pub savage: bool,
+
+    // Creature will occur in every region with the correct biome.
     pub ubiquitous: bool,
+
+    // The vermin creature will attempt to eat exposed food.
     pub vermin_eater: bool,
+
+    // The vermin appears in water and will attempt to swim around.
     pub vermin_fish: bool,
+
+    // The creature appears in "general" surface ground locations.
     pub vermin_grounder: bool,
+
+    // The vermin are attracted to rotting stuff and loose food left in the open and cause unhappy thoughts to dwarves who encounter them
     pub vermin_rotter: bool,
+
+    // The creature randomly appears near dirt or mud
     pub vermin_soil: bool,
+
+    // The vermin will appear in a single tile cluster of many vermin, such as a colony of ants.
     pub vermin_soil_colony: bool,
 
     // integers
@@ -62,103 +100,300 @@ pub struct DFCreatureCaste {
     // Identification
     name: String,
     // Boolean Flags
+
+    // Prevents tamed creature from being made available for adoption,
+    // instead allowing it to automatically adopt whoever it wants.
     pub adopts_owner: bool,
+
+    // Found on [LARGE_PREDATOR]s who ambush their prey. Instead of charging relentlessly at prey,
+    // the predator will wait till the prey is within a few squares before charging.
     pub ambush_predator: bool,
+
+    // Allows a creature to breathe both in and out of water
+    // (unlike [AQUATIC]) - does not prevent drowning in magma.
     pub amphibious: bool,
+
+    // Enables the creature to breathe in water, but causes it to air-drown on dry land.
     pub aquatic: bool,
+
+    // Causes the creature to be excluded from the object testing arena's creature spawning list.
     pub arena_restricted: bool,
+
+    // 	Prevents the creature from attacking or frighten creatures with the [NATURAL] tag.
     pub at_peace_with_wildlife: bool,
+
+    // The creature is non-aggressive by default, and will never automatically be engaged by companions
+    // or soldiers, running away from any creatures that are not friendly to it, and will only defend
+    // itself if it becomes enraged
     pub benign: bool,
+
+    // Creature eats bones. Implies [CARNIVORE].
     pub bone_carnivore: bool,
+
+    // Creature only eats meat. If the creature goes on rampages in worldgen, it will often devour the people/animals it kills.
     pub carnivore: bool,
+
+    // When combined with any of [PET], [PACK_ANIMAL], [WAGON_PULLER] and/or [MOUNT], the creature is guaranteed
+    // to be domesticated by any civilization with [COMMON_DOMESTIC_PET], [COMMON_DOMESTIC_PACK], [COMMON_DOMESTIC_PULL]
+    // and/or [COMMON_DOMESTIC_MOUNT] respectively. Such civilizations will always have access to the creature,
+    // even in the absence of wild populations.
     pub common_domestic: bool,
+
+    // The creature can be cooked in meals without first being butchered/cleaned
     pub cookable_live: bool,
+
+    // Found on generated demons. Marks the caste to be used in the initial wave after breaking into the underworld,
+    // and by the demon civilizations created during world-gen breaches
     pub demon: bool,
+
+    // Causes the creature to die upon attacking. Used by honey bees to simulate them dying after using their stingers.
     pub die_when_vermin_bite: bool,
+
+    // Allows the creature to wear or wield items.
     pub equips: bool,
+
+    // The creature can see regardless of whether it has working eyes and has full 360 degree vision,
+    // making it impossible to strike the creature from a blind spot in combat.
     pub extravision: bool,
+
+    // Found on forgotten beasts
     pub feature_beast: bool,
+
+    // Makes the creature biologically female, enabling her to bear young.
     pub female: bool,
+
+    // Makes the creature immune to FIREBALL and FIREJET attacks, and allows it to path through high temperature zones, like lava or fires
     pub fire_immune: bool,
+
+    // Like [FIREIMMUNE], but also renders the creature immune to DRAGONFIRE attacks.
     pub fire_immune_super: bool,
+
+    // The creature's corpse is a single FISH_RAW food item that needs to be cleaned (into a FISH item) at a fishery to become edible
     pub fish_item: bool,
+
+    // Allows a creature to fly, independent of it having wings or not.
     pub flier: bool,
+
+    // The creature can and will gnaw its way out of animal traps and cages using the specified verb,
+    // depending on the material from which it is made (normally wood).
     pub gnawer: bool,
+
+    //	The creature has nerves in its muscles. Cutting the muscle tissue can sever motor and sensory nerves.
     pub has_nerves: bool,
+
+    // 	Creature hunts and kills nearby vermin.
     pub hunts_vermin: bool,
+
+    // 	The creature cannot move.
     pub immobile: bool,
+
+    // The creature is immobile while on land. Only works on [AQUATIC] creatures which can't breathe on land.
     pub immobile_land: bool,
+
+    // The creature radiates fire. It will ignite, and potentially completely destroy, items the creature is standing on.
     pub immolate: bool,
+
+    // Alias for [CAN_SPEAK] + [CAN_LEARN]
     pub intelligent: bool,
+
+    // Will attack things that are smaller than it (like dwarves). Only one group of "large predators"
+    // (possibly two groups on "savage" maps) will appear on any given map
     pub large_predator: bool,
+
+    // 	Creature lays eggs instead of giving birth to live young.
     pub lays_eggs: bool,
+
+    // The creature will generate light, such as in adventurer mode at night.
     pub light_gen: bool,
+
+    // 	Lets a creature open doors that are set to forbidden in fortress mode.
     pub lock_picker: bool,
+
+    // The creature is able to see while submerged in magma.
     pub magma_vision: bool,
+
+    // 	Makes the creature biologically male.
     pub male: bool,
+
+    // Makes the creature slowly stroll around, unless it's in combat or performing a job.
     pub meanderer: bool,
+
+    // A 'boss' creature. A small number of the creatures are created during worldgen, their histories and descendants (if any)
+    // will be tracked in worldgen (as opposed to simply 'spawning'), and they will occasionally go on rampages
     pub megabeast: bool,
+
+    // The creature spawns stealthed and will attempt to path into the fortress, pulling any levers it comes across.
     pub mischievous: bool,
+
+    // Creature may be used as a mount.
     pub mount: bool,
+
+    // Creature may be used as a mount, but civilizations cannot domesticate it in worldgen without certain exceptions.
     pub mount_exotic: bool,
+
+    // 	Allows the creature to have all-around vision as long as it has multiple heads that can see.
     pub multipart_full_vision: bool,
+
+    // Makes the species usually produce a single offspring per birth, occasionally producing twins or triplets with a 1/500 chance.
     pub multiple_litter_rare: bool,
+
+    // Animal is considered to be natural
     pub natural: bool,
+
+    // Creature doesn't require connected body parts to move
     pub no_connections_for_movement: bool,
+
+    // Creature cannot become dizzy
     pub no_dizziness: bool,
+
+    // Creature does not need to drink
     pub no_drink: bool,
+
+    // Creature does not need to eat
     pub no_eat: bool,
+
+    // Creature cannot suffer fevers
     pub no_fevers: bool,
+
+    // Creature is biologically sexless and unable to breed
     pub no_gender: bool,
+
+    // Creature does not need to sleep
     pub no_sleep: bool,
+
+    // Creature has no bones
     pub no_bones: bool,
+
+    // Creature does not need to breath
     pub no_breathe: bool,
+
+    // Creature has no emotions
     pub no_emotion: bool,
+
+    // Creature can't become tired or over-exerted
     pub no_exert: bool,
+
+    // Creature doesn't feel fear and will never flee from battle
     pub no_fear: bool,
+
+    // Creature will not drop meat when butchered
     pub no_meat: bool,
+
+    // Creature isn't nauseated by gut hits and cannot vomit
     pub no_nausea: bool,
+
+    // Creature doesn't feel pain
     pub no_pain: bool,
+
+    // Creature will not drop a hide when butchered
     pub no_skin: bool,
+
+    // Creature will not drop a skull when butchered or when rot/decay of severed head
     pub no_skull: bool,
+
+    // Creature doesn't produce miasma when rotting
     pub no_smelly_rot: bool,
+
+    // Weapons can't get stuck in the creature
     pub no_stuck_ins: bool,
+
+    // Creature cannot be stunned or knocked unconscious
     pub no_stun: bool,
+
+    // Creature cannot be butchered
     pub not_butcherable: bool,
+
+    // Cannot be raised from the dead, implies creature is not a normal living being
     pub not_living: bool,
+
+    // Creature doesn't require a [THOUGHT] bodypart to survive
     pub no_thought: bool,
+
+    // Is hostile to all creatures except undead and other non-living ones
     pub opposed_to_life: bool,
+
+    // Lets you play as an outsider of this species in adventure mode.
     pub outsider_controllable: bool,
+
+    // Allows the creature to be used as a pack animal.
     pub pack_animal: bool,
+
+    // immune to all paralyzing special attacks.
     pub paralyzeimmune: bool,
+
+    // Allows the creature to be tamed in Fortress mode.
     pub pet: bool,
+
+    // Allows the creature to be tamed in Fortress mode.
     pub pet_exotic: bool,
+
+    // Allows the being to represent itself as a deity
     pub power: bool,
+
+    // Essentially the same as [MEGABEAST], but more of them are created during worldgen
     pub semi_megabeast: bool,
+
+    // Shorthand for [CAN_LEARN] + [SKILL_LEARN_RATES:50]
     pub slow_learner: bool,
+
+    // Creature leaves "remains" instead of a corpse. Used by vermin.
     pub small_remains: bool,
-    pub standard_grazer: bool, //Acts as [GRAZER] but set to 20000*G*(max size)^(-3/4)
+
+    //Acts as [GRAZER] but set to 20000*G*(max size)^(-3/4)
+    pub standard_grazer: bool,
+
+    // Gives the creature knowledge of any secrets with [SUPERNATURAL_LEARNING_POSSIBLE] that match its spheres.
     pub supernatural: bool,
+
+    // 	The creature naturally knows how to swim perfectly and does not use the swimmer skill
     pub swims_innate: bool,
+
+    // The creature swims only as well as their present swimming skill allows them to.
     pub swims_learned: bool,
+
+    // 	The creature's webs can catch larger creatures.
     pub thick_web: bool,
+
+    // 	Found on titans. Cannot be specified in user-defined raws.
     pub titan: bool,
+
+    // Allows the creature to go into martial trances.
     pub trances: bool,
+
+    // The creature will never trigger traps it steps on.
     pub trap_avoid: bool,
+
+    // Found on generated demons; causes the game to create a single named instance of the demon
     pub unique_demon: bool,
+
+    // Like [AT_PEACE_WITH_WILDLIFE], but also makes the creature more valued in artwork by civilisations with the PLANT sphere
     pub vegetation: bool,
+
+    // Some dwarves will hate the creature and get unhappy thoughts when around it.
     pub vermin_hateable: bool,
+
+    // This makes the creature move in a swarm of creatures of the same race as it (e.g. swarm of flies, swarm of ants).
     pub vermin_micro: bool,
+
+    // 	The creature cannot be caught by fishing.
     pub vermin_no_fish: bool,
+
+    //	The creature will not be observed randomly roaming about the map.
     pub vermin_no_roam: bool,
+
+    // The creature cannot be caught in baited animal traps
     pub vermin_no_trap: bool,
+
+    // 	Allows the creature to pull caravan wagons.
     pub wagon_puller: bool,
+
+    // The creature will not get caught in thick webs.
     pub web_immune: bool,
 
     // [min, max] ranges
-    pub clutch_size: [u16; 2],
-    pub litter_size: [u16; 2],
-    pub max_age: [u16; 2],
+    pub clutch_size: [u16; 2], // Number of eggs laid in one sitting.
+    pub litter_size: [u16; 2], // Number of live children birthed at once
+    pub max_age: [u16; 2],     // creatures can lack this and are immortal
 
     // Combo flags (custom)
     pub active_time: u8, // MATUTINAL/DIURNAL/NOCTURNAL/CREPUSCULAR/VESPERTINE via binary math
@@ -167,14 +402,33 @@ pub struct DFCreatureCaste {
     pub trainable: u8,   // trainable_HUNTING/trainable_WAR/BOTH(aka trainable)
 
     // Integer tokens
+
+    // Age at which creature is considered a child, the default is zero.
     pub baby: u32,
+
+    // Age at which creature is considered an adult
     pub child: u32,
+
+    // Increases experience gain during adventure mode
     pub difficulty: u32,
+
+    // Determines the size of laid eggs.
     pub egg_size: u32,
+
+    // The value determines how rapidly grass is trampled when a creature steps on it
     pub grass_trample: u8,
+
+    // The higher the number, the less frequently it needs to eat in order to live.
     pub grazer: u32,
+
+    // Determines how well a creature can see in the dark - higher is better. Dwarves have 10000, which amounts to perfect nightvision.
     pub low_light_vision: u32,
+
+    // How valuable a tamed animal is. Actual cost in points in the embarking screen is 1+(PETVALUE/2) for an untrained animal,
+    // 1+PETVALUE for a war/hunting one.
     pub pet_value: u16,
+
+    // Weighted population of caste; Lower is rarer.
     pub pop_ratio: u16,
 
     // String Tokens
@@ -184,7 +438,7 @@ pub struct DFCreatureCaste {
     pub description: String,
 
     // listicles
-    pub creature_class: Vec<String>,
+    pub creature_class: Vec<String>, // An arbitrary creature classification. Can be set to anything
 
     // Custom tokens
     pub body_size: Vec<DFBodySize>,
