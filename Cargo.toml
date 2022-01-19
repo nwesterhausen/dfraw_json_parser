@@ -9,13 +9,25 @@ authors = [
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-regex = "^1.5"
-slug = "^0.1"
-serde = {version = "^1.0", features = ["derive"]}
-serde_json = "^1.0"
-encoding_rs = "^0.8"
-encoding_rs_io = "^0.1"
-clap = { version = "^3.0", features = ["derive"] }
+encoding_rs = "0.8"
+encoding_rs_io = "0.1"
+regex = "1.5"
+slug = "0.1"
+serde_json = "1.0"
 walkdir = "2"
 rouille = "3"
-phf = { version = "0.10", features = ["macros"]}
+
+[dependencies.clap]
+version = "3"
+default-features = true
+features = ["derive"]
+
+[dependencies.phf]
+version = "0.10"
+default-features = true
+features = ["macros"]
+
+[dependencies.serde]
+version = "1"
+default-features = true
+features = ["derive"]
