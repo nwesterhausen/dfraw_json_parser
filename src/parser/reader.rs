@@ -3,6 +3,9 @@ use regex::Regex;
 use slug::slugify;
 use std::fs::File;
 use std::io::{BufRead, BufReader};
+use std::path::Path;
+
+use crate::LogLevels;
 
 use super::raws::{biomes, creature, names};
 
@@ -11,9 +14,31 @@ enum RawObjectKind {
     None,
 }
 
-pub fn parse_file(input_path: String) -> Vec<creature::DFCreature> {
+pub fn parse_file(input_path: String, logging: LogLevels) -> Vec<creature::DFCreature> {
     let re = Regex::new(r"(\[(?P<key>[^\[:]+):?(?P<value>[^\]\[]*)])").unwrap();
     let enc = encoding_rs::Encoding::for_label("latin1".as_bytes());
+    let mut results: Vec<creature::DFCreature> = Vec::new();
+
+    let filename = Path::new(&input_path)
+        .file_name()
+        .expect("valid filename")
+        .to_string_lossy()
+        .to_string();
+    if filename == "readme.txt"
+        || filename.contains("README")
+        || input_path.contains("examples and notes")
+        || input_path.contains("text")
+        || input_path.contains("interaction examples")
+        || input_path.contains("graphics")
+    {
+        if logging.verbose {
+            println!("Skipping {}, doesn't contain raw data.", filename);
+        }
+        return results;
+    }
+    if logging.verbose {
+        println!("Reading and parsing {}", filename);
+    }
 
     let file = File::open(&input_path).unwrap();
     let decoding_reader = DecodeReaderBytesBuilder::new().encoding(enc).build(file);
@@ -27,15 +52,23 @@ pub fn parse_file(input_path: String) -> Vec<creature::DFCreature> {
     let mut empty_caste = creature::DFCreatureCaste::new("none");
     let mut caste_temp = &mut empty_caste;
 
-    let mut results: Vec<creature::DFCreature> = Vec::new();
-
     for (index, line) in reader.lines().enumerate() {
         if line.is_err() {
-            eprintln!("Error processing {}:{}", &input_path, index);
+            if logging.error {
+                eprintln!("Error processing {}:{}", &input_path, index);
+            }
             continue;
         }
         let line = line.unwrap();
         if index == 0 {
+            if re.is_match(&line) || line.trim().contains(" ") || line.contains("=") {
+                // If we are matching the token expression on line 0 then this isn't a valid raw file
+                // that we expect to encounter.
+                if logging.warn {
+                    eprintln!("Unexpected starting line:{:.60} ({})", &line, filename);
+                }
+                return results;
+            }
             raw_filename = String::from(&line);
             continue;
         }
@@ -48,7 +81,9 @@ pub fn parse_file(input_path: String) -> Vec<creature::DFCreature> {
                         current_object = RawObjectKind::Creature;
                     }
                     &_ => {
-                        println!("No support right now for OBJECT:{}", &cap[3]);
+                        if logging.verbose {
+                            eprintln!("No support right now for OBJECT:{}", &cap[3]);
+                        }
                         return results;
                         // current_object = RawObjectKind::None;
                     }
@@ -66,12 +101,18 @@ pub fn parse_file(input_path: String) -> Vec<creature::DFCreature> {
                                 results.push(creature_temp);
                             } else {
                                 started = true;
+                                if logging.verbose {
+                                    print!("Parsing ");
+                                }
                             }
                             creature_temp = creature::DFCreature::new(&raw_filename, &cap[3]);
                             creature_temp
                                 .castes
                                 .push(creature::DFCreatureCaste::new("EVERY"));
                             caste_temp = creature_temp.castes.last_mut().unwrap();
+                            if logging.verbose {
+                                print!("{}, ", &cap[3]);
+                            }
                         }
                         RawObjectKind::None => (),
                     }
@@ -625,6 +666,17 @@ pub fn parse_file(input_path: String) -> Vec<creature::DFCreature> {
         }
         RawObjectKind::None => (),
     }
-    // println!("{} creatures defined in {}", creatures, &raw_filename);
+
+    if logging.verbose {
+        print!("\n");
+    }
+    if logging.info {
+        println!(
+            "{:48} defines {:>4} creatures",
+            &raw_filename,
+            results.len()
+        );
+    }
+
     results
 }

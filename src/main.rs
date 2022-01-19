@@ -45,14 +45,49 @@ struct Args {
     /// Port to serve the web client on
     #[clap(short, long, default_value_t = 4501, long_help = HELP_PORT)]
     port: u16,
+
+    #[clap(
+        short,
+        long,
+        takes_value = false,
+        help = "Don't print out parsing status to console."
+    )]
+    quiet: bool,
+
+    #[clap(
+        short,
+        long,
+        takes_value = false,
+        help = "Show even more information while parsing."
+    )]
+    verbose: bool,
+}
+
+#[derive(Copy, Clone)]
+pub struct LogLevels {
+    error: bool,
+    warn: bool,
+    info: bool,
+    verbose: bool,
 }
 
 fn main() {
     let args = Args::parse();
 
+    let logging = LogLevels {
+        error: true,
+        warn: true,
+        info: !args.quiet,
+        verbose: args.verbose,
+    };
+
     if !args.raws_dir.is_empty() {
         // If a directory for raws was specified, we will parse what raws we find
-        parser::parse_directory(args.raws_dir, Path::new(&args.out_dir).to_path_buf());
+        parser::parse_directory(
+            args.raws_dir,
+            Path::new(&args.out_dir).to_path_buf(),
+            logging,
+        );
     }
 
     if args.serve {
