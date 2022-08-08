@@ -5,6 +5,11 @@ edition = "2021"
 authors = [
     "Nicholas Westerhausen <nick@westmail.cc>"
 ]
+description = "Library which parses Dwarf Fortress raw files into JSON"
+repository = "https://github.com/nwesterhausen/dfraw_json_parser.git"
+license = "MIT"
+homepage = "https://github.com/nwesterhausen/dfraw_json_parser"
+license-file = "LICENSE.txt"
 
 [lib]
 name = "dfraw_json_parser"
@@ -23,7 +28,7 @@ walkdir = "2"
 log = "0.4.17"
 
 [dependencies.phf]
-version = "0.10"
+version = "0.11.1"
 default-features = true
 features = ["macros"]
 
@@ -35,6 +40,7 @@ features = ["derive"]
 [dependencies.lazy_static]
 git = "https://github.com/rust-lang-nursery/lazy-static.rs.git"
 rev = "e83d66490775eb953807c39d1f073a6daa3bc760"
+version = "1.4.0"
 
 [dev-dependencies]
 rouille = "3"
