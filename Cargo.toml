@@ -6,6 +6,11 @@ authors = [
     "Nicholas Westerhausen <nick@westmail.cc>"
 ]
 
+[lib]
+name = "dfraw_json_parser"
+path = "src/lib.rs"
+crate-type = ["rlib"]
+
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
@@ -16,6 +21,7 @@ rouille = "3"
 slug = "0.1"
 serde_json = "1.0"
 walkdir = "2"
+log = "0.4.17"
 
 [dependencies.clap]
 version = "3"
@@ -31,3 +37,7 @@ features = ["macros"]
 version = "1"
 default-features = true
 features = ["derive"]
+
+[dependencies.lazy_static]
+git = "https://github.com/rust-lang-nursery/lazy-static.rs.git"
+rev = "e83d66490775eb953807c39d1f073a6daa3bc760"

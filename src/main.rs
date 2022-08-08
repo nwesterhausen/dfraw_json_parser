@@ -52,7 +52,10 @@ fn main() {
 
     if !args.raws_dir.is_empty() {
         // If a directory for raws was specified, we will parse what raws we find
-        parser::parse_directory(args.raws_dir, Path::new(&args.out_dir).to_path_buf());
+        parser::parse_directory_to_json_file(
+            args.raws_dir.as_str(),
+            &Path::new(&args.out_dir).to_path_buf(),
+        );
     }
 
     if args.serve {
