@@ -5,9 +5,7 @@
     objectId: string;
     identifier: string;
     name: string;
-    description: string;
     parent_raw: string;
-    searchString?: string[];
     tags: string[];
   };
 
@@ -24,10 +22,6 @@ export type BodySizeRange = {
   
   export type CasteRange<T> = {
     [key: string]: T;
-  };
-  
-  export type CasteTags = {
-    [key: string]: string[];
   };
   
   export type Creature = {
@@ -50,7 +44,7 @@ export type BodySizeRange = {
     inactive_season: CasteRange<number>;
     creature_class: CasteRange<string[]>;
   
-    caste_tags: CasteTags;
+    caste_tags: CasteRange<string[]>;
   
     difficulty: CasteRange<number>;
     grass_trample: CasteRange<number>;
@@ -61,4 +55,6 @@ export type BodySizeRange = {
   
     pref_string: string[];
     population_number: number[];
+
+    descriptions: CasteRange<string>;
   } & Raw;

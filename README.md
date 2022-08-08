@@ -122,23 +122,12 @@ OPTIONS:
 
 ### How to use
 
-#### Download Release
+The example is a usable tool to search raws.
 
-1. download a build from the [releases]() page
-2. run `df-raw-lookup --raws-dir [DIRECTORY] --serve`
+See the project [Overseer's Reference Manual](https://github.com/nwesterhausen/overseers-manual-df) 
+for a project that uses this library.
 
-   It will parse your raws in the directory provided, create a JSON file, and then serve
-   a small web client for easy searching.
-
-#### Build Yourself
-
-(Requires rust and cargo installed on your local machine.)
-
-1. clone this repo
-2. `cargo run -- --raws-dir [DIRECTORY] --serve`
-
-   It will parse your raws in the directory provided, create a JSON file, and then serve
-   a small web client for easy searching.
+There is a [Typescript definition file](./typing.d.ts) for the format of the generated JSON.
 
 ## Perl script
 
