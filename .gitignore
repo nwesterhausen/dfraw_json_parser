@@ -1,7 +1,4 @@
-node_modules/
-
-out.json
-
 # Added by cargo
 
 /target
+Cargo.lock
