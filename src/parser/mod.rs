@@ -52,6 +52,7 @@ fn turn_vec_into_json_string(v: Vec<raws::creature::DFCreature>) -> String {
 fn save_vec_to_json_file(v: Vec<raws::creature::DFCreature>, out_directory: &Path) {
     // The destination file is out.json inside the out_directory
     let out_filepath = out_directory.join("out.json");
+    log::info!("writing to => {:?}", out_filepath);
     let out_file = match File::create(&out_filepath.as_path()) {
         Ok(f) => f,
         Err(e) => {
@@ -59,6 +60,7 @@ fn save_vec_to_json_file(v: Vec<raws::creature::DFCreature>, out_directory: &Pat
             return;
         }
     };
+    log::info!("{:?}", out_file.metadata());
 
     let mut stream = BufWriter::new(out_file);
     let write_error = &format!("Unable to write to {}", out_filepath.to_string_lossy());
