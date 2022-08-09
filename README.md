@@ -6,8 +6,8 @@ I made this because I was playing with [Splint's Vanilla Expanded Mod](http://ww
 and [Primal](http://www.bay12forums.com/smf/index.php?topic=172869.15) and at the prepare carefully
 screen I had no way to figure out what some of the animals were.
 
-Yes there is the [raw explorer](http://www.bay12forums.com/smf/index.php?topic=103360) program but I found 
-that difficult to search with and the information was displayed in basically the same format as the raw file 
+Yes there is the [raw explorer](http://www.bay12forums.com/smf/index.php?topic=103360) program but I found
+that difficult to search with and the information was displayed in basically the same format as the raw file
 itself, so it was hard to read.
 
 There is a Typescript [type definition file](./typing.d.ts).
@@ -23,6 +23,8 @@ the description of the animal, if they laid eggs, if they were milkable, and how
 - Parses raw files for creatures
 
 ### Outputs
+
+#### Creature Token
 
 | Property          | Description                                   | Type                             |
 | ----------------- | --------------------------------------------- | -------------------------------- |
@@ -124,7 +126,7 @@ OPTIONS:
 
 The example is a usable tool to search raws.
 
-See the project [Overseer's Reference Manual](https://github.com/nwesterhausen/overseers-manual-df) 
+See the project [Overseer's Reference Manual](https://github.com/nwesterhausen/overseers-manual-df)
 for a project that uses this library.
 
 There is a [Typescript definition file](./typing.d.ts) for the format of the generated JSON.
