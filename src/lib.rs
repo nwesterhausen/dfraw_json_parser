@@ -365,7 +365,10 @@ pub fn parse_game_raws_with_tauri_emit(df_game_path: &str, window: tauri::Window
             "PROGRESS",
             Payload {
                 percentage: pct,
-                current_module: String::from(entry.file_name().to_str().unwrap_or("")),
+                current_module: format!(
+                    "workshop-mod:{}",
+                    entry.file_name().to_str().unwrap_or("unknown")
+                ),
             },
         ) {
             Err(e) => log::debug!("Tauri window emit error {:?}", e),
