@@ -1,10 +1,9 @@
 use clap::Parser;
 use std::path::Path;
 
-const HELP_RAWS_DIR: &str = "Specify the directory containing the raw files.
+const HELP_GAME_DIR: &str = "Specify the directory where Dwarf Fortress is installed.
 
-This usually is a directory named 'raw' in the save or game directory. 
-If this is left unspecified, no raws will be parsed when running.";
+This directory will likely include the 'gamelog.txt' file, and it should have a 'data' subdirectory.";
 
 const HELP_OUT_DIR: &str = "Specify the directory that the JSON database should be saved into.
 
@@ -25,18 +24,18 @@ defaults to ./www";
 const HELP_PORT: &str = "Specify the port to run the web server on.";
 
 #[derive(Parser, Debug)]
-#[clap(about, version, author)]
+#[command(author, version, about, long_about = None)] // Read from `Cargo.toml`
 struct Args {
-    /// Path to raw files directory
-    #[clap(short, long, default_value_t = String::new(), long_help = HELP_RAWS_DIR)]
-    raws_dir: String,
+    /// Path to df game directory
+    #[clap(short, long, default_value_t = String::new(), long_help = HELP_GAME_DIR)]
+    game_dir: String,
 
     /// Path to save JSON database
     #[clap(short, long, default_value_t = String::from("./www/"), long_help = HELP_OUT_DIR)]
     out_dir: String,
 
     /// Whether we should start a web server for the out_dir
-    #[clap(short, long, takes_value = false, long_help = HELP_SERVE)]
+    #[clap(short, long, long_help = HELP_SERVE)]
     serve: bool,
 
     /// Port to serve the web client on
@@ -45,14 +44,41 @@ struct Args {
 }
 
 fn main() {
+    // Configure logger at runtime
+    fern::Dispatch::new()
+        // Perform allocation-free log formatting
+        .format(|out, message, record| out.finish(format_args!("[{}] {}", record.level(), message)))
+        // Add blanket level filter -
+        .level(log::LevelFilter::Info)
+        // Output to stdout, files, and other Dispatch configurations
+        .chain(std::io::stdout())
+        // Apply globally
+        .apply()
+        .expect("Failed to start logger");
+
     let args = Args::parse();
 
-    if !args.raws_dir.is_empty() {
-        // If a directory for raws was specified, we will parse what raws we find
-        dfraw_json_parser::parse_directory_to_json_file(
-            args.raws_dir.as_str(),
-            &Path::new(&args.out_dir).to_path_buf(),
-        );
+    if !args.game_dir.is_empty() {
+        let Ok(out_path) = std::fs::canonicalize(Path::new(&args.out_dir)) else {
+            log::error!("Unable to standardize output path {} for writing.", &args.out_dir);
+            return;
+        };
+        if !out_path.exists() {
+            log::error!(
+                "Non-existent path specified for saving file to {:?}",
+                out_path
+            );
+            return;
+        }
+        if out_path.is_dir() {
+            // If a directory for raws was specified, we will parse what raws we find
+            dfraw_json_parser::parse_game_raws_to_file(
+                args.game_dir.as_str(),
+                &out_path.join("out.json").to_path_buf(),
+            );
+        } else {
+            log::error!("A non-directory was specified for out_dir");
+        }
     }
 
     if args.serve {

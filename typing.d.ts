@@ -7,6 +7,8 @@
     name: string;
     parent_raw: string;
     tags: string[];
+    raw_module: string;
+    raw_module_version: string;
   };
 
 export type BodySizeRange = {

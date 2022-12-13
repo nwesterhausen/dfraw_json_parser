@@ -12,6 +12,8 @@ use super::raws::{
 pub struct WebCreature {
     identifier: String,
     parent_raw: String,
+    raw_module: String,
+    raw_module_version: String,
     #[serde(rename = "objectId")]
     object_id: String,
     name: String,
@@ -53,6 +55,8 @@ impl WebCreature {
             identifier: creature.get_identifier(),
             parent_raw: creature.get_parent_raw(),
             object_id: creature.get_object_id(),
+            raw_module: creature.get_raw_module(),
+            raw_module_version: creature.get_raw_module_version(),
             name: creature.get_general_name(),
             descriptions: creature.get_description_by_caste(),
             max_age: creature.get_max_ages_by_caste(),
