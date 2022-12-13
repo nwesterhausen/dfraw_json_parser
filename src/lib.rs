@@ -284,7 +284,8 @@ pub fn parse_game_raws_to_file_out(input_path: &str, output_file_path: &Path) {
 #[cfg(feature = "tauri")]
 #[derive(Clone, serde::Serialize)]
 struct Payload {
-    pct: f64,
+    percentage: f64,
+    current_module: String,
 }
 
 #[cfg(feature = "tauri")]
@@ -328,7 +329,13 @@ pub fn parse_game_raws_with_tauri_emit(df_game_path: &str, window: tauri::Window
     for entry in vanilla_iter {
         current_mod = current_mod + 1;
         pct = current_mod as f64 / total_mods as f64;
-        match window.emit("PROGRESS", Payload { pct }) {
+        match window.emit(
+            "PROGRESS",
+            Payload {
+                percentage: pct,
+                current_module: String::from(entry.file_name().to_str().unwrap_or("")),
+            },
+        ) {
             Err(e) => log::debug!("Tauri window emit error {:?}", e),
             _ => (),
         };
@@ -338,7 +345,13 @@ pub fn parse_game_raws_with_tauri_emit(df_game_path: &str, window: tauri::Window
     for entry in installed_iter {
         current_mod = current_mod + 1;
         pct = current_mod as f64 / total_mods as f64;
-        match window.emit("PROGRESS", Payload { pct }) {
+        match window.emit(
+            "PROGRESS",
+            Payload {
+                percentage: pct,
+                current_module: String::from(entry.file_name().to_str().unwrap_or("")),
+            },
+        ) {
             Err(e) => log::debug!("Tauri window emit error {:?}", e),
             _ => (),
         };
@@ -348,7 +361,13 @@ pub fn parse_game_raws_with_tauri_emit(df_game_path: &str, window: tauri::Window
     for entry in mods_iter {
         current_mod = current_mod + 1;
         pct = current_mod as f64 / total_mods as f64;
-        match window.emit("PROGRESS", Payload { pct }) {
+        match window.emit(
+            "PROGRESS",
+            Payload {
+                percentage: pct,
+                current_module: String::from(entry.file_name().to_str().unwrap_or("")),
+            },
+        ) {
             Err(e) => log::debug!("Tauri window emit error {:?}", e),
             _ => (),
         };
@@ -358,7 +377,13 @@ pub fn parse_game_raws_with_tauri_emit(df_game_path: &str, window: tauri::Window
 
     if pct < 1.0 {
         pct = 1.0;
-        match window.emit("PROGRESS", Payload { pct }) {
+        match window.emit(
+            "PROGRESS",
+            Payload {
+                percentage: pct,
+                current_module: String::new(),
+            },
+        ) {
             Err(e) => log::debug!("Tauri window emit error {:?}", e),
             _ => (),
         };
