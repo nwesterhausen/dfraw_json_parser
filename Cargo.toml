@@ -2,9 +2,7 @@
 name = "dfraw_json_parser"
 version = "0.2.1"
 edition = "2021"
-authors = [
-    "Nicholas Westerhausen <nick@westmail.cc>"
-]
+authors = ["Nicholas Westerhausen <nick@westmail.cc>"]
 description = "Library which parses Dwarf Fortress raw files into JSON"
 repository = "https://github.com/nwesterhausen/dfraw_json_parser.git"
 license = "MIT"
@@ -43,9 +41,9 @@ version = "1.4.0"
 
 [dev-dependencies]
 rouille = "3"
-simple_logger = "2.2.0"
+simple_logger = "4.0"
 
 [dev-dependencies.clap]
-version = "3"
+version = "4.0"
 default-features = true
 features = ["derive"]
