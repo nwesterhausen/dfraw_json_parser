@@ -12,7 +12,10 @@ Currently the JSON is returned as a string
 use std::fs::File;
 use std::io::{BufWriter, Write};
 use std::path::Path;
-use walkdir::WalkDir;
+use walkdir::{DirEntry, WalkDir};
+
+#[cfg(feature = "tauri")]
+extern crate tauri;
 
 mod parser;
 
@@ -54,44 +57,25 @@ pub fn parse_game_raws(df_game_path: &str) -> Vec<String> {
     }
 
     let data_path = game_path.join("data");
-    // Guard against missing data path
-    if data_path.exists() && data_path.is_dir() {
-        let vanilla_path = data_path.join("vanilla");
-        let installed_mods_path = data_path.join("installed_mods");
-
-        if vanilla_path.exists() {
-            // Loop through each dfraw_directory and parse it
-            let it = subdirectories(vanilla_path.as_os_str());
-
-            for entry in it {
-                all_json.push(parse_dfraw_dir(entry.path()));
-            }
-        }
-        if installed_mods_path.exists() {
-            // Loop through each dfraw_directory and parse it
-            let it = subdirectories(installed_mods_path.as_os_str());
-
-            for entry in it {
-                all_json.push(parse_dfraw_dir(entry.path()));
-            }
-        }
-    } else {
-        log::warn!(
-            "No data subdirectory found in game directory! Unable to parse raws from vanilla or installed mod."
-        );
-    }
-
+    let vanilla_path = data_path.join("vanilla");
+    let installed_mods_path = data_path.join("installed_mods");
     let workshop_mods_path = game_path.join("mods");
 
-    if workshop_mods_path.exists() && workshop_mods_path.is_dir() {
-        // Loop through each dfraw_directory and parse it
-        let it = subdirectories(workshop_mods_path.as_os_str());
+    let vanilla_iter: Vec<DirEntry> = subdirectories(vanilla_path).unwrap_or(Vec::new());
+    let installed_iter: Vec<DirEntry> = subdirectories(installed_mods_path).unwrap_or(Vec::new());
+    let mods_iter: Vec<DirEntry> = subdirectories(workshop_mods_path).unwrap_or(Vec::new());
 
-        for entry in it {
-            all_json.push(parse_dfraw_dir(entry.path()));
-        }
-    } else {
-        log::info!("No mods subdirectory, will not attempt parsing raws from it");
+    // Loop through each dfraw_directory and parse it
+    for entry in vanilla_iter {
+        all_json.push(parse_dfraw_dir(entry.path()));
+    }
+
+    for entry in installed_iter {
+        all_json.push(parse_dfraw_dir(entry.path()));
+    }
+
+    for entry in mods_iter {
+        all_json.push(parse_dfraw_dir(entry.path()));
     }
 
     let non_empty_json: Vec<String> = all_json
@@ -171,7 +155,7 @@ pub fn parse_dfraw_dir(root_path: &Path) -> String {
         return String::new();
     }
 
-    //Todo: perform "normal" raws parsing on contents.. but we should inject our information from info.txt
+    //perform "normal" raws parsing on contents.. but we should inject our information from info.txt
     let json = parser::parse_directory_to_json_string(
         &objects_path,
         dfraw_module_info.get_identifier().as_str(),
@@ -272,14 +256,19 @@ pub fn parse_game_raws_to_file(input_path: &str, out_filepath: &Path) {
 /// Returns:
 ///
 /// A vector of all subdirectories as walkdir::DirEntry
-fn subdirectories(directory: &std::ffi::OsStr) -> Vec<walkdir::DirEntry> {
-    WalkDir::new(directory)
-        .max_depth(1)
-        .min_depth(1)
-        .into_iter()
-        .filter_map(|e| e.ok())
-        .filter(|e| e.file_type().is_dir())
-        .collect()
+fn subdirectories(directory: std::path::PathBuf) -> Option<Vec<walkdir::DirEntry>> {
+    if !(directory.exists() && directory.is_dir()) {
+        return None;
+    }
+    Some(
+        WalkDir::new(directory)
+            .max_depth(1)
+            .min_depth(1)
+            .into_iter()
+            .filter_map(|e| e.ok())
+            .filter(|e| e.file_type().is_dir())
+            .collect(),
+    )
 }
 
 /// It takes a path to a directory of raws, and a path to a file, and it parses the raws into JSON and saves as the file.
@@ -290,4 +279,123 @@ fn subdirectories(directory: &std::ffi::OsStr) -> Vec<walkdir::DirEntry> {
 /// * `output_file_path`: The path to the file you want to write the JSON to.
 pub fn parse_game_raws_to_file_out(input_path: &str, output_file_path: &Path) {
     parser::parse_directory_to_json_file(output_file_path, input_path, input_path, output_file_path)
+}
+
+#[cfg(feature = "tauri")]
+#[derive(Clone, serde::Serialize)]
+struct Payload {
+    percentage: f64,
+    current_module: String,
+}
+
+#[cfg(feature = "tauri")]
+pub fn parse_game_raws_with_tauri_emit(df_game_path: &str, window: tauri::Window) -> Vec<String> {
+    let mut all_json: Vec<String> = Vec::new();
+
+    //1. "validate" folder is as expected
+    let game_path = Path::new(df_game_path);
+    // Guard against invalid path
+    if !game_path.exists() {
+        log::error!(
+            "Provided game path for parsing doesn't exist!\n{}",
+            df_game_path
+        );
+        return all_json;
+    }
+    if !game_path.is_dir() {
+        log::error!("Game path needs to be a directory {}", df_game_path);
+        return all_json;
+    }
+
+    // warn on no gamelog.txt
+    if !game_path.join("gamelog.txt").exists() {
+        log::warn!("Unable to find gamelog.txt in game directory. Is it valid?");
+    }
+
+    let data_path = game_path.join("data");
+    let vanilla_path = data_path.join("vanilla");
+    let installed_mods_path = data_path.join("installed_mods");
+    let workshop_mods_path = game_path.join("mods");
+
+    let vanilla_iter: Vec<DirEntry> = subdirectories(vanilla_path).unwrap_or(Vec::new());
+    let installed_iter: Vec<DirEntry> = subdirectories(installed_mods_path).unwrap_or(Vec::new());
+    let mods_iter: Vec<DirEntry> = subdirectories(workshop_mods_path).unwrap_or(Vec::new());
+
+    // Calculate total number of modules we will parse:
+    let total_mods = vanilla_iter.len() + installed_iter.len() + mods_iter.len();
+    let mut current_mod: usize = 0;
+    let mut pct = 0.0;
+
+    for entry in vanilla_iter {
+        current_mod = current_mod + 1;
+        pct = current_mod as f64 / total_mods as f64;
+        match window.emit(
+            "PROGRESS",
+            Payload {
+                percentage: pct,
+                current_module: String::from(entry.file_name().to_str().unwrap_or("")),
+            },
+        ) {
+            Err(e) => log::debug!("Tauri window emit error {:?}", e),
+            _ => (),
+        };
+
+        all_json.push(parse_dfraw_dir(entry.path()));
+    }
+    for entry in installed_iter {
+        current_mod = current_mod + 1;
+        pct = current_mod as f64 / total_mods as f64;
+        match window.emit(
+            "PROGRESS",
+            Payload {
+                percentage: pct,
+                current_module: String::from(entry.file_name().to_str().unwrap_or("")),
+            },
+        ) {
+            Err(e) => log::debug!("Tauri window emit error {:?}", e),
+            _ => (),
+        };
+
+        all_json.push(parse_dfraw_dir(entry.path()));
+    }
+    for entry in mods_iter {
+        current_mod = current_mod + 1;
+        pct = current_mod as f64 / total_mods as f64;
+        match window.emit(
+            "PROGRESS",
+            Payload {
+                percentage: pct,
+                current_module: format!(
+                    "workshop-mod:{}",
+                    entry.file_name().to_str().unwrap_or("unknown")
+                ),
+            },
+        ) {
+            Err(e) => log::debug!("Tauri window emit error {:?}", e),
+            _ => (),
+        };
+
+        all_json.push(parse_dfraw_dir(entry.path()));
+    }
+
+    if pct < 1.0 {
+        pct = 1.0;
+        match window.emit(
+            "PROGRESS",
+            Payload {
+                percentage: pct,
+                current_module: String::new(),
+            },
+        ) {
+            Err(e) => log::debug!("Tauri window emit error {:?}", e),
+            _ => (),
+        };
+    }
+
+    let non_empty_json: Vec<String> = all_json
+        .into_iter()
+        .filter(|s| !String::is_empty(s))
+        .collect();
+
+    non_empty_json
 }

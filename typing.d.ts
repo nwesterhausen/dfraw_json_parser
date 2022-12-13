@@ -60,3 +60,9 @@ export type BodySizeRange = {
 
     descriptions: CasteRange<string>;
   } & Raw;
+
+  // Definition for tauri progress event payload
+  export type ProgressPayload = {
+    current_module: string;
+    percentage: number;
+  }
