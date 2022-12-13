@@ -323,7 +323,7 @@ pub fn parse_game_raws_with_tauri_emit(df_game_path: &str, window: tauri::Window
     // Calculate total number of modules we will parse:
     let total_mods = vanilla_iter.len() + installed_iter.len() + mods_iter.len();
     let mut current_mod: usize = 0;
-    let mut pct;
+    let mut pct = 0.0;
 
     for entry in vanilla_iter {
         current_mod = current_mod + 1;
