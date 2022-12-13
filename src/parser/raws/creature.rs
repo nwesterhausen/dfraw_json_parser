@@ -12,6 +12,8 @@ use super::{
 pub struct DFCreature {
     identifier: String,
     parent_raw: String,
+    dfraw_identifier: String,
+    dfraw_version: String,
     #[serde(rename = "objectId")]
     object_id: String,
 
@@ -31,7 +33,7 @@ pub struct DFCreature {
     pub general_child_name: SingPlurName,
     pub name: Name,
 
-    // Listicle
+    // Arrays
     pub biomes: Vec<String>,
     pub pref_string: Vec<String>,
 
@@ -46,8 +48,10 @@ impl Clone for DFCreature {
     fn clone(&self) -> Self {
         Self {
             identifier: self.identifier.to_string(),
-            parent_raw: self.identifier.to_string(),
-            object_id: self.identifier.to_string(),
+            parent_raw: self.parent_raw.to_string(),
+            object_id: self.object_id.to_string(),
+            dfraw_identifier: self.dfraw_identifier.to_string(),
+            dfraw_version: self.dfraw_version.to_string(),
             tags: self.tags.clone(),
             frequency: self.frequency,
             cluster_number: [self.cluster_number[0], self.cluster_number[1]],
@@ -130,7 +134,7 @@ pub struct DFCreatureCaste {
     pub child_name: SingPlurName,
     pub description: String,
 
-    // listicles
+    // Arrays
     pub creature_class: Vec<String>,
 
     // Custom tokens
@@ -139,11 +143,13 @@ pub struct DFCreatureCaste {
 }
 
 impl DFCreature {
-    pub fn new(raw: &str, id: &str) -> Self {
+    pub fn new(raw: &str, id: &str, dfraw_id: &str, dfraw_version: &str) -> Self {
         Self {
             identifier: String::from(id),
             parent_raw: String::from(raw),
             object_id: format!("{}-{}-{}", raw, "CREATURE", slugify(id)),
+            dfraw_identifier: String::from(dfraw_id),
+            dfraw_version: String::from(dfraw_version),
             // Boolean Flags
             tags: Vec::new(),
 
@@ -160,7 +166,7 @@ impl DFCreature {
             general_child_name: SingPlurName::new(""),
             name: Name::new(""),
 
-            // Listicle
+            // Arrays
             biomes: Vec::new(),
             pref_string: Vec::new(),
 
@@ -173,6 +179,12 @@ impl DFCreature {
     }
     pub fn get_identifier(&self) -> String {
         String::from(&self.identifier)
+    }
+    pub fn get_raw_module(&self) -> String {
+        String::from(&self.dfraw_identifier)
+    }
+    pub fn get_raw_module_version(&self) -> String {
+        String::from(&self.dfraw_version)
     }
     pub fn get_parent_raw(&self) -> String {
         String::from(&self.parent_raw)
@@ -316,7 +328,7 @@ impl DFCreature {
                             * 100.0
                             * (f64::powf(f64::from(body_size.size_cm3() / 10), -0.75));
                         let graze_int = format!("{}", graze_value.round());
-                        log::info!("{}:graze val = {}", &self.identifier, graze_value);
+                        log::debug!("{}:graze val = {}", &self.identifier, graze_value);
                         match graze_int.as_str().parse::<u32>() {
                             Ok(n) => {
                                 if n < 150 {
@@ -509,7 +521,7 @@ impl DFCreatureCaste {
             child_name: SingPlurName::new(""),
             description: String::new(),
 
-            // listicles
+            // Arrays
             creature_class: Vec::new(),
 
             // Custom tokens

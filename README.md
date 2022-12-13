@@ -26,42 +26,44 @@ the description of the animal, if they laid eggs, if they were milkable, and how
 
 #### Creature Token
 
-| Property          | Description                                   | Type                             |
-| ----------------- | --------------------------------------------- | -------------------------------- |
-| identifier        | defined in CREATURE token                     | String                           |
-| parent_raw        | name of the raw file its located              | String                           |
-| objectId          | unique id for creature                        | String                           |
-| name              | species name                                  | String                           |
-| names_map         | names by castes                               | HashMap<String, Vec<String>>     |
-| descriptions      | descriptions by castes                        | HashMap<String, String>          |
-| max_age           | max age by castes                             | HashMap<String, [u16; 2]>        |
-| clutch_size       | clutch size by castes                         | HashMap<String, [u16; 2]>        |
-| based_on          | defined by copy_tags_from token               | String                           |
-| biomes            | biomes creature found in                      | Vec<String>                      |
-| cluster_range     | clust range (how many appear at once)         | [u16; 2]                         |
-| underground_depth | depth found                                   | [u16; 2]                         |
-| body_size         | body size by castes                           | HashMap<String, Vec<DFBodySize>> |
-| grown_at          | age when adult by castes                      | HashMap<String, u32>             |
-| child_at          | age when adolescent by castes                 | HashMap<String, u32>             |
-| egg_sizes         | egg size by castes                            | HashMap<String, u32>             |
-| pet_value         | pet value by castes                           | HashMap<String, u16>             |
-| intelligence      | intelligence by castes                        | HashMap<String, [bool; 2]>       |
-| flier             | flier by castes                               | HashMap<String, bool>            |
-| gnawer            | gnawer by castes                              | HashMap<String, bool>            |
-| trainable         | trainability by castes                        | HashMap<String, u8>              |
-| active_time       | active time by castes                         | HashMap<String, u8>              |
-| inactive_season   | NO_SEASON by castes                           | HashMap<String, u8>              |
-| creature_class    | creature class by castes                      | HashMap<String, Vec<String>>     |
-| tags              | tags on the creature                          | Vec<CreatureTag>                 |
-| caste_tags        | tags on each caste                            | HashMap<String, Vec<CasteTag>>   |
-| difficulty        | difficulty by castes                          | HashMap<String, u32>             |
-| grass_trample     | grass trample by castes                       | HashMap<String, u8>              |
-| grazer            | grazer by castes                              | HashMap<String, u32>             |
-| low_light_vision  | low light vision by castes                    | HashMap<String, u32>             |
-| pop_ratio         | population ratio by castes                    | HashMap<String, u16>             |
-| milkable          | milk production by castes                     | HashMap<String, DFMilkable>      |
-| pref_string       | preference string for creature                | Vec<String>                      |
-| population_number | pop num (how many exist per valid world tile) | [u16; 2]                         |
+| Property           | Description                                   | Type                               |
+| ------------------ | --------------------------------------------- | ---------------------------------- |
+| identifier         | defined in CREATURE token                     | `String`                           |
+| parent_raw         | name of the raw file its located              | `String`                           |
+| raw_module         | id of the raws module raw is from             | `String`                           |
+| raw_module_version | version of the raws module raw is from        | `String`                           |
+| objectId           | unique id for creature                        | `String`                           |
+| name               | species name                                  | `String`                           |
+| names_map          | names by castes                               | `HashMap<String, Vec<String>>`     |
+| descriptions       | descriptions by castes                        | `HashMap<String, String>`          |
+| max_age            | max age by castes                             | `HashMap<String, [u16; 2]>`        |
+| clutch_size        | clutch size by castes                         | `HashMap<String, [u16; 2]>`        |
+| based_on           | defined by copy_tags_from token               | `String`                           |
+| biomes             | biomes creature found in                      | `Vec<String>`                      |
+| cluster_range      | cluster range (how many appear at once)       | `[u16; 2]`                         |
+| underground_depth  | depth found                                   | `[u16; 2]`                         |
+| body_size          | body size by castes                           | `HashMap<String, Vec<DFBodySize>>` |
+| grown_at           | age when adult by castes                      | `HashMap<String, u32>`             |
+| child_at           | age when adolescent by castes                 | `HashMap<String, u32>`             |
+| egg_sizes          | egg size by castes                            | `HashMap<String, u32>`             |
+| pet_value          | pet value by castes                           | `HashMap<String, u16>`             |
+| intelligence       | intelligence by castes                        | `HashMap<String, [bool; 2]>`       |
+| flier              | flier by castes                               | `HashMap<String, bool>`            |
+| gnawer             | gnawer by castes                              | `HashMap<String, bool>`            |
+| trainable          | trainability by castes                        | `HashMap<String, u8>`              |
+| active_time        | active time by castes                         | `HashMap<String, u8>`              |
+| inactive_season    | NO_SEASON by castes                           | `HashMap<String, u8>`              |
+| creature_class     | creature class by castes                      | `HashMap<String, Vec<String>>`     |
+| tags               | tags on the creature                          | `Vec<CreatureTag>`                 |
+| caste_tags         | tags on each caste                            | `HashMap<String, Vec<CasteTag>>`   |
+| difficulty         | difficulty by castes                          | `HashMap<String, u32>`             |
+| grass_trample      | grass trample by castes                       | `HashMap<String, u8>`              |
+| grazer             | grazer by castes                              | `HashMap<String, u32>`             |
+| low_light_vision   | low light vision by castes                    | `HashMap<String, u32>`             |
+| pop_ratio          | population ratio by castes                    | `HashMap<String, u16>`             |
+| milkable           | milk production by castes                     | `HashMap<String, DFMilkable>`      |
+| pref_string        | preference string for creature                | `Vec<String>`                      |
+| population_number  | pop num (how many exist per valid world tile) | `[u16; 2]`                         |
 
 ## Rust Program
 
@@ -77,49 +79,49 @@ cargo run --example cli -- --help
 
 ### cli.rs
 
-```
-USAGE:
-    cli.exe [OPTIONS]
+```sh
+Library which parses Dwarf Fortress raw files into JSON
 
-OPTIONS:
-    -h, --help
-            Print help information
+Usage: cli.exe [OPTIONS]
 
-    -o, --out-dir <OUT_DIR>
-            Specify the directory that the JSON database should be saved into.
+Options:
+  -g, --game-dir <GAME_DIR>
+          Specify the directory where Dwarf Fortress is installed.
 
-            If raw files are parsed, a JSON database (an array of objects) is
-            saved to disk in a location specified by this argument. This will
-            create an 'out.json' file in the directory specified by this argument.
+          This directory will likely include the 'gamelog.txt' file, and it should have a 'data' subdirectory.
 
-            [default: ./www/]
+          [default: ]
 
-    -p, --port <PORT>
-            Specify the port to run the web server on.
+  -o, --out-dir <OUT_DIR>
+          Specify the directory that the JSON database should be saved into.
 
-            [default: 4501]
+          If raw files are parsed, a JSON database (an array of objects) is
+          saved to disk in a location specified by this argument. This will
+          create an 'out.json' file in the directory specified by this argument.
 
-    -r, --raws-dir <RAWS_DIR>
-            Specify the directory containing the raw files.
+          [default: ./www/]
 
-            This usually is a directory named 'raw' in the save or game directory.
-            If this is left unspecified, no raws will be parsed when running.
+  -s, --serve
+          Include this flag to start a web server for the web search client.
 
-            [default: ]
+          Included in the repository is a 'www' folder with a small web client
+          that will fetch the JSON database created by this program (out.json)
+          and present it in a searchable manner to the user.
 
-    -s, --serve
-            Include this flag to start a web server for the web search client.
+          If you include this flag, after any parsing is done, a tiny HTTP server
+          will start server files from the directory specified by 'out-dir' which
+          defaults to ./www
 
-            Included in the repository is a 'www' folder with a small web client
-            that will fetch the JSON database created by this program (out.json)
-            and present it in a searchable manner to the user.
+  -p, --port <PORT>
+          Specify the port to run the web server on.
 
-            If you include this flag, after any parsing is done, a tiny HTTP server
-            will start server files from the directory specified by 'out-dir' which
-            defaults to ./www
+          [default: 4501]
 
-    -V, --version
-            Print version information
+  -h, --help
+          Print help information (use `-h` for a summary)
+
+  -V, --version
+          Print version information
 ```
 
 ### How to use

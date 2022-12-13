@@ -9,75 +9,285 @@ Currently the only raws that are parsed are Creature raws.
 Currently the JSON is returned as a string
 */
 
+use std::fs::File;
+use std::io::{BufWriter, Write};
 use std::path::Path;
+use walkdir::WalkDir;
 
 mod parser;
 
-//Todo: add an option to recurse into the directory
 //Todo: add an option to apply any COPY_TAG_FROM and APPLY_CREATURE_VARIATION tags
 //Todo: add an option to specify what kinds of raws to parse
 //Todo: add a parameter for JSON_FILE name (currently hard-coded to out.json)
 
-/**
-This will return JSON (in string format) of the `rawfile`.
+/// It takes a path to a DF game directory, and returns a JSON array of all the raws in that directory
+///
+/// Arguments:
+///
+/// * `df_game_path`: The path to the game directory. This is the directory that contains the data,
+/// mods, and gamelog.txt files.
+///
+/// Returns:
+///
+/// A string vec containing the JSON array for each parsed raws module
+pub fn parse_game_raws(df_game_path: &str) -> Vec<String> {
+    let mut all_json: Vec<String> = Vec::new();
 
-# Examples
+    //1. "validate" folder is as expected
+    let game_path = Path::new(df_game_path);
+    // Guard against invalid path
+    if !game_path.exists() {
+        log::error!(
+            "Provided game path for parsing doesn't exist!\n{}",
+            df_game_path
+        );
+        return all_json;
+    }
+    if !game_path.is_dir() {
+        log::error!("Game path needs to be a directory {}", df_game_path);
+        return all_json;
+    }
 
-```
-use dfraw_json_parser::parse_rawfile_to_json_string;
+    // warn on no gamelog.txt
+    if !game_path.join("gamelog.txt").exists() {
+        log::warn!("Unable to find gamelog.txt in game directory. Is it valid?");
+    }
 
-let jsonString = parse_rawfile_to_json_string("creature_next_underground.txt");
-```
-*/
-pub fn parse_rawfile_to_json_string(rawfile: &str) -> String  {
-    parser::parse_directory_to_json_string(rawfile)
+    let data_path = game_path.join("data");
+    // Guard against missing data path
+    if data_path.exists() && data_path.is_dir() {
+        let vanilla_path = data_path.join("vanilla");
+        let installed_mods_path = data_path.join("installed_mods");
+
+        if vanilla_path.exists() {
+            // Loop through each dfraw_directory and parse it
+            let it = subdirectories(vanilla_path.as_os_str());
+
+            for entry in it {
+                all_json.push(parse_dfraw_dir(entry.path()));
+            }
+        }
+        if installed_mods_path.exists() {
+            // Loop through each dfraw_directory and parse it
+            let it = subdirectories(installed_mods_path.as_os_str());
+
+            for entry in it {
+                all_json.push(parse_dfraw_dir(entry.path()));
+            }
+        }
+    } else {
+        log::warn!(
+            "No data subdirectory found in game directory! Unable to parse raws from vanilla or installed mod."
+        );
+    }
+
+    let workshop_mods_path = game_path.join("mods");
+
+    if workshop_mods_path.exists() && workshop_mods_path.is_dir() {
+        // Loop through each dfraw_directory and parse it
+        let it = subdirectories(workshop_mods_path.as_os_str());
+
+        for entry in it {
+            all_json.push(parse_dfraw_dir(entry.path()));
+        }
+    } else {
+        log::info!("No mods subdirectory, will not attempt parsing raws from it");
+    }
+
+    let non_empty_json: Vec<String> = all_json
+        .into_iter()
+        .filter(|s| !String::is_empty(s))
+        .collect();
+
+    non_empty_json
 }
 
-/**
-This will parse the file it finds at `rawfile` and save the parsed JSON
-to an 'out.json' file in the out_directory.
+/// Parse a directory of raws, and return a JSON string of the parsed raws.
+///
+/// The first thing we do is check that the directory exists, and that it's a directory. If it doesn't
+/// exist, or it's not a directory, we return an empty string
+///
+/// Arguments:
+///
+/// * `root_path`: The path to the directory containing the raws.
+///
+/// Returns:
+///
+/// A JSON string containing the raws for the given directory.
+pub fn parse_dfraw_dir(root_path: &Path) -> String {
+    //1. Get information from the info.txt file
+    if !root_path.exists() {
+        log::error!(
+            "Provided directory to parse raws does not exist: {:?}",
+            root_path
+        );
+        return String::new();
+    }
+    if !root_path.is_dir() {
+        log::error!(
+            "Provided 'directory' to parse is not actually a directory! {:?}",
+            root_path
+        );
+        return String::new();
+    }
 
-# Examples
+    // Check for info.txt
+    let info_txt_path = root_path.join("info.txt");
+    if !info_txt_path.exists() {
+        let Some(dir_name) = root_path.file_name() else {
+            log::error!("Error reading module dir {:?}", root_path);
+            return String::new();
+        };
+        let dir_name_str = dir_name.to_str().unwrap_or("");
 
-```
-use dfraw_json_parser::parse_rawfile_to_json_file;
+        if !(dir_name_str.eq("mod_upload")
+            || dir_name_str.eq("examples and notes")
+            || dir_name_str.eq("interaction examples"))
+        {
+            log::error!(
+                "No info.txt as expected in {:?}. Is this DF 50.xx?",
+                root_path.file_name().unwrap_or_default()
+            );
+        }
 
-// This saves an 'out.json' file in the current directory
-parse_rawfile_to_json_file("creature_birds.txt", &std::env::current_dir().unwrap());
-```
-*/
-pub fn parse_rawfile_to_json_file(rawfile: &str, out_directory: &Path) {
-    parser::parse_directory_to_json_file(rawfile, out_directory);
+        return String::new();
+    }
+
+    let dfraw_module_info = parser::parse_info_file(&info_txt_path);
+    log::info!(
+        "Parsing raws for {} v{}",
+        dfraw_module_info.get_identifier(),
+        dfraw_module_info.displayed_version
+    );
+
+    //2. Parse raws in the 'object' subdirectory
+    let objects_path = root_path.join("objects");
+    if !objects_path.exists() {
+        log::warn!("No objects subdirectory, no raws to parse.");
+        return String::new();
+    }
+    if !objects_path.is_dir() {
+        log::error!("Objects subdirectory is not valid subdirectory! Unable to parse raws.");
+        return String::new();
+    }
+
+    //Todo: perform "normal" raws parsing on contents.. but we should inject our information from info.txt
+    let json = parser::parse_directory_to_json_string(
+        &objects_path,
+        dfraw_module_info.get_identifier().as_str(),
+        dfraw_module_info.displayed_version.as_str(),
+    );
+
+    //3. Return the object array for this dfraw dir
+    json
 }
 
-/**
-This will return JSON (in string format) of the raw files in raws_directory.
+/// It takes a path to a folder containing raws, and a path to a file, and it parses the raws and saves
+/// the result to the file as JSON
+///
+/// Arguments:
+///
+/// * `input_path`: The path to the raws folder.
+/// * `output_file_path`: The path to the file to save the parsed raws to.
+pub fn parse_game_raws_to_file(input_path: &str, out_filepath: &Path) {
+    let json_string_vec = parse_game_raws(input_path);
+    log::info!("Saving json to to {:?}", out_filepath);
 
-# Examples
+    let out_file = match File::create(&out_filepath) {
+        Ok(f) => f,
+        Err(e) => {
+            log::error!("Unable to open out.json for writing \n{:?}", e);
+            return;
+        }
+    };
 
-```
-use dfraw_json_parser::parse_directory_to_json_string;
+    let mut stream = BufWriter::new(out_file);
+    let write_error = &format!("Unable to write to {}", out_filepath.to_string_lossy());
+    match write!(stream, "[") {
+        Ok(_x) => (),
+        Err(e) => {
+            log::error!("{}\n{:?}", write_error, e);
+            return;
+        }
+    };
 
-let jsonString = parse_directory_to_json_string("data/save/region1/raw");
-```
-*/
-pub fn parse_directory_to_json_string(raws_directory: &str) -> String {
-    parser::parse_directory_to_json_string(raws_directory)
+    let mut json_string_iter = json_string_vec.into_iter().peekable();
+    while let Some(json_string) = json_string_iter.next() {
+        match write!(stream, "{}", json_string) {
+            Ok(_x) => (),
+            Err(e) => {
+                log::error!("{}\n{:?}", write_error, e);
+                return;
+            }
+        };
+
+        if json_string_iter.peek().is_some() {
+            match write!(stream, ",") {
+                Ok(_x) => (),
+                Err(e) => {
+                    log::error!("{}\n{:?}", write_error, e);
+                    return;
+                }
+            };
+        }
+
+        match stream.flush() {
+            Ok(_x) => (),
+            Err(e) => {
+                log::error!("{}\n{:?}", write_error, e);
+                return;
+            }
+        };
+    }
+
+    match write!(stream, "]") {
+        Ok(_x) => (),
+        Err(e) => {
+            log::error!("{}\n{:?}", write_error, e);
+            return;
+        }
+    };
+    match stream.flush() {
+        Ok(_x) => (),
+        Err(e) => {
+            log::error!("{}\n{:?}", write_error, e);
+        }
+    };
 }
 
-/**
-This will parse what raw files it finds at raws_directory and save the parsed JSON
-to an 'out.json' file in the out_directory.
+/// Get a vec of subdirectories for a given directory
+///
+/// Using the WalkDir crate:
+/// 1. create a new WalkDir for `directory`
+/// 2. limit to immediate contents (max_depth and min_depth at 1)
+/// 3. as an iterator..
+///     4. filter_map into only non-error results
+///     5. filter into only directories
+/// 4. collect as a vec
+///
+/// Arguments:
+///
+/// * `directory`: The directory to search in
+///
+/// Returns:
+///
+/// A vector of all subdirectories as walkdir::DirEntry
+fn subdirectories(directory: &std::ffi::OsStr) -> Vec<walkdir::DirEntry> {
+    WalkDir::new(directory)
+        .max_depth(1)
+        .min_depth(1)
+        .into_iter()
+        .filter_map(|e| e.ok())
+        .filter(|e| e.file_type().is_dir())
+        .collect()
+}
 
-# Examples
-
-```
-use dfraw_json_parser::parse_directory_to_json_file;
-
-// This saves an 'out.json' file in the current directory
-parse_directory_to_json_file("data/save/region1/raw", &std::env::current_dir().unwrap());
-```
-*/
-pub fn parse_directory_to_json_file(raws_directory: &str, out_directory: &Path) {
-    parser::parse_directory_to_json_file(raws_directory, out_directory);
+/// It takes a path to a directory of raws, and a path to a file, and it parses the raws into JSON and saves as the file.
+///
+/// Arguments:
+///
+/// * `input_path`: The path to the raws directory.
+/// * `output_file_path`: The path to the file you want to write the JSON to.
+pub fn parse_game_raws_to_file_out(input_path: &str, output_file_path: &Path) {
+    parser::parse_directory_to_json_file(output_file_path, input_path, input_path, output_file_path)
 }
