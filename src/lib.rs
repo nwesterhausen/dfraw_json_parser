@@ -355,11 +355,14 @@ pub fn parse_game_raws_with_tauri_emit(df_game_path: &str, window: tauri::Window
 
         all_json.push(parse_dfraw_dir(entry.path()));
     }
-    pct = 1.0;
-    match window.emit("PROGRESS", Payload { pct }) {
-        Err(e) => log::debug!("Tauri window emit error {:?}", e),
-        _ => (),
-    };
+
+    if pct < 1.0 {
+        pct = 1.0;
+        match window.emit("PROGRESS", Payload { pct }) {
+            Err(e) => log::debug!("Tauri window emit error {:?}", e),
+            _ => (),
+        };
+    }
 
     let non_empty_json: Vec<String> = all_json
         .into_iter()
