@@ -15,7 +15,7 @@ pub struct DFCreature {
     parent_raw: String,
     dfraw_identifier: String,
     dfraw_version: String,
-    found_in: String,
+    dfraw_found_in: String,
     #[serde(rename = "objectId")]
     object_id: String,
 
@@ -54,7 +54,7 @@ impl Clone for DFCreature {
             object_id: self.object_id.to_string(),
             dfraw_identifier: self.dfraw_identifier.to_string(),
             dfraw_version: self.dfraw_version.to_string(),
-            found_in: self.found_in.to_string(),
+            dfraw_found_in: self.dfraw_found_in.to_string(),
             tags: self.tags.clone(),
             frequency: self.frequency,
             cluster_number: [self.cluster_number[0], self.cluster_number[1]],
@@ -153,7 +153,7 @@ impl DFCreature {
             object_id: format!("{}-{}-{}", raw, "CREATURE", slugify(id)),
             dfraw_identifier: String::from(info_text.get_identifier()),
             dfraw_version: String::from(info_text.displayed_version.as_str()),
-            found_in: String::from(info_text.get_sourced_directory()),
+            dfraw_found_in: String::from(info_text.get_sourced_directory()),
             // Boolean Flags
             tags: Vec::new(),
 
@@ -189,6 +189,9 @@ impl DFCreature {
     }
     pub fn get_raw_module_version(&self) -> String {
         String::from(&self.dfraw_version)
+    }
+    pub fn get_dfraw_found_in(&self) -> String {
+        String::from(&self.dfraw_found_in)
     }
     pub fn get_parent_raw(&self) -> String {
         String::from(&self.parent_raw)

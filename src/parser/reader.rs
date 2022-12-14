@@ -22,13 +22,109 @@ lazy_static! {
         encoding_rs::Encoding::for_label(b"latin1");
 }
 
-pub fn parse_file(input_path: &str, info_text: &DFInfoFile) -> Vec<creature::DFCreature> {
+/// It reads a file, line by line, and checks the first line for the filename, reads lines until it encounters the
+/// [OBJECT:<type>] tag in the file.
+///
+/// Arguments:
+///
+/// * `input_path`: Path to the file to be read
+/// * `module_info`: Information about the raw module `input_path` is within
+///
+/// Returns:
+///
+/// RawObjectKind for the type of [OBJECT] tag encountered, and RawObjectKind::None if it is unsupported.
+pub fn read_raw_file_type(input_path: &Path) -> RawObjectKind {
+    let caller = "Raw File Type Checker";
+    // Validate file exists
+    if !input_path.exists() {
+        log::error!("{} - Path doesn't exist {}", caller, input_path.display());
+        return RawObjectKind::None;
+    }
+    if !input_path.is_file() {
+        log::error!(
+            "{} - Path does not point to a file {}",
+            caller,
+            input_path.display(),
+        );
+        return RawObjectKind::None;
+    }
+
+    // Open the file
+    let Ok(file) = File::open(input_path) else {
+        log::error!("{} - Unable to open file {}",caller, input_path.display());
+        return RawObjectKind::None;
+    };
+
+    // Setup a file reader for the encoding used by DF
+    let decoding_reader = DecodeReaderBytesBuilder::new().encoding(*ENC).build(file);
+    let reader = BufReader::new(decoding_reader);
+
+    // String to store the parsed filename in
+    let mut raw_filename = String::new();
+
+    // Read in lines until we encounter the [OBJECT tag] or complete the file.
+    for (index, line) in reader.lines().enumerate() {
+        if line.is_err() {
+            log::error!(
+                "{} - Error processing {}:{}",
+                caller,
+                input_path.display(),
+                index
+            );
+            continue;
+        }
+        // Match the line so we can check the pieces of it
+        let line = match line {
+            Ok(l) => l,
+            Err(e) => {
+                log::error!("Line-reading error\n{:?}", e);
+                continue;
+            }
+        };
+        // The filename is always the top line of a DF raw file
+        if index == 0 {
+            raw_filename = String::from(&line);
+            continue;
+        }
+        // Multiple matches can occur in a single line, so we loop over all captures within the match
+        // for this line.
+        for cap in RE.captures_iter(&line) {
+            log::trace!("{} - Key: {} Value: {}", caller, &cap[2], &cap[3]);
+            // Match the front part of the tag
+            match &cap[2] {
+                // We are only concerned with the [OBJECT] key
+                "OBJECT" => {
+                    log::trace!("{} - {} is a {} raw file", caller, raw_filename, &cap[3]);
+                    match &cap[3] {
+                        "CREATURE" => {
+                            return RawObjectKind::Creature;
+                        }
+                        // Currently, any other type of raw object is unsupported
+                        &_ => {
+                            log::debug!("{} - Currently no support for OBJECT:{}", caller, &cap[3]);
+                            return RawObjectKind::None;
+                            // current_object = RawObjectKind::None;
+                        }
+                    }
+                }
+                &_ => (),
+            }
+        }
+    }
+
+    // Reading through the entire file and not finding an [OBJECT] tag means the raw file is invalid
+    log::warn!("{} - no [OBJECT] tag in {}", caller, input_path.display());
+    RawObjectKind::None
+}
+
+pub fn parse_creature_file(input_path: &Path, info_text: &DFInfoFile) -> Vec<creature::DFCreature> {
+    let caller = "Parse Creature Raw";
     let mut results: Vec<creature::DFCreature> = Vec::new();
 
     let file = match File::open(&input_path) {
         Ok(f) => f,
         Err(e) => {
-            log::error!("Error opening raw file for parsing!\n{:?}", e);
+            log::error!("{} - Error opening raw file for parsing!\n{:?}", caller, e);
             return results;
         }
     };
@@ -50,13 +146,18 @@ pub fn parse_file(input_path: &str, info_text: &DFInfoFile) -> Vec<creature::DFC
 
     for (index, line) in reader.lines().enumerate() {
         if line.is_err() {
-            log::error!("Error processing {}:{}", &input_path, index);
+            log::error!(
+                "{} - Error processing {}:{}",
+                caller,
+                input_path.display(),
+                index
+            );
             continue;
         }
         let line = match line {
             Ok(l) => l,
             Err(e) => {
-                log::error!("Line-reading error\n{:?}", e);
+                log::error!("{} - Line-reading error\n{:?}", caller, e);
                 continue;
             }
         };
@@ -65,7 +166,7 @@ pub fn parse_file(input_path: &str, info_text: &DFInfoFile) -> Vec<creature::DFC
             continue;
         }
         for cap in RE.captures_iter(&line) {
-            log::debug!("Key: {} Value: {}", &cap[2], &cap[3]);
+            log::trace!("{} - Key: {} Value: {}", caller, &cap[2], &cap[3]);
             match &cap[2] {
                 "OBJECT" => match &cap[3] {
                     "CREATURE" => {
@@ -73,8 +174,8 @@ pub fn parse_file(input_path: &str, info_text: &DFInfoFile) -> Vec<creature::DFC
                         current_object = RawObjectKind::Creature;
                     }
                     &_ => {
-                        log::debug!("No support right now for OBJECT:{}", &cap[3]);
-                        return results;
+                        log::debug!("{} - Wrong type of raw ({})", caller, &cap[3]);
+                        return Vec::new();
                         // current_object = RawObjectKind::None;
                     }
                 },
@@ -753,7 +854,7 @@ pub fn parse_file(input_path: &str, info_text: &DFInfoFile) -> Vec<creature::DFC
                 "SELECT_CASTE" => {
                     //SELECT_CASTE:<CASTE_NAME> --> retrieve tags for this
                     let target_caste_name = &cap[3];
-                    log::debug!(
+                    log::trace!(
                         "{}: selecting caste {}",
                         creature_temp.get_identifier(),
                         target_caste_name
@@ -798,7 +899,14 @@ pub fn parse_file(input_path: &str, info_text: &DFInfoFile) -> Vec<creature::DFC
         }
         RawObjectKind::None => (),
     }
-    log::info!("{} creatures defined in {}", results.len(), &raw_filename);
+    log::info!(
+        "{} creatures defined in {} ({} {} in {})",
+        results.len(),
+        &raw_filename,
+        info_text.get_identifier(),
+        info_text.displayed_version,
+        info_text.get_sourced_directory(),
+    );
     results
 }
 
@@ -834,7 +942,7 @@ pub fn parse_dfraw_module_info_file(info_file_path: &Path, source_dir: &str) -> 
             }
         };
         for cap in RE.captures_iter(&line) {
-            log::debug!("Key: {} Value: {}", &cap[2], &cap[3]);
+            log::trace!("Key: {} Value: {}", &cap[2], &cap[3]);
             match &cap[2] {
                 // SECTION FOR MATCHING info.txt DATA
                 "ID" => {

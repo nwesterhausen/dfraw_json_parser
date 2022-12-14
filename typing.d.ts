@@ -9,7 +9,7 @@
     tags: string[];
     raw_module: string;
     raw_module_version: string;
-    found_in: string;
+    raw_module_found_in: string;
   };
 
 export type BodySizeRange = {

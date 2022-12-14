@@ -137,6 +137,7 @@ pub fn parse_dfraw_dir(root_path: &Path, sourced_dir: &str) -> String {
         return String::new();
     }
 
+    // Parse info.txt to get raw module information
     let dfraw_module_info = parser::parse_info_file(&info_txt_path, sourced_dir);
     log::info!(
         "Parsing raws for {} v{}",
@@ -147,7 +148,7 @@ pub fn parse_dfraw_dir(root_path: &Path, sourced_dir: &str) -> String {
     //2. Parse raws in the 'object' subdirectory
     let objects_path = root_path.join("objects");
     if !objects_path.exists() {
-        log::warn!("No objects subdirectory, no raws to parse.");
+        log::debug!("No objects subdirectory, no raws to parse.");
         return String::new();
     }
     if !objects_path.is_dir() {
