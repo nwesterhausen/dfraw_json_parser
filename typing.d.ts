@@ -9,6 +9,7 @@
     tags: string[];
     raw_module: string;
     raw_module_version: string;
+    found_in: string;
   };
 
 export type BodySizeRange = {
@@ -60,6 +61,19 @@ export type BodySizeRange = {
 
     descriptions: CasteRange<string>;
   } & Raw;
+
+  // info.txt raw definition
+  export type DFInfoFile = {
+    identifier: string;
+    sourced_directory: string;
+    numeric_version: number;
+    displayed_version: string;
+    earliest_compatible_numeric_version: number;
+    earliest_compatible_displayed_version: string;
+    author: string;
+    name: string;
+    description: string;
+}
 
   // Definition for tauri progress event payload
   export type ProgressPayload = {

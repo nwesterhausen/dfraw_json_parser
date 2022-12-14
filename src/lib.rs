@@ -67,15 +67,15 @@ pub fn parse_game_raws(df_game_path: &str) -> Vec<String> {
 
     // Loop through each dfraw_directory and parse it
     for entry in vanilla_iter {
-        all_json.push(parse_dfraw_dir(entry.path()));
+        all_json.push(parse_dfraw_dir(entry.path(), "vanilla"));
     }
 
     for entry in installed_iter {
-        all_json.push(parse_dfraw_dir(entry.path()));
+        all_json.push(parse_dfraw_dir(entry.path(), "installed_mods"));
     }
 
     for entry in mods_iter {
-        all_json.push(parse_dfraw_dir(entry.path()));
+        all_json.push(parse_dfraw_dir(entry.path(), "mods"));
     }
 
     let non_empty_json: Vec<String> = all_json
@@ -98,7 +98,7 @@ pub fn parse_game_raws(df_game_path: &str) -> Vec<String> {
 /// Returns:
 ///
 /// A JSON string containing the raws for the given directory.
-pub fn parse_dfraw_dir(root_path: &Path) -> String {
+pub fn parse_dfraw_dir(root_path: &Path, sourced_dir: &str) -> String {
     //1. Get information from the info.txt file
     if !root_path.exists() {
         log::error!(
@@ -137,7 +137,7 @@ pub fn parse_dfraw_dir(root_path: &Path) -> String {
         return String::new();
     }
 
-    let dfraw_module_info = parser::parse_info_file(&info_txt_path);
+    let dfraw_module_info = parser::parse_info_file(&info_txt_path, sourced_dir);
     log::info!(
         "Parsing raws for {} v{}",
         dfraw_module_info.get_identifier(),
@@ -156,11 +156,7 @@ pub fn parse_dfraw_dir(root_path: &Path) -> String {
     }
 
     //perform "normal" raws parsing on contents.. but we should inject our information from info.txt
-    let json = parser::parse_directory_to_json_string(
-        &objects_path,
-        dfraw_module_info.get_identifier().as_str(),
-        dfraw_module_info.displayed_version.as_str(),
-    );
+    let json = parser::parse_directory_to_json_string(&objects_path, &dfraw_module_info);
 
     //3. Return the object array for this dfraw dir
     json
@@ -277,8 +273,12 @@ fn subdirectories(directory: std::path::PathBuf) -> Option<Vec<walkdir::DirEntry
 ///
 /// * `input_path`: The path to the raws directory.
 /// * `output_file_path`: The path to the file you want to write the JSON to.
-pub fn parse_game_raws_to_file_out(input_path: &str, output_file_path: &Path) {
-    parser::parse_directory_to_json_file(output_file_path, input_path, input_path, output_file_path)
+pub fn parse_game_raws_to_file_out(
+    input_path: &Path,
+    info_file_data: &parser::raws::info::DFInfoFile,
+    output_file_path: &Path,
+) {
+    parser::parse_directory_to_json_file(input_path, info_file_data, output_file_path)
 }
 
 #[cfg(feature = "tauri")]
@@ -340,7 +340,7 @@ pub fn parse_game_raws_with_tauri_emit(df_game_path: &str, window: tauri::Window
             _ => (),
         };
 
-        all_json.push(parse_dfraw_dir(entry.path()));
+        all_json.push(parse_dfraw_dir(entry.path(), "vanilla"));
     }
     for entry in installed_iter {
         current_mod = current_mod + 1;
@@ -356,7 +356,7 @@ pub fn parse_game_raws_with_tauri_emit(df_game_path: &str, window: tauri::Window
             _ => (),
         };
 
-        all_json.push(parse_dfraw_dir(entry.path()));
+        all_json.push(parse_dfraw_dir(entry.path(), "installed_mods"));
     }
     for entry in mods_iter {
         current_mod = current_mod + 1;
@@ -375,7 +375,7 @@ pub fn parse_game_raws_with_tauri_emit(df_game_path: &str, window: tauri::Window
             _ => (),
         };
 
-        all_json.push(parse_dfraw_dir(entry.path()));
+        all_json.push(parse_dfraw_dir(entry.path(), "mods"));
     }
 
     if pct < 1.0 {

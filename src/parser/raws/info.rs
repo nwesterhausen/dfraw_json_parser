@@ -3,6 +3,7 @@ use serde::{Deserialize, Serialize};
 #[derive(Serialize, Deserialize, Debug)]
 pub struct DFInfoFile {
     identifier: String,
+    sourced_directory: String,
     pub numeric_version: u32,
     pub displayed_version: String,
     pub earliest_compatible_numeric_version: u32,
@@ -13,9 +14,10 @@ pub struct DFInfoFile {
 }
 
 impl DFInfoFile {
-    pub fn new(id: &str) -> Self {
+    pub fn new(id: &str, sourced_dir: &str) -> Self {
         Self {
             identifier: id.to_string(),
+            sourced_directory: sourced_dir.to_string(),
             numeric_version: 0,
             displayed_version: "0".to_string(),
             earliest_compatible_numeric_version: 0,
@@ -28,5 +30,8 @@ impl DFInfoFile {
 
     pub fn get_identifier(&self) -> String {
         String::from(&self.identifier)
+    }
+    pub fn get_sourced_directory(&self) -> String {
+        String::from(&self.sourced_directory)
     }
 }

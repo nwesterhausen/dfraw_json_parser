@@ -1,4 +1,5 @@
 use super::parsing;
+use super::raws::info::DFInfoFile;
 use super::raws::tags::{CasteTag, CreatureTag};
 use super::raws::{biomes, creature, info, names, tags};
 
@@ -21,11 +22,7 @@ lazy_static! {
         encoding_rs::Encoding::for_label(b"latin1");
 }
 
-pub fn parse_file(
-    input_path: &str,
-    dfraw_id: &str,
-    dfraw_version: &str,
-) -> Vec<creature::DFCreature> {
+pub fn parse_file(input_path: &str, info_text: &DFInfoFile) -> Vec<creature::DFCreature> {
     let mut results: Vec<creature::DFCreature> = Vec::new();
 
     let file = match File::open(&input_path) {
@@ -43,7 +40,7 @@ pub fn parse_file(
     let mut raw_filename = String::new();
     let mut current_object = RawObjectKind::None;
     let mut started = false;
-    let mut creature_temp = creature::DFCreature::new("None", "None", dfraw_id, dfraw_version);
+    let mut creature_temp = creature::DFCreature::new("None", "None", info_text);
 
     let mut caste_tags: Vec<CasteTag> = Vec::new();
     let mut creature_tags: Vec<CreatureTag> = Vec::new();
@@ -102,12 +99,8 @@ pub fn parse_file(
                             }
                             //Reset all temp values
                             //1. Make new creature from [CREATURE:<NAME>]
-                            creature_temp = creature::DFCreature::new(
-                                &raw_filename,
-                                &cap[3],
-                                dfraw_id,
-                                dfraw_version,
-                            );
+                            creature_temp =
+                                creature::DFCreature::new(&raw_filename, &cap[3], info_text);
                             //2. Make new caste
                             caste_temp = creature::DFCreatureCaste::new("ALL");
                             //3. Reset/empty caste tags
@@ -809,12 +802,12 @@ pub fn parse_file(
     results
 }
 
-pub fn parse_dfraw_module_info_file(info_file_path: &Path) -> info::DFInfoFile {
+pub fn parse_dfraw_module_info_file(info_file_path: &Path, source_dir: &str) -> info::DFInfoFile {
     let file = match File::open(&info_file_path) {
         Ok(f) => f,
         Err(e) => {
             log::error!("Error opening raw file for parsing!\n{:?}", e);
-            return info::DFInfoFile::new("error");
+            return info::DFInfoFile::new("error", source_dir);
         }
     };
 
@@ -822,7 +815,7 @@ pub fn parse_dfraw_module_info_file(info_file_path: &Path) -> info::DFInfoFile {
     let reader = BufReader::new(decoding_reader);
 
     // info.txt details
-    let mut info_file_data: info::DFInfoFile = info::DFInfoFile::new("");
+    let mut info_file_data: info::DFInfoFile = info::DFInfoFile::new("", source_dir);
 
     for (index, line) in reader.lines().enumerate() {
         if line.is_err() {
@@ -842,7 +835,7 @@ pub fn parse_dfraw_module_info_file(info_file_path: &Path) -> info::DFInfoFile {
                 // SECTION FOR MATCHING info.txt DATA
                 "ID" => {
                     // the [ID:identifier] tag should be the top of the info.txt file
-                    info_file_data = info::DFInfoFile::new(&cap[3]);
+                    info_file_data = info::DFInfoFile::new(&cap[3], source_dir);
                 }
                 "NUMERIC_VERSION" => match cap[3].parse() {
                     Ok(n) => info_file_data.numeric_version = n,

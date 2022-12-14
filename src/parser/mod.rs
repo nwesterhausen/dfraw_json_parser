@@ -6,7 +6,7 @@ use walkdir::WalkDir;
 
 mod conversion;
 mod parsing;
-mod raws;
+pub mod raws;
 mod reader;
 
 /// Given the raws directory and raw module info, returns a JSON string of parsed raw info.
@@ -22,14 +22,9 @@ mod reader;
 /// A String
 pub fn parse_directory_to_json_string(
     raws_directory: &Path,
-    raws_module_identifier: &str,
-    raws_module_version: &str,
+    info_text_file: &raws::info::DFInfoFile,
 ) -> String {
-    turn_vec_into_json_string(parse_directory(
-        raws_directory,
-        raws_module_identifier,
-        raws_module_version,
-    ))
+    turn_vec_into_json_string(parse_directory(raws_directory, info_text_file))
 }
 
 /// It takes a directory of raws, parses them, and saves the result to out.json in `out_directory`
@@ -42,12 +37,11 @@ pub fn parse_directory_to_json_string(
 /// * `out_directory`: The directory to save the JSON file to.
 pub fn parse_directory_to_json_file(
     raws_directory: &Path,
-    raws_module_identifier: &str,
-    raws_module_version: &str,
+    info_text_file: &raws::info::DFInfoFile,
     out_directory: &Path,
 ) {
     save_vec_to_json_file(
-        parse_directory(raws_directory, raws_module_identifier, raws_module_version),
+        parse_directory(raws_directory, info_text_file),
         out_directory,
     );
 }
@@ -66,8 +60,7 @@ pub fn parse_directory_to_json_file(
 /// A vector of DFCreature objects.
 fn parse_directory(
     raws_directory: &Path,
-    raws_module_identifier: &str,
-    raws_module_version: &str,
+    info_text_file: &raws::info::DFInfoFile,
 ) -> Vec<raws::creature::DFCreature> {
     let mut creatures: Vec<raws::creature::DFCreature> = Vec::new();
 
@@ -81,11 +74,7 @@ fn parse_directory(
         if f_name.ends_with(".txt") {
             let entry_path = entry.path().to_string_lossy().to_string();
             log::debug!("parsing {}", &entry_path);
-            creatures.append(&mut reader::parse_file(
-                &entry_path,
-                raws_module_identifier,
-                raws_module_version,
-            ));
+            creatures.append(&mut reader::parse_file(&entry_path, info_text_file));
         }
     }
     log::debug!(
@@ -171,8 +160,8 @@ fn save_vec_to_json_file(v: Vec<raws::creature::DFCreature>, out_directory: &Pat
     };
 }
 
-pub fn parse_info_file(input_path: &Path) -> raws::info::DFInfoFile {
-    reader::parse_dfraw_module_info_file(input_path)
+pub fn parse_info_file(input_path: &Path, sourced_dir: &str) -> raws::info::DFInfoFile {
+    reader::parse_dfraw_module_info_file(input_path, sourced_dir)
 }
 
 fn stringify_raw_vec(raws: Vec<raws::creature::DFCreature>) -> Vec<String> {
