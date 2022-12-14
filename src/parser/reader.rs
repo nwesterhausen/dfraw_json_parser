@@ -819,13 +819,17 @@ pub fn parse_dfraw_module_info_file(info_file_path: &Path, source_dir: &str) -> 
 
     for (index, line) in reader.lines().enumerate() {
         if line.is_err() {
-            log::error!("Error processing {:?}:{}", &info_file_path, index);
+            log::error!(
+                "DFInfoFile - Error processing {:?}:{}",
+                &info_file_path,
+                index
+            );
             continue;
         }
         let line = match line {
             Ok(l) => l,
             Err(e) => {
-                log::error!("Line-reading error\n{:?}", e);
+                log::error!("DFInfoFile - Line-reading error\n{:?}", e);
                 continue;
             }
         };
@@ -839,19 +843,31 @@ pub fn parse_dfraw_module_info_file(info_file_path: &Path, source_dir: &str) -> 
                 }
                 "NUMERIC_VERSION" => match cap[3].parse() {
                     Ok(n) => info_file_data.numeric_version = n,
-                    Err(e) => log::error!(
-                        "Unable to parse numeric_version in {}\n{:?}",
-                        info_file_data.get_identifier(),
-                        e
-                    ),
+                    Err(_e) => {
+                        log::error!(
+                            "DFInfoFile - Unable to parse {} numeric_version: '{}' is not integer!",
+                            info_file_data.get_identifier(),
+                            &cap[3]
+                        );
+                        log::error!(
+                            "DFInfoFile - {} numeric_version is invalid",
+                            info_file_path.display()
+                        );
+                    }
                 },
                 "EARLIEST_COMPATIBLE_NUMERIC_VERSION" => match cap[3].parse() {
                     Ok(n) => info_file_data.earliest_compatible_numeric_version = n,
-                    Err(e) => log::error!(
-                        "Unable to parse numeric_version in {}\n{:?}",
-                        info_file_data.get_identifier(),
-                        e
-                    ),
+                    Err(_e) => {
+                        log::error!(
+                            "DFInfoFile - Unable to parse {} earliest_compatible_numeric_version: '{}' is not integer!",
+                            info_file_data.get_identifier(),
+                            &cap[3]
+                        );
+                        log::error!(
+                            "DFInfoFile - {} earliest_compatible_numeric_version is invalid",
+                            info_file_path.display()
+                        );
+                    }
                 },
                 "DISPLAYED_VERSION" => {
                     info_file_data.displayed_version = String::from(&cap[3]);
