@@ -18,6 +18,7 @@ pub enum RawObjectKind {
 
 lazy_static! {
     static ref RE: Regex = Regex::new(r"(\[(?P<key>[^\[:]+):?(?P<value>[^\]\[]*)])").unwrap();
+    static ref NON_DIGIT_RE: Regex = Regex::new(r"\D").unwrap();
     static ref ENC: Option<&'static encoding_rs::Encoding> =
         encoding_rs::Encoding::for_label(b"latin1");
 }
@@ -952,29 +953,45 @@ pub fn parse_dfraw_module_info_file(info_file_path: &Path, source_dir: &str) -> 
                 "NUMERIC_VERSION" => match cap[3].parse() {
                     Ok(n) => info_file_data.numeric_version = n,
                     Err(_e) => {
-                        log::error!(
-                            "DFInfoFile - Unable to parse {} numeric_version: '{}' is not integer!",
+                        log::warn!(
+                            "DFInfoFile - 'numeric_version' value in {}: '{}' is not integer! file: {}",
                             info_file_data.get_identifier(),
-                            &cap[3]
-                        );
-                        log::error!(
-                            "DFInfoFile - {} numeric_version is invalid",
+                            &cap[3],
                             info_file_path.display()
                         );
+                        // match on \D to replace any non-digit characters with empty string
+                        let digits_only = NON_DIGIT_RE.replace_all(&cap[3], "").to_string();
+                        match digits_only.parse() {
+                            Ok(n) => info_file_data.numeric_version = n,
+                            Err(_e) => {
+                                log::error!(
+                                    "DFInfoFile - Unable to parse numerals from {}",
+                                    digits_only
+                                );
+                            }
+                        }
                     }
                 },
                 "EARLIEST_COMPATIBLE_NUMERIC_VERSION" => match cap[3].parse() {
                     Ok(n) => info_file_data.earliest_compatible_numeric_version = n,
                     Err(_e) => {
-                        log::error!(
-                            "DFInfoFile - Unable to parse {} earliest_compatible_numeric_version: '{}' is not integer!",
+                        log::warn!(
+                            "DFInfoFile - 'earliest_compatible_numeric_version' value in {}: '{}' is not integer! file: {}",
                             info_file_data.get_identifier(),
-                            &cap[3]
-                        );
-                        log::error!(
-                            "DFInfoFile - {} earliest_compatible_numeric_version is invalid",
+                            &cap[3],
                             info_file_path.display()
                         );
+                        // match on \D to replace any non-digit characters with empty string
+                        let digits_only = NON_DIGIT_RE.replace_all(&cap[3], "").to_string();
+                        match digits_only.parse() {
+                            Ok(n) => info_file_data.earliest_compatible_numeric_version = n,
+                            Err(_e) => {
+                                log::error!(
+                                    "DFInfoFile - Unable to parse numerals from {}",
+                                    digits_only
+                                );
+                            }
+                        }
                     }
                 },
                 "DISPLAYED_VERSION" => {

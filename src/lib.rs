@@ -56,11 +56,13 @@ pub fn parse_game_raws(df_game_path: &str) -> Vec<String> {
         log::warn!("Unable to find gamelog.txt in game directory. Is it valid?");
     }
 
+    // Set file paths for vanilla raw modules, workshop mods and installed mods
     let data_path = game_path.join("data");
     let vanilla_path = data_path.join("vanilla");
     let installed_mods_path = data_path.join("installed_mods");
     let workshop_mods_path = game_path.join("mods");
 
+    // Read directories from above, and if we have an issue, return an empty vec
     let vanilla_iter: Vec<DirEntry> = subdirectories(vanilla_path).unwrap_or(Vec::new());
     let installed_iter: Vec<DirEntry> = subdirectories(installed_mods_path).unwrap_or(Vec::new());
     let mods_iter: Vec<DirEntry> = subdirectories(workshop_mods_path).unwrap_or(Vec::new());
