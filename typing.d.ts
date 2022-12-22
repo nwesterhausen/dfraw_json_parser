@@ -10,7 +10,7 @@ export type Raw = {
   raw_module: string;
   raw_module_version: string;
   raw_module_found_in: string;
-  type: string;
+  raw_type: string;
 };
 
 export type BodySizeRange = {
