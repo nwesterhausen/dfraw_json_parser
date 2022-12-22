@@ -3,7 +3,6 @@ use std::io::{BufWriter, Write};
 use std::path::Path;
 use walkdir::WalkDir;
 
-mod conversion;
 mod json_conversion;
 mod parsing;
 pub mod raws;
@@ -99,7 +98,7 @@ fn parse_raws_to_json(
         }
     }
     log::debug!(
-        "{} creatures parsed from directory {:?}",
+        "{} raws parsed from directory {:?}",
         parsed_raws.len(),
         &raws_directory
     );
