@@ -3,11 +3,12 @@ use std::collections::HashMap;
 use serde::{Deserialize, Serialize};
 use slug::slugify;
 
-use super::{
+use crate::parser::raws::{
     info::DFInfoFile,
     names::{Name, SingPlurName},
     tags::{self, CasteTag},
 };
+use crate::parser::reader::RawObjectKind;
 
 #[derive(Serialize, Deserialize, Debug)]
 pub struct DFCreature {
@@ -16,6 +17,7 @@ pub struct DFCreature {
     dfraw_identifier: String,
     dfraw_version: String,
     dfraw_found_in: String,
+    raw_type: RawObjectKind,
     #[serde(rename = "objectId")]
     object_id: String,
 
@@ -55,6 +57,7 @@ impl Clone for DFCreature {
             dfraw_identifier: self.dfraw_identifier.to_string(),
             dfraw_version: self.dfraw_version.to_string(),
             dfraw_found_in: self.dfraw_found_in.to_string(),
+            raw_type: RawObjectKind::Creature,
             tags: self.tags.clone(),
             frequency: self.frequency,
             cluster_number: [self.cluster_number[0], self.cluster_number[1]],
@@ -154,6 +157,7 @@ impl DFCreature {
             dfraw_identifier: String::from(info_text.get_identifier()),
             dfraw_version: String::from(info_text.displayed_version.as_str()),
             dfraw_found_in: String::from(info_text.get_sourced_directory()),
+            raw_type: RawObjectKind::Creature,
             // Boolean Flags
             tags: Vec::new(),
 
@@ -195,6 +199,9 @@ impl DFCreature {
     }
     pub fn get_parent_raw(&self) -> String {
         String::from(&self.parent_raw)
+    }
+    pub fn get_raw_type(&self) -> String {
+        format!("{:?}", self.raw_type)
     }
     pub fn get_object_id(&self) -> String {
         String::from(&self.object_id)
