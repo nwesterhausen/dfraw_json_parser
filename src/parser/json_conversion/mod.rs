@@ -3,6 +3,7 @@ pub trait TypedJsonSerializable {
 }
 
 mod creature;
+mod info_file;
 
 pub struct Empty;
 

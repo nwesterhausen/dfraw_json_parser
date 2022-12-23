@@ -96,6 +96,7 @@ pub fn parse_game_raws(df_game_path: &str) -> Vec<String> {
 /// Arguments:
 ///
 /// * `root_path`: The path to the directory containing the raws.
+/// * `sourced_dir`: The directory the root_path was found under.
 ///
 /// Returns:
 ///
@@ -165,7 +166,7 @@ pub fn parse_dfraw_dir(root_path: &Path, sourced_dir: &str) -> String {
     json
 }
 
-/// It takes a path to a folder containing raws, and a path to a file, and it parses the raws and saves
+/// Takes a path to a folder containing raws, and a path to a file, and parses the raws and saves
 /// the result to the file as JSON
 ///
 /// Arguments:
@@ -270,7 +271,7 @@ fn subdirectories(directory: std::path::PathBuf) -> Option<Vec<walkdir::DirEntry
     )
 }
 
-/// It takes a path to a directory of raws, and a path to a file, and it parses the raws into JSON and saves as the file.
+/// Takes a path to a directory of raws, and a path to a file, and parses the raws into JSON and saves as the file.
 ///
 /// Arguments:
 ///
@@ -286,12 +287,32 @@ pub fn parse_game_raws_to_file_out(
 
 #[cfg(feature = "tauri")]
 #[derive(Clone, serde::Serialize)]
-struct Payload {
+/// It's a struct to represent the progress of the current job. This is emitted back to the Tauri app using the `PROGRESS` event.
+///
+/// Properties:
+///
+/// * `percentage`: The percentage of completed steps out of total steps.
+/// * `current_module`: The name of the module that is currently being processed.
+struct ProgressPayload {
     percentage: f64,
     current_module: String,
 }
 
 #[cfg(feature = "tauri")]
+/// Parse a directory of raws, and return a JSON string of the parsed raws. While parsing, this will
+/// emit tauri events to the supplied window. The event is titled `PROGRESS` and it uses the `ProgressPayload`
+/// payload for the payload.
+///
+/// The payload supplies the current progress as a float and the name of the current folder being parsed.
+///
+/// Properties:
+///
+/// * `df_game_path`: The path to the Dwarf Fortress install directory
+/// * `window`: A tauri::Window to emit `PROGRESS` events to.
+///
+/// Returns:
+///
+/// A (large) JSON string with details on all raws in the game path.
 pub fn parse_game_raws_with_tauri_emit(df_game_path: &str, window: tauri::Window) -> Vec<String> {
     let mut all_json: Vec<String> = Vec::new();
 
@@ -334,7 +355,7 @@ pub fn parse_game_raws_with_tauri_emit(df_game_path: &str, window: tauri::Window
         pct = current_mod as f64 / total_mods as f64;
         match window.emit(
             "PROGRESS",
-            Payload {
+            ProgressPayload {
                 percentage: pct,
                 current_module: String::from(entry.file_name().to_str().unwrap_or("")),
             },
@@ -350,7 +371,7 @@ pub fn parse_game_raws_with_tauri_emit(df_game_path: &str, window: tauri::Window
         pct = current_mod as f64 / total_mods as f64;
         match window.emit(
             "PROGRESS",
-            Payload {
+            ProgressPayload {
                 percentage: pct,
                 current_module: String::from(entry.file_name().to_str().unwrap_or("")),
             },
@@ -366,7 +387,7 @@ pub fn parse_game_raws_with_tauri_emit(df_game_path: &str, window: tauri::Window
         pct = current_mod as f64 / total_mods as f64;
         match window.emit(
             "PROGRESS",
-            Payload {
+            ProgressPayload {
                 percentage: pct,
                 current_module: format!(
                     "workshop-mod:{}",
@@ -385,7 +406,7 @@ pub fn parse_game_raws_with_tauri_emit(df_game_path: &str, window: tauri::Window
         pct = 1.0;
         match window.emit(
             "PROGRESS",
-            Payload {
+            ProgressPayload {
                 percentage: pct,
                 current_module: String::new(),
             },
@@ -401,4 +422,115 @@ pub fn parse_game_raws_with_tauri_emit(df_game_path: &str, window: tauri::Window
         .collect();
 
     non_empty_json
+}
+
+pub fn parse_raw_module_info(df_game_path: &str) -> Vec<String> {
+    let mut all_json: Vec<String> = Vec::new();
+
+    //1. "validate" folder is as expected
+    let game_path = Path::new(df_game_path);
+    // Guard against invalid path
+    if !game_path.exists() {
+        log::error!(
+            "Provided game path for parsing doesn't exist!\n{}",
+            df_game_path
+        );
+        return all_json;
+    }
+    if !game_path.is_dir() {
+        log::error!("Game path needs to be a directory {}", df_game_path);
+        return all_json;
+    }
+
+    // warn on no gamelog.txt
+    if !game_path.join("gamelog.txt").exists() {
+        log::warn!("Unable to find gamelog.txt in game directory. Is it valid?");
+    }
+
+    // Set file paths for vanilla raw modules, workshop mods and installed mods
+    let data_path = game_path.join("data");
+    let vanilla_path = data_path.join("vanilla");
+    let installed_mods_path = data_path.join("installed_mods");
+    let workshop_mods_path = game_path.join("mods");
+
+    // Read directories from above, and if we have an issue, return an empty vec
+    let vanilla_iter: Vec<DirEntry> = subdirectories(vanilla_path).unwrap_or(Vec::new());
+    let installed_iter: Vec<DirEntry> = subdirectories(installed_mods_path).unwrap_or(Vec::new());
+    let mods_iter: Vec<DirEntry> = subdirectories(workshop_mods_path).unwrap_or(Vec::new());
+
+    // Loop through each dfraw_directory and parse it
+    for entry in vanilla_iter {
+        all_json.push(parse_raw_module_dir_info(entry.path(), "vanilla"));
+    }
+
+    for entry in installed_iter {
+        all_json.push(parse_raw_module_dir_info(entry.path(), "installed_mods"));
+    }
+
+    for entry in mods_iter {
+        all_json.push(parse_raw_module_dir_info(entry.path(), "mods"));
+    }
+
+    let non_empty_json: Vec<String> = all_json
+        .into_iter()
+        .filter(|s| !String::is_empty(s))
+        .collect();
+
+    non_empty_json
+}
+
+/// Parse a directory of raws, and return a JSON string of the parsed raw module info files.
+///
+/// The first thing we do is check that the directory exists, and that it's a directory. If it doesn't
+/// exist, or it's not a directory, we return an empty string
+///
+/// Arguments:
+///
+/// * `root_path`: The path to the directory containing the raws.
+/// * `sourced_dir`: The directory the root_path was found under.
+///
+/// Returns:
+///
+/// A JSON string containing the info about the raws for the given directory.
+pub fn parse_raw_module_dir_info(root_path: &Path, sourced_dir: &str) -> String {
+    //1. Get information from the info.txt file
+    if !root_path.exists() {
+        log::error!(
+            "Provided directory to parse raws does not exist: {:?}",
+            root_path
+        );
+        return String::new();
+    }
+    if !root_path.is_dir() {
+        log::error!(
+            "Provided 'directory' to parse is not actually a directory! {:?}",
+            root_path
+        );
+        return String::new();
+    }
+
+    // Check for info.txt
+    let info_txt_path = root_path.join("info.txt");
+    if !info_txt_path.exists() {
+        let Some(dir_name) = root_path.file_name() else {
+            log::error!("Error reading module dir {:?}", root_path);
+            return String::new();
+        };
+        let dir_name_str = dir_name.to_str().unwrap_or("");
+
+        if !(dir_name_str.eq("mod_upload")
+            || dir_name_str.eq("examples and notes")
+            || dir_name_str.eq("interaction examples"))
+        {
+            log::error!(
+                "No info.txt as expected in {:?}. Is this DF 50.xx?",
+                root_path.file_name().unwrap_or_default()
+            );
+        }
+
+        return String::new();
+    }
+
+    // Parse info.txt to get raw module information
+    parser::parse_info_file_to_json_string(&info_txt_path, sourced_dir)
 }

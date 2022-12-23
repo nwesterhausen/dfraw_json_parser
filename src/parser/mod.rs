@@ -3,6 +3,8 @@ use std::io::{BufWriter, Write};
 use std::path::Path;
 use walkdir::WalkDir;
 
+use self::json_conversion::TypedJsonSerializable;
+
 mod json_conversion;
 mod parsing;
 pub mod raws;
@@ -158,6 +160,19 @@ fn save_string_vec_to_json_file(string_vec: Vec<String>, out_directory: &Path) {
 
 pub fn parse_info_file(input_path: &Path, sourced_dir: &str) -> raws::info::DFInfoFile {
     reader::parse_dfraw_module_info_file(input_path, sourced_dir)
+}
+
+pub fn parse_info_file_to_json_string(input_path: &Path, sourced_dir: &str) -> String {
+    let info_file = parse_info_file(input_path, sourced_dir);
+    match info_file.to_typed_json_string() {
+        Ok(s) => {
+            return s.to_string();
+        }
+        Err(e) => {
+            log::error!("Failure to serialize parsed raw data\n{}", e);
+            return "".to_owned();
+        }
+    }
 }
 
 fn stringify_raw_vec(
