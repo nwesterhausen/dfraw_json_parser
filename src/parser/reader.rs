@@ -103,6 +103,9 @@ pub fn read_raw_file_type(input_path: &Path) -> RawObjectKind {
                         "CREATURE" => {
                             return RawObjectKind::Creature;
                         }
+                        "PLANT" => {
+                            return RawObjectKind::Plant;
+                        }
                         // Currently, any other type of raw object is unsupported
                         &_ => {
                             log::debug!("{} - Currently no support for OBJECT:{}", caller, &cap[3]);
@@ -215,7 +218,7 @@ pub fn parse_creature_file(input_path: &Path, info_text: &DFInfoFile) -> Vec<cre
                             //5. Reset/empty caste vector
                             temp_caste_vec = Vec::new();
                         }
-                        RawObjectKind::None => (),
+                        _ => (),
                     }
                 }
                 "CASTE" => {
@@ -901,7 +904,7 @@ pub fn parse_creature_file(input_path: &Path, info_text: &DFInfoFile) -> Vec<cre
             // If we already *were* capturing a creature, export it.
             results.push(creature_temp);
         }
-        RawObjectKind::None => (),
+        _ => (),
     }
     log::info!(
         "{} creatures defined in {} ({} {} in {})",
