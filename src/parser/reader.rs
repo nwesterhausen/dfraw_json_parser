@@ -14,6 +14,8 @@ use std::path::Path;
 #[derive(serde::Serialize, Debug, serde::Deserialize)]
 pub enum RawObjectKind {
     Creature,
+    Plant,
+    Material,
     None,
 }
 
