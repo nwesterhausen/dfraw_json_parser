@@ -17,6 +17,7 @@ pub struct DFCreature {
     dfraw_identifier: String,
     dfraw_version: String,
     dfraw_found_in: String,
+    dfraw_display: String,
     raw_type: RawObjectKind,
 
     // Boolean Flags
@@ -54,6 +55,7 @@ impl Clone for DFCreature {
             dfraw_identifier: self.dfraw_identifier.to_string(),
             dfraw_version: self.dfraw_version.to_string(),
             dfraw_found_in: self.dfraw_found_in.to_string(),
+            dfraw_display: self.dfraw_display.to_string(),
             raw_type: RawObjectKind::Creature,
             tags: self.tags.clone(),
             frequency: self.frequency,
@@ -153,6 +155,7 @@ impl DFCreature {
             dfraw_identifier: String::from(info_text.get_identifier()),
             dfraw_version: String::from(info_text.displayed_version.as_str()),
             dfraw_found_in: String::from(info_text.get_sourced_directory()),
+            dfraw_display: format!("{} v{}", info_text.name, info_text.displayed_version),
             raw_type: RawObjectKind::Creature,
             // Boolean Flags
             tags: Vec::new(),
@@ -192,6 +195,9 @@ impl DFCreature {
     }
     pub fn get_dfraw_found_in(&self) -> String {
         String::from(&self.dfraw_found_in)
+    }
+    pub fn get_dfraw_display(&self) -> String {
+        String::from(&self.dfraw_display)
     }
     pub fn get_parent_raw(&self) -> String {
         String::from(&self.parent_raw)

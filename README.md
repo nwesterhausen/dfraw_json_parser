@@ -48,44 +48,45 @@ It parses the info.txt file in each raw module directory it goes through.
 
 Creature data and its castes are included. However, currently doesn't apply COPY_TAG_FROM.
 
-| Property           | Description                                   | Type                               |
-| ------------------ | --------------------------------------------- | ---------------------------------- |
-| identifier         | defined in CREATURE token                     | `String`                           |
-| parent_raw         | name of the raw file its located              | `String`                           |
-| raw_module         | id of the raws module raw is from             | `String`                           |
-| raw_module_version | version of the raws module raw is from        | `String`                           |
-| objectId           | unique id for creature                        | `String`                           |
-| name               | species name                                  | `String`                           |
-| names_map          | names by castes                               | `HashMap<String, Vec<String>>`     |
-| descriptions       | descriptions by castes                        | `HashMap<String, String>`          |
-| max_age            | max age by castes                             | `HashMap<String, [u16; 2]>`        |
-| clutch_size        | clutch size by castes                         | `HashMap<String, [u16; 2]>`        |
-| based_on           | defined by copy_tags_from token               | `String`                           |
-| biomes             | biomes creature found in                      | `Vec<String>`                      |
-| cluster_range      | cluster range (how many appear at once)       | `[u16; 2]`                         |
-| underground_depth  | depth found                                   | `[u16; 2]`                         |
-| body_size          | body size by castes                           | `HashMap<String, Vec<DFBodySize>>` |
-| grown_at           | age when adult by castes                      | `HashMap<String, u32>`             |
-| child_at           | age when adolescent by castes                 | `HashMap<String, u32>`             |
-| egg_sizes          | egg size by castes                            | `HashMap<String, u32>`             |
-| pet_value          | pet value by castes                           | `HashMap<String, u16>`             |
-| intelligence       | intelligence by castes                        | `HashMap<String, [bool; 2]>`       |
-| flier              | flier by castes                               | `HashMap<String, bool>`            |
-| gnawer             | gnawer by castes                              | `HashMap<String, bool>`            |
-| trainable          | trainability by castes                        | `HashMap<String, u8>`              |
-| active_time        | active time by castes                         | `HashMap<String, u8>`              |
-| inactive_season    | NO_SEASON by castes                           | `HashMap<String, u8>`              |
-| creature_class     | creature class by castes                      | `HashMap<String, Vec<String>>`     |
-| tags               | tags on the creature                          | `Vec<CreatureTag>`                 |
-| caste_tags         | tags on each caste                            | `HashMap<String, Vec<CasteTag>>`   |
-| difficulty         | difficulty by castes                          | `HashMap<String, u32>`             |
-| grass_trample      | grass trample by castes                       | `HashMap<String, u8>`              |
-| grazer             | grazer by castes                              | `HashMap<String, u32>`             |
-| low_light_vision   | low light vision by castes                    | `HashMap<String, u32>`             |
-| pop_ratio          | population ratio by castes                    | `HashMap<String, u16>`             |
-| milkable           | milk production by castes                     | `HashMap<String, DFMilkable>`      |
-| pref_string        | preference string for creature                | `Vec<String>`                      |
-| population_number  | pop num (how many exist per valid world tile) | `[u16; 2]`                         |
+| Property           | Description                                        | Type                               |
+| ------------------ | -------------------------------------------------- | ---------------------------------- |
+| identifier         | defined in CREATURE token                          | `String`                           |
+| parent_raw         | name of the raw file its located                   | `String`                           |
+| raw_module         | id of the raws module raw is from                  | `String`                           |
+| raw_module_version | version of the raws module raw is from             | `String`                           |
+| dfraw_display      | human readable "Name Version" of the parent module | `String`                           |
+| objectId           | unique id for creature                             | `String`                           |
+| name               | species name                                       | `String`                           |
+| names_map          | names by castes                                    | `HashMap<String, Vec<String>>`     |
+| descriptions       | descriptions by castes                             | `HashMap<String, String>`          |
+| max_age            | max age by castes                                  | `HashMap<String, [u16; 2]>`        |
+| clutch_size        | clutch size by castes                              | `HashMap<String, [u16; 2]>`        |
+| based_on           | defined by copy_tags_from token                    | `String`                           |
+| biomes             | biomes creature found in                           | `Vec<String>`                      |
+| cluster_range      | cluster range (how many appear at once)            | `[u16; 2]`                         |
+| underground_depth  | depth found                                        | `[u16; 2]`                         |
+| body_size          | body size by castes                                | `HashMap<String, Vec<DFBodySize>>` |
+| grown_at           | age when adult by castes                           | `HashMap<String, u32>`             |
+| child_at           | age when adolescent by castes                      | `HashMap<String, u32>`             |
+| egg_sizes          | egg size by castes                                 | `HashMap<String, u32>`             |
+| pet_value          | pet value by castes                                | `HashMap<String, u16>`             |
+| intelligence       | intelligence by castes                             | `HashMap<String, [bool; 2]>`       |
+| flier              | flier by castes                                    | `HashMap<String, bool>`            |
+| gnawer             | gnawer by castes                                   | `HashMap<String, bool>`            |
+| trainable          | trainability by castes                             | `HashMap<String, u8>`              |
+| active_time        | active time by castes                              | `HashMap<String, u8>`              |
+| inactive_season    | NO_SEASON by castes                                | `HashMap<String, u8>`              |
+| creature_class     | creature class by castes                           | `HashMap<String, Vec<String>>`     |
+| tags               | tags on the creature                               | `Vec<CreatureTag>`                 |
+| caste_tags         | tags on each caste                                 | `HashMap<String, Vec<CasteTag>>`   |
+| difficulty         | difficulty by castes                               | `HashMap<String, u32>`             |
+| grass_trample      | grass trample by castes                            | `HashMap<String, u8>`              |
+| grazer             | grazer by castes                                   | `HashMap<String, u32>`             |
+| low_light_vision   | low light vision by castes                         | `HashMap<String, u32>`             |
+| pop_ratio          | population ratio by castes                         | `HashMap<String, u16>`             |
+| milkable           | milk production by castes                          | `HashMap<String, DFMilkable>`      |
+| pref_string        | preference string for creature                     | `Vec<String>`                      |
+| population_number  | pop num (how many exist per valid world tile)      | `[u16; 2]`                         |
 
 ## Rust Program
 
