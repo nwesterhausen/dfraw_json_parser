@@ -5,6 +5,35 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## v0.7.3 (2022-12-28)
+
+### New Features
+
+ - <csr-id-d072b719c51dcb1b8065edd9251364aded5b79d2/> ✨ add parse_single_raw to lib and cli example
+
+### Bug Fixes
+
+ - <csr-id-ae012665b7097242b39e27e07741d5f284eec291/> 🐛 save all info for final raw read from file
+
+### Commit Statistics
+
+<csr-read-only-do-not-edit/>
+
+ - 2 commits contributed to the release.
+ - 2 commits were understood as [conventional](https://www.conventionalcommits.org).
+ - 0 issues like '(#ID)' were seen in commit messages
+
+### Commit Details
+
+<csr-read-only-do-not-edit/>
+
+<details><summary>view details</summary>
+
+ * **Uncategorized**
+    - 🐛 save all info for final raw read from file ([`ae01266`](https://github.com/nwesterhausen/dfraw_json_parser/commit/ae012665b7097242b39e27e07741d5f284eec291))
+    - ✨ add parse_single_raw to lib and cli example ([`d072b71`](https://github.com/nwesterhausen/dfraw_json_parser/commit/d072b719c51dcb1b8065edd9251364aded5b79d2))
+</details>
+
 ## v0.7.2 (2022-12-28)
 
 <csr-id-6ed8d209706a530c35d0cd284df72d7c04d3efe6/>
@@ -63,7 +92,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 <csr-read-only-do-not-edit/>
 
- - 19 commits contributed to the release over the course of 14 calendar days.
+ - 20 commits contributed to the release over the course of 14 calendar days.
  - 14 days passed between releases.
  - 18 commits were understood as [conventional](https://www.conventionalcommits.org).
  - 0 issues like '(#ID)' were seen in commit messages
@@ -75,6 +104,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 <details><summary>view details</summary>
 
  * **Uncategorized**
+    - Release dfraw_json_parser v0.7.2 ([`50ad40a`](https://github.com/nwesterhausen/dfraw_json_parser/commit/50ad40a8a2752b4e25c41de122c666b97c2261e1))
     - 📝 add CHANGELOG.md ([`db4c9c4`](https://github.com/nwesterhausen/dfraw_json_parser/commit/db4c9c40712b05f619c12bd15b18b0220a5fd5ce))
     - Release dfraw_json_parser v0.7.2 ([`f5568c8`](https://github.com/nwesterhausen/dfraw_json_parser/commit/f5568c8437d953b03190f4082f2fba9e49abfae7))
     - 🔥 remove object_id on creature ([`bb5de44`](https://github.com/nwesterhausen/dfraw_json_parser/commit/bb5de4483e6c0b5bfb15a0a5e2defdd067bd6c9d))
