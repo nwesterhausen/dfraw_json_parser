@@ -74,6 +74,7 @@ export type DFInfoFile = {
   author: string;
   name: string;
   description: string;
+  display_title: string;
 }
 
 // Definition for tauri progress event payload

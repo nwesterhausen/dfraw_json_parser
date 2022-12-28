@@ -424,6 +424,16 @@ pub fn parse_game_raws_with_tauri_emit(df_game_path: &str, window: tauri::Window
     non_empty_json
 }
 
+/// Given the path to the game directory, returns a vector of JSON strings of object representing a raw module.
+/// This returns the JSON for every detected raw module in all tested directories.
+///
+/// Arguments:
+///
+/// * `df_game_path`: The path to the game directory.
+///
+/// Returns:
+///
+/// A vector of JSON strings with module data.
 pub fn parse_raw_module_info(df_game_path: &str) -> Vec<String> {
     let mut all_json: Vec<String> = Vec::new();
 
@@ -533,4 +543,81 @@ pub fn parse_raw_module_dir_info(root_path: &Path, sourced_dir: &str) -> String 
 
     // Parse info.txt to get raw module information
     parser::parse_info_file_to_json_string(&info_txt_path, sourced_dir)
+}
+
+/// Takes the path to the DF game directory, parses the raw module info files and then
+/// writes the JSON strings of those parsed modules to the out_filepath
+///
+/// Arguments:
+///
+/// * `df_game_path`: The path to the the DF game directory.
+/// * `out_filepath`: The path to the file you want to write to.
+pub fn parse_raw_module_info_to_file(df_game_path: &str, out_filepath: &Path) {
+    let json_string_vec = parse_raw_module_info(df_game_path);
+    log::info!("Saving json to to {:?}", out_filepath);
+
+    let out_file = match File::create(&out_filepath) {
+        Ok(f) => f,
+        Err(e) => {
+            log::error!(
+                "Unable to open {} for writing \n{:?}",
+                out_filepath.display(),
+                e
+            );
+            return;
+        }
+    };
+
+    let mut stream = BufWriter::new(out_file);
+    let write_error = &format!("Unable to write to {}", out_filepath.to_string_lossy());
+    match write!(stream, "[") {
+        Ok(_x) => (),
+        Err(e) => {
+            log::error!("{}\n{:?}", write_error, e);
+            return;
+        }
+    };
+
+    let mut json_string_iter = json_string_vec.into_iter().peekable();
+    while let Some(json_string) = json_string_iter.next() {
+        match write!(stream, "{}", json_string) {
+            Ok(_x) => (),
+            Err(e) => {
+                log::error!("{}\n{:?}", write_error, e);
+                return;
+            }
+        };
+
+        if json_string_iter.peek().is_some() {
+            match write!(stream, ",") {
+                Ok(_x) => (),
+                Err(e) => {
+                    log::error!("{}\n{:?}", write_error, e);
+                    return;
+                }
+            };
+        }
+
+        match stream.flush() {
+            Ok(_x) => (),
+            Err(e) => {
+                log::error!("{}\n{:?}", write_error, e);
+                return;
+            }
+        };
+    }
+
+    match write!(stream, "]") {
+        Ok(_x) => (),
+        Err(e) => {
+            log::error!("{}\n{:?}", write_error, e);
+            return;
+        }
+    };
+    match stream.flush() {
+        Ok(_x) => (),
+        Err(e) => {
+            log::error!("{}\n{:?}", write_error, e);
+        }
+    };
 }

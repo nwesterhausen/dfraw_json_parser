@@ -14,6 +14,7 @@ pub struct TypedJsonInfoFile {
     author: String,
     name: String,
     description: String,
+    display_title: String,
 }
 
 impl TypedJsonInfoFile {
@@ -30,6 +31,7 @@ impl TypedJsonInfoFile {
             name: info_file.name.to_owned(),
             numeric_version: info_file.numeric_version,
             sourced_directory: info_file.get_sourced_directory(),
+            display_title: format!("{} v{}", info_file.name, info_file.displayed_version),
         }
     }
 }
