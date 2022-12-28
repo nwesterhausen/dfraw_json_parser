@@ -7,6 +7,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## v0.7.2 (2022-12-28)
 
+<csr-id-6ed8d209706a530c35d0cd284df72d7c04d3efe6/>
+<csr-id-5e6dde45b3489ad93660372f654fa637a4379d98/>
+<csr-id-a6f00156cddc9b0c42b5f0a19883d5382c19d160/>
+<csr-id-5a9740e01528680c3f6543673fbd722913ac57c2/>
+<csr-id-7932e59c509f1da93e8f431fbbef9a164de144d1/>
+<csr-id-bb5de4483e6c0b5bfb15a0a5e2defdd067bd6c9d/>
+<csr-id-a8301caede5aa2090b769c05e19a699267e07b07/>
+<csr-id-8d79e7bc493584248b8adbc98ae4f178f517a6a6/>
+<csr-id-59e2dff2d583cd8c5c55411688a6c8f4ddcf361a/>
+
 ### Chore
 
  - <csr-id-6ed8d209706a530c35d0cd284df72d7c04d3efe6/> 🔖 bump version
@@ -14,6 +24,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
  - <csr-id-a6f00156cddc9b0c42b5f0a19883d5382c19d160/> 🔖 0.5.0 serialization as traits
  - <csr-id-5a9740e01528680c3f6543673fbd722913ac57c2/> 🔖 release 0.4.0
  - <csr-id-7932e59c509f1da93e8f431fbbef9a164de144d1/> 🧑‍💻 rust-analyzer for all features
+
+### Documentation
+
+ - <csr-id-db4c9c40712b05f619c12bd15b18b0220a5fd5ce/> 📝 add CHANGELOG.md
+   using changelog generation via cargo-smart-release
 
 ### New Features
 
@@ -48,9 +63,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 <csr-read-only-do-not-edit/>
 
- - 17 commits contributed to the release over the course of 14 calendar days.
+ - 19 commits contributed to the release over the course of 14 calendar days.
  - 14 days passed between releases.
- - 17 commits were understood as [conventional](https://www.conventionalcommits.org).
+ - 18 commits were understood as [conventional](https://www.conventionalcommits.org).
  - 0 issues like '(#ID)' were seen in commit messages
 
 ### Commit Details
@@ -60,6 +75,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 <details><summary>view details</summary>
 
  * **Uncategorized**
+    - 📝 add CHANGELOG.md ([`db4c9c4`](https://github.com/nwesterhausen/dfraw_json_parser/commit/db4c9c40712b05f619c12bd15b18b0220a5fd5ce))
+    - Release dfraw_json_parser v0.7.2 ([`f5568c8`](https://github.com/nwesterhausen/dfraw_json_parser/commit/f5568c8437d953b03190f4082f2fba9e49abfae7))
     - 🔥 remove object_id on creature ([`bb5de44`](https://github.com/nwesterhausen/dfraw_json_parser/commit/bb5de4483e6c0b5bfb15a0a5e2defdd067bd6c9d))
     - ✨ add an objectId to the info file object ([`d21a63e`](https://github.com/nwesterhausen/dfraw_json_parser/commit/d21a63e2466562711aa277b0f6a26ace9ceb9534))
     - ✨ modify example and update readme, bump release ([`a8301ca`](https://github.com/nwesterhausen/dfraw_json_parser/commit/a8301caede5aa2090b769c05e19a699267e07b07))
@@ -80,6 +97,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 </details>
 
 ## v0.3.1 (2022-12-13)
+
+<csr-id-373da1570664724774cddd13d34ae50c05a47dd8/>
 
 ### Chore
 
@@ -121,6 +140,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 </details>
 
 ## v0.3.0 (2022-12-13)
+
+<csr-id-0c7aebb62c9b8cae212207bddcae6edbece83995/>
 
 ### Chore
 
