@@ -9,6 +9,7 @@ mod json_conversion;
 mod parsing;
 pub mod raws;
 mod reader;
+mod refs;
 
 /// Given the raws directory and raw module info, returns a JSON string of parsed raw info.
 ///

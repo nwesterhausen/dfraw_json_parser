@@ -1,11 +1,11 @@
+use crate::parser::refs::{DF_ENCODING, NON_DIGIT_RE, RAW_TOKEN_RE};
+
 use super::parsing;
 use super::raws::info::DFInfoFile;
 use super::raws::tags::{CasteTag, CreatureTag};
 use super::raws::{biomes, creature, info, names, tags};
 
 use encoding_rs_io::DecodeReaderBytesBuilder;
-use lazy_static::lazy_static;
-use regex::Regex;
 use slug::slugify;
 use std::fs::File;
 use std::io::{BufRead, BufReader};
@@ -15,13 +15,6 @@ use std::path::Path;
 pub enum RawObjectKind {
     Creature,
     None,
-}
-
-lazy_static! {
-    static ref RE: Regex = Regex::new(r"(\[(?P<key>[^\[:]+):?(?P<value>[^\]\[]*)])").unwrap();
-    static ref NON_DIGIT_RE: Regex = Regex::new(r"\D").unwrap();
-    static ref ENC: Option<&'static encoding_rs::Encoding> =
-        encoding_rs::Encoding::for_label(b"latin1");
 }
 
 /// It reads a file, line by line, and checks the first line for the filename, reads lines until it encounters the
@@ -58,7 +51,9 @@ pub fn read_raw_file_type(input_path: &Path) -> RawObjectKind {
     };
 
     // Setup a file reader for the encoding used by DF
-    let decoding_reader = DecodeReaderBytesBuilder::new().encoding(*ENC).build(file);
+    let decoding_reader = DecodeReaderBytesBuilder::new()
+        .encoding(*DF_ENCODING)
+        .build(file);
     let reader = BufReader::new(decoding_reader);
 
     // String to store the parsed filename in
@@ -90,7 +85,7 @@ pub fn read_raw_file_type(input_path: &Path) -> RawObjectKind {
         }
         // Multiple matches can occur in a single line, so we loop over all captures within the match
         // for this line.
-        for cap in RE.captures_iter(&line) {
+        for cap in RAW_TOKEN_RE.captures_iter(&line) {
             log::trace!("{} - Key: {} Value: {}", caller, &cap[2], &cap[3]);
             // Match the front part of the tag
             match &cap[2] {
@@ -131,7 +126,9 @@ pub fn parse_creature_file(input_path: &Path, info_text: &DFInfoFile) -> Vec<cre
         }
     };
 
-    let decoding_reader = DecodeReaderBytesBuilder::new().encoding(*ENC).build(file);
+    let decoding_reader = DecodeReaderBytesBuilder::new()
+        .encoding(*DF_ENCODING)
+        .build(file);
     let reader = BufReader::new(decoding_reader);
 
     // let mut creatures = 0;
@@ -167,7 +164,7 @@ pub fn parse_creature_file(input_path: &Path, info_text: &DFInfoFile) -> Vec<cre
             raw_filename = String::from(&line);
             continue;
         }
-        for cap in RE.captures_iter(&line) {
+        for cap in RAW_TOKEN_RE.captures_iter(&line) {
             log::trace!("{} - Key: {} Value: {}", caller, &cap[2], &cap[3]);
             match &cap[2] {
                 "OBJECT" => match &cap[3] {
@@ -921,7 +918,9 @@ pub fn parse_dfraw_module_info_file(info_file_path: &Path, source_dir: &str) -> 
         }
     };
 
-    let decoding_reader = DecodeReaderBytesBuilder::new().encoding(*ENC).build(file);
+    let decoding_reader = DecodeReaderBytesBuilder::new()
+        .encoding(*DF_ENCODING)
+        .build(file);
     let reader = BufReader::new(decoding_reader);
 
     // info.txt details
@@ -943,7 +942,7 @@ pub fn parse_dfraw_module_info_file(info_file_path: &Path, source_dir: &str) -> 
                 continue;
             }
         };
-        for cap in RE.captures_iter(&line) {
+        for cap in RAW_TOKEN_RE.captures_iter(&line) {
             log::trace!("Key: {} Value: {}", &cap[2], &cap[3]);
             match &cap[2] {
                 // SECTION FOR MATCHING info.txt DATA
