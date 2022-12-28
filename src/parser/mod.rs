@@ -4,6 +4,7 @@ use std::path::Path;
 use walkdir::WalkDir;
 
 use self::json_conversion::TypedJsonSerializable;
+use self::raws::info::DFInfoFile;
 
 mod json_conversion;
 mod parsing;
@@ -106,6 +107,22 @@ fn parse_raws_to_json(
         &raws_directory
     );
     parsed_raws
+}
+
+pub fn read_single_raw_file(raw_file: &Path) -> String {
+    let info_text_file = DFInfoFile::new("manual-origin", "user-specified");
+
+    match reader::read_raw_file_type(raw_file) {
+        reader::RawObjectKind::Creature => {
+            log::info!("Parsing creature raws from {}", raw_file.display());
+            let creature_raw_vec = reader::parse_creature_file(&raw_file, &info_text_file);
+            return format!("[{}]", stringify_raw_vec(creature_raw_vec).join(","));
+        }
+        _ => {
+            log::warn!("Unknown raw type or failure to parse it.");
+            return String::new();
+        }
+    }
 }
 
 fn save_string_vec_to_json_file(string_vec: Vec<String>, out_directory: &Path) {

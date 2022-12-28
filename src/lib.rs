@@ -621,3 +621,56 @@ pub fn parse_raw_module_info_to_file(df_game_path: &str, out_filepath: &Path) {
         }
     };
 }
+
+pub fn read_single_raw_file(raw_file: &Path) -> String {
+    parser::read_single_raw_file(raw_file)
+}
+
+pub fn read_single_raw_file_to_file(raw_file: &Path, out_filepath: &Path) {
+    let parsed_json_string = read_single_raw_file(raw_file);
+    log::info!("Saving json to to {:?}", out_filepath);
+
+    let out_file = match File::create(&out_filepath) {
+        Ok(f) => f,
+        Err(e) => {
+            log::error!(
+                "Unable to open {} for writing \n{:?}",
+                out_filepath.display(),
+                e
+            );
+            return;
+        }
+    };
+
+    let mut stream = BufWriter::new(out_file);
+    let write_error = &format!("Unable to write to {}", out_filepath.to_string_lossy());
+    match write!(stream, "[") {
+        Ok(_x) => (),
+        Err(e) => {
+            log::error!("{}\n{:?}", write_error, e);
+            return;
+        }
+    };
+
+    match write!(stream, "{}", parsed_json_string) {
+        Ok(_x) => (),
+        Err(e) => {
+            log::error!("{}\n{:?}", write_error, e);
+            return;
+        }
+    };
+
+    match write!(stream, "]") {
+        Ok(_x) => (),
+        Err(e) => {
+            log::error!("{}\n{:?}", write_error, e);
+            return;
+        }
+    };
+    match stream.flush() {
+        Ok(_x) => (),
+        Err(e) => {
+            log::error!("{}\n{:?}", write_error, e);
+        }
+    };
+}
