@@ -894,6 +894,15 @@ pub fn parse_creature_file(input_path: &Path, info_text: &DFInfoFile) -> Vec<cre
     match current_object {
         RawObjectKind::Creature => {
             // If we already *were* capturing a creature, export it.
+            //1. Save caste tags
+            caste_temp.tags = caste_tags.clone();
+            //2. Save caste
+            temp_caste_vec.push(caste_temp.clone());
+            //3. Save creature tags
+            creature_temp.tags = creature_tags.clone();
+            //4. Save tamp_castes to creature
+            creature_temp.castes = temp_caste_vec.clone();
+            //5. Save creature
             results.push(creature_temp);
         }
         RawObjectKind::None => (),
