@@ -24,7 +24,29 @@ the description of the animal, if they laid eggs, if they were milkable, and how
 
 ### Outputs
 
+There is a [Typescript definition file](./typing.d.ts) for the format of the generated JSON. Here are detailed
+descriptions of Rust structs used when performing the serde_json serialization.
+
+#### DF Info File
+
+It parses the info.txt file in each raw module directory it goes through.
+
+| Property                              | Description                                                           | Type     |
+| ------------------------------------- | --------------------------------------------------------------------- | -------- |
+| identifier                            | id of the raw module                                                  | `String` |
+| sourced_directory                     | directory found in, `vanilla`, `mods` or `installed_mods`             | `String` |
+| numeric_version                       | version of raw module represented as a number                         | `u32`    |
+| displayed_version                     | human-readable display for `numeric_version`                          | `String` |
+| earliest_compatible_numeric_version   | earliest "upgrade-compatible" version of this raw module, as a number | `u32`    |
+| earliest_compatible_displayed_version | human readable display for `earliest_compatible_numeric_version`      | `String` |
+| author                                | author of the raw module                                              | `String` |
+| name                                  | human readable name of the module                                     | `String` |
+| description                           | description of the module                                             | `String` |
+| display_title                         | built-in formatting for `{name} v{displayed_version}`                 | `String` |
+
 #### Creature Token
+
+Creature data and its castes are included. However, currently doesn't apply COPY_TAG_FROM.
 
 | Property           | Description                                   | Type                               |
 | ------------------ | --------------------------------------------- | ---------------------------------- |
@@ -97,25 +119,12 @@ Options:
 
           If raw files are parsed, a JSON database (an array of objects) is
           saved to disk in a location specified by this argument. This will
-          create an 'out.json' file in the directory specified by this argument.
+          create an 'raws.json' file in the directory specified by this argument.
+
+          Alongside raws.json will be a modules.json which is a JSON database for the
+          raw modules that were found and parsed.
 
           [default: ./www/]
-
-  -s, --serve
-          Include this flag to start a web server for the web search client.
-
-          Included in the repository is a 'www' folder with a small web client
-          that will fetch the JSON database created by this program (out.json)
-          and present it in a searchable manner to the user.
-
-          If you include this flag, after any parsing is done, a tiny HTTP server
-          will start server files from the directory specified by 'out-dir' which
-          defaults to ./www
-
-  -p, --port <PORT>
-          Specify the port to run the web server on.
-
-          [default: 4501]
 
   -h, --help
           Print help information (use `-h` for a summary)
@@ -126,12 +135,16 @@ Options:
 
 ### How to use
 
-The example is a usable tool to search raws.
-
-See the project [Overseer's Reference Manual](https://github.com/nwesterhausen/overseers-manual-df)
-for a project that uses this library.
+The [example](examples/cli.rs) is a usable tool to write the parsed raws into JSON, this could then be uploaded
+to Algolia search for searching through, or can be easily ingested by a website with javascript.
 
 There is a [Typescript definition file](./typing.d.ts) for the format of the generated JSON.
+
+#### Existing Projects
+
+These are projects which use this library.
+
+- [Overseer's Reference Manual for Dwarf Fortress](https://github.com/nwesterhausen/overseers-manual-df)
 
 ## Perl script
 
