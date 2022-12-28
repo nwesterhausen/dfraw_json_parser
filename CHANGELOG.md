@@ -5,6 +5,30 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## v0.7.4 (2022-12-28)
+
+### New Features
+
+ - <csr-id-ed463c84a64cc8b774ebb576704ff20c0bec15d0/> ✨ add human-readable raw module source to raws
+
+### Commit Statistics
+
+<csr-read-only-do-not-edit/>
+
+ - 1 commit contributed to the release.
+ - 1 commit was understood as [conventional](https://www.conventionalcommits.org).
+ - 0 issues like '(#ID)' were seen in commit messages
+
+### Commit Details
+
+<csr-read-only-do-not-edit/>
+
+<details><summary>view details</summary>
+
+ * **Uncategorized**
+    - ✨ add human-readable raw module source to raws ([`ed463c8`](https://github.com/nwesterhausen/dfraw_json_parser/commit/ed463c84a64cc8b774ebb576704ff20c0bec15d0))
+</details>
+
 ## v0.7.3 (2022-12-28)
 
 ### New Features
@@ -19,7 +43,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 <csr-read-only-do-not-edit/>
 
- - 2 commits contributed to the release.
+ - 3 commits contributed to the release.
  - 2 commits were understood as [conventional](https://www.conventionalcommits.org).
  - 0 issues like '(#ID)' were seen in commit messages
 
@@ -30,6 +54,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 <details><summary>view details</summary>
 
  * **Uncategorized**
+    - Release dfraw_json_parser v0.7.3 ([`9800d75`](https://github.com/nwesterhausen/dfraw_json_parser/commit/9800d75e2a0d98cf86dd8ce6820ada716cd7a776))
     - 🐛 save all info for final raw read from file ([`ae01266`](https://github.com/nwesterhausen/dfraw_json_parser/commit/ae012665b7097242b39e27e07741d5f284eec291))
     - ✨ add parse_single_raw to lib and cli example ([`d072b71`](https://github.com/nwesterhausen/dfraw_json_parser/commit/d072b719c51dcb1b8065edd9251364aded5b79d2))
 </details>
