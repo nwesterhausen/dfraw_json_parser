@@ -1022,5 +1022,12 @@ pub fn parse_dfraw_module_info_file(info_file_path: &Path, source_dir: &str) -> 
             }
         }
     }
+
+    // Do some final checks to confirm that the name is set. Specifically in "Dark Ages V - War & Mythos" the
+    // [name] Token in the info.txt is written incorrectly as "[name]X" instead of [name:X]
+    if info_file_data.name.is_empty() || info_file_data.name.len() == 0 {
+        info_file_data.name = String::from(info_file_data.get_identifier());
+    }
+
     info_file_data
 }
