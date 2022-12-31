@@ -43,7 +43,7 @@ fn main() {
         // Perform allocation-free log formatting
         .format(|out, message, record| out.finish(format_args!("[{}] {}", record.level(), message)))
         // Add blanket level filter -
-        .level(log::LevelFilter::Info)
+        .level(log::LevelFilter::Debug)
         // Output to stdout, files, and other Dispatch configurations
         .chain(std::io::stdout())
         // Apply globally

@@ -3,7 +3,7 @@ use crate::parser::refs::{DF_ENCODING, NON_DIGIT_RE, RAW_TOKEN_RE};
 use super::parsing;
 use super::raws::info::DFInfoFile;
 use super::raws::tags::{CasteTag, CreatureTag};
-use super::raws::{biomes, creature, info, names, tags};
+use super::raws::{biomes, creature, info, names, plant, tags};
 
 use encoding_rs_io::DecodeReaderBytesBuilder;
 use slug::slugify;
@@ -1035,4 +1035,156 @@ pub fn parse_dfraw_module_info_file(info_file_path: &Path, source_dir: &str) -> 
     }
 
     info_file_data
+}
+
+pub fn parse_plant_file(input_path: &Path, info_text: &DFInfoFile) -> Vec<plant::DFPlant> {
+    let caller = "Parse Plant Raw";
+    let mut results: Vec<plant::DFPlant> = Vec::new();
+
+    let file = match File::open(&input_path) {
+        Ok(f) => f,
+        Err(e) => {
+            log::error!("{} - Error opening raw file for parsing!\n{:?}", caller, e);
+            return results;
+        }
+    };
+
+    let decoding_reader = DecodeReaderBytesBuilder::new()
+        .encoding(*DF_ENCODING)
+        .build(file);
+    let reader = BufReader::new(decoding_reader);
+
+    // let mut creatures = 0;
+    let mut raw_filename = String::new();
+    let mut current_object = RawObjectKind::None;
+    let mut started = false;
+    let mut plant_temp = plant::DFPlant::new("None", "None", info_text);
+
+    let mut material_tags: Vec<tags::MaterialTag> = Vec::new();
+    let mut plant_tags: Vec<tags::PlantTag> = Vec::new();
+    let mut temp_material_vec: Vec<plant::SimpleMaterial> = Vec::new();
+
+    let mut material_temp = plant::SimpleMaterial::empty();
+
+    for (index, line) in reader.lines().enumerate() {
+        if line.is_err() {
+            log::error!(
+                "{} - Error processing {}:{}",
+                caller,
+                input_path.display(),
+                index
+            );
+            continue;
+        }
+
+        let line = match line {
+            Ok(l) => l,
+            Err(e) => {
+                log::error!("{} - Line-reading error\n{:?}", caller, e);
+                continue;
+            }
+        };
+
+        if index == 0 {
+            raw_filename = String::from(&line);
+            continue;
+        }
+
+        for cap in RAW_TOKEN_RE.captures_iter(&line) {
+            log::trace!("{} - Key: {} Value: {}", caller, &cap[2], &cap[3]);
+            match &cap[2] {
+                "OBJECT" => match &cap[3] {
+                    "PLANT" => {
+                        // Discovered raws for plants.
+                        current_object = RawObjectKind::Plant;
+                    }
+                    &_ => {
+                        log::debug!("{} - Wrong type of raw ({})", caller, &cap[3]);
+                        return Vec::new();
+                        // current_object = RawObjectKind::None;
+                    }
+                },
+                "PLANT" => {
+                    // We are starting a creature object capture
+                    match current_object {
+                        RawObjectKind::Plant => {
+                            if started {
+                                // If we already *were* capturing a creature, export it.
+                                //1. Save caste tags
+                                material_temp.tags = material_tags.clone();
+                                //2. Save caste
+                                temp_material_vec.push(material_temp.clone());
+                                //3. Save creature tags
+                                plant_temp.tags = plant_tags.clone();
+                                //4. Save tamp_castes to creature
+                                plant_temp.materials_vec = temp_material_vec.clone();
+                                //5. Save creature
+                                results.push(plant_temp);
+                            } else {
+                                started = true;
+                            }
+                            //Reset all temp values
+                            log::debug!("Starting new plant {}", &cap[3]);
+                            //1. Make new creature from [CREATURE:<NAME>]
+                            plant_temp = plant::DFPlant::new(&raw_filename, &cap[3], info_text);
+                            //2. Make new caste
+                            material_temp = plant::SimpleMaterial::empty();
+                            //3. Reset/empty caste tags
+                            material_tags = Vec::new();
+                            //4. Reset/empty creature tags
+                            plant_tags = Vec::new();
+                            //5. Reset/empty caste vector
+                            temp_material_vec = Vec::new();
+                        }
+                        _ => (),
+                    }
+                }
+                "USE_MATERIAL_TEMPLATE" => {
+                    log::debug!("Found defined template {} {}", &cap[2], &cap[3]);
+                    //1. Save caste tags
+                    material_temp.tags = material_tags.clone();
+                    //2. Save caste
+                    temp_material_vec.push(material_temp.clone());
+                    //3. Make new caste from [CASTE:<NAME>]
+                    material_temp = plant::SimpleMaterial::new(&cap[3]);
+                    //4. Reset/empty caste tags
+                    material_tags = Vec::new();
+                }
+                "BIOME" => match biomes::BIOMES.get(&cap[3]) {
+                    Some(biome_name) => plant_temp.biomes.push((*biome_name).to_string()),
+                    None => log::warn!("{} is not in biome dictionary!", &cap[3]),
+                },
+
+                //TODO: Add rest of plant tokens
+                //TODO: Add rest of the simple material tokens we care about
+                &_ => (),
+            }
+        }
+    }
+
+    match current_object {
+        RawObjectKind::Plant => {
+            // If we already *were* capturing a plant, export it.
+            //1. Save caste tags
+            material_temp.tags = material_tags.clone();
+            //2. Save caste
+            temp_material_vec.push(material_temp.clone());
+            //3. Save creature tags
+            plant_temp.tags = plant_tags.clone();
+            //4. Save tamp_castes to creature
+            plant_temp.materials_vec = temp_material_vec.clone();
+            //5. Save creature
+            results.push(plant_temp);
+        }
+        _ => (),
+    }
+    log::info!(
+        "{} plants defined in {} ({} {} in {})",
+        results.len(),
+        &raw_filename,
+        info_text.get_identifier(),
+        info_text.displayed_version,
+        info_text.get_sourced_directory(),
+    );
+    results
 }
