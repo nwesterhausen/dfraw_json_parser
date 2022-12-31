@@ -9,19 +9,17 @@ const HELP_OUT_DIR: &str = "Specify the directory that the JSON database should 
 
 If raw files are parsed, a JSON database (an array of objects) is
 saved to disk in a location specified by this argument. This will
-create an 'out.json' file in the directory specified by this argument.";
+create an 'raws.json' file in the directory specified by this argument.
 
-const HELP_SERVE: &str = "Include this flag to start a web server for the web search client.
+Alongside raws.json will be a modules.json which is a JSON database for the
+raw modules that were found and parsed.";
 
-Included in the repository is a 'www' folder with a small web client
-that will fetch the JSON database created by this program (out.json)
-and present it in a searchable manner to the user. 
+const HELP_SINGLE_RAW: &str = "Specify a single raw file to parse, output is saved or put to console.
 
-If you include this flag, after any parsing is done, a tiny HTTP server
-will start server files from the directory specified by 'out-dir' which
-defaults to ./www";
-
-const HELP_PORT: &str = "Specify the port to run the web server on.";
+Since there are some details dfraw_json_parser gets from the directory structure, those will
+be filled with dummy values when using this command. They will be filled-in automatically. If you choose
+to specify an out_dir, the parsed JSON will be saved to single-raw.json, otherwise it will be output
+to the console.";
 
 #[derive(Parser, Debug)]
 #[command(author, version, about, long_about = None)] // Read from `Cargo.toml`
@@ -31,16 +29,12 @@ struct Args {
     game_dir: String,
 
     /// Path to save JSON database
-    #[clap(short, long, default_value_t = String::from("./www/"), long_help = HELP_OUT_DIR)]
+    #[clap(short, long, default_value_t = String::new(), long_help = HELP_OUT_DIR)]
     out_dir: String,
 
-    /// Whether we should start a web server for the out_dir
-    #[clap(short, long, long_help = HELP_SERVE)]
-    serve: bool,
-
-    /// Port to serve the web client on
-    #[clap(short, long, default_value_t = 4501, long_help = HELP_PORT)]
-    port: u16,
+    /// Single raw file to parse
+    #[clap(short, long, default_value_t = String::new(), long_help = HELP_SINGLE_RAW)]
+    raw_file: String,
 }
 
 fn main() {
@@ -58,7 +52,12 @@ fn main() {
 
     let args = Args::parse();
 
+    // If the Game Dir is specified
     if !args.game_dir.is_empty() {
+        if args.out_dir.is_empty() {
+            log::error!("Unable to parse and output JSON without specifying out_dir");
+            return;
+        }
         let Ok(out_path) = std::fs::canonicalize(Path::new(&args.out_dir)) else {
             log::error!("Unable to standardize output path {} for writing.", &args.out_dir);
             return;
@@ -74,51 +73,47 @@ fn main() {
             // If a directory for raws was specified, we will parse what raws we find
             dfraw_json_parser::parse_game_raws_to_file(
                 args.game_dir.as_str(),
-                &out_path.join("out.json").to_path_buf(),
+                &out_path.join("raws.json").to_path_buf(),
+            );
+            // Also save the modules info
+            dfraw_json_parser::parse_raw_module_info_to_file(
+                args.game_dir.as_str(),
+                &out_path.join("modules.json").to_path_buf(),
             );
         } else {
             log::error!("A non-directory was specified for out_dir");
         }
     }
 
-    if args.serve {
-        serve_files(args.out_dir, args.port);
-    }
-}
+    if !args.raw_file.is_empty() {
+        let Ok(raw_file_path) = std::fs::canonicalize(Path::new(&args.raw_file)) else {
+            log::error!("Unable to standardize raw file path to read. {}", &args.out_dir);
+            return;
+        };
 
-fn serve_files(directory: String, port: u16) {
-    let server_string = format!("localhost:{}", port);
-    println!("Starting server at http://{}", server_string);
-
-    rouille::start_server(&server_string, move |request| {
-        {
-            // The `match_assets` function tries to find a file whose name corresponds to the URL
-            // of the request. The second parameter (`"."`) tells where the files to look for are
-            // located.
-            // In order to avoid potential security threats, `match_assets` will never return any
-            // file outside of this directory even if the URL is for example `/../../foo.txt`.
-            let response = rouille::match_assets(&request, &directory);
-
-            // If a file is found, the `match_assets` function will return a response with a 200
-            // status code and the content of the file. If no file is found, it will instead return
-            // an empty 404 response.
-            // Here we check whether if a file is found, and if so we return the response.
-            if response.is_success() {
-                return response;
-            }
+        if args.out_dir.is_empty() {
+            log::warn!("No output directory specified, dumping to console.");
+            let parsed_raws = dfraw_json_parser::read_single_raw_file(&raw_file_path);
+            println!("{}", parsed_raws);
+            return;
         }
 
-        // This point of the code is reached only if no static file matched the request URL.
-
-        // In a real website you probably want to serve non-static files here (with the `router!`
-        // macro for example), but here we just return a 404 response.
-        rouille::router!(request,
-            (GET) (/) => {
-                // If you requested '/' redirect to index.html
-                rouille::Response::redirect_302("/index.html")
-            },
-
-            _ => rouille::Response::empty_404()
-        )
-    });
+        let Ok(out_path) = std::fs::canonicalize(Path::new(&args.out_dir)) else {
+            log::error!("Unable to standardize output path {} for writing.", &args.out_dir);
+            return;
+        };
+        if !out_path.exists() {
+            log::error!(
+                "Non-existent path specified for saving file to {:?}",
+                out_path
+            );
+            return;
+        }
+        if out_path.is_dir() {
+            dfraw_json_parser::read_single_raw_file_to_file(
+                &raw_file_path,
+                &out_path.join("single-raw.json").to_path_buf(),
+            )
+        }
+    }
 }

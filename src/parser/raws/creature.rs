@@ -17,9 +17,8 @@ pub struct DFCreature {
     dfraw_identifier: String,
     dfraw_version: String,
     dfraw_found_in: String,
+    dfraw_display: String,
     raw_type: RawObjectKind,
-    #[serde(rename = "objectId")]
-    object_id: String,
 
     // Boolean Flags
     pub tags: Vec<tags::CreatureTag>,
@@ -53,10 +52,10 @@ impl Clone for DFCreature {
         Self {
             identifier: self.identifier.to_string(),
             parent_raw: self.parent_raw.to_string(),
-            object_id: self.object_id.to_string(),
             dfraw_identifier: self.dfraw_identifier.to_string(),
             dfraw_version: self.dfraw_version.to_string(),
             dfraw_found_in: self.dfraw_found_in.to_string(),
+            dfraw_display: self.dfraw_display.to_string(),
             raw_type: RawObjectKind::Creature,
             tags: self.tags.clone(),
             frequency: self.frequency,
@@ -153,10 +152,10 @@ impl DFCreature {
         Self {
             identifier: String::from(id),
             parent_raw: String::from(raw),
-            object_id: format!("{}-{}-{}", raw, "CREATURE", slugify(id)),
             dfraw_identifier: String::from(info_text.get_identifier()),
             dfraw_version: String::from(info_text.displayed_version.as_str()),
             dfraw_found_in: String::from(info_text.get_sourced_directory()),
+            dfraw_display: format!("{} v{}", info_text.name, info_text.displayed_version),
             raw_type: RawObjectKind::Creature,
             // Boolean Flags
             tags: Vec::new(),
@@ -197,6 +196,9 @@ impl DFCreature {
     pub fn get_dfraw_found_in(&self) -> String {
         String::from(&self.dfraw_found_in)
     }
+    pub fn get_dfraw_display(&self) -> String {
+        String::from(&self.dfraw_display)
+    }
     pub fn get_parent_raw(&self) -> String {
         String::from(&self.parent_raw)
     }
@@ -204,7 +206,12 @@ impl DFCreature {
         format!("{:?}", self.raw_type)
     }
     pub fn get_object_id(&self) -> String {
-        String::from(&self.object_id)
+        format!(
+            "{}-{}-{}",
+            self.get_parent_raw(),
+            "CREATURE",
+            slugify(self.get_identifier())
+        )
     }
     pub fn get_general_name(&self) -> String {
         self.name.to_string_vec()[0].to_string()

@@ -3,10 +3,14 @@ use std::io::{BufWriter, Write};
 use std::path::Path;
 use walkdir::WalkDir;
 
+use self::json_conversion::TypedJsonSerializable;
+use self::raws::info::DFInfoFile;
+
 mod json_conversion;
 mod parsing;
 pub mod raws;
 mod reader;
+mod refs;
 
 /// Given the raws directory and raw module info, returns a JSON string of parsed raw info.
 ///
@@ -105,6 +109,22 @@ fn parse_raws_to_json(
     parsed_raws
 }
 
+pub fn read_single_raw_file(raw_file: &Path) -> String {
+    let info_text_file = DFInfoFile::new("manual-origin", "user-specified");
+
+    match reader::read_raw_file_type(raw_file) {
+        reader::RawObjectKind::Creature => {
+            log::info!("Parsing creature raws from {}", raw_file.display());
+            let creature_raw_vec = reader::parse_creature_file(&raw_file, &info_text_file);
+            return format!("[{}]", stringify_raw_vec(creature_raw_vec).join(","));
+        }
+        _ => {
+            log::warn!("Unknown raw type or failure to parse it.");
+            return String::new();
+        }
+    }
+}
+
 fn save_string_vec_to_json_file(string_vec: Vec<String>, out_directory: &Path) {
     // The destination file is out.json inside the out_directory
     let out_filepath = out_directory.join("out.json");
@@ -158,6 +178,19 @@ fn save_string_vec_to_json_file(string_vec: Vec<String>, out_directory: &Path) {
 
 pub fn parse_info_file(input_path: &Path, sourced_dir: &str) -> raws::info::DFInfoFile {
     reader::parse_dfraw_module_info_file(input_path, sourced_dir)
+}
+
+pub fn parse_info_file_to_json_string(input_path: &Path, sourced_dir: &str) -> String {
+    let info_file = parse_info_file(input_path, sourced_dir);
+    match info_file.to_typed_json_string() {
+        Ok(s) => {
+            return s.to_string();
+        }
+        Err(e) => {
+            log::error!("Failure to serialize parsed raw data\n{}", e);
+            return "".to_owned();
+        }
+    }
 }
 
 fn stringify_raw_vec(
