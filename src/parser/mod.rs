@@ -118,6 +118,11 @@ pub fn read_single_raw_file(raw_file: &Path) -> String {
             let creature_raw_vec = reader::parse_creature_file(&raw_file, &info_text_file);
             return format!("[{}]", stringify_raw_vec(creature_raw_vec).join(","));
         }
+        reader::RawObjectKind::Plant => {
+            log::info!("Parsing plant raws from {}", raw_file.display());
+            let plant_raw_vec = reader::parse_plant_file(&raw_file, &info_text_file);
+            return format!("[{}]", stringify_raw_vec(plant_raw_vec).join(","));
+        }
         _ => {
             log::warn!("Unknown raw type or failure to parse it.");
             return String::new();

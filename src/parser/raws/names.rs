@@ -35,6 +35,15 @@ impl Name {
             String::from(&self.adjective),
         ]
     }
+    pub fn set_singular(&mut self, name: &str) {
+        self.singular = String::from(name);
+    }
+    pub fn set_plural(&mut self, name: &str) {
+        self.plural = String::from(name);
+    }
+    pub fn set_adjective(&mut self, name: &str) {
+        self.adjective = String::from(name);
+    }
 }
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
@@ -53,6 +62,12 @@ impl SingPlurName {
         while names.len() < 2 {
             names.push("");
         }
+        if names[1].eq("STP") {
+            return Self {
+                singular: String::from(names[0]),
+                plural: String::new(),
+            };
+        }
         Self {
             singular: String::from(names[0]),
             plural: String::from(names[1]),
@@ -60,5 +75,38 @@ impl SingPlurName {
     }
     pub fn to_string_vec(&self) -> Vec<String> {
         vec![String::from(&self.singular), String::from(&self.plural)]
+    }
+}
+
+#[derive(Serialize, Deserialize, Debug, Clone)]
+pub struct StateName {
+    solid: String,
+    liquid: String,
+    gas: String,
+}
+
+impl StateName {
+    pub fn new() -> Self {
+        Self {
+            solid: String::new(),
+            liquid: String::new(),
+            gas: String::new(),
+        }
+    }
+    pub fn from(solid: &str, liquid: &str, gas: &str) -> Self {
+        Self {
+            solid: String::from(solid),
+            liquid: String::from(liquid),
+            gas: String::from(gas),
+        }
+    }
+    pub fn set_solid(&mut self, name: &str) {
+        self.solid = String::from(name);
+    }
+    pub fn set_liquid(&mut self, name: &str) {
+        self.liquid = String::from(name);
+    }
+    pub fn set_gas(&mut self, name: &str) {
+        self.gas = String::from(name);
     }
 }
