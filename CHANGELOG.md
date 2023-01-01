@@ -5,6 +5,41 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## v0.7.6 (2023-01-01)
+
+### New Features
+
+ - <csr-id-3de87c132c9ffc1531242f03292d897a9043683f/> 🚀 add plant parsing into lib.rs
+ - <csr-id-ba141563a121e2654ad1af165bef5642de5ff4ae/> 🌟 support plant raws
+   * feat: 🚧 start implementing plant raws (and its requirements)
+   
+   * feat: ✨ detect plant raws
+   
+   * feat: ✨ parse plants simply
+   
+   * feat: ✨ support plant raws
+
+### Commit Statistics
+
+<csr-read-only-do-not-edit/>
+
+ - 2 commits contributed to the release.
+ - 3 days passed between releases.
+ - 2 commits were understood as [conventional](https://www.conventionalcommits.org).
+ - 1 unique issue was worked on: [#9](https://github.com/nwesterhausen/dfraw_json_parser/issues/9)
+
+### Commit Details
+
+<csr-read-only-do-not-edit/>
+
+<details><summary>view details</summary>
+
+ * **[#9](https://github.com/nwesterhausen/dfraw_json_parser/issues/9)**
+    - 🌟 support plant raws ([`ba14156`](https://github.com/nwesterhausen/dfraw_json_parser/commit/ba141563a121e2654ad1af165bef5642de5ff4ae))
+ * **Uncategorized**
+    - 🚀 add plant parsing into lib.rs ([`3de87c1`](https://github.com/nwesterhausen/dfraw_json_parser/commit/3de87c132c9ffc1531242f03292d897a9043683f))
+</details>
+
 ## v0.7.5 (2022-12-29)
 
 ### Bug Fixes
@@ -15,7 +50,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 <csr-read-only-do-not-edit/>
 
- - 1 commit contributed to the release.
+ - 2 commits contributed to the release.
  - 1 commit was understood as [conventional](https://www.conventionalcommits.org).
  - 0 issues like '(#ID)' were seen in commit messages
 
@@ -26,6 +61,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 <details><summary>view details</summary>
 
  * **Uncategorized**
+    - Release dfraw_json_parser v0.7.5 ([`57502cc`](https://github.com/nwesterhausen/dfraw_json_parser/commit/57502cc2047d17e52f503926523596285ebff7a5))
     - 🐛 use identifier if empty name ([`6c576b2`](https://github.com/nwesterhausen/dfraw_json_parser/commit/6c576b2a13153bbe757c5cd72f92107120f6e60a))
 </details>
 
@@ -87,6 +123,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## v0.7.2 (2022-12-28)
 
 <csr-id-6ed8d209706a530c35d0cd284df72d7c04d3efe6/>
+<csr-id-5e6dde45b3489ad93660372f654fa637a4379d98/>
+<csr-id-a6f00156cddc9b0c42b5f0a19883d5382c19d160/>
+<csr-id-5a9740e01528680c3f6543673fbd722913ac57c2/>
+<csr-id-7932e59c509f1da93e8f431fbbef9a164de144d1/>
+<csr-id-bb5de4483e6c0b5bfb15a0a5e2defdd067bd6c9d/>
+<csr-id-a8301caede5aa2090b769c05e19a699267e07b07/>
+<csr-id-8d79e7bc493584248b8adbc98ae4f178f517a6a6/>
+<csr-id-59e2dff2d583cd8c5c55411688a6c8f4ddcf361a/>
+
+
 <csr-id-5e6dde45b3489ad93660372f654fa637a4379d98/>
 <csr-id-a6f00156cddc9b0c42b5f0a19883d5382c19d160/>
 <csr-id-5a9740e01528680c3f6543673fbd722913ac57c2/>
@@ -180,6 +226,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 <csr-id-373da1570664724774cddd13d34ae50c05a47dd8/>
 
+
+
 ### Chore
 
  - <csr-id-373da1570664724774cddd13d34ae50c05a47dd8/> 🔖 bump version
@@ -222,6 +270,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## v0.3.0 (2022-12-13)
 
 <csr-id-0c7aebb62c9b8cae212207bddcae6edbece83995/>
+
+
 
 ### Chore
 
