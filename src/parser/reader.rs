@@ -1,3 +1,4 @@
+use crate::parser::raws::names::SingPlurName;
 use crate::parser::refs::{DF_ENCODING, NON_DIGIT_RE, RAW_TOKEN_RE};
 
 use super::parsing;
@@ -7,6 +8,7 @@ use super::raws::{biomes, creature, info, names, plant, tags};
 
 use encoding_rs_io::DecodeReaderBytesBuilder;
 use slug::slugify;
+
 use std::fs::File;
 use std::io::{BufRead, BufReader};
 use std::path::Path;
@@ -1063,6 +1065,7 @@ pub fn parse_plant_file(input_path: &Path, info_text: &DFInfoFile) -> Vec<plant:
     let mut material_tags: Vec<tags::MaterialTag> = Vec::new();
     let mut plant_tags: Vec<tags::PlantTag> = Vec::new();
     let mut temp_material_vec: Vec<plant::SimpleMaterial> = Vec::new();
+    let mut temp_plant_growth = plant::PlantGrowth::None;
 
     let mut material_temp = plant::SimpleMaterial::empty();
 
@@ -1140,23 +1143,189 @@ pub fn parse_plant_file(input_path: &Path, info_text: &DFInfoFile) -> Vec<plant:
                     }
                 }
                 "USE_MATERIAL_TEMPLATE" => {
-                    log::debug!("Found defined template {} {}", &cap[2], &cap[3]);
                     //1. Save caste tags
+                    material_tags.extend(material_temp.tags);
                     material_temp.tags = material_tags.clone();
                     //2. Save caste
                     temp_material_vec.push(material_temp.clone());
+
+                    // Split the value into a descriptor and template
+                    let split = cap[3].split(':').collect::<Vec<&str>>();
+                    if split.len() != 2 {
+                        log::error!("Unable to build from material template {}", &cap[3]);
+                        // When we can't do anything about the template, just use empty one
+                        material_temp = plant::SimpleMaterial::empty();
+                        material_tags = Vec::new();
+                        continue;
+                    }
+
+                    log::debug!("Found defined template {} {}", &split[0], &split[1]);
                     //3. Make new caste from [CASTE:<NAME>]
-                    material_temp = plant::SimpleMaterial::new(&cap[3]);
+                    material_temp = plant::SimpleMaterial::new(&split[0], &split[1]);
                     //4. Reset/empty caste tags
-                    material_tags = Vec::new();
+                    // ~~material_tags = Vec::new();~~
+                    //5. Get material template to add (known) template tags
+                    material_tags = Vec::clone(&plant::material_tags_from_template(&split[1]));
                 }
                 "BIOME" => match biomes::BIOMES.get(&cap[3]) {
                     Some(biome_name) => plant_temp.biomes.push((*biome_name).to_string()),
                     None => log::warn!("{} is not in biome dictionary!", &cap[3]),
                 },
+                "GROWTH" => match &cap[3] {
+                    "LEAVES" => temp_plant_growth = plant::PlantGrowth::Leaves,
+                    "FLOWERS" => temp_plant_growth = plant::PlantGrowth::Flowers,
+                    "FRUIT" => temp_plant_growth = plant::PlantGrowth::Fruit,
+                    "SPATHES" => temp_plant_growth = plant::PlantGrowth::Spathes,
+                    "NUT" => temp_plant_growth = plant::PlantGrowth::Nut,
+                    "SEED_CATKINS" => temp_plant_growth = plant::PlantGrowth::SeedCatkins,
+                    "POLLEN_CATKINS" => temp_plant_growth = plant::PlantGrowth::PollenCatkins,
+                    "CONE" => temp_plant_growth = plant::PlantGrowth::Cone,
+                    "SEED_CONE" => temp_plant_growth = plant::PlantGrowth::SeedCone,
+                    "POLLEN_CONE" => temp_plant_growth = plant::PlantGrowth::PollenCone,
+                    "POD" => temp_plant_growth = plant::PlantGrowth::Pod,
+                    _ => {
+                        log::debug!("Un-matched plant growth token '{}'", &cap[3]);
+                    }
+                },
+                "GROWTH_NAME" => {
+                    plant_temp
+                        .growth_names
+                        .insert(temp_plant_growth.clone(), SingPlurName::new(&cap[3]));
+                }
+                "NAME" => {
+                    plant_temp.name.set_singular(&cap[3]);
+                }
+                "NAME_PLURAL" => {
+                    plant_temp.name.set_plural(&cap[3]);
+                }
+                "ADJ" => {
+                    plant_temp.name.set_adjective(&cap[3]);
+                }
+                "PREFSTRING" => {
+                    plant_temp.pref_string.push(String::from(&cap[3]));
+                }
+                "FREQUENCY" => match cap[3].parse() {
+                    Ok(n) => plant_temp.frequency = n,
+                    Err(e) => log::error!(
+                        "{}:FREQUENCY parsing error\n{:?}",
+                        plant_temp.get_identifier(),
+                        e
+                    ),
+                },
+                "CLUSTERSIZE" => match cap[3].parse() {
+                    Ok(n) => plant_temp.cluster_size = n,
+                    Err(e) => log::error!(
+                        "{}:CLUSTERSIZE parsing error\n{:?}",
+                        plant_temp.get_identifier(),
+                        e
+                    ),
+                },
+                "GROWDUR" => match cap[3].parse() {
+                    Ok(n) => plant_temp.growth_duration = n,
+                    Err(e) => log::error!(
+                        "{}:GROWDUR parsing error\n{:?}",
+                        plant_temp.get_identifier(),
+                        e
+                    ),
+                },
+                "VALUE" => match cap[3].parse() {
+                    Ok(n) => plant_temp.value = n,
+                    Err(e) => log::error!(
+                        "{}:VALUE parsing error\n{:?}",
+                        plant_temp.get_identifier(),
+                        e
+                    ),
+                },
+                "MATERIAL_VALUE" => match cap[3].parse() {
+                    Ok(n) => material_temp.material_value = n,
+                    Err(e) => log::error!(
+                        "{}:{:?}:MATERIAL_VALUE parsing error\n{:?}",
+                        plant_temp.get_identifier(),
+                        material_temp.material_type,
+                        e
+                    ),
+                },
+                "EDIBLE_VERMIN" => {
+                    material_tags.push(tags::MaterialTag::EdibleVermin);
+                }
+                "EDIBLE_RAW" => {
+                    material_tags.push(tags::MaterialTag::EdibleRaw);
+                }
+                "EDIBLE_COOKED" => {
+                    material_tags.push(tags::MaterialTag::EdibleCooked);
+                }
+                "STATE_NAME" => {
+                    // Split the value into a descriptor and value
+                    let split = cap[3].split(':').collect::<Vec<&str>>();
 
-                //TODO: Add rest of plant tokens
-                //TODO: Add rest of the simple material tokens we care about
+                    if split.len() != 2 {
+                        log::error!("Unable to read name from {}", &cap[3]);
+                        // When we can't do anything about this name, just continue
+                        continue;
+                    }
+
+                    match split[0] {
+                        "ALL_SOLID" => material_temp.state_name.set_solid(&split[1]),
+                        "LIQUID" => material_temp.state_name.set_liquid(&split[1]),
+                        "GAS" => material_temp.state_name.set_gas(&split[1]),
+                        _ => (),
+                    }
+                }
+                "STATE_ADJ" => {
+                    // Split the value into a descriptor and value
+                    let split = cap[3].split(':').collect::<Vec<&str>>();
+
+                    if split.len() != 2 {
+                        log::error!("Unable to read name from {}", &cap[3]);
+                        // When we can't do anything about this name, just continue
+                        continue;
+                    }
+
+                    match split[0] {
+                        "ALL_SOLID" => material_temp.state_adj.set_solid(&split[1]),
+                        "LIQUID" => material_temp.state_adj.set_liquid(&split[1]),
+                        "GAS" => material_temp.state_adj.set_gas(&split[1]),
+                        _ => (),
+                    }
+                }
+                "STATE_NAME_ADJ" => {
+                    // Split the value into a descriptor and value
+                    let split = cap[3].split(':').collect::<Vec<&str>>();
+
+                    if split.len() != 2 {
+                        log::error!("Unable to read name from {}", &cap[3]);
+                        // When we can't do anything about this name, just continue
+                        continue;
+                    }
+
+                    match split[0] {
+                        "ALL_SOLID" => {
+                            material_temp.state_name.set_solid(&split[1]);
+                            material_temp.state_adj.set_solid(&split[1]);
+                        }
+                        "LIQUID" => {
+                            material_temp.state_name.set_liquid(&split[1]);
+                            material_temp.state_adj.set_liquid(&split[1]);
+                        }
+                        "GAS" => {
+                            material_temp.state_name.set_gas(&split[1]);
+                            material_temp.state_adj.set_gas(&split[1]);
+                        }
+                        _ => (),
+                    }
+                }
+                "STATE_COLOR" => {
+                    // Split the value into a descriptor and value
+                    let split = cap[3].split(':').collect::<Vec<&str>>();
+
+                    if split.len() != 2 {
+                        log::error!("Unable to read color from {}", &cap[3]);
+                        // When we can't do anything about this name, just continue
+                        continue;
+                    }
+
+                    material_temp.state_color = String::from(split[1]);
+                }
                 &_ => (),
             }
         }
@@ -1166,6 +1335,7 @@ pub fn parse_plant_file(input_path: &Path, info_text: &DFInfoFile) -> Vec<plant:
         RawObjectKind::Plant => {
             // If we already *were* capturing a plant, export it.
             //1. Save caste tags
+            material_tags.extend(material_temp.tags);
             material_temp.tags = material_tags.clone();
             //2. Save caste
             temp_material_vec.push(material_temp.clone());

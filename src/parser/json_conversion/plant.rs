@@ -1,6 +1,8 @@
+use std::collections::HashMap;
+
 use crate::parser::raws::{
-    plant::{DFPlant, SimpleMaterial},
-    tags::PlantTag,
+    plant::{DFPlant, PlantGrowth, SimpleMaterial},
+    tags::PlantTag, names::SingPlurName,
 };
 
 use super::TypedJsonSerializable;
@@ -36,6 +38,8 @@ pub struct TypedJsonPlant {
     // pub seed: DFPlantSeed,
     // Sub Tags
     materials: Vec<SimpleMaterial>,
+    growth_names: HashMap<PlantGrowth, SingPlurName>,
+    growth_duration: u32,
 }
 
 impl TypedJsonPlant {
@@ -50,6 +54,7 @@ impl TypedJsonPlant {
             raw_module_display: plant.get_dfraw_display(),
             raw_type: plant.get_raw_type(),
             name: plant.get_general_name(),
+
             frequency: plant.frequency,
             pref_string: plant.pref_string.clone(),
             tags: Vec::clone(&plant.tags),
@@ -58,6 +63,9 @@ impl TypedJsonPlant {
             underground_depth: plant.underground_depth,
             value: plant.value,
             materials: Vec::clone(&plant.materials_vec),
+
+            growth_names: HashMap::clone(&plant.growth_names),
+            growth_duration: plant.growth_duration,
         }
     }
 }
