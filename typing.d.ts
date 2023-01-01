@@ -106,7 +106,7 @@ export type DFPlant = {
     [growth: string]: SingPluralName;
   }
   growth_duration: number;
-}
+} & Raw;
 
 // info.txt raw definition
 export type DFInfoFile = {
