@@ -97,6 +97,11 @@ fn parse_raws_to_json(
                     let creature_raw_vec = reader::parse_creature_file(&entry_path, info_text_file);
                     parsed_raws.extend(stringify_raw_vec(creature_raw_vec));
                 }
+                reader::RawObjectKind::Plant => {
+                    log::debug!("parsing {}", entry_path.display());
+                    let plant_raw_vec = reader::parse_plant_file(&entry_path, info_text_file);
+                    parsed_raws.extend(stringify_raw_vec(plant_raw_vec));
+                }
                 _ => log::trace!("{} - skipping {}", caller, entry_path.display()),
             }
         }
