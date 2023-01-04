@@ -1324,7 +1324,7 @@ pub fn parse_plant_file(input_path: &Path, info_text: &DFInfoFile) -> Vec<plant:
                         continue;
                     }
 
-                    material_temp.state_color = String::from(split[1]);
+                    material_temp.state_color.set(split[0], split[1]);
                 }
                 &_ => (),
             }
