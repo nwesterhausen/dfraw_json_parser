@@ -87,7 +87,7 @@ fn main() {
 
     if !args.raw_file.is_empty() {
         let Ok(raw_file_path) = std::fs::canonicalize(Path::new(&args.raw_file)) else {
-            log::error!("Unable to standardize raw file path to read. {}", &args.out_dir);
+            log::error!("Unable to standardize raw file path to read. {}", &args.raw_file);
             return;
         };
 
