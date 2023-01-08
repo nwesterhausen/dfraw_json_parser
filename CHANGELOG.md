@@ -5,6 +5,46 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## v0.7.7 (2023-01-08)
+
+### New Features
+
+ - <csr-id-3ae61273d150faeff3e407ef7d7d8ea4629ac021/> 🌟 include more plant data
+   * feat:
+   
+   * fix: 🐛 fix error message for bad raw input file in example
+   
+   * feat: ✨ report all state colors
+   
+   * chore: 🚀 update type definition for simple material
+
+### Bug Fixes
+
+ - <csr-id-f931dbeedff7e3a5ccfe065213b7672737b86de5/> 🐛 typescript typing cohesion
+ - <csr-id-7bde574e03f659e1abff93cb6d4d1fc0dd0af34d/> 🐛 fix typings for plant
+
+### Commit Statistics
+
+<csr-read-only-do-not-edit/>
+
+ - 3 commits contributed to the release over the course of 6 calendar days.
+ - 6 days passed between releases.
+ - 3 commits were understood as [conventional](https://www.conventionalcommits.org).
+ - 1 unique issue was worked on: [#10](https://github.com/nwesterhausen/dfraw_json_parser/issues/10)
+
+### Commit Details
+
+<csr-read-only-do-not-edit/>
+
+<details><summary>view details</summary>
+
+ * **[#10](https://github.com/nwesterhausen/dfraw_json_parser/issues/10)**
+    - 🌟 include more plant data ([`3ae6127`](https://github.com/nwesterhausen/dfraw_json_parser/commit/3ae61273d150faeff3e407ef7d7d8ea4629ac021))
+ * **Uncategorized**
+    - 🐛 typescript typing cohesion ([`f931dbe`](https://github.com/nwesterhausen/dfraw_json_parser/commit/f931dbeedff7e3a5ccfe065213b7672737b86de5))
+    - 🐛 fix typings for plant ([`7bde574`](https://github.com/nwesterhausen/dfraw_json_parser/commit/7bde574e03f659e1abff93cb6d4d1fc0dd0af34d))
+</details>
+
 ## v0.7.6 (2023-01-01)
 
 ### New Features
@@ -12,18 +52,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
  - <csr-id-3de87c132c9ffc1531242f03292d897a9043683f/> 🚀 add plant parsing into lib.rs
  - <csr-id-ba141563a121e2654ad1af165bef5642de5ff4ae/> 🌟 support plant raws
    * feat: 🚧 start implementing plant raws (and its requirements)
-   
-   * feat: ✨ detect plant raws
-   
-   * feat: ✨ parse plants simply
-   
-   * feat: ✨ support plant raws
+* feat: ✨ detect plant raws
+* feat: ✨ parse plants simply
+* feat: ✨ support plant raws
 
 ### Commit Statistics
 
 <csr-read-only-do-not-edit/>
 
- - 2 commits contributed to the release.
+ - 3 commits contributed to the release.
  - 3 days passed between releases.
  - 2 commits were understood as [conventional](https://www.conventionalcommits.org).
  - 1 unique issue was worked on: [#9](https://github.com/nwesterhausen/dfraw_json_parser/issues/9)
@@ -37,6 +74,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
  * **[#9](https://github.com/nwesterhausen/dfraw_json_parser/issues/9)**
     - 🌟 support plant raws ([`ba14156`](https://github.com/nwesterhausen/dfraw_json_parser/commit/ba141563a121e2654ad1af165bef5642de5ff4ae))
  * **Uncategorized**
+    - Release dfraw_json_parser v0.7.6 ([`3bfa8f9`](https://github.com/nwesterhausen/dfraw_json_parser/commit/3bfa8f9ca4b66598032f159483b576b082566d43))
     - 🚀 add plant parsing into lib.rs ([`3de87c1`](https://github.com/nwesterhausen/dfraw_json_parser/commit/3de87c132c9ffc1531242f03292d897a9043683f))
 </details>
 
@@ -123,6 +161,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## v0.7.2 (2022-12-28)
 
 <csr-id-6ed8d209706a530c35d0cd284df72d7c04d3efe6/>
+<csr-id-5e6dde45b3489ad93660372f654fa637a4379d98/>
+<csr-id-a6f00156cddc9b0c42b5f0a19883d5382c19d160/>
+<csr-id-5a9740e01528680c3f6543673fbd722913ac57c2/>
+<csr-id-7932e59c509f1da93e8f431fbbef9a164de144d1/>
+<csr-id-bb5de4483e6c0b5bfb15a0a5e2defdd067bd6c9d/>
+<csr-id-a8301caede5aa2090b769c05e19a699267e07b07/>
+<csr-id-8d79e7bc493584248b8adbc98ae4f178f517a6a6/>
+<csr-id-59e2dff2d583cd8c5c55411688a6c8f4ddcf361a/>
+
+
 <csr-id-5e6dde45b3489ad93660372f654fa637a4379d98/>
 <csr-id-a6f00156cddc9b0c42b5f0a19883d5382c19d160/>
 <csr-id-5a9740e01528680c3f6543673fbd722913ac57c2/>
