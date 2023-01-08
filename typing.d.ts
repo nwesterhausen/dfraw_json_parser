@@ -87,7 +87,7 @@ export type SimpleMaterial = {
 // Plant raw definition
 export type DFPlant = {
   name: string;
-  pref_string: string;
+  pref_string: string[];
   value: number;
 
   // Environment Tokens

@@ -1,8 +1,9 @@
 use std::collections::HashMap;
 
 use crate::parser::raws::{
+    names::SingPlurName,
     plant::{DFPlant, PlantGrowth, SimpleMaterial},
-    tags::PlantTag, names::SingPlurName,
+    tags::PlantTag,
 };
 
 use super::TypedJsonSerializable;
@@ -22,9 +23,9 @@ pub struct TypedJsonPlant {
     #[serde(rename = "objectId")]
     object_id: String,
     tags: Vec<PlantTag>,
+    name: String,
 
     // Basic Tokens
-    name: String,
     pref_string: Vec<String>,
     value: u32,
 
