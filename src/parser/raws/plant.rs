@@ -94,7 +94,9 @@ pub struct SimpleMaterial {
     pub state_adj: StateName,
     pub material_value: u32,
     pub tags: Vec<tags::MaterialTag>,
-    pub state_color: String,
+    pub state_color: StateName,
+    pub specific_heat: u32,
+    pub syndromes: Vec<String>,
 }
 
 impl DFPlant {
@@ -169,8 +171,10 @@ impl SimpleMaterial {
             material_value: 0,
             state_name: StateName::new(),
             state_adj: StateName::new(),
-            state_color: String::new(),
+            state_color: StateName::new(),
             tags: Vec::new(),
+            specific_heat: 0,
+            syndromes: Vec::new(),
         }
     }
     pub fn new(material_type: &str, template: &str) -> Self {
@@ -204,18 +208,23 @@ impl SimpleMaterial {
         }
 
         let mut tags_vec: Vec<tags::MaterialTag> = Vec::new();
+        let mut syndrome_vec: Vec<String> = Vec::new();
 
         match template {
             "PLANT_ALCOHOL_TEMPLATE" => {
                 tags_vec.push(tags::MaterialTag::AlcoholPlant);
 
+                syndrome_vec.push(String::from("inebriation"));
+
                 return Self {
                     material_type: material_type,
                     material_value: 1,
-                    state_color: String::from("brown"),
+                    state_color: StateName::from("brown", "brown", "brown"),
                     state_name: StateName::from("alcohol", "frozen alcohol", "boiling alcohol"),
                     state_adj: StateName::from("alcohol", "frozen alcohol", "boiling alcohol"),
                     tags: tags_vec,
+                    specific_heat: 2440,
+                    syndromes: syndrome_vec,
                 };
             }
             "PLANT_POWDER_TEMPLATE" => {
@@ -224,10 +233,12 @@ impl SimpleMaterial {
                 return Self {
                     material_type: material_type,
                     material_value: 1,
-                    state_color: String::from("white"),
+                    state_color: StateName::from("white", "black", "black"),
                     state_name: StateName::from("plant powder", "none", "none"),
                     state_adj: StateName::from("plant powder", "none", "none"),
                     tags: tags_vec,
+                    syndromes: syndrome_vec,
+                    specific_heat: 800,
                 };
             }
             "PLANT_EXTRACT_TEMPLATE" => {
@@ -237,10 +248,12 @@ impl SimpleMaterial {
                 return Self {
                     material_type: material_type,
                     material_value: 1,
-                    state_color: String::from("white"),
+                    state_color: StateName::from("white", "white", "white"),
                     state_name: StateName::from("frozen extract", "extract", "boiling extract"),
                     state_adj: StateName::from("frozen extract", "extract", "boiling extract"),
                     tags: tags_vec,
+                    syndromes: syndrome_vec,
+                    specific_heat: 4181,
                 };
             }
             "PLANT_OIL_TEMPLATE" => {
@@ -249,7 +262,7 @@ impl SimpleMaterial {
                 return Self {
                     material_type: material_type,
                     material_value: 1,
-                    state_color: String::from("yellow"),
+                    state_color: StateName::from("yellow", "yellow", "yellow"),
                     state_name: StateName::from(
                         "frozen vegetable oil",
                         "vegetable oil",
@@ -261,6 +274,8 @@ impl SimpleMaterial {
                         "boiling vegetable oil",
                     ),
                     tags: tags_vec,
+                    specific_heat: 1820,
+                    syndromes: syndrome_vec,
                 };
             }
             "PLANT_SOAP_TEMPLATE" => {
@@ -269,10 +284,12 @@ impl SimpleMaterial {
                 return Self {
                     material_type: material_type,
                     material_value: 1,
-                    state_color: String::from("cream"),
+                    state_color: StateName::from("cream", "cream", "cream"),
                     state_name: StateName::from("soap", "melted soap", "n/a"),
                     state_adj: StateName::from("soap", "melted soap", "n/a"),
                     tags: tags_vec,
+                    syndromes: syndrome_vec,
+                    specific_heat: 800,
                 };
             }
             "SEED_TEMPLATE" => {
@@ -282,10 +299,12 @@ impl SimpleMaterial {
                 return Self {
                     material_type: material_type,
                     material_value: 1,
-                    state_color: String::from("brown"),
+                    state_color: StateName::from("brown", "brown", "brown"),
                     state_name: StateName::from("seed", "none", "none"),
                     state_adj: StateName::from("seed", "none", "none"),
                     tags: tags_vec,
+                    syndromes: syndrome_vec,
+                    specific_heat: 800,
                 };
             }
             "LEAF_TEMPLATE" => {
@@ -294,10 +313,12 @@ impl SimpleMaterial {
                 return Self {
                     material_type: material_type,
                     material_value: 1,
-                    state_color: String::from("green"),
+                    state_color: StateName::from("green", "black", "black"),
                     state_name: StateName::from("leaf", "none", "none"),
                     state_adj: StateName::from("leaf", "none", "none"),
                     tags: tags_vec,
+                    syndromes: syndrome_vec,
+                    specific_heat: 800,
                 };
             }
             "FRUIT_TEMPLATE" => {
@@ -306,10 +327,12 @@ impl SimpleMaterial {
                 return Self {
                     material_type: material_type,
                     material_value: 1,
-                    state_color: String::from("green"),
+                    state_color: StateName::from("green", "black", "black"),
                     state_name: StateName::from("fruit", "none", "none"),
                     state_adj: StateName::from("fruit", "none", "none"),
                     tags: tags_vec,
+                    syndromes: syndrome_vec,
+                    specific_heat: 800,
                 };
             }
             "MUSHROOM_TEMPLATE" => {
@@ -318,10 +341,12 @@ impl SimpleMaterial {
                 return Self {
                     material_type: material_type,
                     material_value: 1,
-                    state_color: String::from("green"),
+                    state_color: StateName::from("green", "black", "black"),
                     state_name: StateName::from("mushroom", "none", "none"),
                     state_adj: StateName::from("mushroom", "none", "none"),
                     tags: tags_vec,
+                    syndromes: syndrome_vec,
+                    specific_heat: 800,
                 };
             }
             "FLOWER_TEMPLATE" => {
@@ -330,10 +355,12 @@ impl SimpleMaterial {
                 return Self {
                     material_type: material_type,
                     material_value: 1,
-                    state_color: String::from("cream"),
+                    state_color: StateName::from("cream", "black", "black"),
                     state_name: StateName::from("flower", "none", "none"),
                     state_adj: StateName::from("flower", "none", "none"),
                     tags: tags_vec,
+                    syndromes: syndrome_vec,
+                    specific_heat: 800,
                 };
             }
             "THREAD_PLANT_TEMPLATE" => {
@@ -343,10 +370,12 @@ impl SimpleMaterial {
                 return Self {
                     material_type: material_type,
                     material_value: 1,
-                    state_color: String::from("gray"),
+                    state_color: StateName::from("gray", "black", "black"),
                     state_name: StateName::from("fiber", "none", "none"),
                     state_adj: StateName::from("fiber", "none", "none"),
                     tags: tags_vec,
+                    specific_heat: 420,
+                    syndromes: syndrome_vec,
                 };
             }
             "STRUCTURAL_PLANT_TEMPLATE" => {
@@ -356,23 +385,47 @@ impl SimpleMaterial {
                 return Self {
                     material_type: material_type,
                     material_value: 1,
-                    state_color: String::from("brown"),
+                    state_color: StateName::from("brown", "brown", "brown"),
                     state_name: StateName::from("plant", "none", "none"),
                     state_adj: StateName::from("plant", "none", "none"),
                     tags: tags_vec,
+                    specific_heat: 3000,
+                    syndromes: syndrome_vec,
                 };
             }
             "WOOD_TEMPLATE" => {
-                tags_vec.push(tags::MaterialTag::Rots);
-                tags_vec.push(tags::MaterialTag::StructuralPlantMaterial);
+                tags_vec.push(tags::MaterialTag::ItemsHard);
+                tags_vec.push(tags::MaterialTag::ItemsWeapon);
+                tags_vec.push(tags::MaterialTag::ItemsWeaponRanged);
+                tags_vec.push(tags::MaterialTag::ItemsAmmo);
+                tags_vec.push(tags::MaterialTag::ItemsArmor);
+                tags_vec.push(tags::MaterialTag::ItemsSiegeEngine);
+                tags_vec.push(tags::MaterialTag::Wood);
 
                 return Self {
                     material_type: material_type,
                     material_value: 1,
-                    state_color: String::from("brown"),
+                    state_color: StateName::from("brown", "brown", "brown"),
                     state_name: StateName::from("wood", "n/a", "n/a"),
                     state_adj: StateName::from("wooden", "n/a", "n/a"),
                     tags: tags_vec,
+                    specific_heat: 420,
+                    syndromes: syndrome_vec,
+                };
+            }
+            "FEATHER_TEMPLATE" => {
+                tags_vec.push(tags::MaterialTag::ImpliesAnimalKill);
+                tags_vec.push(tags::MaterialTag::Feather);
+
+                return Self {
+                    material_type: material_type,
+                    material_value: 1,
+                    state_color: StateName::from("gray", "gray", "gray"),
+                    state_name: StateName::from("feather", "n/a", "n/a"),
+                    state_adj: StateName::from("feather", "n/a", "n/a"),
+                    tags: tags_vec,
+                    specific_heat: 420,
+                    syndromes: syndrome_vec,
                 };
             }
             _ => Self {
@@ -380,8 +433,10 @@ impl SimpleMaterial {
                 material_value: 0,
                 state_name: StateName::new(),
                 state_adj: StateName::new(),
-                state_color: String::new(),
+                state_color: StateName::new(),
                 tags: tags_vec,
+                syndromes: syndrome_vec,
+                specific_heat: 800,
             },
         }
     }

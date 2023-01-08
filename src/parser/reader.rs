@@ -1265,7 +1265,7 @@ pub fn parse_plant_file(input_path: &Path, info_text: &DFInfoFile) -> Vec<plant:
                     }
 
                     match split[0] {
-                        "ALL_SOLID" => material_temp.state_name.set_solid(&split[1]),
+                        "ALL_SOLID" | "SOLID" => material_temp.state_name.set_solid(&split[1]),
                         "LIQUID" => material_temp.state_name.set_liquid(&split[1]),
                         "GAS" => material_temp.state_name.set_gas(&split[1]),
                         _ => (),
@@ -1282,7 +1282,7 @@ pub fn parse_plant_file(input_path: &Path, info_text: &DFInfoFile) -> Vec<plant:
                     }
 
                     match split[0] {
-                        "ALL_SOLID" => material_temp.state_adj.set_solid(&split[1]),
+                        "ALL_SOLID" | "SOLID" => material_temp.state_adj.set_solid(&split[1]),
                         "LIQUID" => material_temp.state_adj.set_liquid(&split[1]),
                         "GAS" => material_temp.state_adj.set_gas(&split[1]),
                         _ => (),
@@ -1299,7 +1299,7 @@ pub fn parse_plant_file(input_path: &Path, info_text: &DFInfoFile) -> Vec<plant:
                     }
 
                     match split[0] {
-                        "ALL_SOLID" => {
+                        "ALL_SOLID" | "SOLID" => {
                             material_temp.state_name.set_solid(&split[1]);
                             material_temp.state_adj.set_solid(&split[1]);
                         }
@@ -1324,7 +1324,18 @@ pub fn parse_plant_file(input_path: &Path, info_text: &DFInfoFile) -> Vec<plant:
                         continue;
                     }
 
-                    material_temp.state_color = String::from(split[1]);
+                    match split[0] {
+                        "ALL_SOLID" | "SOLID" => {
+                            material_temp.state_color.set_solid(&split[1]);
+                        }
+                        "LIQUID" => {
+                            material_temp.state_color.set_liquid(&split[1]);
+                        }
+                        "GAS" => {
+                            material_temp.state_color.set_gas(&split[1]);
+                        }
+                        _ => (),
+                    }
                 }
                 &_ => (),
             }
