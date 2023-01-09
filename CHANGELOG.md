@@ -5,12 +5,11 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## v0.9.0 (2023-01-09)
+## v0.9.1 (2023-01-09)
 
-### Refactor
+### Bug Fixes
 
- - <csr-id-b5ac4440b1189f0c7ef8fdaeca97d36d334a3100/> 🔥 refactor typings for consistency
-   Changes the json objects to use camelCase for all fields
+ - <csr-id-b2781ed4df8ef99419169bc29313f309856fa824/> 📝 object property consistency changes
 
 ### Commit Statistics
 
@@ -27,6 +26,34 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 <details><summary>view details</summary>
 
  * **Uncategorized**
+    - 📝 object property consistency changes ([`b2781ed`](https://github.com/nwesterhausen/dfraw_json_parser/commit/b2781ed4df8ef99419169bc29313f309856fa824))
+</details>
+
+## v0.9.0 (2023-01-09)
+
+<csr-id-b5ac4440b1189f0c7ef8fdaeca97d36d334a3100/>
+
+### Refactor
+
+ - <csr-id-b5ac4440b1189f0c7ef8fdaeca97d36d334a3100/> 🔥 refactor typings for consistency
+   Changes the json objects to use camelCase for all fields
+
+### Commit Statistics
+
+<csr-read-only-do-not-edit/>
+
+ - 2 commits contributed to the release.
+ - 1 commit was understood as [conventional](https://www.conventionalcommits.org).
+ - 0 issues like '(#ID)' were seen in commit messages
+
+### Commit Details
+
+<csr-read-only-do-not-edit/>
+
+<details><summary>view details</summary>
+
+ * **Uncategorized**
+    - Release dfraw_json_parser v0.9.0 ([`73a673e`](https://github.com/nwesterhausen/dfraw_json_parser/commit/73a673e1deead5d4dabbf93fb0933f5dc1ef5b0b))
     - 🔥 refactor typings for consistency ([`b5ac444`](https://github.com/nwesterhausen/dfraw_json_parser/commit/b5ac4440b1189f0c7ef8fdaeca97d36d334a3100))
 </details>
 
@@ -280,7 +307,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 <csr-id-59e2dff2d583cd8c5c55411688a6c8f4ddcf361a/>
 
 
-<csr-id-7932e59c509f1da93e8f431fbbef9a164de144d1/>
 <csr-id-bb5de4483e6c0b5bfb15a0a5e2defdd067bd6c9d/>
 <csr-id-a8301caede5aa2090b769c05e19a699267e07b07/>
 <csr-id-8d79e7bc493584248b8adbc98ae4f178f517a6a6/>
