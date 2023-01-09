@@ -5,13 +5,13 @@ use std::io::{BufRead, BufReader};
 use std::path::Path;
 
 use crate::parser::raws::info::DFInfoFile;
-use crate::parser::raws::{biomes, material, names, plant, tags};
+use crate::parser::raws::{inorganic, material, tags};
 use crate::parser::reader::RawObjectKind;
 use crate::parser::refs::{DF_ENCODING, RAW_TOKEN_RE};
 
-pub fn parse(input_path: &Path, info_text: &DFInfoFile) -> Vec<plant::DFPlant> {
-    let caller = "Parse Plant Raw";
-    let mut results: Vec<plant::DFPlant> = Vec::new();
+pub fn parse(input_path: &Path, info_text: &DFInfoFile) -> Vec<inorganic::DFInorganic> {
+    let caller = "Parse Inorganic Raw";
+    let mut results: Vec<inorganic::DFInorganic> = Vec::new();
 
     let file = match File::open(&input_path) {
         Ok(f) => f,
@@ -30,13 +30,9 @@ pub fn parse(input_path: &Path, info_text: &DFInfoFile) -> Vec<plant::DFPlant> {
     let mut raw_filename = String::new();
     let mut current_object = RawObjectKind::None;
     let mut started = false;
-    let mut plant_temp = plant::DFPlant::new("None", "None", info_text);
+    let mut inorganic_temp = inorganic::DFInorganic::new("None", "None", info_text);
 
     let mut material_tags: Vec<tags::MaterialTag> = Vec::new();
-    let mut plant_tags: Vec<tags::PlantTag> = Vec::new();
-    let mut temp_material_vec: Vec<material::SimpleMaterial> = Vec::new();
-    let mut temp_plant_growth = plant::PlantGrowth::None;
-
     let mut material_temp = material::SimpleMaterial::empty();
 
     for (index, line) in reader.lines().enumerate() {
@@ -67,9 +63,9 @@ pub fn parse(input_path: &Path, info_text: &DFInfoFile) -> Vec<plant::DFPlant> {
             log::trace!("{} - Key: {} Value: {}", caller, &cap[2], &cap[3]);
             match &cap[2] {
                 "OBJECT" => match &cap[3] {
-                    "PLANT" => {
+                    "INORGANIC" => {
                         // Discovered raws for plants.
-                        current_object = RawObjectKind::Plant;
+                        current_object = RawObjectKind::Inorganic;
                     }
                     &_ => {
                         log::debug!("{} - Wrong type of raw ({})", caller, &cap[3]);
@@ -77,153 +73,64 @@ pub fn parse(input_path: &Path, info_text: &DFInfoFile) -> Vec<plant::DFPlant> {
                         // current_object = RawObjectKind::None;
                     }
                 },
-                "PLANT" => {
+                "INORGANIC" => {
                     // We are starting a creature object capture
                     match current_object {
-                        RawObjectKind::Plant => {
+                        RawObjectKind::Inorganic => {
                             if started {
-                                // If we already *were* capturing a creature, export it.
-                                //1. Save caste tags
+                                // If we already *were* capturing, export it.
+                                //1. Save material tags
                                 material_temp.tags = material_tags.clone();
-                                //2. Save caste
-                                temp_material_vec.push(material_temp.clone());
-                                //3. Save creature tags
-                                plant_temp.tags = plant_tags.clone();
-                                //4. Save tamp_castes to creature
-                                plant_temp.materials_vec = temp_material_vec.clone();
+                                //2. Save material
+                                inorganic_temp.material = material_temp.clone();
                                 //5. Save creature
-                                results.push(plant_temp);
+                                results.push(inorganic_temp);
                             } else {
                                 started = true;
                             }
                             //Reset all temp values
-                            log::debug!("Starting new plant {}", &cap[3]);
-                            //1. Make new creature from [CREATURE:<NAME>]
-                            plant_temp = plant::DFPlant::new(&raw_filename, &cap[3], info_text);
-                            //2. Make new caste
+                            log::debug!("Starting new inorganic {}", &cap[3]);
+                            //1. Make new inorganic from [INORGANIC:<NAME>]
+                            inorganic_temp =
+                                inorganic::DFInorganic::new(&raw_filename, &cap[3], info_text);
+                            //2. Make new material
                             material_temp = material::SimpleMaterial::empty();
                             //3. Reset/empty caste tags
                             material_tags = Vec::new();
-                            //4. Reset/empty creature tags
-                            plant_tags = Vec::new();
-                            //5. Reset/empty caste vector
-                            temp_material_vec = Vec::new();
                         }
                         _ => (),
                     }
                 }
                 "USE_MATERIAL_TEMPLATE" => {
-                    //1. Save caste tags
-                    material_tags.extend(material_temp.tags);
-                    material_temp.tags = material_tags.clone();
-                    //2. Save caste
-                    temp_material_vec.push(material_temp.clone());
+                    // As far as I know, inorganics have a single material template.
 
-                    // Split the value into a descriptor and template
-                    let split = cap[3].split(':').collect::<Vec<&str>>();
-                    if split.len() != 2 {
-                        log::error!("Unable to build from material template {}", &cap[3]);
-                        // When we can't do anything about the template, just use empty one
-                        material_temp = material::SimpleMaterial::empty();
-                        material_tags = Vec::new();
-                        continue;
-                    }
-
-                    log::debug!("Found defined template {} {}", &split[0], &split[1]);
+                    log::debug!("Found defined template {}", &cap[3]);
                     //3. Make new caste from [CASTE:<NAME>]
-                    material_temp = material::SimpleMaterial::new(&split[0], &split[1]);
+                    material_temp = material::SimpleMaterial::new(&cap[3], &cap[3]);
                     //4. Reset/empty caste tags
                     // ~~material_tags = Vec::new();~~
                     //5. Get material template to add (known) template tags
-                    material_tags = Vec::clone(&material::material_tags_from_template(&split[1]));
-                }
-                "BIOME" => match biomes::BIOMES.get(&cap[3]) {
-                    Some(biome_name) => plant_temp.biomes.push((*biome_name).to_string()),
-                    None => log::warn!("{} is not in biome dictionary!", &cap[3]),
-                },
-                "GROWTH" => match &cap[3] {
-                    "LEAVES" => temp_plant_growth = plant::PlantGrowth::Leaves,
-                    "FLOWERS" => temp_plant_growth = plant::PlantGrowth::Flowers,
-                    "FRUIT" => temp_plant_growth = plant::PlantGrowth::Fruit,
-                    "SPATHES" => temp_plant_growth = plant::PlantGrowth::Spathes,
-                    "NUT" => temp_plant_growth = plant::PlantGrowth::Nut,
-                    "SEED_CATKINS" => temp_plant_growth = plant::PlantGrowth::SeedCatkins,
-                    "POLLEN_CATKINS" => temp_plant_growth = plant::PlantGrowth::PollenCatkins,
-                    "CONE" => temp_plant_growth = plant::PlantGrowth::Cone,
-                    "SEED_CONE" => temp_plant_growth = plant::PlantGrowth::SeedCone,
-                    "POLLEN_CONE" => temp_plant_growth = plant::PlantGrowth::PollenCone,
-                    "POD" => temp_plant_growth = plant::PlantGrowth::Pod,
-                    _ => {
-                        log::debug!("Un-matched plant growth token '{}'", &cap[3]);
-                    }
-                },
-                "GROWTH_NAME" => {
-                    plant_temp
-                        .growth_names
-                        .insert(temp_plant_growth.clone(), names::SingPlurName::new(&cap[3]));
-                }
-                "NAME" => {
-                    plant_temp.name.set_singular(&cap[3]);
-                }
-                "NAME_PLURAL" => {
-                    plant_temp.name.set_plural(&cap[3]);
-                }
-                "ADJ" => {
-                    plant_temp.name.set_adjective(&cap[3]);
+                    material_tags = Vec::clone(&material::material_tags_from_template(&cap[3]));
                 }
                 "PREFSTRING" => {
-                    plant_temp.pref_string.push(String::from(&cap[3]));
+                    log::warn!(
+                        "THERE INDEED WERE PREF STRING FOR {}: {}",
+                        inorganic_temp.get_object_id(),
+                        &cap[3]
+                    );
                 }
-                "FREQUENCY" => match cap[3].parse() {
-                    Ok(n) => plant_temp.frequency = n,
-                    Err(e) => log::error!(
-                        "{}:FREQUENCY parsing error\n{:?}",
-                        plant_temp.get_identifier(),
-                        e
-                    ),
-                },
-                "CLUSTERSIZE" => match cap[3].parse() {
-                    Ok(n) => plant_temp.cluster_size = n,
-                    Err(e) => log::error!(
-                        "{}:CLUSTERSIZE parsing error\n{:?}",
-                        plant_temp.get_identifier(),
-                        e
-                    ),
-                },
-                "GROWDUR" => match cap[3].parse() {
-                    Ok(n) => plant_temp.growth_duration = n,
-                    Err(e) => log::error!(
-                        "{}:GROWDUR parsing error\n{:?}",
-                        plant_temp.get_identifier(),
-                        e
-                    ),
-                },
-                "VALUE" => match cap[3].parse() {
-                    Ok(n) => plant_temp.value = n,
-                    Err(e) => log::error!(
-                        "{}:VALUE parsing error\n{:?}",
-                        plant_temp.get_identifier(),
-                        e
-                    ),
-                },
+                "REACTION_CLASS" => {
+                    material_temp.reaction_classes.push(String::from(&cap[3]));
+                }
                 "MATERIAL_VALUE" => match cap[3].parse() {
                     Ok(n) => material_temp.material_value = n,
                     Err(e) => log::error!(
                         "{}:{:?}:MATERIAL_VALUE parsing error\n{:?}",
-                        plant_temp.get_identifier(),
+                        inorganic_temp.get_identifier(),
                         material_temp.material_type,
                         e
                     ),
                 },
-                "EDIBLE_VERMIN" => {
-                    material_tags.push(tags::MaterialTag::EdibleVermin);
-                }
-                "EDIBLE_RAW" => {
-                    material_tags.push(tags::MaterialTag::EdibleRaw);
-                }
-                "EDIBLE_COOKED" => {
-                    material_tags.push(tags::MaterialTag::EdibleCooked);
-                }
                 "STATE_NAME" => {
                     // Split the value into a descriptor and value
                     let split = cap[3].split(':').collect::<Vec<&str>>();
@@ -307,30 +214,149 @@ pub fn parse(input_path: &Path, info_text: &DFInfoFile) -> Vec<plant::DFPlant> {
                         _ => (),
                     }
                 }
+
+                "NO_STONE_STOCKPILE" => {
+                    material_tags.push(tags::MaterialTag::NoStoneStockpile);
+                }
+                "DISPLAY_UNGLAZED" => {
+                    material_tags.push(tags::MaterialTag::DisplayUnglazed);
+                }
+                "IS_STONE" => {
+                    material_tags.push(tags::MaterialTag::IsStone);
+                }
+                "IS_CERAMIC" => {
+                    material_tags.push(tags::MaterialTag::IsCeramic);
+                }
+                "IS_METAL" => {
+                    material_tags.push(tags::MaterialTag::IsMetal);
+                }
+                "ITEMS_WEAPON" => {
+                    material_tags.push(tags::MaterialTag::ItemsWeapon);
+                }
+                "ITEMS_WEAPON_RANGED" => {
+                    material_tags.push(tags::MaterialTag::ItemsWeaponRanged);
+                }
+                "ITEMS_AMMO" => {
+                    material_tags.push(tags::MaterialTag::ItemsAmmo);
+                }
+                "ITEMS_DIGGER" => {
+                    material_tags.push(tags::MaterialTag::ItemsDigger);
+                }
+                "ITEMS_ARMOR" => {
+                    material_tags.push(tags::MaterialTag::ItemsArmor);
+                }
+                "ITEMS_ANVIL" => {
+                    material_tags.push(tags::MaterialTag::ItemsAnvil);
+                }
+                "ITEMS_HARD" => {
+                    material_tags.push(tags::MaterialTag::ItemsHard);
+                }
+                "ITEMS_METAL" => {
+                    material_tags.push(tags::MaterialTag::ItemsMetal);
+                }
+                "ITEMS_BARRED" => {
+                    material_tags.push(tags::MaterialTag::ItemsBarred);
+                }
+                "ITEMS_SCALED" => {
+                    material_tags.push(tags::MaterialTag::ItemsScaled);
+                }
+                "SEDIMENTARY" => {
+                    material_tags.push(tags::MaterialTag::Sedimentary);
+                }
+                "SEDIMENTARY_OCEAN_SHALLOW" => {
+                    material_tags.push(tags::MaterialTag::SedimentaryOceanShallow);
+                }
+                "AQUIFER" => {
+                    material_tags.push(tags::MaterialTag::Aquifer);
+                }
+                "SEDIMENTARY_OCEAN_DEEP" => {
+                    material_tags.push(tags::MaterialTag::SedimentaryOceanDeep);
+                }
+                "IGNEOUS_INTRUSIVE" => {
+                    material_tags.push(tags::MaterialTag::IgneousIntrusive);
+                }
+                "IGNEOUS_EXTRUSIVE" => {
+                    material_tags.push(tags::MaterialTag::IgneousExtrusive);
+                }
+                "METAMORPHIC" => {
+                    material_tags.push(tags::MaterialTag::Aquifer);
+                }
+                "SPEC_HEAT" => match cap[3].parse() {
+                    Ok(n) => material_temp.temperatures.specific_heat = n,
+                    Err(e) => log::error!(
+                        "{}:SPEC_HEAT parsing error\n{:?}",
+                        inorganic_temp.get_identifier(),
+                        e
+                    ),
+                },
+                "IGNITE_POINT" => match cap[3].parse() {
+                    Ok(n) => material_temp.temperatures.ignite_point = n,
+                    Err(e) => log::error!(
+                        "{}:IGNITE_POINT parsing error\n{:?}",
+                        inorganic_temp.get_identifier(),
+                        e
+                    ),
+                },
+                "MELTING_POINT" => match cap[3].parse() {
+                    Ok(n) => material_temp.temperatures.melting_point = n,
+                    Err(e) => log::error!(
+                        "{}:MELTING_POINT parsing error\n{:?}",
+                        inorganic_temp.get_identifier(),
+                        e
+                    ),
+                },
+                "BOILING_POINT" => match cap[3].parse() {
+                    Ok(n) => material_temp.temperatures.boiling_point = n,
+                    Err(e) => log::error!(
+                        "{}:BOILING_POINT parsing error\n{:?}",
+                        inorganic_temp.get_identifier(),
+                        e
+                    ),
+                },
+                "HEATDAM_POINT" => match cap[3].parse() {
+                    Ok(n) => material_temp.temperatures.heat_dam_point = n,
+                    Err(e) => log::error!(
+                        "{}:HEATDAM_POINT parsing error\n{:?}",
+                        inorganic_temp.get_identifier(),
+                        e
+                    ),
+                },
+                "COLDDAM_POINT" => match cap[3].parse() {
+                    Ok(n) => material_temp.temperatures.cold_dam_point = n,
+                    Err(e) => log::error!(
+                        "{}:COLDDAM_POINT parsing error\n{:?}",
+                        inorganic_temp.get_identifier(),
+                        e
+                    ),
+                },
+                "MAT_FIXED_TEMP" => match cap[3].parse() {
+                    Ok(n) => material_temp.temperatures.material_fixed_temp = n,
+                    Err(e) => log::error!(
+                        "{}:MAT_FIXED_TEMP parsing error\n{:?}",
+                        inorganic_temp.get_identifier(),
+                        e
+                    ),
+                },
                 &_ => (),
             }
         }
     }
 
     match current_object {
-        RawObjectKind::Plant => {
-            // If we already *were* capturing a plant, export it.
-            //1. Save caste tags
+        RawObjectKind::Inorganic => {
+            // If we already *were* capturing, export it.
+            //1. Save material tags
             material_tags.extend(material_temp.tags);
             material_temp.tags = material_tags.clone();
-            //2. Save caste
-            temp_material_vec.push(material_temp.clone());
-            //3. Save creature tags
-            plant_temp.tags = plant_tags.clone();
-            //4. Save tamp_castes to creature
-            plant_temp.materials_vec = temp_material_vec.clone();
-            //5. Save creature
-            results.push(plant_temp);
+            //2. Save material
+            inorganic_temp.material = material_temp.clone();
+            //5. Save inorganic
+            results.push(inorganic_temp);
         }
         _ => (),
     }
     log::info!(
-        "{} plants defined in {} ({} {} in {})",
+        "{} inorganic objects defined in {} ({} {} in {})",
         results.len(),
         &raw_filename,
         info_text.get_identifier(),

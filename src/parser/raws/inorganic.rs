@@ -1,17 +1,14 @@
-use std::collections::HashMap;
-
 use crate::parser::raws::{
     info::DFInfoFile,
-    names::Name,
     tags::{self},
 };
-use crate::parser::raws::{material, names};
 use crate::parser::reader::RawObjectKind;
-use serde::{Deserialize, Serialize};
 use slug::slugify;
 
+use super::material;
+
 #[derive(Debug)]
-pub struct DFPlant {
+pub struct DFInorganic {
     // Common Raw file Things
     identifier: String,
     parent_raw: String,
@@ -23,48 +20,10 @@ pub struct DFPlant {
     pub tags: Vec<tags::PlantTag>,
 
     // Basic Tokens
-    pub name: Name,
-    pub pref_string: Vec<String>,
-    pub value: u32,
-    pub growth_duration: u32,
-    pub growth_names: HashMap<PlantGrowth, names::SingPlurName>,
-
-    // Environment Tokens
-    pub underground_depth: [u32; 2],
-    pub frequency: u32,
-    pub cluster_size: u32,
-    pub biomes: Vec<String>,
-    // pub growth: DFPlantGrowth,
-    // pub materials: Vec<DFMaterialTemplate>,
-    // pub seed: DFPlantSeed,
-    // Sub Tags
-    pub materials_vec: Vec<material::SimpleMaterial>,
+    pub material: material::SimpleMaterial,
 }
 
-#[derive(Serialize, Deserialize, Debug, PartialEq, Eq, Hash, Clone, Copy)]
-pub enum PlantGrowth {
-    None,
-    Leaves,
-    Spathes,
-    Fruit,
-    Flowers,
-    Nut,
-    SeedCatkins,
-    PollenCatkins,
-    Cone,
-    SeedCone,
-    PollenCone,
-    Feathers,
-    Eggs,
-    Pod,
-}
-
-#[derive(Serialize, Deserialize, Debug)]
-pub struct DFPlantSeed {
-    pub name: Name,
-}
-
-impl DFPlant {
+impl DFInorganic {
     pub fn new(raw: &str, id: &str, info_text: &DFInfoFile) -> Self {
         Self {
             identifier: String::from(id),
@@ -73,25 +32,11 @@ impl DFPlant {
             dfraw_version: String::from(info_text.displayed_version.as_str()),
             dfraw_found_in: String::from(info_text.get_sourced_directory()),
             dfraw_display: format!("{} v{}", info_text.name, info_text.displayed_version),
-            raw_type: RawObjectKind::Plant,
+            raw_type: RawObjectKind::Inorganic,
             // Boolean Flags
             tags: Vec::new(),
 
-            // integers
-            frequency: 50, //Defaults to 50 if not specified
-            cluster_size: 0,
-
-            biomes: Vec::new(),
-            name: Name::new(""),
-
-            pref_string: Vec::new(),
-            value: 0,
-            underground_depth: [0, 0],
-            growth_duration: 0,
-            growth_names: HashMap::new(),
-
-            // Simple materials
-            materials_vec: Vec::new(),
+            material: material::SimpleMaterial::empty(),
         }
     }
 
@@ -120,11 +65,11 @@ impl DFPlant {
         format!(
             "{}-{}-{}",
             self.get_parent_raw(),
-            "PLANT",
+            "INORGANIC",
             slugify(self.get_identifier())
         )
     }
     pub fn get_general_name(&self) -> String {
-        self.name.to_string_vec()[0].to_string()
+        String::from(self.material.state_name.get_solid())
     }
 }

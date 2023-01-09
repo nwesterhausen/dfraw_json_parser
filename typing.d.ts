@@ -106,6 +106,12 @@ export type DFPlant = {
   growth_duration: number;
 } & Raw;
 
+// Inorganic Raw definition
+export type DFInorganic = {
+  name: string;
+  material: SimpleMaterial;
+} & Raw;
+
 // info.txt raw definition
 export type DFInfoFile = {
   identifier: string;
