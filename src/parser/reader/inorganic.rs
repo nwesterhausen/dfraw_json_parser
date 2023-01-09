@@ -281,62 +281,111 @@ pub fn parse(input_path: &Path, info_text: &DFInfoFile) -> Vec<inorganic::DFInor
                 "METAMORPHIC" => {
                     material_tags.push(tags::MaterialTag::Aquifer);
                 }
-                "SPEC_HEAT" => match cap[3].parse() {
-                    Ok(n) => material_temp.temperatures.specific_heat = n,
-                    Err(e) => log::error!(
-                        "{}:SPEC_HEAT parsing error\n{:?}",
-                        inorganic_temp.get_identifier(),
-                        e
-                    ),
-                },
-                "IGNITE_POINT" => match cap[3].parse() {
-                    Ok(n) => material_temp.temperatures.ignite_point = n,
-                    Err(e) => log::error!(
-                        "{}:IGNITE_POINT parsing error\n{:?}",
-                        inorganic_temp.get_identifier(),
-                        e
-                    ),
-                },
-                "MELTING_POINT" => match cap[3].parse() {
-                    Ok(n) => material_temp.temperatures.melting_point = n,
-                    Err(e) => log::error!(
-                        "{}:MELTING_POINT parsing error\n{:?}",
-                        inorganic_temp.get_identifier(),
-                        e
-                    ),
-                },
-                "BOILING_POINT" => match cap[3].parse() {
-                    Ok(n) => material_temp.temperatures.boiling_point = n,
-                    Err(e) => log::error!(
-                        "{}:BOILING_POINT parsing error\n{:?}",
-                        inorganic_temp.get_identifier(),
-                        e
-                    ),
-                },
-                "HEATDAM_POINT" => match cap[3].parse() {
-                    Ok(n) => material_temp.temperatures.heat_dam_point = n,
-                    Err(e) => log::error!(
-                        "{}:HEATDAM_POINT parsing error\n{:?}",
-                        inorganic_temp.get_identifier(),
-                        e
-                    ),
-                },
-                "COLDDAM_POINT" => match cap[3].parse() {
-                    Ok(n) => material_temp.temperatures.cold_dam_point = n,
-                    Err(e) => log::error!(
-                        "{}:COLDDAM_POINT parsing error\n{:?}",
-                        inorganic_temp.get_identifier(),
-                        e
-                    ),
-                },
-                "MAT_FIXED_TEMP" => match cap[3].parse() {
-                    Ok(n) => material_temp.temperatures.material_fixed_temp = n,
-                    Err(e) => log::error!(
-                        "{}:MAT_FIXED_TEMP parsing error\n{:?}",
-                        inorganic_temp.get_identifier(),
-                        e
-                    ),
-                },
+                "SPEC_HEAT" => {
+                    if cap[3].eq("NONE") {
+                        material_temp.temperatures.material_fixed_temp = 0;
+                        continue;
+                    }
+
+                    match cap[3].parse() {
+                        Ok(n) => material_temp.temperatures.specific_heat = n,
+                        Err(e) => log::error!(
+                            "{}:SPEC_HEAT parsing error\n{:?}",
+                            inorganic_temp.get_identifier(),
+                            e
+                        ),
+                    }
+                }
+                "IGNITE_POINT" => {
+                    if cap[3].eq("NONE") {
+                        material_temp.temperatures.material_fixed_temp = 0;
+                        continue;
+                    }
+
+                    match cap[3].parse() {
+                        Ok(n) => material_temp.temperatures.ignite_point = n,
+                        Err(e) => log::error!(
+                            "{}:IGNITE_POINT parsing error\n{:?}",
+                            inorganic_temp.get_identifier(),
+                            e
+                        ),
+                    }
+                }
+                "MELTING_POINT" => {
+                    if cap[3].eq("NONE") {
+                        material_temp.temperatures.material_fixed_temp = 0;
+                        continue;
+                    }
+
+                    match cap[3].parse() {
+                        Ok(n) => material_temp.temperatures.melting_point = n,
+                        Err(e) => log::error!(
+                            "{}:MELTING_POINT parsing error\n{:?}",
+                            inorganic_temp.get_identifier(),
+                            e
+                        ),
+                    }
+                }
+                "BOILING_POINT" => {
+                    if cap[3].eq("NONE") {
+                        material_temp.temperatures.material_fixed_temp = 0;
+                        continue;
+                    }
+
+                    match cap[3].parse() {
+                        Ok(n) => material_temp.temperatures.boiling_point = n,
+                        Err(e) => log::error!(
+                            "{}:BOILING_POINT parsing error\n{:?}",
+                            inorganic_temp.get_identifier(),
+                            e
+                        ),
+                    }
+                }
+                "HEATDAM_POINT" => {
+                    if cap[3].eq("NONE") {
+                        material_temp.temperatures.material_fixed_temp = 0;
+                        continue;
+                    }
+
+                    match cap[3].parse() {
+                        Ok(n) => material_temp.temperatures.heat_dam_point = n,
+                        Err(e) => log::error!(
+                            "{}:HEATDAM_POINT parsing error\n{:?}",
+                            inorganic_temp.get_identifier(),
+                            e
+                        ),
+                    }
+                }
+                "COLDDAM_POINT" => {
+                    if cap[3].eq("NONE") {
+                        material_temp.temperatures.material_fixed_temp = 0;
+                        continue;
+                    }
+
+                    match cap[3].parse() {
+                        Ok(n) => material_temp.temperatures.cold_dam_point = n,
+                        Err(e) => log::error!(
+                            "{}:COLDDAM_POINT parsing error\n{:?}",
+                            inorganic_temp.get_identifier(),
+                            e
+                        ),
+                    }
+                }
+                "MAT_FIXED_TEMP" => {
+                    if cap[3].eq("NONE") {
+                        material_temp.temperatures.material_fixed_temp = 0;
+                        continue;
+                    }
+
+                    match cap[3].parse() {
+                        Ok(n) => material_temp.temperatures.material_fixed_temp = n,
+                        Err(e) => log::error!(
+                            "{}:MAT_FIXED_TEMP parsing error\n{:?}",
+                            inorganic_temp.get_identifier(),
+                            e
+                        ),
+                    }
+                }
                 &_ => (),
             }
         }
