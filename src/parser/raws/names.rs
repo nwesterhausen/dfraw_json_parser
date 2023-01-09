@@ -112,18 +112,4 @@ impl StateName {
     pub fn get_solid(&self) -> &str {
         &self.solid.as_str()
     }
-    pub fn set(&mut self, state: &str, name: &str) {
-        match state {
-            "Solid" | "SOLID" | "ALL_SOLID" => self.solid = String::from(name),
-            "Liquid" | "LIQUID" | "ALL_LIQUID" => self.liquid = String::from(name),
-            "Gas" | "GAS" | "ALL_GAS" => self.gas = String::from(name),
-            _ => {
-                log::debug!(
-                    "Unable to classify {} for state descriptor '{}'",
-                    state,
-                    name
-                );
-            }
-        }
-    }
 }
