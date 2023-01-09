@@ -94,12 +94,12 @@ fn parse_raws_to_json(
             match reader::read_raw_file_type(entry_path) {
                 reader::RawObjectKind::Creature => {
                     log::debug!("parsing {}", entry_path.display());
-                    let creature_raw_vec = reader::parse_creature_file(&entry_path, info_text_file);
+                    let creature_raw_vec = reader::creature::parse(&entry_path, info_text_file);
                     parsed_raws.extend(stringify_raw_vec(creature_raw_vec));
                 }
                 reader::RawObjectKind::Plant => {
                     log::debug!("parsing {}", entry_path.display());
-                    let plant_raw_vec = reader::parse_plant_file(&entry_path, info_text_file);
+                    let plant_raw_vec = reader::plant::parse(&entry_path, info_text_file);
                     parsed_raws.extend(stringify_raw_vec(plant_raw_vec));
                 }
                 _ => log::trace!("{} - skipping {}", caller, entry_path.display()),
@@ -120,12 +120,12 @@ pub fn read_single_raw_file(raw_file: &Path) -> String {
     match reader::read_raw_file_type(raw_file) {
         reader::RawObjectKind::Creature => {
             log::info!("Parsing creature raws from {}", raw_file.display());
-            let creature_raw_vec = reader::parse_creature_file(&raw_file, &info_text_file);
+            let creature_raw_vec = reader::creature::parse(&raw_file, &info_text_file);
             return format!("[{}]", stringify_raw_vec(creature_raw_vec).join(","));
         }
         reader::RawObjectKind::Plant => {
             log::info!("Parsing plant raws from {}", raw_file.display());
-            let plant_raw_vec = reader::parse_plant_file(&raw_file, &info_text_file);
+            let plant_raw_vec = reader::plant::parse(&raw_file, &info_text_file);
             return format!("[{}]", stringify_raw_vec(plant_raw_vec).join(","));
         }
         _ => {
@@ -187,7 +187,7 @@ fn save_string_vec_to_json_file(string_vec: Vec<String>, out_directory: &Path) {
 }
 
 pub fn parse_info_file(input_path: &Path, sourced_dir: &str) -> raws::info::DFInfoFile {
-    reader::parse_dfraw_module_info_file(input_path, sourced_dir)
+    reader::info_file::parse(input_path, sourced_dir)
 }
 
 pub fn parse_info_file_to_json_string(input_path: &Path, sourced_dir: &str) -> String {
