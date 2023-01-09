@@ -5,11 +5,11 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## v0.9.1 (2023-01-09)
+## v0.9.2 (2023-01-09)
 
 ### Bug Fixes
 
- - <csr-id-b2781ed4df8ef99419169bc29313f309856fa824/> 📝 object property consistency changes
+ - <csr-id-f16e0e21b8056914c410e224e47db22e3b6061e2/> 🐛 casteTags property in camel case
 
 ### Commit Statistics
 
@@ -26,6 +26,31 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 <details><summary>view details</summary>
 
  * **Uncategorized**
+    - 🐛 casteTags property in camel case ([`f16e0e2`](https://github.com/nwesterhausen/dfraw_json_parser/commit/f16e0e21b8056914c410e224e47db22e3b6061e2))
+</details>
+
+## v0.9.1 (2023-01-09)
+
+### Bug Fixes
+
+ - <csr-id-b2781ed4df8ef99419169bc29313f309856fa824/> 📝 object property consistency changes
+
+### Commit Statistics
+
+<csr-read-only-do-not-edit/>
+
+ - 2 commits contributed to the release.
+ - 1 commit was understood as [conventional](https://www.conventionalcommits.org).
+ - 0 issues like '(#ID)' were seen in commit messages
+
+### Commit Details
+
+<csr-read-only-do-not-edit/>
+
+<details><summary>view details</summary>
+
+ * **Uncategorized**
+    - Release dfraw_json_parser v0.9.1 ([`252113d`](https://github.com/nwesterhausen/dfraw_json_parser/commit/252113dd4c0c8d24bfbbd2b7a6be26146fa92941))
     - 📝 object property consistency changes ([`b2781ed`](https://github.com/nwesterhausen/dfraw_json_parser/commit/b2781ed4df8ef99419169bc29313f309856fa824))
 </details>
 
@@ -307,7 +332,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 <csr-id-59e2dff2d583cd8c5c55411688a6c8f4ddcf361a/>
 
 
-<csr-id-bb5de4483e6c0b5bfb15a0a5e2defdd067bd6c9d/>
 <csr-id-a8301caede5aa2090b769c05e19a699267e07b07/>
 <csr-id-8d79e7bc493584248b8adbc98ae4f178f517a6a6/>
 <csr-id-59e2dff2d583cd8c5c55411688a6c8f4ddcf361a/>
