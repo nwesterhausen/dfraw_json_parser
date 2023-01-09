@@ -28,11 +28,16 @@ pub enum SimpleMaterialType {
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct SimpleMaterial {
+    #[serde(rename = "type")]
     pub material_type: SimpleMaterialType,
+    #[serde(rename = "names")]
     pub state_name: StateName,
+    #[serde(rename = "adjectives")]
     pub state_adj: StateName,
+    #[serde(rename = "value")]
     pub material_value: u32,
     pub tags: Vec<tags::MaterialTag>,
+    #[serde(rename = "colors")]
     pub state_color: StateName,
     pub temperatures: Temperatures,
     pub syndromes: Vec<String>,
@@ -325,8 +330,8 @@ impl SimpleMaterial {
                 tags_vec.push(tags::MaterialTag::Wood);
 
                 temperatures.specific_heat = 420;
-                temperatures.heat_dam_point = 10250;
-                temperatures.cold_dam_point = 9900;
+                temperatures.heat_damage_point = 10250;
+                temperatures.cold_damage_point = 9900;
 
                 return Self {
                     material_type: material_type,

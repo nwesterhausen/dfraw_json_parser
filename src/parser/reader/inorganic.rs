@@ -367,7 +367,7 @@ pub fn parse(input_path: &Path, info_text: &DFInfoFile) -> Vec<inorganic::DFInor
                     }
 
                     match cap[3].parse() {
-                        Ok(n) => material_temp.temperatures.ignite_point = n,
+                        Ok(n) => material_temp.temperatures.ignition_point = n,
                         Err(e) => log::error!(
                             "{}:IGNITE_POINT parsing error\n{:?}",
                             inorganic_temp.get_identifier(),
@@ -412,7 +412,7 @@ pub fn parse(input_path: &Path, info_text: &DFInfoFile) -> Vec<inorganic::DFInor
                     }
 
                     match cap[3].parse() {
-                        Ok(n) => material_temp.temperatures.heat_dam_point = n,
+                        Ok(n) => material_temp.temperatures.heat_damage_point = n,
                         Err(e) => log::error!(
                             "{}:HEATDAM_POINT parsing error\n{:?}",
                             inorganic_temp.get_identifier(),
@@ -427,7 +427,7 @@ pub fn parse(input_path: &Path, info_text: &DFInfoFile) -> Vec<inorganic::DFInor
                     }
 
                     match cap[3].parse() {
-                        Ok(n) => material_temp.temperatures.cold_dam_point = n,
+                        Ok(n) => material_temp.temperatures.cold_damage_point = n,
                         Err(e) => log::error!(
                             "{}:COLDDAM_POINT parsing error\n{:?}",
                             inorganic_temp.get_identifier(),
