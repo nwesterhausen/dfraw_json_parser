@@ -6,6 +6,7 @@ use crate::parser::reader::RawObjectKind;
 use slug::slugify;
 
 use super::material;
+use super::{environment, roll_chance};
 
 #[derive(Debug)]
 pub struct DFInorganic {
@@ -17,10 +18,15 @@ pub struct DFInorganic {
     dfraw_found_in: String,
     dfraw_display: String,
     raw_type: RawObjectKind,
-    pub tags: Vec<tags::PlantTag>,
+    pub tags: Vec<tags::InorganicTag>,
 
     // Basic Tokens
     pub material: material::SimpleMaterial,
+    pub environments: Vec<environment::Environment>,
+    pub environments_specific: Vec<environment::Environment>,
+
+    pub metal_ores: Vec<roll_chance::RollChance>,
+    pub thread_metals: Vec<roll_chance::RollChance>,
 }
 
 impl DFInorganic {
@@ -37,6 +43,10 @@ impl DFInorganic {
             tags: Vec::new(),
 
             material: material::SimpleMaterial::empty(),
+            environments: Vec::new(),
+            environments_specific: Vec::new(),
+            metal_ores: Vec::new(),
+            thread_metals: Vec::new(),
         }
     }
 

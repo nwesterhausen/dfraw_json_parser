@@ -24,7 +24,25 @@ pub enum CreatureTag {
 }
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq)]
-pub enum InorganicTag {}
+pub enum InorganicTag {
+    Sedimentary,
+    Aquifer,
+    SedimentaryOceanShallow,
+    SedimentaryOceanDeep,
+    IgneousIntrusive,
+    IgneousExtrusive,
+    Metamorphic,
+    Soil,
+    SoilOcean,
+    Wafers,
+    DeepSpecial,
+    DeepSurface,
+    Lava,
+    Special,
+    Generated,
+    Divine,
+    SoilSand,
+}
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq)]
 pub enum PlantTag {
@@ -142,13 +160,6 @@ pub enum MaterialTag {
     Wafers,
     Wood,
     Yarn,
-    Sedimentary,
-    Aquifer,
-    SedimentaryOceanShallow,
-    SedimentaryOceanDeep,
-    IgneousIntrusive,
-    IgneousExtrusive,
-    Metamorphic,
 }
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq)]

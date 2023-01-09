@@ -4,8 +4,10 @@ use std::fs::File;
 use std::io::{BufRead, BufReader};
 use std::path::Path;
 
+use crate::parser::raws::environment::Environment;
 use crate::parser::raws::info::DFInfoFile;
-use crate::parser::raws::{inorganic, material, tags};
+use crate::parser::raws::roll_chance::RollChance;
+use crate::parser::raws::{inorganic, material, roll_chance, tags};
 use crate::parser::reader::RawObjectKind;
 use crate::parser::refs::{DF_ENCODING, RAW_TOKEN_RE};
 
@@ -34,6 +36,11 @@ pub fn parse(input_path: &Path, info_text: &DFInfoFile) -> Vec<inorganic::DFInor
 
     let mut material_tags: Vec<tags::MaterialTag> = Vec::new();
     let mut material_temp = material::SimpleMaterial::empty();
+    let mut environments_temp: Vec<Environment> = Vec::new();
+    let mut environments_spec_temp: Vec<Environment> = Vec::new();
+    let mut inorganic_tags: Vec<tags::InorganicTag> = Vec::new();
+    let mut metal_ores: Vec<roll_chance::RollChance> = Vec::new();
+    let mut metal_threads: Vec<roll_chance::RollChance> = Vec::new();
 
     for (index, line) in reader.lines().enumerate() {
         if line.is_err() {
@@ -81,6 +88,15 @@ pub fn parse(input_path: &Path, info_text: &DFInfoFile) -> Vec<inorganic::DFInor
                                 // If we already *were* capturing, export it.
                                 //1. Save material tags
                                 material_temp.tags = material_tags.clone();
+                                //2a. Save inorganic environment
+                                inorganic_temp.environments = environments_temp.clone();
+                                inorganic_temp.environments_specific =
+                                    environments_spec_temp.clone();
+                                //2b. Save inorganic metal produced
+                                inorganic_temp.metal_ores = metal_ores.clone();
+                                inorganic_temp.thread_metals = metal_threads.clone();
+                                //3. Save creature tags
+                                inorganic_temp.tags = inorganic_tags.clone();
                                 //2. Save material
                                 inorganic_temp.material = material_temp.clone();
                                 //5. Save creature
@@ -97,6 +113,11 @@ pub fn parse(input_path: &Path, info_text: &DFInfoFile) -> Vec<inorganic::DFInor
                             material_temp = material::SimpleMaterial::empty();
                             //3. Reset/empty caste tags
                             material_tags = Vec::new();
+                            environments_temp = Vec::new();
+                            environments_spec_temp = Vec::new();
+                            inorganic_tags = Vec::new();
+                            metal_ores = Vec::new();
+                            metal_threads = Vec::new();
                         }
                         _ => (),
                     }
@@ -109,6 +130,7 @@ pub fn parse(input_path: &Path, info_text: &DFInfoFile) -> Vec<inorganic::DFInor
                     material_temp = material::SimpleMaterial::new(&cap[3], &cap[3]);
                     //4. Reset/empty caste tags
                     // ~~material_tags = Vec::new();~~
+                    environments_temp = Vec::new();
                     //5. Get material template to add (known) template tags
                     material_tags = Vec::clone(&material::material_tags_from_template(&cap[3]));
                 }
@@ -261,25 +283,67 @@ pub fn parse(input_path: &Path, info_text: &DFInfoFile) -> Vec<inorganic::DFInor
                     material_tags.push(tags::MaterialTag::ItemsScaled);
                 }
                 "SEDIMENTARY" => {
-                    material_tags.push(tags::MaterialTag::Sedimentary);
+                    inorganic_tags.push(tags::InorganicTag::Sedimentary);
                 }
                 "SEDIMENTARY_OCEAN_SHALLOW" => {
-                    material_tags.push(tags::MaterialTag::SedimentaryOceanShallow);
+                    inorganic_tags.push(tags::InorganicTag::SedimentaryOceanShallow);
                 }
                 "AQUIFER" => {
-                    material_tags.push(tags::MaterialTag::Aquifer);
+                    inorganic_tags.push(tags::InorganicTag::Aquifer);
                 }
                 "SEDIMENTARY_OCEAN_DEEP" => {
-                    material_tags.push(tags::MaterialTag::SedimentaryOceanDeep);
+                    inorganic_tags.push(tags::InorganicTag::SedimentaryOceanDeep);
                 }
                 "IGNEOUS_INTRUSIVE" => {
-                    material_tags.push(tags::MaterialTag::IgneousIntrusive);
+                    inorganic_tags.push(tags::InorganicTag::IgneousIntrusive);
                 }
                 "IGNEOUS_EXTRUSIVE" => {
-                    material_tags.push(tags::MaterialTag::IgneousExtrusive);
+                    inorganic_tags.push(tags::InorganicTag::IgneousExtrusive);
                 }
                 "METAMORPHIC" => {
-                    material_tags.push(tags::MaterialTag::Aquifer);
+                    inorganic_tags.push(tags::InorganicTag::Metamorphic);
+                }
+                "LAVA" => {
+                    inorganic_tags.push(tags::InorganicTag::Lava);
+                }
+                "WAFERS" => {
+                    inorganic_tags.push(tags::InorganicTag::Wafers);
+                }
+                "DEEP_SPECIAL" => {
+                    inorganic_tags.push(tags::InorganicTag::DeepSpecial);
+                }
+                "DEEP_SURFACE" => {
+                    inorganic_tags.push(tags::InorganicTag::DeepSurface);
+                }
+                "SPECIAL" => {
+                    inorganic_tags.push(tags::InorganicTag::Special);
+                }
+                "GENERATED" => {
+                    inorganic_tags.push(tags::InorganicTag::Generated);
+                }
+                "DIVINE" => {
+                    inorganic_tags.push(tags::InorganicTag::Divine);
+                }
+                "SOIL" => {
+                    inorganic_tags.push(tags::InorganicTag::Soil);
+                }
+                "SOIL_OCEAN" => {
+                    inorganic_tags.push(tags::InorganicTag::SoilOcean);
+                }
+                "SOIL_SAND" => {
+                    inorganic_tags.push(tags::InorganicTag::SoilSand);
+                }
+                "ENVIRONMENT" => {
+                    environments_temp.push(Environment::from_tag(&cap[3]));
+                }
+                "ENVIRONMENT_SPEC" => {
+                    environments_spec_temp.push(Environment::from_tag(&cap[3]));
+                }
+                "METAL_ORE" => {
+                    metal_ores.push(RollChance::from_tag(&cap[3]));
+                }
+                "THREAD_METAL" => {
+                    metal_threads.push(RollChance::from_tag(&cap[3]));
                 }
                 "SPEC_HEAT" => {
                     if cap[3].eq("NONE") {
@@ -397,6 +461,14 @@ pub fn parse(input_path: &Path, info_text: &DFInfoFile) -> Vec<inorganic::DFInor
             //1. Save material tags
             material_tags.extend(material_temp.tags);
             material_temp.tags = material_tags.clone();
+            //2a. Save inorganic environment
+            inorganic_temp.environments = environments_temp.clone();
+            inorganic_temp.environments_specific = environments_spec_temp.clone();
+            //2b. Save inorganic metal produced
+            inorganic_temp.metal_ores = metal_ores.clone();
+            inorganic_temp.thread_metals = metal_threads.clone();
+            //3. Save creature tags
+            inorganic_temp.tags = inorganic_tags.clone();
             //2. Save material
             inorganic_temp.material = material_temp.clone();
             //5. Save inorganic

@@ -1,4 +1,6 @@
-use crate::parser::raws::{inorganic::DFInorganic, material, tags::InorganicTag};
+use crate::parser::raws::{
+    environment, inorganic::DFInorganic, material, roll_chance, tags::InorganicTag,
+};
 
 use super::TypedJsonSerializable;
 use serde::{Deserialize, Serialize};
@@ -21,6 +23,10 @@ pub struct TypedJsonInorganic {
 
     // Material
     material: material::SimpleMaterial,
+    environments: Vec<environment::Environment>,
+    environments_specific: Vec<environment::Environment>,
+    metal_ores: Vec<roll_chance::RollChance>,
+    thread_metals: Vec<roll_chance::RollChance>,
 }
 
 impl TypedJsonInorganic {
@@ -37,7 +43,11 @@ impl TypedJsonInorganic {
             name: inorganic.get_general_name(),
 
             material: inorganic.material.clone(),
-            tags: Vec::new(),
+            tags: inorganic.tags.clone(),
+            environments: inorganic.environments.clone(),
+            environments_specific: inorganic.environments_specific.clone(),
+            metal_ores: inorganic.metal_ores.clone(),
+            thread_metals: inorganic.thread_metals.clone(),
         }
     }
 }
