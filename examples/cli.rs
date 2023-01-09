@@ -1,4 +1,5 @@
 use clap::Parser;
+use fern::colors::{Color, ColoredLevelConfig};
 use std::path::Path;
 
 const HELP_GAME_DIR: &str = "Specify the directory where Dwarf Fortress is installed.
@@ -38,10 +39,21 @@ struct Args {
 }
 
 fn main() {
+    // Specify color configuration
+    let colors = ColoredLevelConfig::new()
+        // Specify info as cyan
+        .info(Color::Cyan);
     // Configure logger at runtime
     fern::Dispatch::new()
         // Perform allocation-free log formatting
-        .format(|out, message, record| out.finish(format_args!("[{}] {}", record.level(), message)))
+        .format(move |out, message, record| {
+            out.finish(format_args!(
+                "{} [{}] {}",
+                chrono::Local::now().format("%Y-%m-%d %H:%M:%S"),
+                colors.color(record.level()),
+                message
+            ));
+        })
         // Add blanket level filter -
         .level(log::LevelFilter::Info)
         // Output to stdout, files, and other Dispatch configurations

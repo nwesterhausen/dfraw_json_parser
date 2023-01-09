@@ -44,7 +44,11 @@ rev = "e83d66490775eb953807c39d1f073a6daa3bc760"
 version = "1.4.0"
 
 [dev-dependencies]
-fern = "0.6.1"
+chrono = "0.4"
+
+[dev-dependencies.fern]
+version = "0.6.1"
+features = ["colored"]
 
 [dev-dependencies.clap]
 version = "4.0"
