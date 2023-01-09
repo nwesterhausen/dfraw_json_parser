@@ -5,13 +5,14 @@ export type Raw = {
   objectId: string;
   identifier: string;
   name: string;
-  parent_raw: string;
+  parentRaw: string;
   tags: string[];
-  raw_module: string;
-  raw_module_version: string;
-  raw_module_found_in: string;
-  raw_module_display: string;
-  raw_type: string;
+  rawModule: string;
+  moduleVersion: string;
+  moduleSourceDirectory: string;
+  moduleDisplayName: string;
+  rawType: string;
+  rawRelativePath: string;
 };
 
 export type BodySizeRange = {
@@ -30,36 +31,37 @@ export type CasteRange<T> = {
 };
 
 export type Creature = {
-  max_age: CasteRange<number[]>;
-  clutch_size: CasteRange<number[]>;
-  based_on?: string;
+  maxAge: CasteRange<number[]>;
+  clutchSize: CasteRange<number[]>;
+  basedOn?: string;
   biomes: string[];
-  cluster_range: number[];
-  underground_depth: number[];
-  body_size: CasteRange<BodySizeRange[]>;
-  grown_at: CasteRange<number>;
-  names_map: CasteRange<string[]>;
-  egg_sizes: CasteRange<number>;
-  pet_value: CasteRange<number>;
+  clusterRange: number[];
+  undergroundDepth: number[];
+  bodySize: CasteRange<BodySizeRange[]>;
+  grownAt: CasteRange<number>;
+  childAt: CasteRange<number>;
+  namesMap: CasteRange<string[]>;
+  eggSizes: CasteRange<number>;
+  petValue: CasteRange<number>;
   intelligence: CasteRange<boolean[]>;
   flier: CasteRange<boolean>;
   gnawer: CasteRange<boolean>;
   trainable: CasteRange<number>;
-  active_time: CasteRange<number>;
-  inactive_season: CasteRange<number>;
-  creature_class: CasteRange<string[]>;
+  activeTime: CasteRange<number>;
+  inactiveSeason: CasteRange<number>;
+  creatureClass: CasteRange<string[]>;
 
   caste_tags: CasteRange<string[]>;
 
   difficulty: CasteRange<number>;
-  grass_trample: CasteRange<number>;
+  grassTrample: CasteRange<number>;
   grazer: CasteRange<number>;
-  low_light_vision: CasteRange<number>;
-  pop_ratio: CasteRange<number>;
+  lowlightVision: CasteRange<number>;
+  populationRatio: CasteRange<number>;
   milkable: CasteRange<MilkableDesc>;
 
-  pref_string: string[];
-  population_number: number[];
+  preferenceStrings: string[];
+  populationNumber: number[];
 
   descriptions: CasteRange<string>;
 } & Raw;
@@ -75,41 +77,69 @@ export type StateName = {
   gas: string;
 };
 
+export type Temperatures = {
+  specificHeat: number;
+  ignitionPoint: number;
+  meltingPoint: number;
+  boilingPoint: number;
+  heatDamagePoint: number;
+  coldDamagePoint: number;
+  materialFixedTemp: number;
+};
+
 export type SimpleMaterial = {
-  material_type: string;
-  state_name: StateName;
-  state_adj: StateName;
-  material_value: number;
+  type: string;
+  names: StateName;
+  adjectives: StateName;
+  value: number;
+  colors: StateName;
   tags: string[];
-  state_color: StateName;
+  syndromes: string[];
+  temperatures: Temperatures;
+  reactionClasses: string[];
 };
 
 // Plant raw definition
 export type DFPlant = {
   name: string;
-  pref_string: string[];
+  preferenceStrings: string[];
   value: number;
 
   // Environment Tokens
-  underground_depth: number[];
+  undergroundDepth: number[];
   frequency: number;
-  cluster_size: number;
+  clusterSize: number;
   biomes: string[];
   // pub growth: DFPlantGrowth,
   // pub materials: Vec<DFMaterialTemplate>,
   // pub seed: DFPlantSeed,
   // Sub Tags
   materials: SimpleMaterial[];
-  growth_names: {
+  growthNames: {
     [growth: string]: SingPluralName;
   };
-  growth_duration: number;
+  growthDuration: number;
 } & Raw;
+
+export type Environment = {
+  surroundingRock: string;
+  grouping: string;
+  frequency: number;
+};
+
+export type RollChance = {
+  metal: string;
+  chance: number;
+};
 
 // Inorganic Raw definition
 export type DFInorganic = {
   name: string;
   material: SimpleMaterial;
+  environments: Environment[];
+  specificEnvironments: Environment[];
+  metalOres: RollChance[];
+  threadMetals: RollChance[];
 } & Raw;
 
 // info.txt raw definition
@@ -125,6 +155,7 @@ export type DFInfoFile = {
   description: string;
   display_title: string;
   objectId: string;
+  relative_path: string;
 };
 
 // Definition for tauri progress event payload

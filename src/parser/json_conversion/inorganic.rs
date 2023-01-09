@@ -10,23 +10,34 @@ use serde::{Deserialize, Serialize};
 pub struct TypedJsonInorganic {
     // Common Raw file Things
     identifier: String,
+    #[serde(rename = "parentRaw")]
     parent_raw: String,
+    #[serde(rename = "rawModule")]
     raw_module: String,
+    #[serde(rename = "moduleVersion")]
     raw_module_version: String,
+    #[serde(rename = "moduleSourceDirectory")]
     raw_module_found_in: String,
+    #[serde(rename = "moduleDisplayName")]
     raw_module_display: String,
-    relative_path: String,
+    #[serde(rename = "rawType")]
     raw_type: String,
+    #[serde(rename = "rawRelativePath")]
+    relative_path: String,
     #[serde(rename = "objectId")]
     object_id: String,
+
     tags: Vec<InorganicTag>,
     name: String,
 
     // Material
     material: material::SimpleMaterial,
     environments: Vec<environment::Environment>,
-    environments_specific: Vec<environment::Environment>,
+    #[serde(rename = "specificEnvironments")]
+    specific_environments: Vec<environment::Environment>,
+    #[serde(rename = "metalOres")]
     metal_ores: Vec<roll_chance::RollChance>,
+    #[serde(rename = "threadMetals")]
     thread_metals: Vec<roll_chance::RollChance>,
 }
 
@@ -47,7 +58,7 @@ impl TypedJsonInorganic {
             material: inorganic.material.clone(),
             tags: inorganic.tags.clone(),
             environments: inorganic.environments.clone(),
-            environments_specific: inorganic.environments_specific.clone(),
+            specific_environments: inorganic.environments_specific.clone(),
             metal_ores: inorganic.metal_ores.clone(),
             thread_metals: inorganic.thread_metals.clone(),
         }

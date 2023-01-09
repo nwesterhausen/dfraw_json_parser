@@ -15,25 +15,36 @@ use serde::{Deserialize, Serialize};
 pub struct TypedJsonPlant {
     // Common Raw file Things
     identifier: String,
+    #[serde(rename = "parentRaw")]
     parent_raw: String,
+    #[serde(rename = "rawModule")]
     raw_module: String,
+    #[serde(rename = "moduleVersion")]
     raw_module_version: String,
+    #[serde(rename = "moduleSourceDirectory")]
     raw_module_found_in: String,
+    #[serde(rename = "moduleDisplayName")]
     raw_module_display: String,
+    #[serde(rename = "rawType")]
     raw_type: String,
+    #[serde(rename = "rawRelativePath")]
     relative_path: String,
     #[serde(rename = "objectId")]
     object_id: String,
+
     tags: Vec<PlantTag>,
     name: String,
 
     // Basic Tokens
+    #[serde(rename = "preferenceStrings")]
     pref_string: Vec<String>,
     value: u32,
 
     // Environment Tokens
+    #[serde(rename = "undergroundDepth")]
     underground_depth: [u32; 2],
     frequency: u32,
+    #[serde(rename = "clusterSize")]
     cluster_size: u32,
     biomes: Vec<String>,
     // pub growth: DFPlantGrowth,
@@ -41,7 +52,9 @@ pub struct TypedJsonPlant {
     // pub seed: DFPlantSeed,
     // Sub Tags
     materials: Vec<SimpleMaterial>,
+    #[serde(rename = "growthNames")]
     growth_names: HashMap<PlantGrowth, SingPlurName>,
+    #[serde(rename = "growthDuration")]
     growth_duration: u32,
 }
 

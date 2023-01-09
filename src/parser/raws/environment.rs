@@ -11,17 +11,18 @@ pub enum GroupingStyle {
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct Environment {
-    rock_layer: String,
+    #[serde(rename = "surroundingRock")]
+    surrounding_rock: String,
     grouping: GroupingStyle,
-    size: u32,
+    frequency: u32,
 }
 
 impl Environment {
     pub fn empty() -> Self {
         Self {
-            rock_layer: String::new(),
+            surrounding_rock: String::new(),
             grouping: GroupingStyle::None,
-            size: 0,
+            frequency: 0,
         }
     }
     pub fn from_tag(tag_value: &str) -> Self {
@@ -52,16 +53,16 @@ impl Environment {
             Ok(n) => {
                 return Self {
                     grouping,
-                    rock_layer,
-                    size: n,
+                    surrounding_rock: rock_layer,
+                    frequency: n,
                 }
             }
             Err(e) => {
                 log::warn!("Unable to parse size from {},{:?}", split[2], e);
                 return Self {
                     grouping,
-                    rock_layer,
-                    size: 0,
+                    surrounding_rock: rock_layer,
+                    frequency: 0,
                 };
             }
         }
