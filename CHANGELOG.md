@@ -5,7 +5,40 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## v0.8.1 (2023-01-09)
+
+### Chore
+
+ - <csr-id-e87e4363aea2a138d7e1deb7c7a47f8c262ef9ff/> 🔊 add colored logs to cli example
+
+### New Features
+
+ - <csr-id-984103be271f86f8c683195f9e5463f218a1cbde/> ✨ add relative_path to parsed data
+
+### Commit Statistics
+
+<csr-read-only-do-not-edit/>
+
+ - 2 commits contributed to the release.
+ - 2 commits were understood as [conventional](https://www.conventionalcommits.org).
+ - 0 issues like '(#ID)' were seen in commit messages
+
+### Commit Details
+
+<csr-read-only-do-not-edit/>
+
+<details><summary>view details</summary>
+
+ * **Uncategorized**
+    - ✨ add relative_path to parsed data ([`984103b`](https://github.com/nwesterhausen/dfraw_json_parser/commit/984103be271f86f8c683195f9e5463f218a1cbde))
+    - 🔊 add colored logs to cli example ([`e87e436`](https://github.com/nwesterhausen/dfraw_json_parser/commit/e87e4363aea2a138d7e1deb7c7a47f8c262ef9ff))
+</details>
+
 ## v0.8.0 (2023-01-09)
+
+<csr-id-77cc03033f66655cfe58e102dbbea9500d91a98b/>
+<csr-id-48d50ad26512c5a35b8c3d136a49da3b4f1cc95b/>
+<csr-id-9669a1cd9d2be7518d989a26fbd4dc656edd4c9b/>
 
 ### New Features
 
@@ -33,7 +66,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 <csr-read-only-do-not-edit/>
 
- - 7 commits contributed to the release.
+ - 8 commits contributed to the release.
  - 1 day passed between releases.
  - 7 commits were understood as [conventional](https://www.conventionalcommits.org).
  - 0 issues like '(#ID)' were seen in commit messages
@@ -45,6 +78,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 <details><summary>view details</summary>
 
  * **Uncategorized**
+    - Release dfraw_json_parser v0.8.0 ([`9ebf2df`](https://github.com/nwesterhausen/dfraw_json_parser/commit/9ebf2dfbd421d6666c71c6f4a28f6fe6f29a5b36))
     - 🔥 remove unused set() on StateName ([`77cc030`](https://github.com/nwesterhausen/dfraw_json_parser/commit/77cc03033f66655cfe58e102dbbea9500d91a98b))
     - 🎨 format biomes ([`9669a1c`](https://github.com/nwesterhausen/dfraw_json_parser/commit/9669a1cd9d2be7518d989a26fbd4dc656edd4c9b))
     - ✨ add remaining inorganic tokens ([`ee95964`](https://github.com/nwesterhausen/dfraw_json_parser/commit/ee95964c58bad45f0678a3c414523ff1958e4661))
@@ -218,7 +252,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 <csr-id-59e2dff2d583cd8c5c55411688a6c8f4ddcf361a/>
 
 
-<csr-id-a6f00156cddc9b0c42b5f0a19883d5382c19d160/>
 <csr-id-5a9740e01528680c3f6543673fbd722913ac57c2/>
 <csr-id-7932e59c509f1da93e8f431fbbef9a164de144d1/>
 <csr-id-bb5de4483e6c0b5bfb15a0a5e2defdd067bd6c9d/>
