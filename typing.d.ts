@@ -51,7 +51,7 @@ export type Creature = {
   inactiveSeason: CasteRange<number>;
   creatureClass: CasteRange<string[]>;
 
-  caste_tags: CasteRange<string[]>;
+  casteTags: CasteRange<string[]>;
 
   difficulty: CasteRange<number>;
   grassTrample: CasteRange<number>;
