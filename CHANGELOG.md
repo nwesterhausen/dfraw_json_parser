@@ -5,18 +5,64 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## v0.8.0 (2023-01-09)
+
+### New Features
+
+ - <csr-id-ee95964c58bad45f0678a3c414523ff1958e4661/> ✨ add remaining inorganic tokens
+ - <csr-id-1a52fb5b9e5f09cdb4bba0ebcd08a72662751d74/> ✨ add un-recognized BIOME tokens as-is
+ - <csr-id-ca789a7e7bc8d5d10f1ff5bc43b0dfda96a249c9/> ✨ add inorganic object parsing
+   Adds parsing support for inoragnic raws
+   
+   Updates the SimpleMaterial struct with a Temperatures to hold temperature information (removing "specific_heat").
+
+### Bug Fixes
+
+ - <csr-id-04a55b93596a794fa59f55e3146b7f3ecc9ff43a/> 🐛 handle NONE case for temperatures
+
+### Refactor
+
+ - <csr-id-77cc03033f66655cfe58e102dbbea9500d91a98b/> 🔥 remove unused set() on StateName
+ - <csr-id-48d50ad26512c5a35b8c3d136a49da3b4f1cc95b/> 🧑‍💻 transform large reader.rs into module
+
+### Style
+
+ - <csr-id-9669a1cd9d2be7518d989a26fbd4dc656edd4c9b/> 🎨 format biomes
+
+### Commit Statistics
+
+<csr-read-only-do-not-edit/>
+
+ - 7 commits contributed to the release.
+ - 1 day passed between releases.
+ - 7 commits were understood as [conventional](https://www.conventionalcommits.org).
+ - 0 issues like '(#ID)' were seen in commit messages
+
+### Commit Details
+
+<csr-read-only-do-not-edit/>
+
+<details><summary>view details</summary>
+
+ * **Uncategorized**
+    - 🔥 remove unused set() on StateName ([`77cc030`](https://github.com/nwesterhausen/dfraw_json_parser/commit/77cc03033f66655cfe58e102dbbea9500d91a98b))
+    - 🎨 format biomes ([`9669a1c`](https://github.com/nwesterhausen/dfraw_json_parser/commit/9669a1cd9d2be7518d989a26fbd4dc656edd4c9b))
+    - ✨ add remaining inorganic tokens ([`ee95964`](https://github.com/nwesterhausen/dfraw_json_parser/commit/ee95964c58bad45f0678a3c414523ff1958e4661))
+    - ✨ add un-recognized BIOME tokens as-is ([`1a52fb5`](https://github.com/nwesterhausen/dfraw_json_parser/commit/1a52fb5b9e5f09cdb4bba0ebcd08a72662751d74))
+    - 🐛 handle NONE case for temperatures ([`04a55b9`](https://github.com/nwesterhausen/dfraw_json_parser/commit/04a55b93596a794fa59f55e3146b7f3ecc9ff43a))
+    - ✨ add inorganic object parsing ([`ca789a7`](https://github.com/nwesterhausen/dfraw_json_parser/commit/ca789a7e7bc8d5d10f1ff5bc43b0dfda96a249c9))
+    - 🧑‍💻 transform large reader.rs into module ([`48d50ad`](https://github.com/nwesterhausen/dfraw_json_parser/commit/48d50ad26512c5a35b8c3d136a49da3b4f1cc95b))
+</details>
+
 ## v0.7.7 (2023-01-08)
 
 ### New Features
 
  - <csr-id-3ae61273d150faeff3e407ef7d7d8ea4629ac021/> 🌟 include more plant data
    * feat:
-   
-   * fix: 🐛 fix error message for bad raw input file in example
-   
-   * feat: ✨ report all state colors
-   
-   * chore: 🚀 update type definition for simple material
+* fix: 🐛 fix error message for bad raw input file in example
+* feat: ✨ report all state colors
+* chore: 🚀 update type definition for simple material
 
 ### Bug Fixes
 
@@ -27,7 +73,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 <csr-read-only-do-not-edit/>
 
- - 3 commits contributed to the release over the course of 6 calendar days.
+ - 4 commits contributed to the release over the course of 6 calendar days.
  - 6 days passed between releases.
  - 3 commits were understood as [conventional](https://www.conventionalcommits.org).
  - 1 unique issue was worked on: [#10](https://github.com/nwesterhausen/dfraw_json_parser/issues/10)
@@ -41,6 +87,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
  * **[#10](https://github.com/nwesterhausen/dfraw_json_parser/issues/10)**
     - 🌟 include more plant data ([`3ae6127`](https://github.com/nwesterhausen/dfraw_json_parser/commit/3ae61273d150faeff3e407ef7d7d8ea4629ac021))
  * **Uncategorized**
+    - Release dfraw_json_parser v0.7.7 ([`712dd58`](https://github.com/nwesterhausen/dfraw_json_parser/commit/712dd58040e86571a7e7aef9ba50a964e3038ac0))
     - 🐛 typescript typing cohesion ([`f931dbe`](https://github.com/nwesterhausen/dfraw_json_parser/commit/f931dbeedff7e3a5ccfe065213b7672737b86de5))
     - 🐛 fix typings for plant ([`7bde574`](https://github.com/nwesterhausen/dfraw_json_parser/commit/7bde574e03f659e1abff93cb6d4d1fc0dd0af34d))
 </details>
@@ -171,7 +218,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 <csr-id-59e2dff2d583cd8c5c55411688a6c8f4ddcf361a/>
 
 
-<csr-id-5e6dde45b3489ad93660372f654fa637a4379d98/>
 <csr-id-a6f00156cddc9b0c42b5f0a19883d5382c19d160/>
 <csr-id-5a9740e01528680c3f6543673fbd722913ac57c2/>
 <csr-id-7932e59c509f1da93e8f431fbbef9a164de144d1/>
@@ -274,8 +320,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 <csr-id-373da1570664724774cddd13d34ae50c05a47dd8/>
 
-
-
 ### Chore
 
  - <csr-id-373da1570664724774cddd13d34ae50c05a47dd8/> 🔖 bump version
@@ -318,8 +362,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## v0.3.0 (2022-12-13)
 
 <csr-id-0c7aebb62c9b8cae212207bddcae6edbece83995/>
-
-
 
 ### Chore
 
