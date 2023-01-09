@@ -24,6 +24,9 @@ pub enum CreatureTag {
 }
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq)]
+pub enum InorganicTag {}
+
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq)]
 pub enum PlantTag {
     Dry,
     Evil,
@@ -83,6 +86,7 @@ pub enum MaterialTag {
     Horn,
     Hoof,
     ImpliesAnimalKill,
+    IsCeramic,
     IsGlass,
     IsMetal,
     IsStone,
@@ -138,6 +142,13 @@ pub enum MaterialTag {
     Wafers,
     Wood,
     Yarn,
+    Sedimentary,
+    Aquifer,
+    SedimentaryOceanShallow,
+    SedimentaryOceanDeep,
+    IgneousIntrusive,
+    IgneousExtrusive,
+    Metamorphic,
 }
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq)]

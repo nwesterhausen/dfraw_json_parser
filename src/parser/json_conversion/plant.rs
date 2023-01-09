@@ -1,8 +1,9 @@
 use std::collections::HashMap;
 
 use crate::parser::raws::{
+    material::SimpleMaterial,
     names::SingPlurName,
-    plant::{DFPlant, PlantGrowth, SimpleMaterial},
+    plant::{DFPlant, PlantGrowth},
     tags::PlantTag,
 };
 

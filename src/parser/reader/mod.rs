@@ -8,6 +8,7 @@ use std::path::Path;
 
 pub mod creature;
 pub mod info_file;
+pub mod inorganic;
 pub mod plant;
 
 #[derive(serde::Serialize, Debug, serde::Deserialize)]

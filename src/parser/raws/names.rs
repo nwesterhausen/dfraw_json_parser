@@ -109,6 +109,9 @@ impl StateName {
     pub fn set_gas(&mut self, name: &str) {
         self.gas = String::from(name);
     }
+    pub fn get_solid(&self) -> &str {
+        &self.solid.as_str()
+    }
     pub fn set(&mut self, state: &str, name: &str) {
         match state {
             "Solid" | "SOLID" | "ALL_SOLID" => self.solid = String::from(name),

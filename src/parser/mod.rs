@@ -102,6 +102,11 @@ fn parse_raws_to_json(
                     let plant_raw_vec = reader::plant::parse(&entry_path, info_text_file);
                     parsed_raws.extend(stringify_raw_vec(plant_raw_vec));
                 }
+                reader::RawObjectKind::Inorganic => {
+                    log::debug!("parsing {}", entry_path.display());
+                    let inorganic_raw_vec = reader::inorganic::parse(&entry_path, info_text_file);
+                    parsed_raws.extend(stringify_raw_vec(inorganic_raw_vec));
+                }
                 _ => log::trace!("{} - skipping {}", caller, entry_path.display()),
             }
         }
@@ -127,6 +132,11 @@ pub fn read_single_raw_file(raw_file: &Path) -> String {
             log::info!("Parsing plant raws from {}", raw_file.display());
             let plant_raw_vec = reader::plant::parse(&raw_file, &info_text_file);
             return format!("[{}]", stringify_raw_vec(plant_raw_vec).join(","));
+        }
+        reader::RawObjectKind::Inorganic => {
+            log::info!("Parsing inorganic raws from {}", raw_file.display());
+            let inorganic_raw_vec = reader::inorganic::parse(&raw_file, &info_text_file);
+            return format!("[{}]", stringify_raw_vec(inorganic_raw_vec).join(","));
         }
         _ => {
             log::warn!("Unknown raw type or failure to parse it.");
