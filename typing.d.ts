@@ -145,21 +145,21 @@ export type DFInorganic = {
 // info.txt raw definition
 export type DFInfoFile = {
   identifier: string;
-  sourced_directory: string;
-  numeric_version: number;
-  displayed_version: string;
-  earliest_compatible_numeric_version: number;
-  earliest_compatible_displayed_version: string;
+  sourcedDirectory: string;
+  numericVersion: number;
+  displayedVersion: string;
+  earliestCompatibleNumericVersion: number;
+  earliestCompatibleDisplayedVersion: string;
   author: string;
   name: string;
   description: string;
-  display_title: string;
+  displayTitle: string;
   objectId: string;
-  relative_path: string;
+  relativePath: string;
 };
 
 // Definition for tauri progress event payload
 export type ProgressPayload = {
-  current_module: string;
+  currentModule: string;
   percentage: number;
 };

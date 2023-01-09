@@ -7,15 +7,22 @@ use slug::slugify;
 #[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct TypedJsonInfoFile {
     identifier: String,
+    #[serde(rename = "sourcedDirectory")]
     sourced_directory: String,
+    #[serde(rename = "numericVersion")]
     numeric_version: u32,
+    #[serde(rename = "displayedVersion")]
     displayed_version: String,
+    #[serde(rename = "earliestCompatibleNumericVersion")]
     earliest_compatible_numeric_version: u32,
+    #[serde(rename = "earliestCompatibleDisplayedVersion")]
     earliest_compatible_displayed_version: String,
     author: String,
     name: String,
     description: String,
+    #[serde(rename = "displayTitle")]
     display_title: String,
+    #[serde(rename = "relativePath")]
     relative_path: String,
     #[serde(rename = "objectId")]
     object_id: String,

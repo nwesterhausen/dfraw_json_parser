@@ -295,6 +295,7 @@ pub fn parse_game_raws_to_file_out(
 /// * `current_module`: The name of the module that is currently being processed.
 struct ProgressPayload {
     percentage: f64,
+    #[serde(rename = "currentModule")]
     current_module: String,
 }
 
