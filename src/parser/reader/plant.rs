@@ -139,7 +139,14 @@ pub fn parse(input_path: &Path, info_text: &DFInfoFile) -> Vec<plant::DFPlant> {
                 }
                 "BIOME" => match biomes::BIOMES.get(&cap[3]) {
                     Some(biome_name) => plant_temp.biomes.push((*biome_name).to_string()),
-                    None => log::warn!("{} is not in biome dictionary!", &cap[3]),
+                    None => {
+                        log::warn!(
+                            "BIOME:{} is not a valid token (in {}); Will add it 'as-is' to biome list",
+                            &cap[3],
+                            plant_temp.get_identifier()
+                        );
+                        plant_temp.biomes.push(String::from(&cap[3]));
+                    }
                 },
                 "GROWTH" => match &cap[3] {
                     "LEAVES" => temp_plant_growth = plant::PlantGrowth::Leaves,

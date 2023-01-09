@@ -128,7 +128,14 @@ pub fn parse(input_path: &Path, info_text: &DFInfoFile) -> Vec<creature::DFCreat
                 }
                 "BIOME" => match biomes::BIOMES.get(&cap[3]) {
                     Some(biome_name) => creature_temp.biomes.push((*biome_name).to_string()),
-                    None => log::warn!("{} is not in biome dictionary!", &cap[3]),
+                    None => {
+                        log::warn!(
+                            "BIOME:{} is not a valid token (in {}); Will add it 'as-is' to biome list",
+                            &cap[3],
+                            creature_temp.get_identifier()
+                        );
+                        creature_temp.biomes.push(String::from(&cap[3]));
+                    }
                 },
                 "BODY_SIZE" => {
                     let split = cap[3].split(':').collect::<Vec<&str>>();
