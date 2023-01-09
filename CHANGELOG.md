@@ -5,7 +5,34 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## v0.9.0 (2023-01-09)
+
+### Refactor
+
+ - <csr-id-b5ac4440b1189f0c7ef8fdaeca97d36d334a3100/> 🔥 refactor typings for consistency
+   Changes the json objects to use camelCase for all fields
+
+### Commit Statistics
+
+<csr-read-only-do-not-edit/>
+
+ - 1 commit contributed to the release.
+ - 1 commit was understood as [conventional](https://www.conventionalcommits.org).
+ - 0 issues like '(#ID)' were seen in commit messages
+
+### Commit Details
+
+<csr-read-only-do-not-edit/>
+
+<details><summary>view details</summary>
+
+ * **Uncategorized**
+    - 🔥 refactor typings for consistency ([`b5ac444`](https://github.com/nwesterhausen/dfraw_json_parser/commit/b5ac4440b1189f0c7ef8fdaeca97d36d334a3100))
+</details>
+
 ## v0.8.1 (2023-01-09)
+
+<csr-id-e87e4363aea2a138d7e1deb7c7a47f8c262ef9ff/>
 
 ### Chore
 
@@ -19,7 +46,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 <csr-read-only-do-not-edit/>
 
- - 2 commits contributed to the release.
+ - 3 commits contributed to the release.
  - 2 commits were understood as [conventional](https://www.conventionalcommits.org).
  - 0 issues like '(#ID)' were seen in commit messages
 
@@ -30,6 +57,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 <details><summary>view details</summary>
 
  * **Uncategorized**
+    - Release dfraw_json_parser v0.8.1 ([`5539af6`](https://github.com/nwesterhausen/dfraw_json_parser/commit/5539af65b57c653d4f877f1b3a712604390d1a6b))
     - ✨ add relative_path to parsed data ([`984103b`](https://github.com/nwesterhausen/dfraw_json_parser/commit/984103be271f86f8c683195f9e5463f218a1cbde))
     - 🔊 add colored logs to cli example ([`e87e436`](https://github.com/nwesterhausen/dfraw_json_parser/commit/e87e4363aea2a138d7e1deb7c7a47f8c262ef9ff))
 </details>
@@ -252,7 +280,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 <csr-id-59e2dff2d583cd8c5c55411688a6c8f4ddcf361a/>
 
 
-<csr-id-5a9740e01528680c3f6543673fbd722913ac57c2/>
 <csr-id-7932e59c509f1da93e8f431fbbef9a164de144d1/>
 <csr-id-bb5de4483e6c0b5bfb15a0a5e2defdd067bd6c9d/>
 <csr-id-a8301caede5aa2090b769c05e19a699267e07b07/>
