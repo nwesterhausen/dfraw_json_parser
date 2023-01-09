@@ -1,9 +1,11 @@
 pub mod biomes;
 pub mod creature;
+pub mod environment;
 pub mod info;
 pub mod inorganic;
 pub mod material;
 pub mod names;
 pub mod plant;
+pub mod roll_chance;
 pub mod tags;
 pub mod temperatures;
