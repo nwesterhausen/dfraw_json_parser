@@ -15,6 +15,7 @@ pub struct TypedJsonCreature {
     raw_module_found_in: String,
     raw_module_display: String,
     raw_type: String,
+    relative_path: String,
     #[serde(rename = "objectId")]
     object_id: String,
     name: String,
@@ -61,6 +62,7 @@ impl TypedJsonCreature {
             raw_module_found_in: creature.get_dfraw_found_in(),
             raw_module_display: creature.get_dfraw_display(),
             raw_type: creature.get_raw_type(),
+            relative_path: creature.get_dfraw_relative_path(),
             name: creature.get_general_name(),
             descriptions: creature.get_description_by_caste(),
             max_age: creature.get_max_ages_by_caste(),

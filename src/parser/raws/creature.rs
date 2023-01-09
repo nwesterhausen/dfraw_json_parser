@@ -10,7 +10,7 @@ use crate::parser::raws::{
 };
 use crate::parser::reader::RawObjectKind;
 
-#[derive(Serialize, Deserialize, Debug)]
+#[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct DFCreature {
     identifier: String,
     parent_raw: String,
@@ -18,6 +18,7 @@ pub struct DFCreature {
     dfraw_version: String,
     dfraw_found_in: String,
     dfraw_display: String,
+    dfraw_relative_path: String,
     raw_type: RawObjectKind,
 
     // Boolean Flags
@@ -47,64 +48,7 @@ pub struct DFCreature {
     pub copy_tags_from: Vec<String>, // vec of creature identifiers
 }
 
-impl Clone for DFCreature {
-    fn clone(&self) -> Self {
-        Self {
-            identifier: self.identifier.to_string(),
-            parent_raw: self.parent_raw.to_string(),
-            dfraw_identifier: self.dfraw_identifier.to_string(),
-            dfraw_version: self.dfraw_version.to_string(),
-            dfraw_found_in: self.dfraw_found_in.to_string(),
-            dfraw_display: self.dfraw_display.to_string(),
-            raw_type: RawObjectKind::Creature,
-            tags: self.tags.clone(),
-            frequency: self.frequency,
-            cluster_number: [self.cluster_number[0], self.cluster_number[1]],
-            population_number: [self.population_number[0], self.population_number[1]],
-            underground_depth: [self.underground_depth[0], self.underground_depth[1]],
-            general_baby_name: self.general_baby_name.clone(),
-            general_child_name: self.general_child_name.clone(),
-            name: self.name.clone(),
-            biomes: self.biomes.clone(),
-            pref_string: self.pref_string.clone(),
-            castes: self.castes.clone(),
-            copy_tags_from: self.copy_tags_from.clone(),
-        }
-    }
-}
-
-impl Clone for DFCreatureCaste {
-    fn clone(&self) -> Self {
-        Self {
-            name: self.name.to_string(),
-            tags: self.tags.clone(),
-            clutch_size: [self.clutch_size[0], self.clutch_size[1]],
-            litter_size: [self.clutch_size[0], self.clutch_size[1]],
-            max_age: [self.max_age[0], self.max_age[1]],
-            active_time: self.active_time,
-            curious_beast: self.curious_beast,
-            no_season: self.no_season,
-            trainable: self.trainable,
-            baby: self.baby,
-            child: self.child,
-            difficulty: self.difficulty,
-            egg_size: self.egg_size,
-            grass_trample: self.grass_trample,
-            grazer: self.grazer,
-            low_light_vision: self.low_light_vision,
-            pet_value: self.pet_value,
-            pop_ratio: self.pop_ratio,
-            baby_name: self.baby_name.clone(),
-            caste_name: self.caste_name.clone(),
-            child_name: self.child_name.clone(),
-            description: self.description.to_string(),
-            creature_class: self.creature_class.clone(),
-            body_size: self.body_size.clone(),
-            milkable: self.milkable.clone(),
-        }
-    }
-}
-#[derive(Serialize, Deserialize, Debug)]
+#[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct DFCreatureCaste {
     // Identification
     pub name: String,
@@ -156,6 +100,7 @@ impl DFCreature {
             dfraw_version: String::from(info_text.displayed_version.as_str()),
             dfraw_found_in: String::from(info_text.get_sourced_directory()),
             dfraw_display: format!("{} v{}", info_text.name, info_text.displayed_version),
+            dfraw_relative_path: String::from(info_text.get_relative_path()),
             raw_type: RawObjectKind::Creature,
             // Boolean Flags
             tags: Vec::new(),
@@ -198,6 +143,9 @@ impl DFCreature {
     }
     pub fn get_dfraw_display(&self) -> String {
         String::from(&self.dfraw_display)
+    }
+    pub fn get_dfraw_relative_path(&self) -> String {
+        String::from(&self.dfraw_relative_path)
     }
     pub fn get_parent_raw(&self) -> String {
         String::from(&self.parent_raw)

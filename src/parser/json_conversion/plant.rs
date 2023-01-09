@@ -21,6 +21,7 @@ pub struct TypedJsonPlant {
     raw_module_found_in: String,
     raw_module_display: String,
     raw_type: String,
+    relative_path: String,
     #[serde(rename = "objectId")]
     object_id: String,
     tags: Vec<PlantTag>,
@@ -54,6 +55,7 @@ impl TypedJsonPlant {
             raw_module_version: plant.get_raw_module_version(),
             raw_module_found_in: plant.get_dfraw_found_in(),
             raw_module_display: plant.get_dfraw_display(),
+            relative_path: plant.get_dfraw_relative_path(),
             raw_type: plant.get_raw_type(),
             name: plant.get_general_name(),
 

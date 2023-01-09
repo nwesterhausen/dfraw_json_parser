@@ -15,6 +15,7 @@ pub struct TypedJsonInorganic {
     raw_module_version: String,
     raw_module_found_in: String,
     raw_module_display: String,
+    relative_path: String,
     raw_type: String,
     #[serde(rename = "objectId")]
     object_id: String,
@@ -39,6 +40,7 @@ impl TypedJsonInorganic {
             raw_module_version: inorganic.get_raw_module_version(),
             raw_module_found_in: inorganic.get_dfraw_found_in(),
             raw_module_display: inorganic.get_dfraw_display(),
+            relative_path: inorganic.get_dfraw_relative_path(),
             raw_type: inorganic.get_raw_type(),
             name: inorganic.get_general_name(),
 

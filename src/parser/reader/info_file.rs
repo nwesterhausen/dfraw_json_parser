@@ -8,11 +8,30 @@ use crate::parser::raws::info;
 use crate::parser::refs::{DF_ENCODING, NON_DIGIT_RE, RAW_TOKEN_RE};
 
 pub fn parse(info_file_path: &Path, source_dir: &str) -> info::DFInfoFile {
+    let relative_path = match info_file_path.parent() {
+        Some(parent_dir) => {
+            format!(
+                "\"{}/{}/{}\"",
+                source_dir,
+                parent_dir.file_name().unwrap_or_default().to_string_lossy(),
+                info_file_path
+                    .file_name()
+                    .unwrap_or_default()
+                    .to_string_lossy()
+            )
+        }
+        None => format!(
+            "\"{}/<unknown>/{:?}\"",
+            source_dir,
+            info_file_path.file_name()
+        ),
+    };
+
     let file = match File::open(&info_file_path) {
         Ok(f) => f,
         Err(e) => {
-            log::error!("Error opening raw file for parsing!\n{:?}", e);
-            return info::DFInfoFile::new("error", source_dir);
+            log::error!("DFInfoFile - Error opening raw file for parsing!\n{:?}", e);
+            return info::DFInfoFile::new("error", source_dir, &relative_path);
         }
     };
 
@@ -22,13 +41,16 @@ pub fn parse(info_file_path: &Path, source_dir: &str) -> info::DFInfoFile {
     let reader = BufReader::new(decoding_reader);
 
     // info.txt details
-    let mut info_file_data: info::DFInfoFile = info::DFInfoFile::new("", source_dir);
+    let mut header = String::from("DFInfoFile");
+    let mut info_file_data: info::DFInfoFile =
+        info::DFInfoFile::new("", source_dir, &relative_path);
 
     for (index, line) in reader.lines().enumerate() {
         if line.is_err() {
             log::error!(
-                "DFInfoFile - Error processing {:?}:{}",
-                &info_file_path,
+                "{} - Error processing {:?}:{}",
+                header,
+                relative_path,
                 index
             );
             continue;
@@ -36,7 +58,7 @@ pub fn parse(info_file_path: &Path, source_dir: &str) -> info::DFInfoFile {
         let line = match line {
             Ok(l) => l,
             Err(e) => {
-                log::error!("DFInfoFile - Line-reading error\n{:?}", e);
+                log::error!("{} - Line-reading error\n{:?}", header, e);
                 continue;
             }
         };
@@ -46,16 +68,16 @@ pub fn parse(info_file_path: &Path, source_dir: &str) -> info::DFInfoFile {
                 // SECTION FOR MATCHING info.txt DATA
                 "ID" => {
                     // the [ID:identifier] tag should be the top of the info.txt file
-                    info_file_data = info::DFInfoFile::new(&cap[3], source_dir);
+                    info_file_data = info::DFInfoFile::new(&cap[3], source_dir, &relative_path);
+                    header = format!("DFInfoFile ({})", &cap[3]);
                 }
                 "NUMERIC_VERSION" => match cap[3].parse() {
                     Ok(n) => info_file_data.numeric_version = n,
                     Err(_e) => {
                         log::warn!(
-                            "DFInfoFile - 'numeric_version' value in {}: '{}' is not integer! file: {}",
-                            info_file_data.get_identifier(),
-                            &cap[3],
-                            info_file_path.display()
+                            "{} - 'NUMERIC_VERSION' should be integer {}",
+                            header,
+                            relative_path
                         );
                         // match on \D to replace any non-digit characters with empty string
                         let digits_only = NON_DIGIT_RE.replace_all(&cap[3], "").to_string();
@@ -63,7 +85,8 @@ pub fn parse(info_file_path: &Path, source_dir: &str) -> info::DFInfoFile {
                             Ok(n) => info_file_data.numeric_version = n,
                             Err(_e) => {
                                 log::error!(
-                                    "DFInfoFile - Unable to parse numerals from {}",
+                                    "{} - Unable to parse any numbers from {}",
+                                    header,
                                     digits_only
                                 );
                             }
@@ -74,10 +97,9 @@ pub fn parse(info_file_path: &Path, source_dir: &str) -> info::DFInfoFile {
                     Ok(n) => info_file_data.earliest_compatible_numeric_version = n,
                     Err(_e) => {
                         log::warn!(
-                            "DFInfoFile - 'earliest_compatible_numeric_version' value in {}: '{}' is not integer! file: {}",
-                            info_file_data.get_identifier(),
-                            &cap[3],
-                            info_file_path.display()
+                            "{} - 'EARLIEST_COMPATIBLE_NUMERIC_VERSION' should be integer {}",
+                            header,
+                            relative_path
                         );
                         // match on \D to replace any non-digit characters with empty string
                         let digits_only = NON_DIGIT_RE.replace_all(&cap[3], "").to_string();
@@ -85,7 +107,8 @@ pub fn parse(info_file_path: &Path, source_dir: &str) -> info::DFInfoFile {
                             Ok(n) => info_file_data.earliest_compatible_numeric_version = n,
                             Err(_e) => {
                                 log::error!(
-                                    "DFInfoFile - Unable to parse numerals from {}",
+                                    "{} - Unable to parse any numbers from {}",
+                                    header,
                                     digits_only
                                 );
                             }
@@ -94,6 +117,11 @@ pub fn parse(info_file_path: &Path, source_dir: &str) -> info::DFInfoFile {
                 },
                 "DISPLAYED_VERSION" => {
                     info_file_data.displayed_version = String::from(&cap[3]);
+                    header = format!(
+                        "DFInfoFile ({}@v{})",
+                        info_file_data.get_identifier(),
+                        &cap[3]
+                    );
                 }
                 "EARLIEST_COMPATIBLE_DISPLAYED_VERSION" => {
                     info_file_data.earliest_compatible_displayed_version = String::from(&cap[3]);

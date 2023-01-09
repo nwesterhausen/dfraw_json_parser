@@ -11,7 +11,7 @@ pub mod info_file;
 pub mod inorganic;
 pub mod plant;
 
-#[derive(serde::Serialize, Debug, serde::Deserialize)]
+#[derive(serde::Serialize, Debug, serde::Deserialize, Clone, Copy)]
 pub enum RawObjectKind {
     Creature,
     Inorganic,

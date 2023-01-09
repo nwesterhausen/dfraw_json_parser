@@ -4,6 +4,7 @@ use serde::{Deserialize, Serialize};
 pub struct DFInfoFile {
     identifier: String,
     sourced_directory: String,
+    relative_path: String,
     pub numeric_version: u32,
     pub displayed_version: String,
     pub earliest_compatible_numeric_version: u32,
@@ -14,10 +15,11 @@ pub struct DFInfoFile {
 }
 
 impl DFInfoFile {
-    pub fn new(id: &str, sourced_dir: &str) -> Self {
+    pub fn new(id: &str, sourced_dir: &str, relative_path: &String) -> Self {
         Self {
             identifier: id.to_string(),
             sourced_directory: sourced_dir.to_string(),
+            relative_path: relative_path.clone(),
             numeric_version: 0,
             displayed_version: "0".to_string(),
             earliest_compatible_numeric_version: 0,
@@ -33,5 +35,8 @@ impl DFInfoFile {
     }
     pub fn get_sourced_directory(&self) -> String {
         String::from(&self.sourced_directory)
+    }
+    pub fn get_relative_path(&self) -> String {
+        String::from(&self.relative_path)
     }
 }

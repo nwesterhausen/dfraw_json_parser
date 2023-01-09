@@ -16,6 +16,7 @@ pub struct TypedJsonInfoFile {
     name: String,
     description: String,
     display_title: String,
+    relative_path: String,
     #[serde(rename = "objectId")]
     object_id: String,
 }
@@ -41,6 +42,7 @@ impl TypedJsonInfoFile {
                 info_file.get_identifier(),
                 info_file.numeric_version
             ),
+            relative_path: info_file.get_relative_path(),
         }
     }
 }
