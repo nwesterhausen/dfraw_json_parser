@@ -5,11 +5,11 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## v0.9.2 (2023-01-09)
+## v0.9.3 (2023-01-10)
 
 ### Bug Fixes
 
- - <csr-id-f16e0e21b8056914c410e224e47db22e3b6061e2/> 🐛 casteTags property in camel case
+ - <csr-id-007c8b41d67bd7a97f0874cd53a9a5e03f436a6d/> 🐛 handle 'ALL' for state_name etc
 
 ### Commit Statistics
 
@@ -26,6 +26,31 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 <details><summary>view details</summary>
 
  * **Uncategorized**
+    - 🐛 handle 'ALL' for state_name etc ([`007c8b4`](https://github.com/nwesterhausen/dfraw_json_parser/commit/007c8b41d67bd7a97f0874cd53a9a5e03f436a6d))
+</details>
+
+## v0.9.2 (2023-01-09)
+
+### Bug Fixes
+
+ - <csr-id-f16e0e21b8056914c410e224e47db22e3b6061e2/> 🐛 casteTags property in camel case
+
+### Commit Statistics
+
+<csr-read-only-do-not-edit/>
+
+ - 2 commits contributed to the release.
+ - 1 commit was understood as [conventional](https://www.conventionalcommits.org).
+ - 0 issues like '(#ID)' were seen in commit messages
+
+### Commit Details
+
+<csr-read-only-do-not-edit/>
+
+<details><summary>view details</summary>
+
+ * **Uncategorized**
+    - Release dfraw_json_parser v0.9.2 ([`399e072`](https://github.com/nwesterhausen/dfraw_json_parser/commit/399e072b2e5d5e23f8cd341ef0c2f36debf99307))
     - 🐛 casteTags property in camel case ([`f16e0e2`](https://github.com/nwesterhausen/dfraw_json_parser/commit/f16e0e21b8056914c410e224e47db22e3b6061e2))
 </details>
 
@@ -332,7 +357,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 <csr-id-59e2dff2d583cd8c5c55411688a6c8f4ddcf361a/>
 
 
-<csr-id-a8301caede5aa2090b769c05e19a699267e07b07/>
 <csr-id-8d79e7bc493584248b8adbc98ae4f178f517a6a6/>
 <csr-id-59e2dff2d583cd8c5c55411688a6c8f4ddcf361a/>
 
