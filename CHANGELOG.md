@@ -5,6 +5,35 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## v0.9.4 (2023-01-10)
+
+### New Features
+
+ - <csr-id-591e64c025b70b31d899a6e6d4c59e0501650e1a/> ✨ add magma safe calculation
+
+### Bug Fixes
+
+ - <csr-id-357f61d32d7c544ab3a7125c4516e24d30eb9a0d/> 🐛 fix typo in RollChance type
+
+### Commit Statistics
+
+<csr-read-only-do-not-edit/>
+
+ - 2 commits contributed to the release.
+ - 2 commits were understood as [conventional](https://www.conventionalcommits.org).
+ - 0 issues like '(#ID)' were seen in commit messages
+
+### Commit Details
+
+<csr-read-only-do-not-edit/>
+
+<details><summary>view details</summary>
+
+ * **Uncategorized**
+    - 🐛 fix typo in RollChance type ([`357f61d`](https://github.com/nwesterhausen/dfraw_json_parser/commit/357f61d32d7c544ab3a7125c4516e24d30eb9a0d))
+    - ✨ add magma safe calculation ([`591e64c`](https://github.com/nwesterhausen/dfraw_json_parser/commit/591e64c025b70b31d899a6e6d4c59e0501650e1a))
+</details>
+
 ## v0.9.3 (2023-01-10)
 
 ### Bug Fixes
@@ -15,7 +44,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 <csr-read-only-do-not-edit/>
 
- - 1 commit contributed to the release.
+ - 2 commits contributed to the release.
  - 1 commit was understood as [conventional](https://www.conventionalcommits.org).
  - 0 issues like '(#ID)' were seen in commit messages
 
@@ -26,6 +55,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 <details><summary>view details</summary>
 
  * **Uncategorized**
+    - Release dfraw_json_parser v0.9.3 ([`5042df1`](https://github.com/nwesterhausen/dfraw_json_parser/commit/5042df1d1927312e5cdb4bcceb8962c247559a46))
     - 🐛 handle 'ALL' for state_name etc ([`007c8b4`](https://github.com/nwesterhausen/dfraw_json_parser/commit/007c8b41d67bd7a97f0874cd53a9a5e03f436a6d))
 </details>
 
@@ -357,7 +387,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 <csr-id-59e2dff2d583cd8c5c55411688a6c8f4ddcf361a/>
 
 
-<csr-id-8d79e7bc493584248b8adbc98ae4f178f517a6a6/>
 <csr-id-59e2dff2d583cd8c5c55411688a6c8f4ddcf361a/>
 
 
