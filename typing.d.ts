@@ -128,7 +128,7 @@ export type Environment = {
 };
 
 export type RollChance = {
-  metal: string;
+  result: string;
   chance: number;
 };
 
