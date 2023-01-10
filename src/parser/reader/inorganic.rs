@@ -154,87 +154,17 @@ pub fn parse(input_path: &Path, info_text: &DFInfoFile) -> Vec<inorganic::DFInor
                     ),
                 },
                 "STATE_NAME" => {
-                    // Split the value into a descriptor and value
-                    let split = cap[3].split(':').collect::<Vec<&str>>();
-
-                    if split.len() != 2 {
-                        log::error!("Unable to read name from {}", &cap[3]);
-                        // When we can't do anything about this name, just continue
-                        continue;
-                    }
-
-                    match split[0] {
-                        "ALL_SOLID" | "SOLID" => material_temp.state_name.set_solid(&split[1]),
-                        "LIQUID" => material_temp.state_name.set_liquid(&split[1]),
-                        "GAS" => material_temp.state_name.set_gas(&split[1]),
-                        _ => (),
-                    }
+                    material_temp.state_name.set_from_tag(&cap[3]);
                 }
                 "STATE_ADJ" => {
-                    // Split the value into a descriptor and value
-                    let split = cap[3].split(':').collect::<Vec<&str>>();
-
-                    if split.len() != 2 {
-                        log::error!("Unable to read name from {}", &cap[3]);
-                        // When we can't do anything about this name, just continue
-                        continue;
-                    }
-
-                    match split[0] {
-                        "ALL_SOLID" | "SOLID" => material_temp.state_adj.set_solid(&split[1]),
-                        "LIQUID" => material_temp.state_adj.set_liquid(&split[1]),
-                        "GAS" => material_temp.state_adj.set_gas(&split[1]),
-                        _ => (),
-                    }
+                    material_temp.state_adj.set_from_tag(&cap[3]);
                 }
                 "STATE_NAME_ADJ" => {
-                    // Split the value into a descriptor and value
-                    let split = cap[3].split(':').collect::<Vec<&str>>();
-
-                    if split.len() != 2 {
-                        log::error!("Unable to read name from {}", &cap[3]);
-                        // When we can't do anything about this name, just continue
-                        continue;
-                    }
-
-                    match split[0] {
-                        "ALL_SOLID" | "SOLID" => {
-                            material_temp.state_name.set_solid(&split[1]);
-                            material_temp.state_adj.set_solid(&split[1]);
-                        }
-                        "LIQUID" => {
-                            material_temp.state_name.set_liquid(&split[1]);
-                            material_temp.state_adj.set_liquid(&split[1]);
-                        }
-                        "GAS" => {
-                            material_temp.state_name.set_gas(&split[1]);
-                            material_temp.state_adj.set_gas(&split[1]);
-                        }
-                        _ => (),
-                    }
+                    material_temp.state_name.set_from_tag(&cap[3]);
+                    material_temp.state_adj.set_from_tag(&cap[3]);
                 }
                 "STATE_COLOR" => {
-                    // Split the value into a descriptor and value
-                    let split = cap[3].split(':').collect::<Vec<&str>>();
-
-                    if split.len() != 2 {
-                        log::error!("Unable to read color from {}", &cap[3]);
-                        // When we can't do anything about this name, just continue
-                        continue;
-                    }
-
-                    match split[0] {
-                        "ALL_SOLID" | "SOLID" => {
-                            material_temp.state_color.set_solid(&split[1]);
-                        }
-                        "LIQUID" => {
-                            material_temp.state_color.set_liquid(&split[1]);
-                        }
-                        "GAS" => {
-                            material_temp.state_color.set_gas(&split[1]);
-                        }
-                        _ => (),
-                    }
+                    material_temp.state_color.set_from_tag(&cap[3]);
                 }
 
                 "NO_STONE_STOCKPILE" => {

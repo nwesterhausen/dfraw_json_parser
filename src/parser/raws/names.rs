@@ -112,4 +112,32 @@ impl StateName {
     pub fn get_solid(&self) -> &str {
         &self.solid.as_str()
     }
+    pub fn set_from_tag(&mut self, tag_value: &str) {
+        // Split the value into a descriptor and value
+        let split = tag_value.split(':').collect::<Vec<&str>>();
+
+        if split.len() != 2 {
+            log::error!("Unable to read name from {}", tag_value);
+            // When we can't do anything about this name, just continue
+            return;
+        }
+
+        match split[0] {
+            "ALL_SOLID" | "SOLID" => {
+                self.set_solid(&split[1]);
+            }
+            "LIQUID" => {
+                self.set_liquid(&split[1]);
+            }
+            "GAS" => {
+                self.set_gas(&split[1]);
+            }
+            "ALL" => {
+                self.set_solid(&split[1]);
+                self.set_liquid(&split[1]);
+                self.set_gas(&split[1]);
+            }
+            _ => (),
+        }
+    }
 }
