@@ -140,6 +140,8 @@ export type DFInorganic = {
   specificEnvironments: Environment[];
   metalOres: RollChance[];
   threadMetals: RollChance[];
+
+  magmaSafe: boolean;
 } & Raw;
 
 // info.txt raw definition

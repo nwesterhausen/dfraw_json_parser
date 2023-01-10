@@ -39,6 +39,10 @@ pub struct TypedJsonInorganic {
     metal_ores: Vec<roll_chance::RollChance>,
     #[serde(rename = "threadMetals")]
     thread_metals: Vec<roll_chance::RollChance>,
+
+    // Calculated
+    #[serde(rename = "magmaSafe")]
+    magma_safe: bool,
 }
 
 impl TypedJsonInorganic {
@@ -61,6 +65,8 @@ impl TypedJsonInorganic {
             specific_environments: inorganic.environments_specific.clone(),
             metal_ores: inorganic.metal_ores.clone(),
             thread_metals: inorganic.thread_metals.clone(),
+
+            magma_safe: inorganic.is_magma_safe(),
         }
     }
 }

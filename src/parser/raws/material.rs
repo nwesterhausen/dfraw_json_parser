@@ -415,6 +415,33 @@ impl SimpleMaterial {
             },
         }
     }
+
+    /// For reactions and custom buildings using the [MAGMA_BUILD_SAFE] token, only a material which is solid and
+    /// stable at the temperature 12000 °U (i.e. MELTING_POINT/BOILING_POINT/IGNITE_POINT/HEATDAM_POINT greater
+    /// than 12000 and COLDDAM_POINT less than 12000) is considered magma-safe.
+    pub fn is_magma_safe(&self) -> bool {
+        // Check melting point
+        if self.temperatures.melting_point > 0 && self.temperatures.melting_point < 12_000 {
+            return false;
+        }
+        // Check boiling point
+        if self.temperatures.boiling_point > 0 && self.temperatures.boiling_point < 12_000 {
+            return false;
+        }
+        // Check ignition point
+        if self.temperatures.ignition_point > 0 && self.temperatures.ignition_point < 12_000 {
+            return false;
+        }
+        // Check heat damage point
+        if self.temperatures.heat_damage_point > 0 && self.temperatures.heat_damage_point < 12_000 {
+            return false;
+        }
+        // Check cold damage point
+        if self.temperatures.cold_damage_point > 12_000 {
+            return false;
+        }
+        return true;
+    }
 }
 
 pub fn material_tags_from_template(template_type: &str) -> Vec<tags::MaterialTag> {
