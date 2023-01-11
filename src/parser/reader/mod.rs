@@ -6,19 +6,13 @@ use std::fs::File;
 use std::io::{BufRead, BufReader};
 use std::path::Path;
 
+use super::raws::RawObjectKind;
+
 pub mod creature;
 pub mod info_file;
 pub mod inorganic;
 pub mod plant;
 
-#[derive(serde::Serialize, Debug, serde::Deserialize, Clone, Copy)]
-pub enum RawObjectKind {
-    Creature,
-    Inorganic,
-    Plant,
-    Material,
-    None,
-}
 /// It reads a file, line by line, and checks the first line for the filename, reads lines until it encounters the
 /// [OBJECT:<type>] tag in the file.
 ///

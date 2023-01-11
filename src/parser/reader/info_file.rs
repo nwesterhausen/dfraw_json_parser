@@ -10,21 +10,9 @@ use crate::parser::refs::{DF_ENCODING, NON_DIGIT_RE, RAW_TOKEN_RE};
 pub fn parse(info_file_path: &Path, source_dir: &str) -> info::DFInfoFile {
     let relative_path = match info_file_path.parent() {
         Some(parent_dir) => {
-            format!(
-                "\"{}/{}/{}\"",
-                source_dir,
-                parent_dir.file_name().unwrap_or_default().to_string_lossy(),
-                info_file_path
-                    .file_name()
-                    .unwrap_or_default()
-                    .to_string_lossy()
-            )
+            String::from(parent_dir.file_name().unwrap_or_default().to_string_lossy())
         }
-        None => format!(
-            "\"{}/<unknown>/{:?}\"",
-            source_dir,
-            info_file_path.file_name()
-        ),
+        None => String::from("!Unavailable"),
     };
 
     let file = match File::open(&info_file_path) {

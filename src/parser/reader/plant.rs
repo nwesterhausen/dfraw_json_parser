@@ -143,7 +143,7 @@ pub fn parse(input_path: &Path, info_text: &DFInfoFile) -> Vec<plant::DFPlant> {
                         log::warn!(
                             "BIOME:{} is not a valid token (in {}); Will add it 'as-is' to biome list",
                             &cap[3],
-                            plant_temp.get_identifier()
+                            plant_temp.get_raw_header().get_identifier()
                         );
                         plant_temp.biomes.push(String::from(&cap[3]));
                     }
@@ -185,7 +185,7 @@ pub fn parse(input_path: &Path, info_text: &DFInfoFile) -> Vec<plant::DFPlant> {
                     Ok(n) => plant_temp.frequency = n,
                     Err(e) => log::error!(
                         "{}:FREQUENCY parsing error\n{:?}",
-                        plant_temp.get_identifier(),
+                        plant_temp.get_raw_header().get_identifier(),
                         e
                     ),
                 },
@@ -193,7 +193,7 @@ pub fn parse(input_path: &Path, info_text: &DFInfoFile) -> Vec<plant::DFPlant> {
                     Ok(n) => plant_temp.cluster_size = n,
                     Err(e) => log::error!(
                         "{}:CLUSTERSIZE parsing error\n{:?}",
-                        plant_temp.get_identifier(),
+                        plant_temp.get_raw_header().get_identifier(),
                         e
                     ),
                 },
@@ -201,7 +201,7 @@ pub fn parse(input_path: &Path, info_text: &DFInfoFile) -> Vec<plant::DFPlant> {
                     Ok(n) => plant_temp.growth_duration = n,
                     Err(e) => log::error!(
                         "{}:GROWDUR parsing error\n{:?}",
-                        plant_temp.get_identifier(),
+                        plant_temp.get_raw_header().get_identifier(),
                         e
                     ),
                 },
@@ -209,7 +209,7 @@ pub fn parse(input_path: &Path, info_text: &DFInfoFile) -> Vec<plant::DFPlant> {
                     Ok(n) => plant_temp.value = n,
                     Err(e) => log::error!(
                         "{}:VALUE parsing error\n{:?}",
-                        plant_temp.get_identifier(),
+                        plant_temp.get_raw_header().get_identifier(),
                         e
                     ),
                 },
@@ -217,7 +217,7 @@ pub fn parse(input_path: &Path, info_text: &DFInfoFile) -> Vec<plant::DFPlant> {
                     Ok(n) => material_temp.material_value = n,
                     Err(e) => log::error!(
                         "{}:{:?}:MATERIAL_VALUE parsing error\n{:?}",
-                        plant_temp.get_identifier(),
+                        plant_temp.get_raw_header().get_identifier(),
                         material_temp.material_type,
                         e
                     ),

@@ -5,6 +5,7 @@ use crate::parser::raws::{
     names::SingPlurName,
     plant::{DFPlant, PlantGrowth},
     tags::PlantTag,
+    RawModuleLocation,
 };
 
 use super::TypedJsonSerializable;
@@ -22,7 +23,7 @@ pub struct TypedJsonPlant {
     #[serde(rename = "moduleVersion")]
     raw_module_version: String,
     #[serde(rename = "moduleSourceDirectory")]
-    raw_module_found_in: String,
+    raw_module_found_in: RawModuleLocation,
     #[serde(rename = "moduleDisplayName")]
     raw_module_display: String,
     #[serde(rename = "rawType")]
@@ -61,15 +62,15 @@ pub struct TypedJsonPlant {
 impl TypedJsonPlant {
     pub fn from(plant: &DFPlant) -> Self {
         Self {
-            identifier: plant.get_identifier(),
-            parent_raw: plant.get_parent_raw(),
-            object_id: plant.get_object_id(),
-            raw_module: plant.get_raw_module(),
-            raw_module_version: plant.get_raw_module_version(),
-            raw_module_found_in: plant.get_dfraw_found_in(),
-            raw_module_display: plant.get_dfraw_display(),
-            relative_path: plant.get_dfraw_relative_path(),
-            raw_type: plant.get_raw_type(),
+            identifier: plant.get_raw_header().get_identifier(),
+            parent_raw: plant.get_raw_header().get_parent_raw(),
+            object_id: plant.get_raw_header().get_object_id(),
+            raw_module: plant.get_raw_header().get_raw_module(),
+            raw_module_version: plant.get_raw_header().get_raw_module_version(),
+            raw_module_found_in: plant.get_raw_header().get_dfraw_found_in(),
+            raw_module_display: plant.get_raw_header().get_dfraw_display(),
+            relative_path: plant.get_raw_header().get_dfraw_relative_path(),
+            raw_type: plant.get_raw_header().get_raw_type(),
             name: plant.get_general_name(),
 
             frequency: plant.frequency,

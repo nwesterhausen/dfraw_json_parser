@@ -3,6 +3,7 @@ use std::collections::HashMap;
 use super::TypedJsonSerializable;
 use crate::parser::raws::creature::DFCreature;
 use crate::parser::raws::tags::{CasteTag, CreatureTag, DFBodySize, DFMilkable};
+use crate::parser::raws::RawModuleLocation;
 use serde::{Deserialize, Serialize};
 
 // Creature Object for Web Consumption
@@ -16,7 +17,7 @@ pub struct TypedJsonCreature {
     #[serde(rename = "moduleVersion")]
     raw_module_version: String,
     #[serde(rename = "moduleSourceDirectory")]
-    raw_module_found_in: String,
+    raw_module_found_in: RawModuleLocation,
     #[serde(rename = "moduleDisplayName")]
     raw_module_display: String,
     #[serde(rename = "rawType")]
@@ -83,15 +84,15 @@ pub struct TypedJsonCreature {
 impl TypedJsonCreature {
     pub fn from(creature: &DFCreature) -> Self {
         Self {
-            identifier: creature.get_identifier(),
-            parent_raw: creature.get_parent_raw(),
-            object_id: creature.get_object_id(),
-            raw_module: creature.get_raw_module(),
-            raw_module_version: creature.get_raw_module_version(),
-            raw_module_found_in: creature.get_dfraw_found_in(),
-            raw_module_display: creature.get_dfraw_display(),
-            raw_type: creature.get_raw_type(),
-            relative_path: creature.get_dfraw_relative_path(),
+            identifier: creature.get_raw_header().get_identifier(),
+            parent_raw: creature.get_raw_header().get_parent_raw(),
+            object_id: creature.get_raw_header().get_object_id(),
+            raw_module: creature.get_raw_header().get_raw_module(),
+            raw_module_version: creature.get_raw_header().get_raw_module_version(),
+            raw_module_found_in: creature.get_raw_header().get_dfraw_found_in(),
+            raw_module_display: creature.get_raw_header().get_dfraw_display(),
+            raw_type: creature.get_raw_header().get_raw_type(),
+            relative_path: creature.get_raw_header().get_dfraw_relative_path(),
             name: creature.get_general_name(),
             descriptions: creature.get_description_by_caste(),
             max_age: creature.get_max_ages_by_caste(),

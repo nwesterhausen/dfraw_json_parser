@@ -313,6 +313,13 @@ pub enum CasteTag {
     WebImmune,
 }
 
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq)]
+pub enum ItemTag {
+    HardMaterial,
+    MetalMaterial,
+    MetalWeaponMaterial,
+}
+
 #[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct DFBodySize {
     years: u32,

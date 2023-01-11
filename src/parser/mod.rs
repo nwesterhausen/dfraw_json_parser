@@ -92,17 +92,17 @@ fn parse_raws_to_json(
             let entry_path = entry.path();
 
             match reader::read_raw_file_type(entry_path) {
-                reader::RawObjectKind::Creature => {
+                raws::RawObjectKind::Creature => {
                     log::debug!("parsing {}", entry_path.display());
                     let creature_raw_vec = reader::creature::parse(&entry_path, info_text_file);
                     parsed_raws.extend(stringify_raw_vec(creature_raw_vec));
                 }
-                reader::RawObjectKind::Plant => {
+                raws::RawObjectKind::Plant => {
                     log::debug!("parsing {}", entry_path.display());
                     let plant_raw_vec = reader::plant::parse(&entry_path, info_text_file);
                     parsed_raws.extend(stringify_raw_vec(plant_raw_vec));
                 }
-                reader::RawObjectKind::Inorganic => {
+                raws::RawObjectKind::Inorganic => {
                     log::debug!("parsing {}", entry_path.display());
                     let inorganic_raw_vec = reader::inorganic::parse(&entry_path, info_text_file);
                     parsed_raws.extend(stringify_raw_vec(inorganic_raw_vec));
@@ -134,17 +134,17 @@ pub fn read_single_raw_file(raw_file: &Path) -> String {
     let info_text_file = DFInfoFile::new("manual-origin", "user-specified", &relative_path);
 
     match reader::read_raw_file_type(raw_file) {
-        reader::RawObjectKind::Creature => {
+        raws::RawObjectKind::Creature => {
             log::info!("Parsing creature raws from {}", relative_path);
             let creature_raw_vec = reader::creature::parse(&raw_file, &info_text_file);
             return format!("[{}]", stringify_raw_vec(creature_raw_vec).join(","));
         }
-        reader::RawObjectKind::Plant => {
+        raws::RawObjectKind::Plant => {
             log::info!("Parsing plant raws from {}", relative_path);
             let plant_raw_vec = reader::plant::parse(&raw_file, &info_text_file);
             return format!("[{}]", stringify_raw_vec(plant_raw_vec).join(","));
         }
-        reader::RawObjectKind::Inorganic => {
+        raws::RawObjectKind::Inorganic => {
             log::info!("Parsing inorganic raws from {}", relative_path);
             let inorganic_raw_vec = reader::inorganic::parse(&raw_file, &info_text_file);
             return format!("[{}]", stringify_raw_vec(inorganic_raw_vec).join(","));

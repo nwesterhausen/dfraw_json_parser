@@ -1,5 +1,6 @@
 use crate::parser::raws::{
     environment, inorganic::DFInorganic, material, roll_chance, tags::InorganicTag,
+    RawModuleLocation,
 };
 
 use super::TypedJsonSerializable;
@@ -17,7 +18,7 @@ pub struct TypedJsonInorganic {
     #[serde(rename = "moduleVersion")]
     raw_module_version: String,
     #[serde(rename = "moduleSourceDirectory")]
-    raw_module_found_in: String,
+    raw_module_found_in: RawModuleLocation,
     #[serde(rename = "moduleDisplayName")]
     raw_module_display: String,
     #[serde(rename = "rawType")]
@@ -48,15 +49,15 @@ pub struct TypedJsonInorganic {
 impl TypedJsonInorganic {
     pub fn from(inorganic: &DFInorganic) -> Self {
         Self {
-            identifier: inorganic.get_identifier(),
-            parent_raw: inorganic.get_parent_raw(),
-            object_id: inorganic.get_object_id(),
-            raw_module: inorganic.get_raw_module(),
-            raw_module_version: inorganic.get_raw_module_version(),
-            raw_module_found_in: inorganic.get_dfraw_found_in(),
-            raw_module_display: inorganic.get_dfraw_display(),
-            relative_path: inorganic.get_dfraw_relative_path(),
-            raw_type: inorganic.get_raw_type(),
+            identifier: inorganic.get_raw_header().get_identifier(),
+            parent_raw: inorganic.get_raw_header().get_parent_raw(),
+            object_id: inorganic.get_raw_header().get_object_id(),
+            raw_module: inorganic.get_raw_header().get_raw_module(),
+            raw_module_version: inorganic.get_raw_header().get_raw_module_version(),
+            raw_module_found_in: inorganic.get_raw_header().get_dfraw_found_in(),
+            raw_module_display: inorganic.get_raw_header().get_dfraw_display(),
+            relative_path: inorganic.get_raw_header().get_dfraw_relative_path(),
+            raw_type: inorganic.get_raw_header().get_raw_type(),
             name: inorganic.get_general_name(),
 
             material: inorganic.material.clone(),

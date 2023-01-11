@@ -2,23 +2,14 @@ use crate::parser::raws::{
     info::DFInfoFile,
     tags::{self},
 };
-use crate::parser::reader::RawObjectKind;
-use slug::slugify;
 
-use super::material;
 use super::{environment, roll_chance};
+use super::{material, DFRawCommon};
 
 #[derive(Debug)]
 pub struct DFInorganic {
     // Common Raw file Things
-    identifier: String,
-    parent_raw: String,
-    dfraw_identifier: String,
-    dfraw_version: String,
-    dfraw_found_in: String,
-    dfraw_display: String,
-    dfraw_relative_path: String,
-    raw_type: RawObjectKind,
+    raw_header: DFRawCommon,
     pub tags: Vec<tags::InorganicTag>,
 
     // Basic Tokens
@@ -33,14 +24,7 @@ pub struct DFInorganic {
 impl DFInorganic {
     pub fn new(raw: &str, id: &str, info_text: &DFInfoFile) -> Self {
         Self {
-            identifier: String::from(id),
-            parent_raw: String::from(raw),
-            dfraw_identifier: String::from(info_text.get_identifier()),
-            dfraw_version: String::from(info_text.displayed_version.as_str()),
-            dfraw_found_in: String::from(info_text.get_sourced_directory()),
-            dfraw_display: format!("{} v{}", info_text.name, info_text.displayed_version),
-            dfraw_relative_path: String::from(info_text.get_relative_path()),
-            raw_type: RawObjectKind::Inorganic,
+            raw_header: DFRawCommon::from(id, raw, info_text, super::RawObjectKind::Inorganic),
             // Boolean Flags
             tags: Vec::new(),
 
@@ -51,38 +35,8 @@ impl DFInorganic {
             thread_metals: Vec::new(),
         }
     }
-
-    pub fn get_identifier(&self) -> String {
-        String::from(&self.identifier)
-    }
-    pub fn get_raw_module(&self) -> String {
-        String::from(&self.dfraw_identifier)
-    }
-    pub fn get_raw_module_version(&self) -> String {
-        String::from(&self.dfraw_version)
-    }
-    pub fn get_dfraw_found_in(&self) -> String {
-        String::from(&self.dfraw_found_in)
-    }
-    pub fn get_dfraw_display(&self) -> String {
-        String::from(&self.dfraw_display)
-    }
-    pub fn get_dfraw_relative_path(&self) -> String {
-        String::from(&self.dfraw_relative_path)
-    }
-    pub fn get_parent_raw(&self) -> String {
-        String::from(&self.parent_raw)
-    }
-    pub fn get_raw_type(&self) -> String {
-        format!("{:?}", self.raw_type)
-    }
-    pub fn get_object_id(&self) -> String {
-        format!(
-            "{}-{}-{}",
-            self.get_parent_raw(),
-            "INORGANIC",
-            slugify(self.get_identifier())
-        )
+    pub fn get_raw_header(&self) -> &DFRawCommon {
+        &self.raw_header
     }
     pub fn get_general_name(&self) -> String {
         String::from(self.material.state_name.get_solid())

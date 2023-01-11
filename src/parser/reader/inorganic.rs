@@ -137,7 +137,7 @@ pub fn parse(input_path: &Path, info_text: &DFInfoFile) -> Vec<inorganic::DFInor
                 "PREFSTRING" => {
                     log::warn!(
                         "THERE INDEED WERE PREF STRING FOR {}: {}",
-                        inorganic_temp.get_object_id(),
+                        inorganic_temp.get_raw_header().get_object_id(),
                         &cap[3]
                     );
                 }
@@ -148,7 +148,7 @@ pub fn parse(input_path: &Path, info_text: &DFInfoFile) -> Vec<inorganic::DFInor
                     Ok(n) => material_temp.material_value = n,
                     Err(e) => log::error!(
                         "{}:{:?}:MATERIAL_VALUE parsing error\n{:?}",
-                        inorganic_temp.get_identifier(),
+                        inorganic_temp.get_raw_header().get_object_id(),
                         material_temp.material_type,
                         e
                     ),
@@ -285,7 +285,7 @@ pub fn parse(input_path: &Path, info_text: &DFInfoFile) -> Vec<inorganic::DFInor
                         Ok(n) => material_temp.temperatures.specific_heat = n,
                         Err(e) => log::error!(
                             "{}:SPEC_HEAT parsing error\n{:?}",
-                            inorganic_temp.get_identifier(),
+                            inorganic_temp.get_raw_header().get_object_id(),
                             e
                         ),
                     }
@@ -300,7 +300,7 @@ pub fn parse(input_path: &Path, info_text: &DFInfoFile) -> Vec<inorganic::DFInor
                         Ok(n) => material_temp.temperatures.ignition_point = n,
                         Err(e) => log::error!(
                             "{}:IGNITE_POINT parsing error\n{:?}",
-                            inorganic_temp.get_identifier(),
+                            inorganic_temp.get_raw_header().get_object_id(),
                             e
                         ),
                     }
@@ -315,7 +315,7 @@ pub fn parse(input_path: &Path, info_text: &DFInfoFile) -> Vec<inorganic::DFInor
                         Ok(n) => material_temp.temperatures.melting_point = n,
                         Err(e) => log::error!(
                             "{}:MELTING_POINT parsing error\n{:?}",
-                            inorganic_temp.get_identifier(),
+                            inorganic_temp.get_raw_header().get_object_id(),
                             e
                         ),
                     }
@@ -330,7 +330,7 @@ pub fn parse(input_path: &Path, info_text: &DFInfoFile) -> Vec<inorganic::DFInor
                         Ok(n) => material_temp.temperatures.boiling_point = n,
                         Err(e) => log::error!(
                             "{}:BOILING_POINT parsing error\n{:?}",
-                            inorganic_temp.get_identifier(),
+                            inorganic_temp.get_raw_header().get_object_id(),
                             e
                         ),
                     }
@@ -345,7 +345,7 @@ pub fn parse(input_path: &Path, info_text: &DFInfoFile) -> Vec<inorganic::DFInor
                         Ok(n) => material_temp.temperatures.heat_damage_point = n,
                         Err(e) => log::error!(
                             "{}:HEATDAM_POINT parsing error\n{:?}",
-                            inorganic_temp.get_identifier(),
+                            inorganic_temp.get_raw_header().get_object_id(),
                             e
                         ),
                     }
@@ -360,7 +360,7 @@ pub fn parse(input_path: &Path, info_text: &DFInfoFile) -> Vec<inorganic::DFInor
                         Ok(n) => material_temp.temperatures.cold_damage_point = n,
                         Err(e) => log::error!(
                             "{}:COLDDAM_POINT parsing error\n{:?}",
-                            inorganic_temp.get_identifier(),
+                            inorganic_temp.get_raw_header().get_object_id(),
                             e
                         ),
                     }
@@ -375,7 +375,7 @@ pub fn parse(input_path: &Path, info_text: &DFInfoFile) -> Vec<inorganic::DFInor
                         Ok(n) => material_temp.temperatures.material_fixed_temp = n,
                         Err(e) => log::error!(
                             "{}:MAT_FIXED_TEMP parsing error\n{:?}",
-                            inorganic_temp.get_identifier(),
+                            inorganic_temp.get_raw_header().get_object_id(),
                             e
                         ),
                     }

@@ -6,21 +6,15 @@ use crate::parser::raws::{
     tags::{self},
 };
 use crate::parser::raws::{material, names};
-use crate::parser::reader::RawObjectKind;
+
 use serde::{Deserialize, Serialize};
-use slug::slugify;
+
+use super::DFRawCommon;
 
 #[derive(Debug)]
 pub struct DFPlant {
-    // Common Raw file Things
-    identifier: String,
-    parent_raw: String,
-    dfraw_identifier: String,
-    dfraw_version: String,
-    dfraw_found_in: String,
-    dfraw_display: String,
-    dfraw_relative_path: String,
-    raw_type: RawObjectKind,
+    /// Common Raw file Things
+    raw_header: DFRawCommon,
     pub tags: Vec<tags::PlantTag>,
 
     // Basic Tokens
@@ -68,14 +62,7 @@ pub struct DFPlantSeed {
 impl DFPlant {
     pub fn new(raw: &str, id: &str, info_text: &DFInfoFile) -> Self {
         Self {
-            identifier: String::from(id),
-            parent_raw: String::from(raw),
-            dfraw_identifier: String::from(info_text.get_identifier()),
-            dfraw_version: String::from(info_text.displayed_version.as_str()),
-            dfraw_found_in: String::from(info_text.get_sourced_directory()),
-            dfraw_display: format!("{} v{}", info_text.name, info_text.displayed_version),
-            dfraw_relative_path: String::from(info_text.get_relative_path()),
-            raw_type: RawObjectKind::Plant,
+            raw_header: DFRawCommon::from(id, raw, info_text, super::RawObjectKind::Plant),
             // Boolean Flags
             tags: Vec::new(),
 
@@ -96,38 +83,8 @@ impl DFPlant {
             materials_vec: Vec::new(),
         }
     }
-
-    pub fn get_identifier(&self) -> String {
-        String::from(&self.identifier)
-    }
-    pub fn get_raw_module(&self) -> String {
-        String::from(&self.dfraw_identifier)
-    }
-    pub fn get_raw_module_version(&self) -> String {
-        String::from(&self.dfraw_version)
-    }
-    pub fn get_dfraw_found_in(&self) -> String {
-        String::from(&self.dfraw_found_in)
-    }
-    pub fn get_dfraw_display(&self) -> String {
-        String::from(&self.dfraw_display)
-    }
-    pub fn get_dfraw_relative_path(&self) -> String {
-        String::from(&self.dfraw_relative_path)
-    }
-    pub fn get_parent_raw(&self) -> String {
-        String::from(&self.parent_raw)
-    }
-    pub fn get_raw_type(&self) -> String {
-        format!("{:?}", self.raw_type)
-    }
-    pub fn get_object_id(&self) -> String {
-        format!(
-            "{}-{}-{}",
-            self.get_parent_raw(),
-            "PLANT",
-            slugify(self.get_identifier())
-        )
+    pub fn get_raw_header(&self) -> &DFRawCommon {
+        &self.raw_header
     }
     pub fn get_general_name(&self) -> String {
         self.name.to_string_vec()[0].to_string()

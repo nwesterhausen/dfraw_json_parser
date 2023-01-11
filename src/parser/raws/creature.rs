@@ -1,25 +1,18 @@
 use std::collections::HashMap;
 
 use serde::{Deserialize, Serialize};
-use slug::slugify;
 
 use crate::parser::raws::{
     info::DFInfoFile,
     names::{Name, SingPlurName},
     tags::{self, CasteTag},
 };
-use crate::parser::reader::RawObjectKind;
 
-#[derive(Serialize, Deserialize, Debug, Clone)]
+use super::DFRawCommon;
+
+#[derive(Debug)]
 pub struct DFCreature {
-    identifier: String,
-    parent_raw: String,
-    dfraw_identifier: String,
-    dfraw_version: String,
-    dfraw_found_in: String,
-    dfraw_display: String,
-    dfraw_relative_path: String,
-    raw_type: RawObjectKind,
+    raw_header: DFRawCommon,
 
     // Boolean Flags
     pub tags: Vec<tags::CreatureTag>,
@@ -94,14 +87,8 @@ pub struct DFCreatureCaste {
 impl DFCreature {
     pub fn new(raw: &str, id: &str, info_text: &DFInfoFile) -> Self {
         Self {
-            identifier: String::from(id),
-            parent_raw: String::from(raw),
-            dfraw_identifier: String::from(info_text.get_identifier()),
-            dfraw_version: String::from(info_text.displayed_version.as_str()),
-            dfraw_found_in: String::from(info_text.get_sourced_directory()),
-            dfraw_display: format!("{} v{}", info_text.name, info_text.displayed_version),
-            dfraw_relative_path: String::from(info_text.get_relative_path()),
-            raw_type: RawObjectKind::Creature,
+            raw_header: DFRawCommon::from(id, raw, info_text, super::RawObjectKind::Creature),
+
             // Boolean Flags
             tags: Vec::new(),
 
@@ -129,37 +116,8 @@ impl DFCreature {
             copy_tags_from: Vec::new(), // vec of creature identifiers
         }
     }
-    pub fn get_identifier(&self) -> String {
-        String::from(&self.identifier)
-    }
-    pub fn get_raw_module(&self) -> String {
-        String::from(&self.dfraw_identifier)
-    }
-    pub fn get_raw_module_version(&self) -> String {
-        String::from(&self.dfraw_version)
-    }
-    pub fn get_dfraw_found_in(&self) -> String {
-        String::from(&self.dfraw_found_in)
-    }
-    pub fn get_dfraw_display(&self) -> String {
-        String::from(&self.dfraw_display)
-    }
-    pub fn get_dfraw_relative_path(&self) -> String {
-        String::from(&self.dfraw_relative_path)
-    }
-    pub fn get_parent_raw(&self) -> String {
-        String::from(&self.parent_raw)
-    }
-    pub fn get_raw_type(&self) -> String {
-        format!("{:?}", self.raw_type)
-    }
-    pub fn get_object_id(&self) -> String {
-        format!(
-            "{}-{}-{}",
-            self.get_parent_raw(),
-            "CREATURE",
-            slugify(self.get_identifier())
-        )
+    pub fn get_raw_header(&self) -> &DFRawCommon {
+        &self.raw_header
     }
     pub fn get_general_name(&self) -> String {
         self.name.to_string_vec()[0].to_string()
@@ -297,7 +255,7 @@ impl DFCreature {
                             * 100.0
                             * (f64::powf(f64::from(body_size.size_cm3() / 10), -0.75));
                         let graze_int = format!("{}", graze_value.round());
-                        log::debug!("{}:graze val = {}", &self.identifier, graze_value);
+
                         match graze_int.as_str().parse::<u32>() {
                             Ok(n) => {
                                 if n < 150 {
@@ -309,7 +267,7 @@ impl DFCreature {
                             Err(e) => {
                                 log::warn!(
                                     "{}:Unable to create GRAZER value from StandardGrazer",
-                                    &self.identifier
+                                    &self.raw_header.identifier
                                 );
                                 log::warn!("{:?}", e);
                             }
