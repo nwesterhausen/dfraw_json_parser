@@ -12,7 +12,7 @@ pub fn parse(info_file_path: &Path) -> info::DFInfoFile {
     let parent_dir = get_parent_dir_name(info_file_path);
     let location = RawModuleLocation::from_info_text_file_path(info_file_path);
 
-    let file = match File::open(&info_file_path) {
+    let file = match File::open(info_file_path) {
         Ok(f) => f,
         Err(e) => {
             log::error!(
@@ -125,8 +125,8 @@ pub fn parse(info_file_path: &Path) -> info::DFInfoFile {
 
     // Do some final checks to confirm that the name is set. Specifically in "Dark Ages V - War & Mythos" the
     // [name] Token in the info.txt is written incorrectly as "[name]X" instead of [name:X]
-    if info_file_data.name.is_empty() || info_file_data.name.len() == 0 {
-        info_file_data.name = String::from(info_file_data.get_identifier());
+    if info_file_data.name.is_empty() || info_file_data.name.is_empty() {
+        info_file_data.name = info_file_data.get_identifier();
     }
 
     // Check for 'unknown' identifier and try to provide any extra info

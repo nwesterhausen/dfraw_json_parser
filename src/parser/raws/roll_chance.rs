@@ -28,10 +28,10 @@ impl RollChance {
         let result = String::from(split[0]);
 
         match split[1].parse() {
-            Ok(n) => return Self { chance: n, result },
+            Ok(n) => Self { chance: n, result },
             Err(e) => {
                 log::warn!("Unable to parse chance from {},{:?}", split[1], e);
-                return Self { chance: 0, result };
+                Self { chance: 0, result }
             }
         }
     }

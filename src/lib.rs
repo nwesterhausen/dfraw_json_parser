@@ -9,18 +9,15 @@ Currently the only raws that are parsed are Creature raws.
 Currently the JSON is returned as a string
 */
 
-#![deny(clippy::pedantic)]
-
 use parser::json_conversion::TypedJsonSerializable;
 use parser::raws::RawModuleLocation;
 use parser::util::subdirectories;
 use std::path::{Path, PathBuf};
 use walkdir::DirEntry;
 
-#[cfg(feature = "tauri")]
-extern crate tauri;
-
 mod parser;
+#[cfg(feature = "tauri")]
+mod tauri_lib;
 
 //Todo: add an option to apply any COPY_TAG_FROM and APPLY_CREATURE_VARIATION tags
 //Todo: add an option to specify what kinds of raws to parse
@@ -56,7 +53,7 @@ pub fn parse_module_location(raw_module_location_path: &Path) -> String {
 
     //2. Get module location from provided path
     let module_location = RawModuleLocation::from_sourced_directory(
-        &raw_module_location_path
+        raw_module_location_path
             .file_name()
             .unwrap_or_default()
             .to_str()
@@ -65,7 +62,7 @@ pub fn parse_module_location(raw_module_location_path: &Path) -> String {
 
     //3. Get list of all subdirectories
     let raw_module_iter: Vec<DirEntry> =
-        subdirectories(PathBuf::from(raw_module_location_path)).unwrap_or(Vec::new());
+        subdirectories(PathBuf::from(raw_module_location_path)).unwrap_or_default();
 
     log::info!(
         "{num} raw modules located in {location:?}",
@@ -113,7 +110,7 @@ pub fn parse_info_txt_in_module_location(raw_module_location_path: &Path) -> Str
 
     //2. Get module location from provided path
     let module_location = RawModuleLocation::from_sourced_directory(
-        &raw_module_location_path
+        raw_module_location_path
             .file_name()
             .unwrap_or_default()
             .to_str()
@@ -122,7 +119,7 @@ pub fn parse_info_txt_in_module_location(raw_module_location_path: &Path) -> Str
 
     //3. Get list of all subdirectories
     let raw_module_iter: Vec<DirEntry> =
-        subdirectories(PathBuf::from(raw_module_location_path)).unwrap_or(Vec::new());
+        subdirectories(PathBuf::from(raw_module_location_path)).unwrap_or_default();
 
     log::info!(
         "{num} raw modules located in {location:?}",
@@ -179,9 +176,9 @@ pub fn parse_game_raws(df_game_path: &str) -> Vec<String> {
     let installed_mods_path = data_path.join("installed_mods");
     let workshop_mods_path = game_path.join("mods");
 
-    all_json.push(parse_module_location(&vanilla_path.as_path()));
-    all_json.push(parse_module_location(&installed_mods_path.as_path()));
-    all_json.push(parse_module_location(&workshop_mods_path.as_path()));
+    all_json.push(parse_module_location(vanilla_path.as_path()));
+    all_json.push(parse_module_location(installed_mods_path.as_path()));
+    all_json.push(parse_module_location(workshop_mods_path.as_path()));
 
     let non_empty_json: Vec<String> = all_json
         .into_iter()
@@ -232,18 +229,28 @@ pub fn parse_all_raw_module_info_to_file(input_path: &str, out_filepath: &Path) 
     parser::util::write_json_string_array_to_file(json_string_vec, out_filepath);
 }
 
-#[cfg(feature = "tauri")]
-#[derive(Clone, serde::Serialize)]
-/// It's a struct to represent the progress of the current job. This is emitted back to the Tauri app using the `PROGRESS` event.
+/// It takes a path to a directory, checks if it's a directory, checks if it has an info.txt file,
+/// parses the info.txt file, and then serializes the parsed data into a JSON string
 ///
-/// Properties:
+/// Arguments:
 ///
-/// * `percentage`: The percentage of completed steps out of total steps.
-/// * `current_module`: The name of the module that is currently being processed.
-struct ProgressPayload {
-    percentage: f64,
-    #[serde(rename = "currentModule")]
-    current_module: String,
+/// * `root_path`: The path to the directory containing the raws.
+///
+/// Returns:
+///
+/// A string.
+pub fn parse_info_txt_from_raw_module(raw_module_directory: &Path) -> String {
+    let dfraw_module_info = parser::parse_info_file_from_module_directory(raw_module_directory);
+    match dfraw_module_info.to_typed_json_string() {
+        Ok(s) => {
+            return s;
+        }
+        Err(e) => {
+            log::error!("Failure to serialize parsed raw data\n{}", e);
+        }
+    }
+
+    String::new()
 }
 
 #[cfg(feature = "tauri")]
@@ -262,138 +269,7 @@ struct ProgressPayload {
 ///
 /// A (large) JSON string with details on all raws in the game path.
 pub fn parse_game_raws_with_tauri_emit(df_game_path: &str, window: tauri::Window) -> Vec<String> {
-    let mut all_json: Vec<String> = Vec::new();
-
-    //1. "validate" folder is as expected
-    let game_path = Path::new(df_game_path);
-    // Guard against invalid path
-    if !game_path.exists() {
-        log::error!(
-            "Provided game path for parsing doesn't exist!\n{}",
-            df_game_path
-        );
-        return all_json;
-    }
-    if !game_path.is_dir() {
-        log::error!("Game path needs to be a directory {}", df_game_path);
-        return all_json;
-    }
-
-    // warn on no gamelog.txt
-    if !game_path.join("gamelog.txt").exists() {
-        log::warn!("Unable to find gamelog.txt in game directory. Is it valid?");
-    }
-
-    let data_path = game_path.join("data");
-    let vanilla_path = data_path.join("vanilla");
-    let installed_mods_path = data_path.join("installed_mods");
-    let workshop_mods_path = game_path.join("mods");
-
-    let vanilla_iter: Vec<DirEntry> = subdirectories(vanilla_path).unwrap_or(Vec::new());
-    let installed_iter: Vec<DirEntry> = subdirectories(installed_mods_path).unwrap_or(Vec::new());
-    let mods_iter: Vec<DirEntry> = subdirectories(workshop_mods_path).unwrap_or(Vec::new());
-
-    // Calculate total number of modules we will parse:
-    let total_mods = vanilla_iter.len() + installed_iter.len() + mods_iter.len();
-    let mut current_mod: usize = 0;
-    let mut pct = 0.0;
-
-    for entry in vanilla_iter {
-        current_mod = current_mod + 1;
-        pct = current_mod as f64 / total_mods as f64;
-        match window.emit(
-            "PROGRESS",
-            ProgressPayload {
-                percentage: pct,
-                current_module: String::from(entry.file_name().to_str().unwrap_or("")),
-            },
-        ) {
-            Err(e) => log::debug!("Tauri window emit error {:?}", e),
-            _ => (),
-        };
-
-        all_json.push(parse_raw_module(entry.path()));
-    }
-    for entry in installed_iter {
-        current_mod = current_mod + 1;
-        pct = current_mod as f64 / total_mods as f64;
-        match window.emit(
-            "PROGRESS",
-            ProgressPayload {
-                percentage: pct,
-                current_module: String::from(entry.file_name().to_str().unwrap_or("")),
-            },
-        ) {
-            Err(e) => log::debug!("Tauri window emit error {:?}", e),
-            _ => (),
-        };
-
-        all_json.push(parse_raw_module(entry.path()));
-    }
-    for entry in mods_iter {
-        current_mod = current_mod + 1;
-        pct = current_mod as f64 / total_mods as f64;
-        match window.emit(
-            "PROGRESS",
-            ProgressPayload {
-                percentage: pct,
-                current_module: format!(
-                    "workshop-mod:{}",
-                    entry.file_name().to_str().unwrap_or("unknown")
-                ),
-            },
-        ) {
-            Err(e) => log::debug!("Tauri window emit error {:?}", e),
-            _ => (),
-        };
-
-        all_json.push(parse_raw_module(entry.path()));
-    }
-
-    if pct < 1.0 {
-        pct = 1.0;
-        match window.emit(
-            "PROGRESS",
-            ProgressPayload {
-                percentage: pct,
-                current_module: String::new(),
-            },
-        ) {
-            Err(e) => log::debug!("Tauri window emit error {:?}", e),
-            _ => (),
-        };
-    }
-
-    let non_empty_json: Vec<String> = all_json
-        .into_iter()
-        .filter(|s| !String::is_empty(s))
-        .collect();
-
-    non_empty_json
-}
-
-/// It takes a path to a directory, checks if it's a directory, checks if it has an info.txt file,
-/// parses the info.txt file, and then serializes the parsed data into a JSON string
-///
-/// Arguments:
-///
-/// * `root_path`: The path to the directory containing the raws.
-///
-/// Returns:
-///
-/// A string.
-pub fn parse_info_txt_from_raw_module(raw_module_directory: &Path) -> String {
-    let dfraw_module_info = parser::parse_info_file_from_module_directory(&raw_module_directory);
-    match dfraw_module_info.to_typed_json_string() {
-        Ok(s) => {
-            return s.to_string();
-        }
-        Err(e) => {
-            log::error!("Failure to serialize parsed raw data\n{}", e);
-        }
-    }
-
-    String::new()
+    tauri_lib::parse_game_raws_with_tauri_emit(df_game_path, window)
 }
 
 /// It takes a path to a file, parses it, and returns a JSON string
@@ -443,15 +319,11 @@ pub fn parse_all_raw_module_info(df_game_path: &str) -> Vec<String> {
     let installed_mods_path = data_path.join("installed_mods");
     let workshop_mods_path = game_path.join("mods");
 
-    let mut all_json: Vec<String> = Vec::new();
-
-    all_json.push(parse_info_txt_in_module_location(&vanilla_path.as_path()));
-    all_json.push(parse_info_txt_in_module_location(
-        &installed_mods_path.as_path(),
-    ));
-    all_json.push(parse_info_txt_in_module_location(
-        &workshop_mods_path.as_path(),
-    ));
+    let all_json = vec![
+        parse_info_txt_in_module_location(vanilla_path.as_path()),
+        parse_info_txt_in_module_location(installed_mods_path.as_path()),
+        parse_info_txt_in_module_location(workshop_mods_path.as_path()),
+    ];
 
     all_json
 }

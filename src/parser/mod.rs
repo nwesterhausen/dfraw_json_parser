@@ -6,7 +6,7 @@ use self::util::get_parent_dir_name;
 
 mod conversion;
 pub mod json_conversion;
-mod parser;
+mod parsing;
 mod parsing_bits;
 pub mod raws;
 mod reader;
@@ -28,7 +28,7 @@ pub mod util;
 /// A JSON string containing the raws for the given directory.
 pub fn parse_raw_module_to_json_string(root_path: &Path) -> String {
     // Parse raws in the location
-    let serializable_vec = parser::parse_raw_module_into_serializable(root_path);
+    let serializable_vec = parsing::parse_raw_module_into_serializable(root_path);
 
     // Convert those raws into JSON strings
     let json_vec = util::stringify_raw_vec(serializable_vec);
@@ -53,8 +53,9 @@ pub fn parse_single_raw_file_to_json_string(raw_file: &Path) -> String {
     let info_text_file = DFInfoFile::new("manual-origin", location, &parent_dir);
 
     let serializable_vec =
-        parser::parse_raws_from_single_file_into_serializable(raw_file, &info_text_file);
-    return format!("[{}]", util::stringify_raw_vec(serializable_vec).join(","));
+        parsing::parse_raws_from_single_file_into_serializable(raw_file, &info_text_file);
+
+    format!("[{}]", util::stringify_raw_vec(serializable_vec).join(","))
 }
 
 /// It takes a path to a info.txt file, and returns a DFInfoFile for it

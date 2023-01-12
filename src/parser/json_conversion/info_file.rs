@@ -45,7 +45,7 @@ impl TypedJsonInfoFile {
             display_title: format!("{} v{}", info_file.name, info_file.displayed_version),
             object_id: format!(
                 "{}_{}_{}",
-                slugify(info_file.author.to_owned()),
+                slugify(&info_file.author),
                 info_file.get_identifier(),
                 info_file.numeric_version
             ),
@@ -56,6 +56,6 @@ impl TypedJsonInfoFile {
 
 impl TypedJsonSerializable for DFInfoFile {
     fn to_typed_json_string(&self) -> Result<String, serde_json::Error> {
-        serde_json::to_string(&TypedJsonInfoFile::from(&self))
+        serde_json::to_string(&TypedJsonInfoFile::from(self))
     }
 }

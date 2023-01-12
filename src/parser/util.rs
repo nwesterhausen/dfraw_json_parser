@@ -80,7 +80,7 @@ pub fn write_json_string_array_to_file(parsed_json_string: Vec<String>, out_file
 pub fn write_json_string_to_file(parsed_json_string: String, out_filepath: &Path) {
     log::info!("Saving json to to {:?}", out_filepath.display());
 
-    let out_file = match File::create(&out_filepath) {
+    let out_file = match File::create(out_filepath) {
         Ok(f) => f,
         Err(e) => {
             log::error!(
@@ -154,4 +154,40 @@ pub fn stringify_raw_vec(
         }
     }
     results
+}
+
+/// "Given a path to a game directory, return a PathBuf to that directory if it exists and is a
+/// directory, otherwise return an error."
+///
+/// The first thing we do is create a PathBuf from the provided game_path. We then check if the path
+/// exists and is a directory. If it doesn't exist, we return an error. If it does exist, but isn't a
+/// directory, we return an error. If it exists and is a directory, we return the PathBuf
+///
+/// Arguments:
+///
+/// * `game_path`: &str
+///
+/// Returns:
+///
+/// A Result<PathBuf, String>
+pub fn path_from_game_directory(game_path: &str) -> Result<PathBuf, String> {
+    //1. "validate" folder is as expected
+    let game_path = Path::new(game_path);
+
+    // Guard against invalid path
+    if !game_path.exists() {
+        return Err(String::from(
+            "Provided game path for parsing doesn't exist!",
+        ));
+    }
+    if !game_path.is_dir() {
+        return Err(String::from("Game path needs to be a directory"));
+    }
+
+    // warn on no gamelog.txt
+    if !game_path.join("gamelog.txt").exists() {
+        log::warn!("Unable to find gamelog.txt in game directory. Is it valid?");
+    }
+
+    Ok(game_path.to_path_buf())
 }

@@ -17,11 +17,11 @@ pub struct DFInfoFile {
 }
 
 impl DFInfoFile {
-    pub fn new(id: &str, location: RawModuleLocation, parent_directory: &String) -> Self {
+    pub fn new(id: &str, location: RawModuleLocation, parent_directory: &str) -> Self {
         Self {
             identifier: id.to_string(),
             location,
-            parent_directory: parent_directory.clone(),
+            parent_directory: parent_directory.to_owned(),
             numeric_version: 0,
             displayed_version: "0".to_string(),
             earliest_compatible_numeric_version: 0,

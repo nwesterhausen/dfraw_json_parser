@@ -42,6 +42,6 @@ impl DFInorganic {
         String::from(self.material.state_name.get_solid())
     }
     pub fn is_magma_safe(&self) -> bool {
-        return self.material.is_magma_safe();
+        self.material.is_magma_safe()
     }
 }

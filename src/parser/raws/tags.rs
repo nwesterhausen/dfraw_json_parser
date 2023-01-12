@@ -1,6 +1,6 @@
 use serde::{Deserialize, Serialize};
 
-#[derive(Serialize, Deserialize, Debug, Clone, PartialEq)]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq)]
 pub enum CreatureTag {
     ArtificialHiveable,
     DoesNotExist,
@@ -23,7 +23,7 @@ pub enum CreatureTag {
     Mundane,
 }
 
-#[derive(Serialize, Deserialize, Debug, Clone, PartialEq)]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq)]
 pub enum InorganicTag {
     Sedimentary,
     Aquifer,
@@ -44,7 +44,7 @@ pub enum InorganicTag {
     SoilSand,
 }
 
-#[derive(Serialize, Deserialize, Debug, Clone, PartialEq)]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq)]
 pub enum PlantTag {
     Dry,
     Evil,
@@ -58,7 +58,7 @@ pub enum PlantTag {
     Brewable,
 }
 
-#[derive(Serialize, Deserialize, Debug, Clone, PartialEq)]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq)]
 pub enum ContaminateTag {
     Blood,
     Slime,
@@ -70,7 +70,7 @@ pub enum ContaminateTag {
     Filth,
 }
 
-#[derive(Serialize, Deserialize, Debug, Clone, PartialEq)]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq)]
 pub enum MaterialStateTag {
     Solid,
     Liquid,
@@ -82,7 +82,7 @@ pub enum MaterialStateTag {
     AllSolid,
 }
 
-#[derive(Serialize, Deserialize, Debug, Clone, PartialEq)]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq)]
 pub enum MaterialTag {
     Alcohol,
     AlcoholCreature,
@@ -162,7 +162,7 @@ pub enum MaterialTag {
     Yarn,
 }
 
-#[derive(Serialize, Deserialize, Debug, Clone, PartialEq)]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq)]
 pub enum SyndromeTag {
     Contact,
     Ingested,
@@ -170,7 +170,7 @@ pub enum SyndromeTag {
     Injected,
     NoHospital,
 }
-#[derive(Serialize, Deserialize, Debug, Clone, PartialEq)]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq)]
 pub enum EffectTag {
     Localized,
     OnlyVascular,
@@ -182,7 +182,7 @@ pub enum EffectTag {
     Abrupt,
 }
 
-#[derive(Serialize, Deserialize, Debug, Clone, PartialEq)]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq)]
 pub enum EffectConditionTag {
     Bruising,
     Blisters,
@@ -216,7 +216,7 @@ pub enum EffectConditionTag {
     RegrowParts,
 }
 
-#[derive(Serialize, Deserialize, Debug, Clone, PartialEq)]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq)]
 pub enum CasteTag {
     LaysEggs,
     AmbushPredator,
@@ -313,11 +313,11 @@ pub enum CasteTag {
     WebImmune,
 }
 
-#[derive(Serialize, Deserialize, Debug, Clone, PartialEq)]
-pub enum ItemTag {
-    HardMaterial,
-    MetalMaterial,
-    MetalWeaponMaterial,
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq)]
+pub enum ItemMaterialTag {
+    Hard,
+    Metal,
+    MetalWeapon,
 }
 
 #[derive(Serialize, Deserialize, Debug, Clone)]

@@ -249,31 +249,27 @@ impl DFCreature {
                 grazer.insert(String::from(&self_caste.name), self_caste.grazer);
             }
             if self_caste.tags.contains(&CasteTag::StandardGrazer) {
-                match self_caste.body_size.last() {
-                    Some(body_size) => {
-                        let graze_value: f64 = 20_000.0
-                            * 100.0
-                            * (f64::powf(f64::from(body_size.size_cm3() / 10), -0.75));
-                        let graze_int = format!("{}", graze_value.round());
+                if let Some(body_size) = self_caste.body_size.last() {
+                    let graze_value: f64 =
+                        20_000.0 * 100.0 * (f64::powf(f64::from(body_size.size_cm3() / 10), -0.75));
+                    let graze_int = format!("{}", graze_value.round());
 
-                        match graze_int.as_str().parse::<u32>() {
-                            Ok(n) => {
-                                if n < 150 {
-                                    grazer.insert(String::from(&self_caste.name), 150);
-                                } else {
-                                    grazer.insert(String::from(&self_caste.name), n);
-                                }
-                            }
-                            Err(e) => {
-                                log::warn!(
-                                    "{}:Unable to create GRAZER value from StandardGrazer",
-                                    &self.raw_header.identifier
-                                );
-                                log::warn!("{:?}", e);
+                    match graze_int.as_str().parse::<u32>() {
+                        Ok(n) => {
+                            if n < 150 {
+                                grazer.insert(String::from(&self_caste.name), 150);
+                            } else {
+                                grazer.insert(String::from(&self_caste.name), n);
                             }
                         }
+                        Err(e) => {
+                            log::warn!(
+                                "{}:Unable to create GRAZER value from StandardGrazer",
+                                &self.raw_header.identifier
+                            );
+                            log::warn!("{:?}", e);
+                        }
                     }
-                    None => (),
                 }
             }
         }

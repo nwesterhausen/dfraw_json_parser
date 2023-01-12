@@ -72,11 +72,11 @@ impl DFRawCommon {
         Self {
             identifier: String::from(id),
             parent_raw: String::from(raw),
-            dfraw_identifier: String::from(info_txt.get_identifier()),
+            dfraw_identifier: info_txt.get_identifier(),
             dfraw_version: String::from(info_txt.displayed_version.as_str()),
             dfraw_found_in: info_txt.get_location(),
             dfraw_display: format!("{} v{}", info_txt.name, info_txt.displayed_version),
-            dfraw_relative_path: String::from(info_txt.get_parent_directory()),
+            dfraw_relative_path: info_txt.get_parent_directory(),
             raw_type: variant,
         }
     }
@@ -126,7 +126,7 @@ impl RawModuleLocation {
                     "RawModuleLocation - Unable to match source directory \"{dir}\"",
                     dir = sourced_directory
                 );
-                return RawModuleLocation::Unknown;
+                RawModuleLocation::Unknown
             }
         }
     }
@@ -142,7 +142,7 @@ impl RawModuleLocation {
                             .unwrap_or_default()
                             .to_string_lossy(),
                     );
-                    return Self::from_sourced_directory(&path_string.as_str());
+                    return Self::from_sourced_directory(path_string.as_str());
                 }
                 None => RawModuleLocation::Unknown,
             },

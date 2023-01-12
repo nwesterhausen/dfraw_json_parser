@@ -136,21 +136,21 @@ pub fn parse_raws_from_single_file_into_serializable(
     match reader::read_raw_file_type(entry_path) {
         RawObjectKind::Creature => {
             log::debug!("parsing {}", entry_path.display());
-            let creature_raw_vec = reader::creature::parse(&entry_path, info_text_file);
+            let creature_raw_vec = reader::creature::parse(entry_path, info_text_file);
             for creature in creature_raw_vec {
                 serializable_raws.push(Box::new(creature.clone()));
             }
         }
         RawObjectKind::Plant => {
             log::debug!("parsing {}", entry_path.display());
-            let plant_raw_vec = reader::plant::parse(&entry_path, info_text_file);
+            let plant_raw_vec = reader::plant::parse(entry_path, info_text_file);
             for plant in plant_raw_vec {
                 serializable_raws.push(Box::new(plant.clone()));
             }
         }
         RawObjectKind::Inorganic => {
             log::debug!("parsing {}", entry_path.display());
-            let inorganic_raw_vec = reader::inorganic::parse(&entry_path, info_text_file);
+            let inorganic_raw_vec = reader::inorganic::parse(entry_path, info_text_file);
             for inorganic in inorganic_raw_vec {
                 serializable_raws.push(Box::new(inorganic.clone()));
             }

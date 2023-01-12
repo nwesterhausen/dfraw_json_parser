@@ -21,7 +21,7 @@ pub fn parse(input_path: &Path, info_text: &DFInfoFile) -> Vec<creature::DFCreat
     let caller = "Parse Creature Raw";
     let mut results: Vec<creature::DFCreature> = Vec::new();
 
-    let file = match File::open(&input_path) {
+    let file = match File::open(input_path) {
         Ok(f) => f,
         Err(e) => {
             log::error!("{} - Error opening raw file for parsing!\n{:?}", caller, e);
@@ -83,37 +83,34 @@ pub fn parse(input_path: &Path, info_text: &DFInfoFile) -> Vec<creature::DFCreat
                 },
                 "CREATURE" => {
                     // We are starting a creature object capture
-                    match current_object {
-                        RawObjectKind::Creature => {
-                            if started {
-                                // If we already *were* capturing a creature, export it.
-                                //1. Save caste tags
-                                caste_temp.tags = caste_tags.clone();
-                                //2. Save caste
-                                temp_caste_vec.push(caste_temp.clone());
-                                //3. Save creature tags
-                                creature_temp.tags = creature_tags.clone();
-                                //4. Save tamp_castes to creature
-                                creature_temp.castes = temp_caste_vec.clone();
-                                //5. Save creature
-                                results.push(creature_temp);
-                            } else {
-                                started = true;
-                            }
-                            //Reset all temp values
-                            //1. Make new creature from [CREATURE:<NAME>]
-                            creature_temp =
-                                creature::DFCreature::new(&raw_filename, &cap[3], info_text);
-                            //2. Make new caste
-                            caste_temp = creature::DFCreatureCaste::new("ALL");
-                            //3. Reset/empty caste tags
-                            caste_tags = Vec::new();
-                            //4. Reset/empty creature tags
-                            creature_tags = Vec::new();
-                            //5. Reset/empty caste vector
-                            temp_caste_vec = Vec::new();
+                    if let RawObjectKind::Creature = current_object {
+                        if started {
+                            // If we already *were* capturing a creature, export it.
+                            //1. Save caste tags
+                            caste_temp.tags = caste_tags.clone();
+                            //2. Save caste
+                            temp_caste_vec.push(caste_temp.clone());
+                            //3. Save creature tags
+                            creature_temp.tags = creature_tags.clone();
+                            //4. Save tamp_castes to creature
+                            creature_temp.castes = temp_caste_vec.clone();
+                            //5. Save creature
+                            results.push(creature_temp);
+                        } else {
+                            started = true;
                         }
-                        _ => (),
+                        //Reset all temp values
+                        //1. Make new creature from [CREATURE:<NAME>]
+                        creature_temp =
+                            creature::DFCreature::new(&raw_filename, &cap[3], info_text);
+                        //2. Make new caste
+                        caste_temp = creature::DFCreatureCaste::new("ALL");
+                        //3. Reset/empty caste tags
+                        caste_tags = Vec::new();
+                        //4. Reset/empty creature tags
+                        creature_tags = Vec::new();
+                        //5. Reset/empty caste vector
+                        temp_caste_vec = Vec::new();
                     }
                 }
                 "CASTE" => {
@@ -801,21 +798,18 @@ pub fn parse(input_path: &Path, info_text: &DFInfoFile) -> Vec<creature::DFCreat
             }
         }
     }
-    match current_object {
-        RawObjectKind::Creature => {
-            // If we already *were* capturing a creature, export it.
-            //1. Save caste tags
-            caste_temp.tags = caste_tags.clone();
-            //2. Save caste
-            temp_caste_vec.push(caste_temp.clone());
-            //3. Save creature tags
-            creature_temp.tags = creature_tags.clone();
-            //4. Save tamp_castes to creature
-            creature_temp.castes = temp_caste_vec.clone();
-            //5. Save creature
-            results.push(creature_temp);
-        }
-        _ => (),
+    if let RawObjectKind::Creature = current_object {
+        // If we already *were* capturing a creature, export it.
+        //1. Save caste tags
+        caste_temp.tags = caste_tags.clone();
+        //2. Save caste
+        temp_caste_vec.push(caste_temp.clone());
+        //3. Save creature tags
+        creature_temp.tags = creature_tags.clone();
+        //4. Save tamp_castes to creature
+        creature_temp.castes = temp_caste_vec.clone();
+        //5. Save creature
+        results.push(creature_temp);
     }
     log::info!(
         "{} creatures defined in {} ({} {} in {:?})",

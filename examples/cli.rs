@@ -103,12 +103,12 @@ fn main() {
             // If a directory for raws was specified, we will parse what raws we find
             dfraw_json_parser::parse_game_raws_to_file(
                 args.game_dir.as_str(),
-                &out_path.join("raws.json").to_path_buf(),
+                &out_path.join("raws.json"),
             );
             // Also save the modules info
             dfraw_json_parser::parse_all_raw_module_info_to_file(
                 args.game_dir.as_str(),
-                &out_path.join("modules.json").to_path_buf(),
+                &out_path.join("modules.json"),
             );
         } else {
             log::error!("A non-directory was specified for out_dir");
@@ -142,7 +142,7 @@ fn main() {
         if out_path.is_dir() {
             dfraw_json_parser::read_single_raw_file_to_file(
                 &raw_file_path,
-                &out_path.join("single-raw.json").to_path_buf(),
+                &out_path.join("single-raw.json"),
             )
         }
     }
@@ -174,7 +174,7 @@ fn main() {
         if out_path.is_dir() {
             dfraw_json_parser::parse_raw_module_to_file(
                 &raw_module_path,
-                &out_path.join("single-module.json").to_path_buf(),
+                &out_path.join("single-module.json"),
             )
         }
     }
@@ -206,7 +206,7 @@ fn main() {
         if out_path.is_dir() {
             dfraw_json_parser::parse_raw_module_location_dir_to_file(
                 &raw_module_location_path,
-                &out_path.join("single-location.json").to_path_buf(),
+                &out_path.join("single-location.json"),
             )
         }
     }

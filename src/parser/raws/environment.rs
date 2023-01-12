@@ -50,20 +50,18 @@ impl Environment {
         };
 
         match split[2].parse() {
-            Ok(n) => {
-                return Self {
-                    grouping,
-                    surrounding_rock: rock_layer,
-                    frequency: n,
-                }
-            }
+            Ok(n) => Self {
+                grouping,
+                surrounding_rock: rock_layer,
+                frequency: n,
+            },
             Err(e) => {
                 log::warn!("Unable to parse size from {},{:?}", split[2], e);
-                return Self {
+                Self {
                     grouping,
                     surrounding_rock: rock_layer,
                     frequency: 0,
-                };
+                }
             }
         }
     }
