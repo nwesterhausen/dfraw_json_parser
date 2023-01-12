@@ -93,3 +93,9 @@ impl TypedJsonSerializable for DFPlant {
         serde_json::to_string(&TypedJsonPlant::from(&self))
     }
 }
+
+impl TypedJsonSerializable for &DFPlant {
+    fn to_typed_json_string(&self) -> Result<String, serde_json::Error> {
+        serde_json::to_string(&TypedJsonPlant::from(&self))
+    }
+}

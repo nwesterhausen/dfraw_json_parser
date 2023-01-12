@@ -22,6 +22,16 @@ be filled with dummy values when using this command. They will be filled-in auto
 to specify an out_dir, the parsed JSON will be saved to single-raw.json, otherwise it will be output
 to the console.";
 
+const HELP_SINGLE_RAW_MODULE: &str = "Specify a single raw module to parse, output is saved or put to console.
+
+Details will be filled in based on provided path and its contents. This should then output all the parsed raws
+within the specified raw module.";
+
+const HELP_SINGLE_RAWS_LOCATION: &str = "Specify a single raw module container directory to parse, output is saved or put to console.
+
+Details will be filled in based on provided path and its contents. This should then output all the parsed raws
+from the raw modules within the location path specified.";
+
 #[derive(Parser, Debug)]
 #[command(author, version, about, long_about = None)] // Read from `Cargo.toml`
 struct Args {
@@ -36,6 +46,14 @@ struct Args {
     /// Single raw file to parse
     #[clap(short, long, default_value_t = String::new(), long_help = HELP_SINGLE_RAW)]
     raw_file: String,
+
+    /// Single raw module to parse
+    #[clap(short, long, default_value_t = String::new(), long_help = HELP_SINGLE_RAW_MODULE)]
+    module_path: String,
+
+    /// Single raw modules location to parse
+    #[clap(short, long, default_value_t = String::new(), long_help = HELP_SINGLE_RAWS_LOCATION)]
+    location_path: String,
 }
 
 fn main() {
@@ -88,7 +106,7 @@ fn main() {
                 &out_path.join("raws.json").to_path_buf(),
             );
             // Also save the modules info
-            dfraw_json_parser::parse_raw_module_info_to_file(
+            dfraw_json_parser::parse_all_raw_module_info_to_file(
                 args.game_dir.as_str(),
                 &out_path.join("modules.json").to_path_buf(),
             );
@@ -105,7 +123,7 @@ fn main() {
 
         if args.out_dir.is_empty() {
             log::warn!("No output directory specified, dumping to console.");
-            let parsed_raws = dfraw_json_parser::read_single_raw_file(&raw_file_path);
+            let parsed_raws = dfraw_json_parser::parse_single_raw_file(&raw_file_path);
             println!("{}", parsed_raws);
             return;
         }
@@ -125,6 +143,70 @@ fn main() {
             dfraw_json_parser::read_single_raw_file_to_file(
                 &raw_file_path,
                 &out_path.join("single-raw.json").to_path_buf(),
+            )
+        }
+    }
+
+    if !args.module_path.is_empty() {
+        let Ok(raw_module_path) = std::fs::canonicalize(Path::new(&args.module_path)) else {
+            log::error!("Unable to standardize raw file path to read. {}", &args.module_path);
+            return;
+        };
+
+        if args.out_dir.is_empty() {
+            log::warn!("No output directory specified, dumping to console.");
+            let parsed_raws = dfraw_json_parser::parse_info_txt_from_raw_module(&raw_module_path);
+            println!("{}", parsed_raws);
+            return;
+        }
+
+        let Ok(out_path) = std::fs::canonicalize(Path::new(&args.out_dir)) else {
+            log::error!("Unable to standardize output path {} for writing.", &args.out_dir);
+            return;
+        };
+        if !out_path.exists() {
+            log::error!(
+                "Non-existent path specified for saving file to {:?}",
+                out_path
+            );
+            return;
+        }
+        if out_path.is_dir() {
+            dfraw_json_parser::parse_raw_module_to_file(
+                &raw_module_path,
+                &out_path.join("single-module.json").to_path_buf(),
+            )
+        }
+    }
+
+    if !args.location_path.is_empty() {
+        let Ok(raw_module_location_path) = std::fs::canonicalize(Path::new(&args.location_path)) else {
+            log::error!("Unable to standardize raw file path to read. {}", &args.location_path);
+            return;
+        };
+
+        if args.out_dir.is_empty() {
+            log::warn!("No output directory specified, dumping to console.");
+            let parsed_raws = dfraw_json_parser::parse_module_location(&raw_module_location_path);
+            println!("[{}]", parsed_raws);
+            return;
+        }
+
+        let Ok(out_path) = std::fs::canonicalize(Path::new(&args.out_dir)) else {
+            log::error!("Unable to standardize output path {} for writing.", &args.out_dir);
+            return;
+        };
+        if !out_path.exists() {
+            log::error!(
+                "Non-existent path specified for saving file to {:?}",
+                out_path
+            );
+            return;
+        }
+        if out_path.is_dir() {
+            dfraw_json_parser::parse_raw_module_location_dir_to_file(
+                &raw_module_location_path,
+                &out_path.join("single-location.json").to_path_buf(),
             )
         }
     }

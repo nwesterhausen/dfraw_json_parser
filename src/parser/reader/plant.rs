@@ -267,12 +267,12 @@ pub fn parse(input_path: &Path, info_text: &DFInfoFile) -> Vec<plant::DFPlant> {
         _ => (),
     }
     log::info!(
-        "{} plants defined in {} ({} {} in {})",
+        "{} plants defined in {} ({} {} in {:?})",
         results.len(),
         &raw_filename,
         info_text.get_identifier(),
         info_text.displayed_version,
-        info_text.get_sourced_directory(),
+        info_text.get_location(),
     );
     results
 }

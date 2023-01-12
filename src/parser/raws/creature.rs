@@ -10,7 +10,7 @@ use crate::parser::raws::{
 
 use super::DFRawCommon;
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct DFCreature {
     raw_header: DFRawCommon,
 

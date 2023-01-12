@@ -77,3 +77,9 @@ impl TypedJsonSerializable for DFInorganic {
         serde_json::to_string(&TypedJsonInorganic::from(&self))
     }
 }
+
+impl TypedJsonSerializable for &DFInorganic {
+    fn to_typed_json_string(&self) -> Result<String, serde_json::Error> {
+        serde_json::to_string(&TypedJsonInorganic::from(&self))
+    }
+}

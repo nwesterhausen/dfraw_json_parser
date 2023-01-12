@@ -133,3 +133,9 @@ impl TypedJsonSerializable for DFCreature {
         serde_json::to_string(&TypedJsonCreature::from(&self))
     }
 }
+
+impl TypedJsonSerializable for &DFCreature {
+    fn to_typed_json_string(&self) -> Result<String, serde_json::Error> {
+        serde_json::to_string(&TypedJsonCreature::from(&self))
+    }
+}

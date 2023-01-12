@@ -6,7 +6,7 @@ use crate::parser::raws::{
 use super::{environment, roll_chance};
 use super::{material, DFRawCommon};
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct DFInorganic {
     // Common Raw file Things
     raw_header: DFRawCommon,

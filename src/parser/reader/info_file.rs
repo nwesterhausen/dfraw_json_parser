@@ -4,22 +4,23 @@ use std::fs::File;
 use std::io::{BufRead, BufReader};
 use std::path::Path;
 
-use crate::parser::raws::info;
+use crate::parser::raws::{info, RawModuleLocation};
 use crate::parser::refs::{DF_ENCODING, NON_DIGIT_RE, RAW_TOKEN_RE};
+use crate::parser::util::get_parent_dir_name;
 
-pub fn parse(info_file_path: &Path, source_dir: &str) -> info::DFInfoFile {
-    let relative_path = match info_file_path.parent() {
-        Some(parent_dir) => {
-            String::from(parent_dir.file_name().unwrap_or_default().to_string_lossy())
-        }
-        None => String::from("!Unavailable"),
-    };
+pub fn parse(info_file_path: &Path) -> info::DFInfoFile {
+    let parent_dir = get_parent_dir_name(info_file_path);
+    let location = RawModuleLocation::from_info_text_file_path(info_file_path);
 
     let file = match File::open(&info_file_path) {
         Ok(f) => f,
         Err(e) => {
-            log::error!("DFInfoFile - Error opening raw file for parsing!\n{:?}", e);
-            return info::DFInfoFile::new("error", source_dir, &relative_path);
+            log::error!(
+                "DFInfoFile - Error opening raw file for parsing in \"{}\"\n{:?}",
+                parent_dir,
+                e
+            );
+            return info::DFInfoFile::empty();
         }
     };
 
@@ -30,17 +31,11 @@ pub fn parse(info_file_path: &Path, source_dir: &str) -> info::DFInfoFile {
 
     // info.txt details
     let mut header = String::from("DFInfoFile");
-    let mut info_file_data: info::DFInfoFile =
-        info::DFInfoFile::new("", source_dir, &relative_path);
+    let mut info_file_data: info::DFInfoFile = info::DFInfoFile::new("", location, &parent_dir);
 
     for (index, line) in reader.lines().enumerate() {
         if line.is_err() {
-            log::error!(
-                "{} - Error processing {:?}:{}",
-                header,
-                relative_path,
-                index
-            );
+            log::error!("{} - Error processing {:?}:{}", header, parent_dir, index);
             continue;
         }
         let line = match line {
@@ -56,7 +51,7 @@ pub fn parse(info_file_path: &Path, source_dir: &str) -> info::DFInfoFile {
                 // SECTION FOR MATCHING info.txt DATA
                 "ID" => {
                     // the [ID:identifier] tag should be the top of the info.txt file
-                    info_file_data = info::DFInfoFile::new(&cap[3], source_dir, &relative_path);
+                    info_file_data = info::DFInfoFile::new(&cap[3], location, &parent_dir);
                     header = format!("DFInfoFile ({})", &cap[3]);
                 }
                 "NUMERIC_VERSION" => match cap[3].parse() {
@@ -65,7 +60,7 @@ pub fn parse(info_file_path: &Path, source_dir: &str) -> info::DFInfoFile {
                         log::warn!(
                             "{} - 'NUMERIC_VERSION' should be integer {}",
                             header,
-                            relative_path
+                            parent_dir
                         );
                         // match on \D to replace any non-digit characters with empty string
                         let digits_only = NON_DIGIT_RE.replace_all(&cap[3], "").to_string();
@@ -87,7 +82,7 @@ pub fn parse(info_file_path: &Path, source_dir: &str) -> info::DFInfoFile {
                         log::warn!(
                             "{} - 'EARLIEST_COMPATIBLE_NUMERIC_VERSION' should be integer {}",
                             header,
-                            relative_path
+                            parent_dir
                         );
                         // match on \D to replace any non-digit characters with empty string
                         let digits_only = NON_DIGIT_RE.replace_all(&cap[3], "").to_string();
@@ -132,6 +127,14 @@ pub fn parse(info_file_path: &Path, source_dir: &str) -> info::DFInfoFile {
     // [name] Token in the info.txt is written incorrectly as "[name]X" instead of [name:X]
     if info_file_data.name.is_empty() || info_file_data.name.len() == 0 {
         info_file_data.name = String::from(info_file_data.get_identifier());
+    }
+
+    // Check for 'unknown' identifier and try to provide any extra info
+    if info_file_data.get_identifier() == "unknown" {
+        log::error!(
+            "Failure parsing proper info from {}",
+            info_file_path.display()
+        )
     }
 
     info_file_data

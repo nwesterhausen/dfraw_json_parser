@@ -1,3 +1,5 @@
+use std::path::Path;
+
 use slug::slugify;
 
 use self::info::DFInfoFile;
@@ -7,7 +9,6 @@ pub mod creature;
 pub mod environment;
 pub mod info;
 pub mod inorganic;
-pub mod item;
 pub mod material;
 pub mod names;
 pub mod plant;
@@ -35,7 +36,7 @@ pub enum RawModuleLocation {
     Unknown,
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 /// Struct to contain what common raw values there are, so it can be used
 /// within the other structs and only get changed in one place etc.
 pub struct DFRawCommon {
@@ -73,11 +74,9 @@ impl DFRawCommon {
             parent_raw: String::from(raw),
             dfraw_identifier: String::from(info_txt.get_identifier()),
             dfraw_version: String::from(info_txt.displayed_version.as_str()),
-            dfraw_found_in: RawModuleLocation::from_sourced_directory(
-                info_txt.get_sourced_directory().as_str(),
-            ),
+            dfraw_found_in: info_txt.get_location(),
             dfraw_display: format!("{} v{}", info_txt.name, info_txt.displayed_version),
-            dfraw_relative_path: String::from(info_txt.get_relative_path()),
+            dfraw_relative_path: String::from(info_txt.get_parent_directory()),
             raw_type: variant,
         }
     }
@@ -129,6 +128,25 @@ impl RawModuleLocation {
                 );
                 return RawModuleLocation::Unknown;
             }
+        }
+    }
+    pub fn from_info_text_file_path(full_path: &Path) -> Self {
+        // info.txt is relative by 2 parents from our module location
+        // <MODULE LOCATION>/<RAW MODULE>/info.txt
+        match full_path.parent() {
+            Some(parent_dir) => match parent_dir.parent() {
+                Some(grandparent_dir) => {
+                    let path_string = String::from(
+                        grandparent_dir
+                            .file_name()
+                            .unwrap_or_default()
+                            .to_string_lossy(),
+                    );
+                    return Self::from_sourced_directory(&path_string.as_str());
+                }
+                None => RawModuleLocation::Unknown,
+            },
+            None => RawModuleLocation::Unknown,
         }
     }
 }

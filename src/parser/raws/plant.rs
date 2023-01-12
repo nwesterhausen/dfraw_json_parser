@@ -11,7 +11,7 @@ use serde::{Deserialize, Serialize};
 
 use super::DFRawCommon;
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct DFPlant {
     /// Common Raw file Things
     raw_header: DFRawCommon,

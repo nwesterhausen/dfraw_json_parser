@@ -5,7 +5,7 @@ use std::fs::File;
 use std::io::{BufRead, BufReader};
 use std::path::Path;
 
-use crate::parser::parsing;
+use crate::parser::parsing_bits;
 use crate::parser::raws::{biomes, names, tags};
 use crate::parser::{
     raws::{
@@ -140,7 +140,7 @@ pub fn parse(input_path: &Path, info_text: &DFInfoFile) -> Vec<creature::DFCreat
                 "BODY_SIZE" => {
                     let split = cap[3].split(':').collect::<Vec<&str>>();
                     if split.len() == 3 {
-                        match parsing::parse_body_size(&split) {
+                        match parsing_bits::parse_body_size(&split) {
                             Ok(size) => caste_temp.body_size.push(size),
                             Err(e) => {
                                 log::error!(
@@ -277,7 +277,7 @@ pub fn parse(input_path: &Path, info_text: &DFInfoFile) -> Vec<creature::DFCreat
                 },
                 "CLUTCH_SIZE" => {
                     let split = cap[3].split(':').collect::<Vec<&str>>();
-                    match parsing::parse_min_max_range(&split) {
+                    match parsing_bits::parse_min_max_range(&split) {
                         Ok(range) => {
                             caste_temp.clutch_size[0] = range[0];
                             caste_temp.clutch_size[1] = range[1];
@@ -291,7 +291,7 @@ pub fn parse(input_path: &Path, info_text: &DFInfoFile) -> Vec<creature::DFCreat
                 }
                 "LITTERSIZE" => {
                     let split = cap[3].split(':').collect::<Vec<&str>>();
-                    match parsing::parse_min_max_range(&split) {
+                    match parsing_bits::parse_min_max_range(&split) {
                         Ok(range) => {
                             caste_temp.litter_size[0] = range[0];
                             caste_temp.litter_size[1] = range[1];
@@ -308,7 +308,7 @@ pub fn parse(input_path: &Path, info_text: &DFInfoFile) -> Vec<creature::DFCreat
                 }
                 "MAXAGE" => {
                     let split = cap[3].split(':').collect::<Vec<&str>>();
-                    match parsing::parse_min_max_range(&split) {
+                    match parsing_bits::parse_min_max_range(&split) {
                         Ok(range) => {
                             caste_temp.max_age[0] = range[0];
                             caste_temp.max_age[1] = range[1];
@@ -391,7 +391,7 @@ pub fn parse(input_path: &Path, info_text: &DFInfoFile) -> Vec<creature::DFCreat
                 }
                 "CLUSTER_NUMBER" => {
                     let split = cap[3].split(':').collect::<Vec<&str>>();
-                    match parsing::parse_min_max_range(&split) {
+                    match parsing_bits::parse_min_max_range(&split) {
                         Ok(range) => {
                             creature_temp.cluster_number[0] = range[0];
                             creature_temp.cluster_number[1] = range[1];
@@ -404,7 +404,7 @@ pub fn parse(input_path: &Path, info_text: &DFInfoFile) -> Vec<creature::DFCreat
                 }
                 "POPULATION_NUMBER" => {
                     let split = cap[3].split(':').collect::<Vec<&str>>();
-                    match parsing::parse_min_max_range(&split) {
+                    match parsing_bits::parse_min_max_range(&split) {
                         Ok(range) => {
                             creature_temp.population_number[0] = range[0];
                             creature_temp.population_number[1] = range[1];
@@ -463,7 +463,7 @@ pub fn parse(input_path: &Path, info_text: &DFInfoFile) -> Vec<creature::DFCreat
                 },
                 "UNDERGROUND_DEPTH" => {
                     let split = cap[3].split(':').collect::<Vec<&str>>();
-                    match parsing::parse_min_max_range(&split) {
+                    match parsing_bits::parse_min_max_range(&split) {
                         Ok(range) => {
                             creature_temp.underground_depth[0] = range[0];
                             creature_temp.underground_depth[1] = range[1];
@@ -818,12 +818,12 @@ pub fn parse(input_path: &Path, info_text: &DFInfoFile) -> Vec<creature::DFCreat
         _ => (),
     }
     log::info!(
-        "{} creatures defined in {} ({} {} in {})",
+        "{} creatures defined in {} ({} {} in {:?})",
         results.len(),
         &raw_filename,
         info_text.get_identifier(),
         info_text.displayed_version,
-        info_text.get_sourced_directory(),
+        info_text.get_location(),
     );
     results
 }

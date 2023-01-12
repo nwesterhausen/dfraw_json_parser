@@ -1,5 +1,5 @@
 use super::TypedJsonSerializable;
-use crate::parser::raws::info::DFInfoFile;
+use crate::parser::raws::{info::DFInfoFile, RawModuleLocation};
 use serde::{Deserialize, Serialize};
 use slug::slugify;
 
@@ -8,7 +8,7 @@ use slug::slugify;
 pub struct TypedJsonInfoFile {
     identifier: String,
     #[serde(rename = "sourcedDirectory")]
-    sourced_directory: String,
+    sourced_directory: RawModuleLocation,
     #[serde(rename = "numericVersion")]
     numeric_version: u32,
     #[serde(rename = "displayedVersion")]
@@ -41,7 +41,7 @@ impl TypedJsonInfoFile {
             identifier: info_file.get_identifier(),
             name: info_file.name.to_owned(),
             numeric_version: info_file.numeric_version,
-            sourced_directory: info_file.get_sourced_directory(),
+            sourced_directory: info_file.get_location(),
             display_title: format!("{} v{}", info_file.name, info_file.displayed_version),
             object_id: format!(
                 "{}_{}_{}",
@@ -49,7 +49,7 @@ impl TypedJsonInfoFile {
                 info_file.get_identifier(),
                 info_file.numeric_version
             ),
-            relative_path: info_file.get_relative_path(),
+            relative_path: info_file.get_parent_directory(),
         }
     }
 }

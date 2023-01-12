@@ -9,10 +9,13 @@ Currently the only raws that are parsed are Creature raws.
 Currently the JSON is returned as a string
 */
 
-use std::fs::File;
-use std::io::{BufWriter, Write};
-use std::path::Path;
-use walkdir::{DirEntry, WalkDir};
+#![deny(clippy::pedantic)]
+
+use parser::json_conversion::TypedJsonSerializable;
+use parser::raws::RawModuleLocation;
+use parser::util::subdirectories;
+use std::path::{Path, PathBuf};
+use walkdir::DirEntry;
 
 #[cfg(feature = "tauri")]
 extern crate tauri;
@@ -23,7 +26,121 @@ mod parser;
 //Todo: add an option to specify what kinds of raws to parse
 //Todo: add a parameter for JSON_FILE name (currently hard-coded to out.json)
 
-/// It takes a path to a DF game directory, and returns a JSON array of all the raws in that directory
+/// It takes a path to a DF raw module-containing directory, and returns a JSON array of all the raws
+/// (from their own raw modules) in that directory
+///
+/// Arguments:
+///
+/// * `raw_module_location_path`: The path to the directory containing the raw modules. This has subdirectories
+/// which contain an 'info.txt' file and raw objects or graphics.
+///
+/// Returns:
+///
+/// A string vec containing the JSON array for each parsed raws module
+pub fn parse_module_location(raw_module_location_path: &Path) -> String {
+    // Guard against invalid path
+    if !raw_module_location_path.exists() {
+        log::error!(
+            "Provided module path for parsing doesn't exist!\n{}",
+            raw_module_location_path.display()
+        );
+        return String::new();
+    }
+    if !raw_module_location_path.is_dir() {
+        log::error!(
+            "Raw module path needs to be a directory {}",
+            raw_module_location_path.display()
+        );
+        return String::new();
+    }
+
+    //2. Get module location from provided path
+    let module_location = RawModuleLocation::from_sourced_directory(
+        &raw_module_location_path
+            .file_name()
+            .unwrap_or_default()
+            .to_str()
+            .unwrap_or_default(),
+    );
+
+    //3. Get list of all subdirectories
+    let raw_module_iter: Vec<DirEntry> =
+        subdirectories(PathBuf::from(raw_module_location_path)).unwrap_or(Vec::new());
+
+    log::info!(
+        "{num} raw modules located in {location:?}",
+        num = raw_module_iter.len(),
+        location = module_location
+    );
+
+    let mut all_json: Vec<String> = Vec::new();
+    //4. Loop over all raw modules in the raw module directory
+    for raw_module_directory in raw_module_iter {
+        //2. Parse raws and dump JSON into array
+        all_json.push(parse_raw_module(raw_module_directory.path()));
+    }
+
+    format!("[{}]", all_json.join(","))
+}
+
+/// It takes a path to a DF raw module-containing directory, and returns a JSON array of all the info.txt details
+/// (from their own raw modules) in that directory
+///
+/// Arguments:
+///
+/// * `raw_module_location_path`: The path to the directory containing the raw modules. This has subdirectories
+/// which contain an 'info.txt' file and raw objects or graphics.
+///
+/// Returns:
+///
+/// A string vec containing the JSON array for each parsed raws module's info
+pub fn parse_info_txt_in_module_location(raw_module_location_path: &Path) -> String {
+    // Guard against invalid path
+    if !raw_module_location_path.exists() {
+        log::error!(
+            "Provided module path for parsing doesn't exist!\n{}",
+            raw_module_location_path.display()
+        );
+        return String::new();
+    }
+    if !raw_module_location_path.is_dir() {
+        log::error!(
+            "Raw module path needs to be a directory {}",
+            raw_module_location_path.display()
+        );
+        return String::new();
+    }
+
+    //2. Get module location from provided path
+    let module_location = RawModuleLocation::from_sourced_directory(
+        &raw_module_location_path
+            .file_name()
+            .unwrap_or_default()
+            .to_str()
+            .unwrap_or_default(),
+    );
+
+    //3. Get list of all subdirectories
+    let raw_module_iter: Vec<DirEntry> =
+        subdirectories(PathBuf::from(raw_module_location_path)).unwrap_or(Vec::new());
+
+    log::info!(
+        "{num} raw modules located in {location:?}",
+        num = raw_module_iter.len(),
+        location = module_location
+    );
+
+    let mut all_json: Vec<String> = Vec::new();
+    //4. Loop over all raw modules in the raw module directory
+    for raw_module_directory in raw_module_iter {
+        //2. Parse raws and dump JSON into array
+        all_json.push(parse_info_txt_from_raw_module(raw_module_directory.path()));
+    }
+
+    format!("[{}]", all_json.join(","))
+}
+
+/// Takes a path to a DF game directory, and returns a JSON array of all the raws in that directory
 ///
 /// Arguments:
 ///
@@ -62,23 +179,9 @@ pub fn parse_game_raws(df_game_path: &str) -> Vec<String> {
     let installed_mods_path = data_path.join("installed_mods");
     let workshop_mods_path = game_path.join("mods");
 
-    // Read directories from above, and if we have an issue, return an empty vec
-    let vanilla_iter: Vec<DirEntry> = subdirectories(vanilla_path).unwrap_or(Vec::new());
-    let installed_iter: Vec<DirEntry> = subdirectories(installed_mods_path).unwrap_or(Vec::new());
-    let mods_iter: Vec<DirEntry> = subdirectories(workshop_mods_path).unwrap_or(Vec::new());
-
-    // Loop through each dfraw_directory and parse it
-    for entry in vanilla_iter {
-        all_json.push(parse_dfraw_dir(entry.path(), "vanilla"));
-    }
-
-    for entry in installed_iter {
-        all_json.push(parse_dfraw_dir(entry.path(), "installed_mods"));
-    }
-
-    for entry in mods_iter {
-        all_json.push(parse_dfraw_dir(entry.path(), "mods"));
-    }
+    all_json.push(parse_module_location(&vanilla_path.as_path()));
+    all_json.push(parse_module_location(&installed_mods_path.as_path()));
+    all_json.push(parse_module_location(&workshop_mods_path.as_path()));
 
     let non_empty_json: Vec<String> = all_json
         .into_iter()
@@ -101,69 +204,8 @@ pub fn parse_game_raws(df_game_path: &str) -> Vec<String> {
 /// Returns:
 ///
 /// A JSON string containing the raws for the given directory.
-pub fn parse_dfraw_dir(root_path: &Path, sourced_dir: &str) -> String {
-    //1. Get information from the info.txt file
-    if !root_path.exists() {
-        log::error!(
-            "Provided directory to parse raws does not exist: {:?}",
-            root_path
-        );
-        return String::new();
-    }
-    if !root_path.is_dir() {
-        log::error!(
-            "Provided 'directory' to parse is not actually a directory! {:?}",
-            root_path
-        );
-        return String::new();
-    }
-
-    // Check for info.txt
-    let info_txt_path = root_path.join("info.txt");
-    if !info_txt_path.exists() {
-        let Some(dir_name) = root_path.file_name() else {
-            log::error!("Error reading module dir {:?}", root_path);
-            return String::new();
-        };
-        let dir_name_str = dir_name.to_str().unwrap_or("");
-
-        if !(dir_name_str.eq("mod_upload")
-            || dir_name_str.eq("examples and notes")
-            || dir_name_str.eq("interaction examples"))
-        {
-            log::error!(
-                "No info.txt as expected in {:?}. Is this DF 50.xx?",
-                root_path.file_name().unwrap_or_default()
-            );
-        }
-
-        return String::new();
-    }
-
-    // Parse info.txt to get raw module information
-    let dfraw_module_info = parser::parse_info_file(&info_txt_path, sourced_dir);
-    log::info!(
-        "Parsing raws for {} v{}",
-        dfraw_module_info.get_identifier(),
-        dfraw_module_info.displayed_version
-    );
-
-    //2. Parse raws in the 'object' subdirectory
-    let objects_path = root_path.join("objects");
-    if !objects_path.exists() {
-        log::debug!("No objects subdirectory, no raws to parse.");
-        return String::new();
-    }
-    if !objects_path.is_dir() {
-        log::error!("Objects subdirectory is not valid subdirectory! Unable to parse raws.");
-        return String::new();
-    }
-
-    //perform "normal" raws parsing on contents.. but we should inject our information from info.txt
-    let json = parser::parse_directory_to_json_string(&objects_path, &dfraw_module_info);
-
-    //3. Return the object array for this dfraw dir
-    json
+pub fn parse_raw_module(root_path: &Path) -> String {
+    parser::parse_raw_module_to_json_string(root_path)
 }
 
 /// Takes a path to a folder containing raws, and a path to a file, and parses the raws and saves
@@ -175,114 +217,19 @@ pub fn parse_dfraw_dir(root_path: &Path, sourced_dir: &str) -> String {
 /// * `output_file_path`: The path to the file to save the parsed raws to.
 pub fn parse_game_raws_to_file(input_path: &str, out_filepath: &Path) {
     let json_string_vec = parse_game_raws(input_path);
-    log::info!("Saving json to to {:?}", out_filepath);
-
-    let out_file = match File::create(&out_filepath) {
-        Ok(f) => f,
-        Err(e) => {
-            log::error!("Unable to open out.json for writing \n{:?}", e);
-            return;
-        }
-    };
-
-    let mut stream = BufWriter::new(out_file);
-    let write_error = &format!("Unable to write to {}", out_filepath.to_string_lossy());
-    match write!(stream, "[") {
-        Ok(_x) => (),
-        Err(e) => {
-            log::error!("{}\n{:?}", write_error, e);
-            return;
-        }
-    };
-
-    let mut json_string_iter = json_string_vec.into_iter().peekable();
-    while let Some(json_string) = json_string_iter.next() {
-        match write!(stream, "{}", json_string) {
-            Ok(_x) => (),
-            Err(e) => {
-                log::error!("{}\n{:?}", write_error, e);
-                return;
-            }
-        };
-
-        if json_string_iter.peek().is_some() {
-            match write!(stream, ",") {
-                Ok(_x) => (),
-                Err(e) => {
-                    log::error!("{}\n{:?}", write_error, e);
-                    return;
-                }
-            };
-        }
-
-        match stream.flush() {
-            Ok(_x) => (),
-            Err(e) => {
-                log::error!("{}\n{:?}", write_error, e);
-                return;
-            }
-        };
-    }
-
-    match write!(stream, "]") {
-        Ok(_x) => (),
-        Err(e) => {
-            log::error!("{}\n{:?}", write_error, e);
-            return;
-        }
-    };
-    match stream.flush() {
-        Ok(_x) => (),
-        Err(e) => {
-            log::error!("{}\n{:?}", write_error, e);
-        }
-    };
+    parser::util::write_json_string_array_to_file(json_string_vec, out_filepath);
 }
 
-/// Get a vec of subdirectories for a given directory
-///
-/// Using the WalkDir crate:
-/// 1. create a new WalkDir for `directory`
-/// 2. limit to immediate contents (max_depth and min_depth at 1)
-/// 3. as an iterator..
-///     4. filter_map into only non-error results
-///     5. filter into only directories
-/// 4. collect as a vec
+/// Takes a path to a folder containing raws, and a path to a file, and parses the raws and saves
+/// the result to the file as JSON
 ///
 /// Arguments:
 ///
-/// * `directory`: The directory to search in
-///
-/// Returns:
-///
-/// A vector of all subdirectories as walkdir::DirEntry
-fn subdirectories(directory: std::path::PathBuf) -> Option<Vec<walkdir::DirEntry>> {
-    if !(directory.exists() && directory.is_dir()) {
-        return None;
-    }
-    Some(
-        WalkDir::new(directory)
-            .max_depth(1)
-            .min_depth(1)
-            .into_iter()
-            .filter_map(|e| e.ok())
-            .filter(|e| e.file_type().is_dir())
-            .collect(),
-    )
-}
-
-/// Takes a path to a directory of raws, and a path to a file, and parses the raws into JSON and saves as the file.
-///
-/// Arguments:
-///
-/// * `input_path`: The path to the raws directory.
-/// * `output_file_path`: The path to the file you want to write the JSON to.
-pub fn parse_game_raws_to_file_out(
-    input_path: &Path,
-    info_file_data: &parser::raws::info::DFInfoFile,
-    output_file_path: &Path,
-) {
-    parser::parse_directory_to_json_file(input_path, info_file_data, output_file_path)
+/// * `input_path`: The path to the raws folder.
+/// * `output_file_path`: The path to the file to save the parsed raws to.
+pub fn parse_all_raw_module_info_to_file(input_path: &str, out_filepath: &Path) {
+    let json_string_vec = parse_all_raw_module_info(input_path);
+    parser::util::write_json_string_array_to_file(json_string_vec, out_filepath);
 }
 
 #[cfg(feature = "tauri")]
@@ -365,7 +312,7 @@ pub fn parse_game_raws_with_tauri_emit(df_game_path: &str, window: tauri::Window
             _ => (),
         };
 
-        all_json.push(parse_dfraw_dir(entry.path(), "vanilla"));
+        all_json.push(parse_raw_module(entry.path()));
     }
     for entry in installed_iter {
         current_mod = current_mod + 1;
@@ -381,7 +328,7 @@ pub fn parse_game_raws_with_tauri_emit(df_game_path: &str, window: tauri::Window
             _ => (),
         };
 
-        all_json.push(parse_dfraw_dir(entry.path(), "installed_mods"));
+        all_json.push(parse_raw_module(entry.path()));
     }
     for entry in mods_iter {
         current_mod = current_mod + 1;
@@ -400,7 +347,7 @@ pub fn parse_game_raws_with_tauri_emit(df_game_path: &str, window: tauri::Window
             _ => (),
         };
 
-        all_json.push(parse_dfraw_dir(entry.path(), "mods"));
+        all_json.push(parse_raw_module(entry.path()));
     }
 
     if pct < 1.0 {
@@ -425,19 +372,51 @@ pub fn parse_game_raws_with_tauri_emit(df_game_path: &str, window: tauri::Window
     non_empty_json
 }
 
-/// Given the path to the game directory, returns a vector of JSON strings of object representing a raw module.
-/// This returns the JSON for every detected raw module in all tested directories.
+/// It takes a path to a directory, checks if it's a directory, checks if it has an info.txt file,
+/// parses the info.txt file, and then serializes the parsed data into a JSON string
 ///
 /// Arguments:
 ///
-/// * `df_game_path`: The path to the game directory.
+/// * `root_path`: The path to the directory containing the raws.
 ///
 /// Returns:
 ///
-/// A vector of JSON strings with module data.
-pub fn parse_raw_module_info(df_game_path: &str) -> Vec<String> {
-    let mut all_json: Vec<String> = Vec::new();
+/// A string.
+pub fn parse_info_txt_from_raw_module(raw_module_directory: &Path) -> String {
+    let dfraw_module_info = parser::parse_info_file_from_module_directory(&raw_module_directory);
+    match dfraw_module_info.to_typed_json_string() {
+        Ok(s) => {
+            return s.to_string();
+        }
+        Err(e) => {
+            log::error!("Failure to serialize parsed raw data\n{}", e);
+        }
+    }
 
+    String::new()
+}
+
+/// It takes a path to a file, parses it, and returns a JSON string
+///
+/// Arguments:
+///
+/// * `raw_file`: The path to the raw file to parse.
+///
+/// Returns:
+///
+/// A JSON String
+pub fn parse_single_raw_file(raw_file: &Path) -> String {
+    parser::parse_single_raw_file_to_json_string(raw_file)
+}
+
+/// Takes the path to the DF game directory, parses the raw module info files and then
+/// writes the JSON strings of those parsed modules to the out_filepath
+///
+/// Arguments:
+///
+/// * `df_game_path`: The path to the the DF game directory.
+/// * `out_filepath`: The path to the file you want to write to.
+pub fn parse_all_raw_module_info(df_game_path: &str) -> Vec<String> {
     //1. "validate" folder is as expected
     let game_path = Path::new(df_game_path);
     // Guard against invalid path
@@ -446,11 +425,11 @@ pub fn parse_raw_module_info(df_game_path: &str) -> Vec<String> {
             "Provided game path for parsing doesn't exist!\n{}",
             df_game_path
         );
-        return all_json;
+        return Vec::new();
     }
     if !game_path.is_dir() {
         log::error!("Game path needs to be a directory {}", df_game_path);
-        return all_json;
+        return Vec::new();
     }
 
     // warn on no gamelog.txt
@@ -464,214 +443,48 @@ pub fn parse_raw_module_info(df_game_path: &str) -> Vec<String> {
     let installed_mods_path = data_path.join("installed_mods");
     let workshop_mods_path = game_path.join("mods");
 
-    // Read directories from above, and if we have an issue, return an empty vec
-    let vanilla_iter: Vec<DirEntry> = subdirectories(vanilla_path).unwrap_or(Vec::new());
-    let installed_iter: Vec<DirEntry> = subdirectories(installed_mods_path).unwrap_or(Vec::new());
-    let mods_iter: Vec<DirEntry> = subdirectories(workshop_mods_path).unwrap_or(Vec::new());
+    let mut all_json: Vec<String> = Vec::new();
 
-    // Loop through each dfraw_directory and parse it
-    for entry in vanilla_iter {
-        all_json.push(parse_raw_module_dir_info(entry.path(), "vanilla"));
-    }
+    all_json.push(parse_info_txt_in_module_location(&vanilla_path.as_path()));
+    all_json.push(parse_info_txt_in_module_location(
+        &installed_mods_path.as_path(),
+    ));
+    all_json.push(parse_info_txt_in_module_location(
+        &workshop_mods_path.as_path(),
+    ));
 
-    for entry in installed_iter {
-        all_json.push(parse_raw_module_dir_info(entry.path(), "installed_mods"));
-    }
-
-    for entry in mods_iter {
-        all_json.push(parse_raw_module_dir_info(entry.path(), "mods"));
-    }
-
-    let non_empty_json: Vec<String> = all_json
-        .into_iter()
-        .filter(|s| !String::is_empty(s))
-        .collect();
-
-    non_empty_json
+    all_json
 }
 
-/// Parse a directory of raws, and return a JSON string of the parsed raw module info files.
-///
-/// The first thing we do is check that the directory exists, and that it's a directory. If it doesn't
-/// exist, or it's not a directory, we return an empty string
+/// It reads a single raw file, parses it, and writes the parsed JSON string to a file
 ///
 /// Arguments:
 ///
-/// * `root_path`: The path to the directory containing the raws.
-/// * `sourced_dir`: The directory the root_path was found under.
-///
-/// Returns:
-///
-/// A JSON string containing the info about the raws for the given directory.
-pub fn parse_raw_module_dir_info(root_path: &Path, sourced_dir: &str) -> String {
-    //1. Get information from the info.txt file
-    if !root_path.exists() {
-        log::error!(
-            "Provided directory to parse raws does not exist: {:?}",
-            root_path
-        );
-        return String::new();
-    }
-    if !root_path.is_dir() {
-        log::error!(
-            "Provided 'directory' to parse is not actually a directory! {:?}",
-            root_path
-        );
-        return String::new();
-    }
-
-    // Check for info.txt
-    let info_txt_path = root_path.join("info.txt");
-    if !info_txt_path.exists() {
-        let Some(dir_name) = root_path.file_name() else {
-            log::error!("Error reading module dir {:?}", root_path);
-            return String::new();
-        };
-        let dir_name_str = dir_name.to_str().unwrap_or("");
-
-        if !(dir_name_str.eq("mod_upload")
-            || dir_name_str.eq("examples and notes")
-            || dir_name_str.eq("interaction examples"))
-        {
-            log::error!(
-                "No info.txt as expected in {:?}. Is this DF 50.xx?",
-                root_path.file_name().unwrap_or_default()
-            );
-        }
-
-        return String::new();
-    }
-
-    // Parse info.txt to get raw module information
-    parser::parse_info_file_to_json_string(&info_txt_path, sourced_dir)
-}
-
-/// Takes the path to the DF game directory, parses the raw module info files and then
-/// writes the JSON strings of those parsed modules to the out_filepath
-///
-/// Arguments:
-///
-/// * `df_game_path`: The path to the the DF game directory.
+/// * `raw_file`: The path to the raw file to read.
 /// * `out_filepath`: The path to the file you want to write to.
-pub fn parse_raw_module_info_to_file(df_game_path: &str, out_filepath: &Path) {
-    let json_string_vec = parse_raw_module_info(df_game_path);
-    log::info!("Saving json to to {:?}", out_filepath);
-
-    let out_file = match File::create(&out_filepath) {
-        Ok(f) => f,
-        Err(e) => {
-            log::error!(
-                "Unable to open {} for writing \n{:?}",
-                out_filepath.display(),
-                e
-            );
-            return;
-        }
-    };
-
-    let mut stream = BufWriter::new(out_file);
-    let write_error = &format!("Unable to write to {}", out_filepath.to_string_lossy());
-    match write!(stream, "[") {
-        Ok(_x) => (),
-        Err(e) => {
-            log::error!("{}\n{:?}", write_error, e);
-            return;
-        }
-    };
-
-    let mut json_string_iter = json_string_vec.into_iter().peekable();
-    while let Some(json_string) = json_string_iter.next() {
-        match write!(stream, "{}", json_string) {
-            Ok(_x) => (),
-            Err(e) => {
-                log::error!("{}\n{:?}", write_error, e);
-                return;
-            }
-        };
-
-        if json_string_iter.peek().is_some() {
-            match write!(stream, ",") {
-                Ok(_x) => (),
-                Err(e) => {
-                    log::error!("{}\n{:?}", write_error, e);
-                    return;
-                }
-            };
-        }
-
-        match stream.flush() {
-            Ok(_x) => (),
-            Err(e) => {
-                log::error!("{}\n{:?}", write_error, e);
-                return;
-            }
-        };
-    }
-
-    match write!(stream, "]") {
-        Ok(_x) => (),
-        Err(e) => {
-            log::error!("{}\n{:?}", write_error, e);
-            return;
-        }
-    };
-    match stream.flush() {
-        Ok(_x) => (),
-        Err(e) => {
-            log::error!("{}\n{:?}", write_error, e);
-        }
-    };
-}
-
-pub fn read_single_raw_file(raw_file: &Path) -> String {
-    parser::read_single_raw_file(raw_file)
-}
-
 pub fn read_single_raw_file_to_file(raw_file: &Path, out_filepath: &Path) {
-    let parsed_json_string = read_single_raw_file(raw_file);
-    log::info!("Saving json to to {:?}", out_filepath);
+    let parsed_json_string = parse_single_raw_file(raw_file);
+    parser::util::write_json_string_to_file(parsed_json_string, out_filepath);
+}
 
-    let out_file = match File::create(&out_filepath) {
-        Ok(f) => f,
-        Err(e) => {
-            log::error!(
-                "Unable to open {} for writing \n{:?}",
-                out_filepath.display(),
-                e
-            );
-            return;
-        }
-    };
+/// Parses a single raw module directory, and writes the parsed JSON string to a file
+///
+/// Arguments:
+///
+/// * `module_path`: The path to the raw file to read.
+/// * `out_filepath`: The path to the file you want to write to.
+pub fn parse_raw_module_to_file(module_path: &Path, out_filepath: &Path) {
+    let parsed_json_string = parse_raw_module(module_path);
+    parser::util::write_json_string_to_file(parsed_json_string, out_filepath);
+}
 
-    let mut stream = BufWriter::new(out_file);
-    let write_error = &format!("Unable to write to {}", out_filepath.to_string_lossy());
-    match write!(stream, "[") {
-        Ok(_x) => (),
-        Err(e) => {
-            log::error!("{}\n{:?}", write_error, e);
-            return;
-        }
-    };
-
-    match write!(stream, "{}", parsed_json_string) {
-        Ok(_x) => (),
-        Err(e) => {
-            log::error!("{}\n{:?}", write_error, e);
-            return;
-        }
-    };
-
-    match write!(stream, "]") {
-        Ok(_x) => (),
-        Err(e) => {
-            log::error!("{}\n{:?}", write_error, e);
-            return;
-        }
-    };
-    match stream.flush() {
-        Ok(_x) => (),
-        Err(e) => {
-            log::error!("{}\n{:?}", write_error, e);
-        }
-    };
+/// Parses all the raw modules within a raw module location, and writes the parsed JSON string to a file
+///
+/// Arguments:
+///
+/// * `raw_module_location_path`: The path to the raw module directory.
+/// * `out_filepath`: The path to the file you want to write to.
+pub fn parse_raw_module_location_dir_to_file(raw_module_location_path: &Path, out_filepath: &Path) {
+    let parsed_json_string = parse_module_location(raw_module_location_path);
+    parser::util::write_json_string_to_file(parsed_json_string, out_filepath);
 }
