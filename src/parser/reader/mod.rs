@@ -23,7 +23,7 @@ pub mod plant;
 ///
 /// Returns:
 ///
-/// RawObjectKind for the type of [OBJECT] tag encountered, and RawObjectKind::None if it is unsupported.
+/// `RawObjectKind` for the type of [OBJECT] tag encountered, and `RawObjectKind::None` if it is unsupported.
 pub fn read_raw_file_type(input_path: &Path) -> RawObjectKind {
     let caller = "Raw File Type Checker";
     // Validate file exists
@@ -48,7 +48,7 @@ pub fn read_raw_file_type(input_path: &Path) -> RawObjectKind {
 
     // Setup a file reader for the encoding used by DF
     let decoding_reader = DecodeReaderBytesBuilder::new()
-        .encoding(*DF_ENCODING)
+        .encoding(Some(*DF_ENCODING))
         .build(file);
     let reader = BufReader::new(decoding_reader);
 

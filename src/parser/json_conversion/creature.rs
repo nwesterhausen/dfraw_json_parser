@@ -8,7 +8,7 @@ use serde::{Deserialize, Serialize};
 
 // Creature Object for Web Consumption
 #[derive(Serialize, Deserialize, Debug, Clone)]
-pub struct TypedJsonCreature {
+pub struct TypedJson {
     identifier: String,
     #[serde(rename = "parentRaw")]
     parent_raw: String,
@@ -81,7 +81,7 @@ pub struct TypedJsonCreature {
     population_number: [u16; 2],
 }
 
-impl TypedJsonCreature {
+impl TypedJson {
     pub fn from(creature: &DFCreature) -> Self {
         Self {
             identifier: creature.get_raw_header().get_identifier(),
@@ -130,12 +130,12 @@ impl TypedJsonCreature {
 
 impl TypedJsonSerializable for DFCreature {
     fn to_typed_json_string(&self) -> Result<String, serde_json::Error> {
-        serde_json::to_string(&TypedJsonCreature::from(self))
+        serde_json::to_string(&TypedJson::from(self))
     }
 }
 
 impl TypedJsonSerializable for &DFCreature {
     fn to_typed_json_string(&self) -> Result<String, serde_json::Error> {
-        serde_json::to_string(&TypedJsonCreature::from(self))
+        serde_json::to_string(&TypedJson::from(self))
     }
 }

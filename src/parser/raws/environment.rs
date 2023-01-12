@@ -38,7 +38,7 @@ impl Environment {
 
         let rock_layer = String::from(split[0]);
 
-        let grouping = match split[1] {
+        let grouping = match *split.get(1).unwrap_or(&"") {
             "CLUSTER" => GroupingStyle::Custer,
             "CLUSTER_ONE" => GroupingStyle::ClusterOne,
             "CLUSTER_SMALL" => GroupingStyle::ClusterSmall,

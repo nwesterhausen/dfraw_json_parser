@@ -7,6 +7,8 @@ description = "Library which parses Dwarf Fortress raw files into JSON"
 repository = "https://github.com/nwesterhausen/dfraw_json_parser.git"
 license = "MIT"
 homepage = "https://github.com/nwesterhausen/dfraw_json_parser"
+keywords = ["dwarf fortress", "JSON", "parsing"]
+categories = ["parsing"]
 
 [lib]
 name = "dfraw_json_parser"

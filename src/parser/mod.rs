@@ -21,7 +21,7 @@ pub mod util;
 /// Arguments:
 ///
 /// * `root_path`: The path to the directory containing the raws.
-/// * `sourced_dir`: The directory the root_path was found under.
+/// * `sourced_dir`: The directory the `root_path` was found under.
 ///
 /// Returns:
 ///
@@ -58,7 +58,7 @@ pub fn parse_single_raw_file_to_json_string(raw_file: &Path) -> String {
     format!("[{}]", util::stringify_raw_vec(serializable_vec).join(","))
 }
 
-/// It takes a path to a info.txt file, and returns a DFInfoFile for it
+/// It takes a path to a info.txt file, and returns a `DFInfoFile` for it
 ///
 /// Arguments:
 ///
@@ -76,7 +76,7 @@ pub fn parse_info_file(input_path: &Path) -> raws::info::DFInfoFile {
 ///
 /// Returns:
 ///
-/// DFInfoFile
+/// `DFInfoFile`
 pub fn parse_info_file_from_module_directory(root_path: &Path) -> DFInfoFile {
     //1. Get information from the info.txt file
     if !root_path.exists() {

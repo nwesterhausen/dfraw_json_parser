@@ -4,5 +4,6 @@
   "cSpell.words": ["dfraw", "gamelog", "Megabeast", "powf", "rouille", "walkdir"],
   "rust-analyzer.cargo.features": ["tauri"],
   "rust-analyzer.checkOnSave.features": "all",
-  "rust-analyzer.checkOnSave.command": "clippy"
+  "rust-analyzer.checkOnSave.command": "clippy",
+  "rust-analyzer.checkOnSave.extraArgs": ["--", "-W", "clippy::cargo", "-W", "clippy::pedantic"]
 }

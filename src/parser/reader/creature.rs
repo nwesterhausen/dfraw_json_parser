@@ -17,6 +17,7 @@ use crate::parser::{
     refs::{DF_ENCODING, RAW_TOKEN_RE},
 };
 
+#[allow(clippy::too_many_lines)]
 pub fn parse(input_path: &Path, info_text: &DFInfoFile) -> Vec<creature::DFCreature> {
     let caller = "Parse Creature Raw";
     let mut results: Vec<creature::DFCreature> = Vec::new();
@@ -30,7 +31,7 @@ pub fn parse(input_path: &Path, info_text: &DFInfoFile) -> Vec<creature::DFCreat
     };
 
     let decoding_reader = DecodeReaderBytesBuilder::new()
-        .encoding(*DF_ENCODING)
+        .encoding(Some(*DF_ENCODING))
         .build(file);
     let reader = BufReader::new(decoding_reader);
 
@@ -123,9 +124,10 @@ pub fn parse(input_path: &Path, info_text: &DFInfoFile) -> Vec<creature::DFCreat
                     //4. Reset/empty caste tags
                     caste_tags = Vec::new();
                 }
-                "BIOME" => match biomes::BIOMES.get(&cap[3]) {
-                    Some(biome_name) => creature_temp.biomes.push((*biome_name).to_string()),
-                    None => {
+                "BIOME" => {
+                    if let Some(biome_name) = biomes::BIOMES.get(&cap[3]) {
+                        creature_temp.biomes.push((*biome_name).to_string());
+                    } else {
                         log::warn!(
                             "BIOME:{} is not a valid token (in {}); Will add it 'as-is' to biome list",
                             &cap[3],
@@ -133,7 +135,7 @@ pub fn parse(input_path: &Path, info_text: &DFInfoFile) -> Vec<creature::DFCreat
                         );
                         creature_temp.biomes.push(String::from(&cap[3]));
                     }
-                },
+                }
                 "BODY_SIZE" => {
                     let split = cap[3].split(':').collect::<Vec<&str>>();
                     if split.len() == 3 {

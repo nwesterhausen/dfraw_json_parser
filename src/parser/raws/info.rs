@@ -26,9 +26,9 @@ impl DFInfoFile {
             displayed_version: "0".to_string(),
             earliest_compatible_numeric_version: 0,
             earliest_compatible_displayed_version: "0".to_string(),
-            author: "".to_string(),
-            name: "".to_string(),
-            description: "".to_string(),
+            author: String::new(),
+            name: String::new(),
+            description: String::new(),
         }
     }
     pub fn empty() -> Self {

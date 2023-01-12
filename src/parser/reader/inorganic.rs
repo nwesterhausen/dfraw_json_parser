@@ -11,6 +11,7 @@ use crate::parser::raws::{inorganic, material, roll_chance, tags};
 use crate::parser::reader::RawObjectKind;
 use crate::parser::refs::{DF_ENCODING, RAW_TOKEN_RE};
 
+#[allow(clippy::too_many_lines)]
 pub fn parse(input_path: &Path, info_text: &DFInfoFile) -> Vec<inorganic::DFInorganic> {
     let caller = "Parse Inorganic Raw";
     let mut results: Vec<inorganic::DFInorganic> = Vec::new();
@@ -24,7 +25,7 @@ pub fn parse(input_path: &Path, info_text: &DFInfoFile) -> Vec<inorganic::DFInor
     };
 
     let decoding_reader = DecodeReaderBytesBuilder::new()
-        .encoding(*DF_ENCODING)
+        .encoding(Some(*DF_ENCODING))
         .build(file);
     let reader = BufReader::new(decoding_reader);
 
@@ -128,7 +129,7 @@ pub fn parse(input_path: &Path, info_text: &DFInfoFile) -> Vec<inorganic::DFInor
                     // ~~material_tags = Vec::new();~~
                     environments_temp = Vec::new();
                     //5. Get material template to add (known) template tags
-                    material_tags = Vec::clone(&material::material_tags_from_template(&cap[3]));
+                    material_tags = Vec::clone(&material::tags_from_template(&cap[3]));
                 }
                 "PREFSTRING" => {
                     log::warn!(

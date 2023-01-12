@@ -7,6 +7,7 @@ use super::{environment, roll_chance};
 use super::{material, DFRawCommon};
 
 #[derive(Debug, Clone)]
+#[allow(clippy::module_name_repetitions)]
 pub struct DFInorganic {
     // Common Raw file Things
     raw_header: DFRawCommon,

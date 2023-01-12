@@ -5,7 +5,7 @@ use slug::slugify;
 
 // Info file Object for Web Consumption
 #[derive(Serialize, Deserialize, Debug, Clone)]
-pub struct TypedJsonInfoFile {
+pub struct TypedJson {
     identifier: String,
     #[serde(rename = "sourcedDirectory")]
     sourced_directory: RawModuleLocation,
@@ -28,18 +28,18 @@ pub struct TypedJsonInfoFile {
     object_id: String,
 }
 
-impl TypedJsonInfoFile {
+impl TypedJson {
     pub fn from(info_file: &DFInfoFile) -> Self {
         Self {
-            author: info_file.author.to_owned(),
-            description: info_file.description.to_owned(),
-            displayed_version: info_file.displayed_version.to_owned(),
+            author: info_file.author.clone(),
+            description: info_file.description.clone(),
+            displayed_version: info_file.displayed_version.clone(),
             earliest_compatible_displayed_version: info_file
                 .earliest_compatible_displayed_version
-                .to_owned(),
+                .clone(),
             earliest_compatible_numeric_version: info_file.earliest_compatible_numeric_version,
             identifier: info_file.get_identifier(),
-            name: info_file.name.to_owned(),
+            name: info_file.name.clone(),
             numeric_version: info_file.numeric_version,
             sourced_directory: info_file.get_location(),
             display_title: format!("{} v{}", info_file.name, info_file.displayed_version),
@@ -56,6 +56,6 @@ impl TypedJsonInfoFile {
 
 impl TypedJsonSerializable for DFInfoFile {
     fn to_typed_json_string(&self) -> Result<String, serde_json::Error> {
-        serde_json::to_string(&TypedJsonInfoFile::from(self))
+        serde_json::to_string(&TypedJson::from(self))
     }
 }

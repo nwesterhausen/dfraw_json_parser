@@ -17,7 +17,7 @@ pub mod tags;
 pub mod temperatures;
 
 #[derive(serde::Serialize, Debug, serde::Deserialize, Clone, Copy)]
-/// There are multiple types of raws, these are the different types handled by dfraw_json_parser.
+/// There are multiple types of raws, these are the different types handled by `dfraw_json_parser`.
 pub enum RawObjectKind {
     Creature,
     Inorganic,

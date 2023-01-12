@@ -11,7 +11,7 @@ use super::raws::tags;
 ///
 /// Returns:
 ///
-/// A Result<[u16; 2], ParseIntError>
+/// A Result<[u16; 2], `ParseIntError`>
 pub fn parse_min_max_range(split: &[&str]) -> Result<[u16; 2], ParseIntError> {
     let min: u16 = match split[0].parse() {
         Ok(n) => n,
@@ -38,7 +38,7 @@ pub fn parse_min_max_range(split: &[&str]) -> Result<[u16; 2], ParseIntError> {
 ///
 /// Returns:
 ///
-/// A Result<tags::DFBodySize, ParseIntError>
+/// A `Result<tags::DFBodySize, ParseIntError>`
 pub fn parse_body_size(split: &[&str]) -> Result<tags::DFBodySize, ParseIntError> {
     let years: u32 = match split[0].parse() {
         Ok(n) => n,

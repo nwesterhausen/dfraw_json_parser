@@ -8,7 +8,7 @@ use serde::{Deserialize, Serialize};
 
 // Creature Object for Web Consumption
 #[derive(Serialize, Deserialize, Debug, Clone)]
-pub struct TypedJsonInorganic {
+pub struct TypedJson {
     // Common Raw file Things
     identifier: String,
     #[serde(rename = "parentRaw")]
@@ -46,7 +46,7 @@ pub struct TypedJsonInorganic {
     magma_safe: bool,
 }
 
-impl TypedJsonInorganic {
+impl TypedJson {
     pub fn from(inorganic: &DFInorganic) -> Self {
         Self {
             identifier: inorganic.get_raw_header().get_identifier(),
@@ -74,12 +74,12 @@ impl TypedJsonInorganic {
 
 impl TypedJsonSerializable for DFInorganic {
     fn to_typed_json_string(&self) -> Result<String, serde_json::Error> {
-        serde_json::to_string(&TypedJsonInorganic::from(self))
+        serde_json::to_string(&TypedJson::from(self))
     }
 }
 
 impl TypedJsonSerializable for &DFInorganic {
     fn to_typed_json_string(&self) -> Result<String, serde_json::Error> {
-        serde_json::to_string(&TypedJsonInorganic::from(self))
+        serde_json::to_string(&TypedJson::from(self))
     }
 }

@@ -8,6 +8,7 @@ use crate::parser::raws::{info, RawModuleLocation};
 use crate::parser::refs::{DF_ENCODING, NON_DIGIT_RE, RAW_TOKEN_RE};
 use crate::parser::util::get_parent_dir_name;
 
+#[allow(clippy::too_many_lines)]
 pub fn parse(info_file_path: &Path) -> info::DFInfoFile {
     let parent_dir = get_parent_dir_name(info_file_path);
     let location = RawModuleLocation::from_info_text_file_path(info_file_path);
@@ -25,23 +26,23 @@ pub fn parse(info_file_path: &Path) -> info::DFInfoFile {
     };
 
     let decoding_reader = DecodeReaderBytesBuilder::new()
-        .encoding(*DF_ENCODING)
+        .encoding(Some(*DF_ENCODING))
         .build(file);
     let reader = BufReader::new(decoding_reader);
 
     // info.txt details
-    let mut header = String::from("DFInfoFile");
+    let mut caller = String::from("DFInfoFile");
     let mut info_file_data: info::DFInfoFile = info::DFInfoFile::new("", location, &parent_dir);
 
     for (index, line) in reader.lines().enumerate() {
         if line.is_err() {
-            log::error!("{} - Error processing {:?}:{}", header, parent_dir, index);
+            log::error!("{} - Error processing {:?}:{}", caller, parent_dir, index);
             continue;
         }
         let line = match line {
             Ok(l) => l,
             Err(e) => {
-                log::error!("{} - Line-reading error\n{:?}", header, e);
+                log::error!("{} - Line-reading error\n{:?}", caller, e);
                 continue;
             }
         };
@@ -52,14 +53,14 @@ pub fn parse(info_file_path: &Path) -> info::DFInfoFile {
                 "ID" => {
                     // the [ID:identifier] tag should be the top of the info.txt file
                     info_file_data = info::DFInfoFile::new(&cap[3], location, &parent_dir);
-                    header = format!("DFInfoFile ({})", &cap[3]);
+                    caller = format!("DFInfoFile ({})", &cap[3]);
                 }
                 "NUMERIC_VERSION" => match cap[3].parse() {
                     Ok(n) => info_file_data.numeric_version = n,
                     Err(_e) => {
                         log::warn!(
                             "{} - 'NUMERIC_VERSION' should be integer {}",
-                            header,
+                            caller,
                             parent_dir
                         );
                         // match on \D to replace any non-digit characters with empty string
@@ -69,7 +70,7 @@ pub fn parse(info_file_path: &Path) -> info::DFInfoFile {
                             Err(_e) => {
                                 log::error!(
                                     "{} - Unable to parse any numbers from {}",
-                                    header,
+                                    caller,
                                     digits_only
                                 );
                             }
@@ -81,7 +82,7 @@ pub fn parse(info_file_path: &Path) -> info::DFInfoFile {
                     Err(_e) => {
                         log::warn!(
                             "{} - 'EARLIEST_COMPATIBLE_NUMERIC_VERSION' should be integer {}",
-                            header,
+                            caller,
                             parent_dir
                         );
                         // match on \D to replace any non-digit characters with empty string
@@ -91,7 +92,7 @@ pub fn parse(info_file_path: &Path) -> info::DFInfoFile {
                             Err(_e) => {
                                 log::error!(
                                     "{} - Unable to parse any numbers from {}",
-                                    header,
+                                    caller,
                                     digits_only
                                 );
                             }
@@ -100,7 +101,7 @@ pub fn parse(info_file_path: &Path) -> info::DFInfoFile {
                 },
                 "DISPLAYED_VERSION" => {
                     info_file_data.displayed_version = String::from(&cap[3]);
-                    header = format!(
+                    caller = format!(
                         "DFInfoFile ({}@v{})",
                         info_file_data.get_identifier(),
                         &cap[3]
@@ -134,7 +135,7 @@ pub fn parse(info_file_path: &Path) -> info::DFInfoFile {
         log::error!(
             "Failure parsing proper info from {}",
             info_file_path.display()
-        )
+        );
     }
 
     info_file_data

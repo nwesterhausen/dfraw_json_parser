@@ -68,7 +68,7 @@ pub fn parse_raw_module_into_serializable(
     parse_raws_into_serializable(raw_module_directory, &dfraw_module_info)
 }
 
-/// It takes a raw module directory path and a DFInfoFile, and returns a vector of <impl TypedJsonSerializable>
+/// It takes a raw module directory path and a `DFInfoFile`, and returns a vector of <impl TypedJsonSerializable>
 ///
 /// Arguments:
 ///
@@ -115,12 +115,12 @@ pub fn parse_raws_into_serializable(
     serializable_raws
 }
 
-/// It takes a path to a file, and a DFInfoFile, and returns a vector of <impl TypedJsonSerializable>
+/// It takes a path to a file, and a `DFInfoFile`, and returns a vector of <impl TypedJsonSerializable>
 ///
 /// Arguments:
 ///
 /// * `entry_path`: &Path - the path to the file to be parsed
-/// * `info_text_file`: This is a struct that contains a HashMap of the info_text_file.txt file.
+/// * `info_text_file`: This is a struct that contains a `HashMap` of the `info_text_file.txt` file.
 ///
 /// Returns:
 ///

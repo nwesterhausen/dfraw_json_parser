@@ -12,6 +12,7 @@ use serde::{Deserialize, Serialize};
 use super::DFRawCommon;
 
 #[derive(Debug, Clone)]
+#[allow(clippy::module_name_repetitions)]
 pub struct DFPlant {
     /// Common Raw file Things
     raw_header: DFRawCommon,
@@ -22,7 +23,7 @@ pub struct DFPlant {
     pub pref_string: Vec<String>,
     pub value: u32,
     pub growth_duration: u32,
-    pub growth_names: HashMap<PlantGrowth, names::SingPlurName>,
+    pub growth_names: HashMap<Growth, names::SingPlurName>,
 
     // Environment Tokens
     pub underground_depth: [u32; 2],
@@ -37,7 +38,7 @@ pub struct DFPlant {
 }
 
 #[derive(Serialize, Deserialize, Debug, PartialEq, Eq, Hash, Clone, Copy)]
-pub enum PlantGrowth {
+pub enum Growth {
     None,
     Leaves,
     Spathes,

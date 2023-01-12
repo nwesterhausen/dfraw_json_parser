@@ -10,11 +10,11 @@ use super::json_conversion;
 
 /// Get a vec of subdirectories for a given directory
 ///
-/// Using the WalkDir crate:
-/// 1. create a new WalkDir for `directory`
-/// 2. limit to immediate contents (max_depth and min_depth at 1)
+/// Using the `WalkDir` crate:
+/// 1. create a new `WalkDir` for `directory`
+/// 2. limit to immediate contents (`max_depth` and `min_depth` at 1)
 /// 3. as an iterator..
-///     4. filter_map into only non-error results
+///     4. `filter_map` into only non-error results
 ///     5. filter into only directories
 /// 4. collect as a vec
 ///
@@ -24,7 +24,7 @@ use super::json_conversion;
 ///
 /// Returns:
 ///
-/// A vector of all subdirectories as walkdir::DirEntry
+/// A vector of all subdirectories as `walkdir::DirEntry`
 pub fn subdirectories(directory: PathBuf) -> Option<Vec<walkdir::DirEntry>> {
     if !(directory.exists() && directory.is_dir()) {
         return None;
@@ -34,7 +34,7 @@ pub fn subdirectories(directory: PathBuf) -> Option<Vec<walkdir::DirEntry>> {
             .max_depth(1)
             .min_depth(1)
             .into_iter()
-            .filter_map(|e| e.ok())
+            .filter_map(std::result::Result::ok)
             .filter(|e| e.file_type().is_dir())
             .collect(),
     )
@@ -66,8 +66,8 @@ pub fn get_parent_dir_name(full_path: &Path) -> String {
 ///
 /// * `parsed_json_string`: String
 /// * `out_filepath`: Path
-pub fn write_json_string_array_to_file(parsed_json_string: Vec<String>, out_filepath: &Path) {
-    write_json_string_to_file(parsed_json_string.join(","), out_filepath)
+pub fn write_json_string_array_to_file(parsed_json_string: &[String], out_filepath: &Path) {
+    write_json_string_to_file(&parsed_json_string.join(","), out_filepath);
 }
 
 /// It takes a string of json and writes it to a file, wrapping it in square brackets to make it a valid
@@ -77,7 +77,7 @@ pub fn write_json_string_array_to_file(parsed_json_string: Vec<String>, out_file
 ///
 /// * `parsed_json_string`: String
 /// * `out_filepath`: Path
-pub fn write_json_string_to_file(parsed_json_string: String, out_filepath: &Path) {
+pub fn write_json_string_to_file(parsed_json_string: &String, out_filepath: &Path) {
     log::info!("Saving json to to {:?}", out_filepath.display());
 
     let out_file = match File::create(out_filepath) {
@@ -102,7 +102,7 @@ pub fn write_json_string_to_file(parsed_json_string: String, out_filepath: &Path
         }
     };
 
-    match write!(stream, "{}", parsed_json_string) {
+    match write!(stream, "{parsed_json_string}") {
         Ok(_x) => (),
         Err(e) => {
             log::error!("{}\n{:?}", write_error, e);
@@ -130,7 +130,7 @@ pub fn write_json_string_to_file(parsed_json_string: String, out_filepath: &Path
 ///
 /// Arguments:
 ///
-/// * `serializable_vec`: Vec<Box<impl json_conversion::TypedJsonSerializable + ?Sized>>
+/// * `serializable_vec`: `Vec<Box<impl json_conversion::TypedJsonSerializable + ?Sized>>`
 ///
 /// Returns:
 ///
@@ -156,12 +156,12 @@ pub fn stringify_raw_vec(
     results
 }
 
-/// "Given a path to a game directory, return a PathBuf to that directory if it exists and is a
+/// "Given a path to a game directory, return a `PathBuf` to that directory if it exists and is a
 /// directory, otherwise return an error."
 ///
-/// The first thing we do is create a PathBuf from the provided game_path. We then check if the path
+/// The first thing we do is create a `PathBuf` from the provided `game_path`. We then check if the path
 /// exists and is a directory. If it doesn't exist, we return an error. If it does exist, but isn't a
-/// directory, we return an error. If it exists and is a directory, we return the PathBuf
+/// directory, we return an error. If it exists and is a directory, we return the `PathBuf`
 ///
 /// Arguments:
 ///

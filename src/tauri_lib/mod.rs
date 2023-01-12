@@ -25,6 +25,7 @@ pub struct ProgressPayload {
 }
 
 #[cfg(feature = "tauri")]
+#[allow(clippy::cast_precision_loss)]
 /// Parse a directory of raws, and return a JSON string of the parsed raws. While parsing, this will
 /// emit tauri events to the supplied window. The event is titled `PROGRESS` and it uses the `ProgressPayload`
 /// payload for the payload.
@@ -34,12 +35,12 @@ pub struct ProgressPayload {
 /// Properties:
 ///
 /// * `df_game_path`: The path to the Dwarf Fortress install directory
-/// * `window`: A tauri::Window to emit `PROGRESS` events to.
+/// * `window`: A `tauri::Window` to emit `PROGRESS` events to.
 ///
 /// Returns:
 ///
 /// A (large) JSON string with details on all raws in the game path.
-pub fn parse_game_raws_with_tauri_emit(df_game_path: &str, window: tauri::Window) -> Vec<String> {
+pub fn parse_game_raws_with_tauri_emit(df_game_path: &str, window: &tauri::Window) -> Vec<String> {
     // Validate game path
     let game_path = match path_from_game_directory(df_game_path) {
         Ok(path_buf) => path_buf,
@@ -77,7 +78,7 @@ pub fn parse_game_raws_with_tauri_emit(df_game_path: &str, window: tauri::Window
                 current_task: String::from("Parse vanilla raw modules"),
             },
         ) {
-            log::debug!("Tauri window emit error {:?}", e)
+            log::debug!("Tauri window emit error {:?}", e);
         };
 
         all_json.push(parse_raw_module(entry.path()));
@@ -93,7 +94,7 @@ pub fn parse_game_raws_with_tauri_emit(df_game_path: &str, window: tauri::Window
                 current_task: String::from("Parse installed_mods raw modules"),
             },
         ) {
-            log::debug!("Tauri window emit error {:?}", e)
+            log::debug!("Tauri window emit error {:?}", e);
         };
 
         all_json.push(parse_raw_module(entry.path()));
@@ -112,7 +113,7 @@ pub fn parse_game_raws_with_tauri_emit(df_game_path: &str, window: tauri::Window
                 current_task: String::from("Parse workshop raw modules"),
             },
         ) {
-            log::debug!("Tauri window emit error {:?}", e)
+            log::debug!("Tauri window emit error {:?}", e);
         };
 
         all_json.push(parse_raw_module(entry.path()));
@@ -128,7 +129,7 @@ pub fn parse_game_raws_with_tauri_emit(df_game_path: &str, window: tauri::Window
                 current_task: String::from("None"),
             },
         ) {
-            log::debug!("Tauri window emit error {:?}", e)
+            log::debug!("Tauri window emit error {:?}", e);
         };
     }
 

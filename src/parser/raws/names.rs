@@ -122,7 +122,7 @@ impl StateName {
             return;
         }
 
-        match split[0] {
+        match *split.first().unwrap_or(&"") {
             "ALL_SOLID" | "SOLID" => {
                 self.set_solid(split[1]);
             }

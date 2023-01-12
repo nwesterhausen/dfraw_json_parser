@@ -1,5 +1,5 @@
 /*!
-dfraw_json_parser provides a way to turn raw files from Dwarf Fortress into JSON.
+`dfraw_json_parser` provides a way to turn raw files from Dwarf Fortress into JSON.
 It functions using a regular expression to break apart the tokens and then checks the
 key in the token against a long list of ones it knows about. Any matches are utilized to
 build its own representation of the raw before a final step where it dumps it to JSON.
@@ -9,9 +9,11 @@ Currently the only raws that are parsed are Creature raws.
 Currently the JSON is returned as a string
 */
 
-use parser::json_conversion::TypedJsonSerializable;
+#![warn(clippy::pedantic)]
+
 use parser::raws::RawModuleLocation;
 use parser::util::subdirectories;
+use parser::{json_conversion::TypedJsonSerializable, util::path_from_game_directory};
 use std::path::{Path, PathBuf};
 use walkdir::DirEntry;
 
@@ -34,6 +36,7 @@ mod tauri_lib;
 /// Returns:
 ///
 /// A string vec containing the JSON array for each parsed raws module
+#[must_use]
 pub fn parse_module_location(raw_module_location_path: &Path) -> String {
     // Guard against invalid path
     if !raw_module_location_path.exists() {
@@ -91,6 +94,7 @@ pub fn parse_module_location(raw_module_location_path: &Path) -> String {
 /// Returns:
 ///
 /// A string vec containing the JSON array for each parsed raws module's info
+#[must_use]
 pub fn parse_info_txt_in_module_location(raw_module_location_path: &Path) -> String {
     // Guard against invalid path
     if !raw_module_location_path.exists() {
@@ -147,6 +151,7 @@ pub fn parse_info_txt_in_module_location(raw_module_location_path: &Path) -> Str
 /// Returns:
 ///
 /// A string vec containing the JSON array for each parsed raws module
+#[must_use]
 pub fn parse_game_raws(df_game_path: &str) -> Vec<String> {
     let mut all_json: Vec<String> = Vec::new();
 
@@ -196,11 +201,12 @@ pub fn parse_game_raws(df_game_path: &str) -> Vec<String> {
 /// Arguments:
 ///
 /// * `root_path`: The path to the directory containing the raws.
-/// * `sourced_dir`: The directory the root_path was found under.
+/// * `sourced_dir`: The directory the `root_path` was found under.
 ///
 /// Returns:
 ///
 /// A JSON string containing the raws for the given directory.
+#[must_use]
 pub fn parse_raw_module(root_path: &Path) -> String {
     parser::parse_raw_module_to_json_string(root_path)
 }
@@ -214,7 +220,7 @@ pub fn parse_raw_module(root_path: &Path) -> String {
 /// * `output_file_path`: The path to the file to save the parsed raws to.
 pub fn parse_game_raws_to_file(input_path: &str, out_filepath: &Path) {
     let json_string_vec = parse_game_raws(input_path);
-    parser::util::write_json_string_array_to_file(json_string_vec, out_filepath);
+    parser::util::write_json_string_array_to_file(&json_string_vec, out_filepath);
 }
 
 /// Takes a path to a folder containing raws, and a path to a file, and parses the raws and saves
@@ -226,7 +232,7 @@ pub fn parse_game_raws_to_file(input_path: &str, out_filepath: &Path) {
 /// * `output_file_path`: The path to the file to save the parsed raws to.
 pub fn parse_all_raw_module_info_to_file(input_path: &str, out_filepath: &Path) {
     let json_string_vec = parse_all_raw_module_info(input_path);
-    parser::util::write_json_string_array_to_file(json_string_vec, out_filepath);
+    parser::util::write_json_string_array_to_file(&json_string_vec, out_filepath);
 }
 
 /// It takes a path to a directory, checks if it's a directory, checks if it has an info.txt file,
@@ -239,6 +245,7 @@ pub fn parse_all_raw_module_info_to_file(input_path: &str, out_filepath: &Path) 
 /// Returns:
 ///
 /// A string.
+#[must_use]
 pub fn parse_info_txt_from_raw_module(raw_module_directory: &Path) -> String {
     let dfraw_module_info = parser::parse_info_file_from_module_directory(raw_module_directory);
     match dfraw_module_info.to_typed_json_string() {
@@ -263,12 +270,13 @@ pub fn parse_info_txt_from_raw_module(raw_module_directory: &Path) -> String {
 /// Properties:
 ///
 /// * `df_game_path`: The path to the Dwarf Fortress install directory
-/// * `window`: A tauri::Window to emit `PROGRESS` events to.
+/// * `window`: A `tauri::Window` to emit `PROGRESS` events to.
 ///
 /// Returns:
 ///
 /// A (large) JSON string with details on all raws in the game path.
-pub fn parse_game_raws_with_tauri_emit(df_game_path: &str, window: tauri::Window) -> Vec<String> {
+#[must_use]
+pub fn parse_game_raws_with_tauri_emit(df_game_path: &str, window: &tauri::Window) -> Vec<String> {
     tauri_lib::parse_game_raws_with_tauri_emit(df_game_path, window)
 }
 
@@ -281,37 +289,28 @@ pub fn parse_game_raws_with_tauri_emit(df_game_path: &str, window: tauri::Window
 /// Returns:
 ///
 /// A JSON String
+#[must_use]
 pub fn parse_single_raw_file(raw_file: &Path) -> String {
     parser::parse_single_raw_file_to_json_string(raw_file)
 }
 
 /// Takes the path to the DF game directory, parses the raw module info files and then
-/// writes the JSON strings of those parsed modules to the out_filepath
+/// writes the JSON strings of those parsed modules to the `out_filepath`
 ///
 /// Arguments:
 ///
 /// * `df_game_path`: The path to the the DF game directory.
 /// * `out_filepath`: The path to the file you want to write to.
+#[must_use]
 pub fn parse_all_raw_module_info(df_game_path: &str) -> Vec<String> {
     //1. "validate" folder is as expected
-    let game_path = Path::new(df_game_path);
-    // Guard against invalid path
-    if !game_path.exists() {
-        log::error!(
-            "Provided game path for parsing doesn't exist!\n{}",
-            df_game_path
-        );
-        return Vec::new();
-    }
-    if !game_path.is_dir() {
-        log::error!("Game path needs to be a directory {}", df_game_path);
-        return Vec::new();
-    }
-
-    // warn on no gamelog.txt
-    if !game_path.join("gamelog.txt").exists() {
-        log::warn!("Unable to find gamelog.txt in game directory. Is it valid?");
-    }
+    let game_path = match path_from_game_directory(df_game_path) {
+        Ok(p) => p,
+        Err(e) => {
+            log::error!("Game Path Error: {}", e);
+            return Vec::new();
+        }
+    };
 
     // Set file paths for vanilla raw modules, workshop mods and installed mods
     let data_path = game_path.join("data");
@@ -336,7 +335,7 @@ pub fn parse_all_raw_module_info(df_game_path: &str) -> Vec<String> {
 /// * `out_filepath`: The path to the file you want to write to.
 pub fn read_single_raw_file_to_file(raw_file: &Path, out_filepath: &Path) {
     let parsed_json_string = parse_single_raw_file(raw_file);
-    parser::util::write_json_string_to_file(parsed_json_string, out_filepath);
+    parser::util::write_json_string_to_file(&parsed_json_string, out_filepath);
 }
 
 /// Parses a single raw module directory, and writes the parsed JSON string to a file
@@ -347,7 +346,7 @@ pub fn read_single_raw_file_to_file(raw_file: &Path, out_filepath: &Path) {
 /// * `out_filepath`: The path to the file you want to write to.
 pub fn parse_raw_module_to_file(module_path: &Path, out_filepath: &Path) {
     let parsed_json_string = parse_raw_module(module_path);
-    parser::util::write_json_string_to_file(parsed_json_string, out_filepath);
+    parser::util::write_json_string_to_file(&parsed_json_string, out_filepath);
 }
 
 /// Parses all the raw modules within a raw module location, and writes the parsed JSON string to a file
@@ -358,5 +357,5 @@ pub fn parse_raw_module_to_file(module_path: &Path, out_filepath: &Path) {
 /// * `out_filepath`: The path to the file you want to write to.
 pub fn parse_raw_module_location_dir_to_file(raw_module_location_path: &Path, out_filepath: &Path) {
     let parsed_json_string = parse_module_location(raw_module_location_path);
-    parser::util::write_json_string_to_file(parsed_json_string, out_filepath);
+    parser::util::write_json_string_to_file(&parsed_json_string, out_filepath);
 }

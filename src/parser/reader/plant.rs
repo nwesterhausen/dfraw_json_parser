@@ -9,6 +9,7 @@ use crate::parser::raws::{biomes, material, names, plant, tags};
 use crate::parser::reader::RawObjectKind;
 use crate::parser::refs::{DF_ENCODING, RAW_TOKEN_RE};
 
+#[allow(clippy::too_many_lines)]
 pub fn parse(input_path: &Path, info_text: &DFInfoFile) -> Vec<plant::DFPlant> {
     let caller = "Parse Plant Raw";
     let mut results: Vec<plant::DFPlant> = Vec::new();
@@ -22,7 +23,7 @@ pub fn parse(input_path: &Path, info_text: &DFInfoFile) -> Vec<plant::DFPlant> {
     };
 
     let decoding_reader = DecodeReaderBytesBuilder::new()
-        .encoding(*DF_ENCODING)
+        .encoding(Some(*DF_ENCODING))
         .build(file);
     let reader = BufReader::new(decoding_reader);
 
@@ -35,7 +36,7 @@ pub fn parse(input_path: &Path, info_text: &DFInfoFile) -> Vec<plant::DFPlant> {
     let mut material_tags: Vec<tags::MaterialTag> = Vec::new();
     let mut plant_tags: Vec<tags::PlantTag> = Vec::new();
     let mut temp_material_vec: Vec<material::SimpleMaterial> = Vec::new();
-    let mut temp_plant_growth = plant::PlantGrowth::None;
+    let mut temp_plant_growth = plant::Growth::None;
 
     let mut material_temp = material::SimpleMaterial::empty();
 
@@ -132,11 +133,12 @@ pub fn parse(input_path: &Path, info_text: &DFInfoFile) -> Vec<plant::DFPlant> {
                     //4. Reset/empty caste tags
                     // ~~material_tags = Vec::new();~~
                     //5. Get material template to add (known) template tags
-                    material_tags = Vec::clone(&material::material_tags_from_template(split[1]));
+                    material_tags = Vec::clone(&material::tags_from_template(split[1]));
                 }
-                "BIOME" => match biomes::BIOMES.get(&cap[3]) {
-                    Some(biome_name) => plant_temp.biomes.push((*biome_name).to_string()),
-                    None => {
+                "BIOME" => {
+                    if let Some(biome_name) = biomes::BIOMES.get(&cap[3]) {
+                        plant_temp.biomes.push((*biome_name).to_string());
+                    } else {
                         log::warn!(
                             "BIOME:{} is not a valid token (in {}); Will add it 'as-is' to biome list",
                             &cap[3],
@@ -144,19 +146,19 @@ pub fn parse(input_path: &Path, info_text: &DFInfoFile) -> Vec<plant::DFPlant> {
                         );
                         plant_temp.biomes.push(String::from(&cap[3]));
                     }
-                },
+                }
                 "GROWTH" => match &cap[3] {
-                    "LEAVES" => temp_plant_growth = plant::PlantGrowth::Leaves,
-                    "FLOWERS" => temp_plant_growth = plant::PlantGrowth::Flowers,
-                    "FRUIT" => temp_plant_growth = plant::PlantGrowth::Fruit,
-                    "SPATHES" => temp_plant_growth = plant::PlantGrowth::Spathes,
-                    "NUT" => temp_plant_growth = plant::PlantGrowth::Nut,
-                    "SEED_CATKINS" => temp_plant_growth = plant::PlantGrowth::SeedCatkins,
-                    "POLLEN_CATKINS" => temp_plant_growth = plant::PlantGrowth::PollenCatkins,
-                    "CONE" => temp_plant_growth = plant::PlantGrowth::Cone,
-                    "SEED_CONE" => temp_plant_growth = plant::PlantGrowth::SeedCone,
-                    "POLLEN_CONE" => temp_plant_growth = plant::PlantGrowth::PollenCone,
-                    "POD" => temp_plant_growth = plant::PlantGrowth::Pod,
+                    "LEAVES" => temp_plant_growth = plant::Growth::Leaves,
+                    "FLOWERS" => temp_plant_growth = plant::Growth::Flowers,
+                    "FRUIT" => temp_plant_growth = plant::Growth::Fruit,
+                    "SPATHES" => temp_plant_growth = plant::Growth::Spathes,
+                    "NUT" => temp_plant_growth = plant::Growth::Nut,
+                    "SEED_CATKINS" => temp_plant_growth = plant::Growth::SeedCatkins,
+                    "POLLEN_CATKINS" => temp_plant_growth = plant::Growth::PollenCatkins,
+                    "CONE" => temp_plant_growth = plant::Growth::Cone,
+                    "SEED_CONE" => temp_plant_growth = plant::Growth::SeedCone,
+                    "POLLEN_CONE" => temp_plant_growth = plant::Growth::PollenCone,
+                    "POD" => temp_plant_growth = plant::Growth::Pod,
                     _ => {
                         log::debug!("Un-matched plant growth token '{}'", &cap[3]);
                     }

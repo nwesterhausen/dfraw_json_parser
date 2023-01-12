@@ -3,7 +3,7 @@ use std::collections::HashMap;
 use crate::parser::raws::{
     material::SimpleMaterial,
     names::SingPlurName,
-    plant::{DFPlant, PlantGrowth},
+    plant::{DFPlant, Growth},
     tags::PlantTag,
     RawModuleLocation,
 };
@@ -13,7 +13,7 @@ use serde::{Deserialize, Serialize};
 
 // Creature Object for Web Consumption
 #[derive(Serialize, Deserialize, Debug, Clone)]
-pub struct TypedJsonPlant {
+pub struct TypedJson {
     // Common Raw file Things
     identifier: String,
     #[serde(rename = "parentRaw")]
@@ -54,12 +54,12 @@ pub struct TypedJsonPlant {
     // Sub Tags
     materials: Vec<SimpleMaterial>,
     #[serde(rename = "growthNames")]
-    growth_names: HashMap<PlantGrowth, SingPlurName>,
+    growth_names: HashMap<Growth, SingPlurName>,
     #[serde(rename = "growthDuration")]
     growth_duration: u32,
 }
 
-impl TypedJsonPlant {
+impl TypedJson {
     pub fn from(plant: &DFPlant) -> Self {
         Self {
             identifier: plant.get_raw_header().get_identifier(),
@@ -90,12 +90,12 @@ impl TypedJsonPlant {
 
 impl TypedJsonSerializable for DFPlant {
     fn to_typed_json_string(&self) -> Result<String, serde_json::Error> {
-        serde_json::to_string(&TypedJsonPlant::from(self))
+        serde_json::to_string(&TypedJson::from(self))
     }
 }
 
 impl TypedJsonSerializable for &DFPlant {
     fn to_typed_json_string(&self) -> Result<String, serde_json::Error> {
-        serde_json::to_string(&TypedJsonPlant::from(self))
+        serde_json::to_string(&TypedJson::from(self))
     }
 }
