@@ -8,6 +8,7 @@ use crate::{
 #[cfg(feature = "tauri")]
 use walkdir::DirEntry;
 
+use std::path::Path;
 #[cfg(feature = "tauri")]
 #[derive(Clone, serde::Serialize)]
 /// It's a struct to represent the progress of the current job. This is emitted back to the Tauri app using the `PROGRESS` event.
@@ -40,13 +41,16 @@ pub struct ProgressPayload {
 /// Returns:
 ///
 /// A (large) JSON string with details on all raws in the game path.
-pub fn parse_game_raws_with_tauri_emit(df_game_path: &str, window: &tauri::Window) -> Vec<String> {
+pub fn parse_game_raws_with_tauri_emit<P: AsRef<Path>>(
+    df_game_path: &P,
+    window: &tauri::Window,
+) -> String {
     // Validate game path
     let game_path = match path_from_game_directory(df_game_path) {
         Ok(path_buf) => path_buf,
         Err(e) => {
             log::error!("{}", e);
-            return Vec::new();
+            return String::new();
         }
     };
 
@@ -75,13 +79,13 @@ pub fn parse_game_raws_with_tauri_emit(df_game_path: &str, window: &tauri::Windo
             ProgressPayload {
                 percentage: pct,
                 current_module: String::from(entry.file_name().to_str().unwrap_or("")),
-                current_task: String::from("Parse vanilla raw modules"),
+                current_task: String::from("Parsing vanilla raw modules"),
             },
         ) {
             log::debug!("Tauri window emit error {:?}", e);
         };
 
-        all_json.push(parse_raw_module(entry.path()));
+        all_json.push(parse_raw_module(&entry.path()));
     }
     for entry in installed_iter {
         current_mod += 1;
@@ -91,13 +95,13 @@ pub fn parse_game_raws_with_tauri_emit(df_game_path: &str, window: &tauri::Windo
             ProgressPayload {
                 percentage: pct,
                 current_module: String::from(entry.file_name().to_str().unwrap_or("")),
-                current_task: String::from("Parse installed_mods raw modules"),
+                current_task: String::from("Parsing installed_mods raw modules"),
             },
         ) {
             log::debug!("Tauri window emit error {:?}", e);
         };
 
-        all_json.push(parse_raw_module(entry.path()));
+        all_json.push(parse_raw_module(&entry.path()));
     }
     for entry in mods_iter {
         current_mod += 1;
@@ -110,13 +114,13 @@ pub fn parse_game_raws_with_tauri_emit(df_game_path: &str, window: &tauri::Windo
                     "workshop-mod:{}",
                     entry.file_name().to_str().unwrap_or("unknown")
                 ),
-                current_task: String::from("Parse workshop raw modules"),
+                current_task: String::from("Parsing workshop raw modules"),
             },
         ) {
             log::debug!("Tauri window emit error {:?}", e);
         };
 
-        all_json.push(parse_raw_module(entry.path()));
+        all_json.push(parse_raw_module(&entry.path()));
     }
 
     if pct < 1.0 {
@@ -138,5 +142,112 @@ pub fn parse_game_raws_with_tauri_emit(df_game_path: &str, window: &tauri::Windo
         .filter(|s| !String::is_empty(s))
         .collect();
 
-    non_empty_json
+    format!("[{}]", non_empty_json.join(","))
+}
+
+#[cfg(feature = "tauri")]
+#[allow(clippy::cast_precision_loss)]
+/// It takes a path to a directory containing raw modules, parses them, and returns a JSON string
+/// containing all the parsed modules. While parsing, emits events to the provided tauri window
+/// to convey parsing status.
+///
+/// Arguments:
+///
+/// * `raw_module_location`: The path to the directory containing the raw modules.
+/// * `window`: The active tauri window to receive events.
+///
+/// Returns:
+///
+/// A JSON string of all the mods in the location.
+pub fn parse_module_location_with_tauri_emit<P: AsRef<Path>>(
+    raw_module_location: &P,
+    window: &tauri::Window,
+) -> String {
+    let raw_module_location_path = raw_module_location.as_ref();
+    // Guard against invalid path
+    if !raw_module_location_path.exists() {
+        log::error!(
+            "Provided module path for parsing doesn't exist!\n{}",
+            raw_module_location_path.display()
+        );
+        return String::new();
+    }
+    if !raw_module_location_path.is_dir() {
+        log::error!(
+            "Raw module path needs to be a directory {}",
+            raw_module_location_path.display()
+        );
+        return String::new();
+    }
+
+    //2. Get module location from provided path
+    let module_location = crate::parser::raws::RawModuleLocation::from_sourced_directory(
+        raw_module_location_path
+            .file_name()
+            .unwrap_or_default()
+            .to_str()
+            .unwrap_or_default(),
+    );
+
+    //3. Get list of all subdirectories
+    let raw_module_iter: Vec<DirEntry> =
+        subdirectories(std::path::PathBuf::from(raw_module_location_path)).unwrap_or_default();
+
+    log::info!(
+        "{num} raw modules located in {location:?}",
+        num = raw_module_iter.len(),
+        location = module_location
+    );
+
+    // Calculate total number of modules we will parse:
+    let total_mods = raw_module_iter.len();
+    let mut current_mod: usize = 0;
+    let mut pct = 0.0;
+
+    let mut all_json: Vec<String> = Vec::new();
+    //4. Loop over all raw modules in the raw module directory
+    for raw_module_directory in raw_module_iter {
+        current_mod += 1;
+        pct = current_mod as f64 / total_mods as f64;
+        if let Err(e) = window.emit(
+            "PROGRESS",
+            ProgressPayload {
+                percentage: pct,
+                current_module: format!(
+                    "module_location:{}",
+                    raw_module_directory
+                        .file_name()
+                        .to_str()
+                        .unwrap_or("unknown")
+                ),
+                current_task: String::from("Parse modules in one location"),
+            },
+        ) {
+            log::debug!("Tauri window emit error {:?}", e);
+        };
+        //2. Parse raws and dump JSON into array
+        all_json.push(parse_raw_module(&raw_module_directory.path()));
+    }
+
+    // Finally send 100% message
+    if pct < 1.0 {
+        pct = 1.0;
+        if let Err(e) = window.emit(
+            "PROGRESS",
+            ProgressPayload {
+                percentage: pct,
+                current_module: String::new(),
+                current_task: String::from("None"),
+            },
+        ) {
+            log::debug!("Tauri window emit error {:?}", e);
+        };
+    }
+
+    let non_empty_json: Vec<String> = all_json
+        .into_iter()
+        .filter(|s| !String::is_empty(s))
+        .collect();
+
+    format!("[{}]", non_empty_json.join(","))
 }

@@ -170,9 +170,9 @@ pub fn stringify_raw_vec(
 /// Returns:
 ///
 /// A Result<PathBuf, String>
-pub fn path_from_game_directory(game_path: &str) -> Result<PathBuf, String> {
+pub fn path_from_game_directory<P: AsRef<Path>>(game_path: &P) -> Result<PathBuf, String> {
     //1. "validate" folder is as expected
-    let game_path = Path::new(game_path);
+    let game_path = Path::new(game_path.as_ref());
 
     // Guard against invalid path
     if !game_path.exists() {
