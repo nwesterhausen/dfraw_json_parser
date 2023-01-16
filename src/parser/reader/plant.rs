@@ -78,7 +78,7 @@ pub fn parse(input_path: &Path, info_text: &DFInfoFile) -> Vec<plant::DFPlant> {
                         // current_object = RawObjectKind::None;
                     }
                 },
-                "PLANT" => {
+                "PLANT" | "SELECT_PLANT" => {
                     // We are starting a creature object capture
                     if let RawObjectKind::Plant = current_object {
                         if started {
@@ -108,7 +108,16 @@ pub fn parse(input_path: &Path, info_text: &DFInfoFile) -> Vec<plant::DFPlant> {
                         plant_tags = Vec::new();
                         //5. Reset/empty caste vector
                         temp_material_vec = Vec::new();
+
+                        // Apply overwrites_raw if this is a SELECT tag
+                        if cap[2].eq("SELECT_PLANT") {
+                            plant_temp.set_overwrites_raw(&cap[3]);
+                        }
                     }
+                }
+                "CUT_USE_MATERIAL_TEMPLATE" => {
+                    // We will have to add one of these for each tag we support cutting..
+                    plant_temp.push_cut_tag(&cap[2], &cap[3]);
                 }
                 "USE_MATERIAL_TEMPLATE" => {
                     //1. Save caste tags
@@ -167,6 +176,9 @@ pub fn parse(input_path: &Path, info_text: &DFInfoFile) -> Vec<plant::DFPlant> {
                     plant_temp
                         .growth_names
                         .insert(temp_plant_growth, names::SingPlurName::new(&cap[3]));
+                }
+                "ALL_NAMES" => {
+                    plant_temp.name.set_all(&cap[3]);
                 }
                 "NAME" => {
                     plant_temp.name.set_singular(&cap[3]);
@@ -242,6 +254,9 @@ pub fn parse(input_path: &Path, info_text: &DFInfoFile) -> Vec<plant::DFPlant> {
                 }
                 "STATE_COLOR" => {
                     material_temp.state_color.set_from_tag(&cap[3]);
+                }
+                "MILL" => {
+                    plant_temp.reactions.push(String::from(&cap[3]));
                 }
                 &_ => (),
             }

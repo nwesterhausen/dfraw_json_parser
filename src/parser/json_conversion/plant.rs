@@ -32,6 +32,8 @@ pub struct TypedJson {
     relative_path: String,
     #[serde(rename = "objectId")]
     object_id: String,
+    #[serde(rename = "overwriteRaw")]
+    overwrites_raw: String,
 
     tags: Vec<PlantTag>,
     name: String,
@@ -57,6 +59,8 @@ pub struct TypedJson {
     growth_names: HashMap<Growth, SingPlurName>,
     #[serde(rename = "growthDuration")]
     growth_duration: u32,
+
+    reactions: Vec<String>,
 }
 
 impl TypedJson {
@@ -72,6 +76,7 @@ impl TypedJson {
             relative_path: plant.get_raw_header().get_dfraw_relative_path(),
             raw_type: plant.get_raw_header().get_raw_type(),
             name: plant.get_general_name(),
+            overwrites_raw: plant.get_raw_header().overwrites_raw.clone(),
 
             frequency: plant.frequency,
             pref_string: plant.pref_string.clone(),
@@ -84,6 +89,8 @@ impl TypedJson {
 
             growth_names: HashMap::clone(&plant.growth_names),
             growth_duration: plant.growth_duration,
+
+            reactions: Vec::clone(&plant.reactions),
         }
     }
 }

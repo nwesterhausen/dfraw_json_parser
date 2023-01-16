@@ -27,6 +27,8 @@ pub struct TypedJson {
     relative_path: String,
     #[serde(rename = "objectId")]
     object_id: String,
+    #[serde(rename = "overwriteRaw")]
+    overwrites_raw: String,
 
     tags: Vec<InorganicTag>,
     name: String,
@@ -59,6 +61,7 @@ impl TypedJson {
             relative_path: inorganic.get_raw_header().get_dfraw_relative_path(),
             raw_type: inorganic.get_raw_header().get_raw_type(),
             name: inorganic.get_general_name(),
+            overwrites_raw: inorganic.get_raw_header().overwrites_raw.clone(),
 
             material: inorganic.material.clone(),
             tags: inorganic.tags.clone(),

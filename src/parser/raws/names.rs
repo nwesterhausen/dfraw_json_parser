@@ -44,6 +44,11 @@ impl Name {
     pub fn set_adjective(&mut self, name: &str) {
         self.adjective = String::from(name);
     }
+    pub fn set_all(&mut self, name: &str) {
+        self.singular = String::from(name);
+        self.plural = String::from(name);
+        self.adjective = String::from(name);
+    }
 }
 
 #[derive(Serialize, Deserialize, Debug, Clone)]

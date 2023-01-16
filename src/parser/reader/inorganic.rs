@@ -81,7 +81,7 @@ pub fn parse(input_path: &Path, info_text: &DFInfoFile) -> Vec<inorganic::DFInor
                         // current_object = RawObjectKind::None;
                     }
                 },
-                "INORGANIC" => {
+                "INORGANIC" | "SELECT_INORGANIC" => {
                     // We are starting a creature object capture
                     if let RawObjectKind::Inorganic = current_object {
                         if started {
@@ -117,6 +117,11 @@ pub fn parse(input_path: &Path, info_text: &DFInfoFile) -> Vec<inorganic::DFInor
                         inorganic_tags = Vec::new();
                         metal_ores = Vec::new();
                         metal_threads = Vec::new();
+
+                        // Apply overwrites_raw if this is a SELECT tag
+                        if cap[2].eq("SELECT_INORGANIC") {
+                            inorganic_temp.set_overwrites_raw(&cap[3]);
+                        }
                     }
                 }
                 "USE_MATERIAL_TEMPLATE" => {
@@ -130,6 +135,10 @@ pub fn parse(input_path: &Path, info_text: &DFInfoFile) -> Vec<inorganic::DFInor
                     environments_temp = Vec::new();
                     //5. Get material template to add (known) template tags
                     material_tags = Vec::clone(&material::tags_from_template(&cap[3]));
+                }
+                "CUT_USE_MATERIAL_TEMPLATE" => {
+                    // We will have to add one of these for each tag we support cutting..
+                    inorganic_temp.push_cut_tag(&cap[2], &cap[3]);
                 }
                 "PREFSTRING" => {
                     log::warn!(

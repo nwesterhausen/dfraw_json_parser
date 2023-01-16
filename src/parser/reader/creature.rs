@@ -82,7 +82,7 @@ pub fn parse(input_path: &Path, info_text: &DFInfoFile) -> Vec<creature::DFCreat
                         // current_object = RawObjectKind::None;
                     }
                 },
-                "CREATURE" => {
+                "CREATURE" | "SELECT_CREATURE" => {
                     // We are starting a creature object capture
                     if let RawObjectKind::Creature = current_object {
                         if started {
@@ -112,6 +112,11 @@ pub fn parse(input_path: &Path, info_text: &DFInfoFile) -> Vec<creature::DFCreat
                         creature_tags = Vec::new();
                         //5. Reset/empty caste vector
                         temp_caste_vec = Vec::new();
+
+                        // Apply overwrites_raw if this is a SELECT tag
+                        if cap[2].eq("SELECT_CREATURE") {
+                            creature_temp.set_overwrites_raw(&cap[3]);
+                        }
                     }
                 }
                 "CASTE" => {
@@ -123,6 +128,10 @@ pub fn parse(input_path: &Path, info_text: &DFInfoFile) -> Vec<creature::DFCreat
                     caste_temp = creature::DFCreatureCaste::new(&cap[3]);
                     //4. Reset/empty caste tags
                     caste_tags = Vec::new();
+                }
+                "CUT_USE_MATERIAL_TEMPLATE" => {
+                    // We will have to add one of these for each tag we support cutting..
+                    creature_temp.push_cut_tag(&cap[2], &cap[3]);
                 }
                 "BIOME" => {
                     if let Some(biome_name) = biomes::BIOMES.get(&cap[3]) {

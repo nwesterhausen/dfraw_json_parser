@@ -36,6 +36,12 @@ pub enum RawModuleLocation {
     Unknown,
 }
 
+#[derive(Debug, Clone, PartialEq, Eq, Hash, serde::Serialize, serde::Deserialize)]
+pub struct CutTag {
+    tag0: String,
+    tag1: String,
+}
+
 #[derive(Debug, Clone)]
 /// Struct to contain what common raw values there are, so it can be used
 /// within the other structs and only get changed in one place etc.
@@ -65,6 +71,11 @@ pub struct DFRawCommon {
     /// Raws can be of many different types, this helps differentiate them when reading from
     /// a large bucket of "raws".
     raw_type: RawObjectKind,
+    /// Using the SELECT tag for a raw definition means replace at least some part of it
+    /// with the information. By default, this will be empty.
+    pub overwrites_raw: String,
+    /// When using SELECT tag, you can CUT some parts from the SELECTed raw.
+    pub cut_tags: Vec<CutTag>,
 }
 
 impl DFRawCommon {
@@ -78,9 +89,16 @@ impl DFRawCommon {
             dfraw_display: format!("{} v{}", info_txt.name, info_txt.displayed_version),
             dfraw_relative_path: info_txt.get_parent_directory(),
             raw_type: variant,
+            overwrites_raw: String::new(),
+            cut_tags: Vec::new(),
         }
     }
-
+    pub fn push_cut_tag(&mut self, tag0: &str, tag1: &str) {
+        self.cut_tags.push(CutTag {
+            tag0: String::from(tag0),
+            tag1: String::from(tag1),
+        });
+    }
     pub fn get_identifier(&self) -> String {
         String::from(&self.identifier)
     }

@@ -26,6 +26,8 @@ pub struct TypedJson {
     relative_path: String,
     #[serde(rename = "objectId")]
     object_id: String,
+    #[serde(rename = "overwriteRaw")]
+    overwrites_raw: String,
 
     name: String,
     tags: Vec<CreatureTag>,
@@ -93,6 +95,8 @@ impl TypedJson {
             raw_module_display: creature.get_raw_header().get_dfraw_display(),
             raw_type: creature.get_raw_header().get_raw_type(),
             relative_path: creature.get_raw_header().get_dfraw_relative_path(),
+            overwrites_raw: creature.get_raw_header().overwrites_raw.clone(),
+
             name: creature.get_general_name(),
             descriptions: creature.get_description_by_caste(),
             max_age: creature.get_max_ages_by_caste(),

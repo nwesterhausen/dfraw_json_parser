@@ -29,6 +29,7 @@ serde_json = "1.0"
 walkdir = "2"
 log = "0.4.17"
 tauri = { version = "1.2", optional = true }
+titlecase = "2.2.1"
 
 [dependencies.phf]
 version = "0.11.1"

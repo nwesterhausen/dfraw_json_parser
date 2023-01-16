@@ -35,6 +35,7 @@ pub struct DFPlant {
     // pub seed: DFPlantSeed,
     // Sub Tags
     pub materials_vec: Vec<material::SimpleMaterial>,
+    pub reactions: Vec<String>,
 }
 
 #[derive(Serialize, Deserialize, Debug, PartialEq, Eq, Hash, Clone, Copy)]
@@ -82,12 +83,24 @@ impl DFPlant {
 
             // Simple materials
             materials_vec: Vec::new(),
+
+            // Simple reactions..
+            reactions: Vec::new(),
         }
     }
     pub fn get_raw_header(&self) -> &DFRawCommon {
         &self.raw_header
     }
+    pub fn set_overwrites_raw(&mut self, raw_name: &str) {
+        self.raw_header.overwrites_raw = String::from(raw_name);
+    }
+    pub fn push_cut_tag(&mut self, tag0: &str, tag1: &str) {
+        self.raw_header.push_cut_tag(tag0, tag1);
+    }
     pub fn get_general_name(&self) -> String {
+        if !self.get_raw_header().overwrites_raw.is_empty() {
+            return format!("Overwrite {}", self.get_raw_header().overwrites_raw);
+        }
         self.name.to_string_vec()[0].to_string()
     }
 }
