@@ -5,6 +5,81 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## v0.10.0 (2023-01-17)
+
+### Chore
+
+ - <csr-id-d8f6f90df5667470625152ed476b6fa4945de12c/> update rust crate clap to 4.1
+ - <csr-id-9aaabf7317998f58325feccfddb49c0c9d4a531e/> 🚀 cherry pick clippy.yml and update renovate config
+ - <csr-id-3e363ff91a2f87f4be26593c6cfc6e9e37882494/> ⚙️ empty renovate config
+ - <csr-id-bac89e814c58315b6629755d25f06ec8d24e4ce2/> update rust crate clap to 4.1
+ - <csr-id-d1a86054f8995bdb12350ab84f8bf1cdfc9e88f5/> 🚀 cherry pick clippy.yml and update renovate config
+ - <csr-id-2f7e6995b52c09be2cc051ba40c0a71b6a67af2f/> ⚙️ empty renovate config
+ - <csr-id-417a67917caa8b7f5e1c410da56fa76cac33d4e3/> 🧑‍💻 rust-analyzer clippy cargo
+
+### Documentation
+
+ - <csr-id-7e118c7fb20f7b84f5d38343b5563276e995b1e5/> 📝 improve library documentation
+
+### New Features
+
+ - <csr-id-b53d1a008b109833bdd8ca36ab5c4ca7a9106bfd/> ⚡️ propogate path as ref
+ - <csr-id-e91d009daa2858212c155fc9f7ea83c94af83c57/> ✨ support SELECT and hopefully CUT
+ - <csr-id-e38f2e8e85f95eb82cac0ce0d769f66dea06b758/> ✨ add tauri-supported raw module location parsing
+
+### Bug Fixes
+
+ - <csr-id-46067f419a8a8d6912f2c626286eafa2f9c9393e/> update rust crate regex to 1.7
+ - <csr-id-8ea5911026b8b65f86393dbbac3223678710caaf/> update rust crate regex to 1.7
+
+### Refactor
+
+ - <csr-id-74fca046ff2fe3e26df372d4ed481773301d05b9/> 🚨 lint clippy::pedantic
+
+ - <csr-id-15d15708f68bb3ff7d7a61c40742e316c985a46f/> 🔥 move most code out of lib, instead call the code from lib
+ - <csr-id-d5648c59538e93ad0f9c96e5ce9a6a2e33a41740/> 🔥 rewrite parsing pattern
+   Set up parsing to work a little more piece-meal. Adds support for parsing a single raw module location dir. Example updated. This lays the groundwork for doing some meta parsing/combining in the future.
+ - <csr-id-8f246a2cb0410202ea54bd581c45ff48306a6f57/> 🔥 move common raw info into its own struct
+
+### Commit Statistics
+
+<csr-read-only-do-not-edit/>
+
+ - 21 commits contributed to the release over the course of 5 calendar days.
+ - 7 days passed between releases.
+ - 17 commits were understood as [conventional](https://www.conventionalcommits.org).
+ - 0 issues like '(#ID)' were seen in commit messages
+
+### Commit Details
+
+<csr-read-only-do-not-edit/>
+
+<details><summary>view details</summary>
+
+ * **Uncategorized**
+    - Merge pull request #13 from nwesterhausen/add-items ([`1d3bbdf`](https://github.com/nwesterhausen/dfraw_json_parser/commit/1d3bbdf6bd7bc7a1046cd2f48fcbf30f1002209b))
+    - Merge branch 'main' into add-items ([`b053d13`](https://github.com/nwesterhausen/dfraw_json_parser/commit/b053d13cafd92edb24df2861f1a0aca1800b24b6))
+    - ⚡️ propogate path as ref ([`b53d1a0`](https://github.com/nwesterhausen/dfraw_json_parser/commit/b53d1a008b109833bdd8ca36ab5c4ca7a9106bfd))
+    - 📝 improve library documentation ([`7e118c7`](https://github.com/nwesterhausen/dfraw_json_parser/commit/7e118c7fb20f7b84f5d38343b5563276e995b1e5))
+    - update rust crate regex to 1.7 ([`46067f4`](https://github.com/nwesterhausen/dfraw_json_parser/commit/46067f419a8a8d6912f2c626286eafa2f9c9393e))
+    - update rust crate clap to 4.1 ([`d8f6f90`](https://github.com/nwesterhausen/dfraw_json_parser/commit/d8f6f90df5667470625152ed476b6fa4945de12c))
+    - 🚀 cherry pick clippy.yml and update renovate config ([`9aaabf7`](https://github.com/nwesterhausen/dfraw_json_parser/commit/9aaabf7317998f58325feccfddb49c0c9d4a531e))
+    - ⚙️ empty renovate config ([`3e363ff`](https://github.com/nwesterhausen/dfraw_json_parser/commit/3e363ff91a2f87f4be26593c6cfc6e9e37882494))
+    - Create .renovaterc ([`663d101`](https://github.com/nwesterhausen/dfraw_json_parser/commit/663d1018edf7a4287c6b8c7da35062a29f60596f))
+    - update rust crate regex to 1.7 ([`8ea5911`](https://github.com/nwesterhausen/dfraw_json_parser/commit/8ea5911026b8b65f86393dbbac3223678710caaf))
+    - update rust crate clap to 4.1 ([`bac89e8`](https://github.com/nwesterhausen/dfraw_json_parser/commit/bac89e814c58315b6629755d25f06ec8d24e4ce2))
+    - 🚀 cherry pick clippy.yml and update renovate config ([`d1a8605`](https://github.com/nwesterhausen/dfraw_json_parser/commit/d1a86054f8995bdb12350ab84f8bf1cdfc9e88f5))
+    - ⚙️ empty renovate config ([`2f7e699`](https://github.com/nwesterhausen/dfraw_json_parser/commit/2f7e6995b52c09be2cc051ba40c0a71b6a67af2f))
+    - Create .renovaterc ([`a06b323`](https://github.com/nwesterhausen/dfraw_json_parser/commit/a06b3235590f5badf2a1bcdf8f6a06384f454628))
+    - ✨ support SELECT and hopefully CUT ([`e91d009`](https://github.com/nwesterhausen/dfraw_json_parser/commit/e91d009daa2858212c155fc9f7ea83c94af83c57))
+    - ✨ add tauri-supported raw module location parsing ([`e38f2e8`](https://github.com/nwesterhausen/dfraw_json_parser/commit/e38f2e8e85f95eb82cac0ce0d769f66dea06b758))
+    - 🧑‍💻 rust-analyzer clippy cargo ([`417a679`](https://github.com/nwesterhausen/dfraw_json_parser/commit/417a67917caa8b7f5e1c410da56fa76cac33d4e3))
+    - 🚨 lint clippy::pedantic ([`74fca04`](https://github.com/nwesterhausen/dfraw_json_parser/commit/74fca046ff2fe3e26df372d4ed481773301d05b9))
+    - 🔥 move most code out of lib, instead call the code from lib ([`15d1570`](https://github.com/nwesterhausen/dfraw_json_parser/commit/15d15708f68bb3ff7d7a61c40742e316c985a46f))
+    - 🔥 rewrite parsing pattern ([`d5648c5`](https://github.com/nwesterhausen/dfraw_json_parser/commit/d5648c59538e93ad0f9c96e5ce9a6a2e33a41740))
+    - 🔥 move common raw info into its own struct ([`8f246a2`](https://github.com/nwesterhausen/dfraw_json_parser/commit/8f246a2cb0410202ea54bd581c45ff48306a6f57))
+</details>
+
 ## v0.9.4 (2023-01-10)
 
 ### New Features
@@ -19,7 +94,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 <csr-read-only-do-not-edit/>
 
- - 2 commits contributed to the release.
+ - 3 commits contributed to the release.
  - 2 commits were understood as [conventional](https://www.conventionalcommits.org).
  - 0 issues like '(#ID)' were seen in commit messages
 
@@ -30,6 +105,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 <details><summary>view details</summary>
 
  * **Uncategorized**
+    - Release dfraw_json_parser v0.9.4 ([`ec7e485`](https://github.com/nwesterhausen/dfraw_json_parser/commit/ec7e485d3922f68bc900f958be21d840f6952d41))
     - 🐛 fix typo in RollChance type ([`357f61d`](https://github.com/nwesterhausen/dfraw_json_parser/commit/357f61d32d7c544ab3a7125c4516e24d30eb9a0d))
     - ✨ add magma safe calculation ([`591e64c`](https://github.com/nwesterhausen/dfraw_json_parser/commit/591e64c025b70b31d899a6e6d4c59e0501650e1a))
 </details>
@@ -387,7 +463,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 <csr-id-59e2dff2d583cd8c5c55411688a6c8f4ddcf361a/>
 
 
-<csr-id-59e2dff2d583cd8c5c55411688a6c8f4ddcf361a/>
 
 
 <csr-id-5e6dde45b3489ad93660372f654fa637a4379d98/>
