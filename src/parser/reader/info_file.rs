@@ -9,7 +9,7 @@ use crate::parser::refs::{DF_ENCODING, NON_DIGIT_RE, RAW_TOKEN_RE};
 use crate::parser::util::get_parent_dir_name;
 
 #[allow(clippy::too_many_lines)]
-pub fn parse(info_file_path: &Path) -> info::DFInfoFile {
+pub fn parse<P: AsRef<Path>>(info_file_path: &P) -> info::DFInfoFile {
     let parent_dir = get_parent_dir_name(info_file_path);
     let location = RawModuleLocation::from_info_text_file_path(info_file_path);
 
@@ -134,7 +134,7 @@ pub fn parse(info_file_path: &Path) -> info::DFInfoFile {
     if info_file_data.get_identifier() == "unknown" {
         log::error!(
             "Failure parsing proper info from {}",
-            info_file_path.display()
+            info_file_path.as_ref().display()
         );
     }
 

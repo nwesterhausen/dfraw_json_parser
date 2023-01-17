@@ -197,7 +197,7 @@ pub fn parse_info_txt_in_location<P: AsRef<Path>>(raw_module_location: &P) -> St
     //4. Loop over all raw modules in the raw module directory
     for raw_module_directory in raw_module_iter {
         //2. Parse raws and dump JSON into array
-        all_json.push(parse_info_txt_in_module(raw_module_directory.path()));
+        all_json.push(parse_info_txt_in_module(&raw_module_directory.path()));
     }
 
     format!("[{}]", all_json.join(","))
@@ -266,7 +266,7 @@ pub fn parse_game_raws<P: AsRef<Path>>(df_game_path: &P) -> String {
 /// A JSON string: `<T extends Raw>[][]]`, where T can be `Creature`, `Inorganic`, or `Plant`.
 /// (See [`typings.d.ts`](https://github.com/nwesterhausen/dfraw_json_parser/blob/main/typing.d.ts))
 pub fn parse_raw_module<P: AsRef<Path>>(raw_module_path: &P) -> String {
-    parser::parse_raw_module_to_json_string(raw_module_path.as_ref())
+    parser::parse_raw_module_to_json_string(raw_module_path)
 }
 
 /// Parse all the game raws and saves the result to a JSON file.
@@ -301,7 +301,7 @@ pub fn parse_info_txt_in_game_dir_to_file<P: AsRef<Path>>(df_game_path: &P, out_
 ///
 /// A JSON string: `InfoFile`
 /// (See [`typings.d.ts`](https://github.com/nwesterhausen/dfraw_json_parser/blob/main/typing.d.ts))
-pub fn parse_info_txt_in_module(raw_module_directory: &Path) -> String {
+pub fn parse_info_txt_in_module<P: AsRef<Path>>(raw_module_directory: &P) -> String {
     let dfraw_module_info = parser::parse_info_file_from_module_directory(raw_module_directory);
     match dfraw_module_info.to_typed_json_string() {
         Ok(s) => {
@@ -326,7 +326,7 @@ pub fn parse_info_txt_in_module(raw_module_directory: &Path) -> String {
 /// A JSON string: `<T extends Raw>[]`, where T can be `Creature`, `Inorganic`, or `Plant`.
 /// (See [`typings.d.ts`](https://github.com/nwesterhausen/dfraw_json_parser/blob/main/typing.d.ts))
 pub fn parse_single_raw_file<P: AsRef<Path>>(raw_file: &P) -> String {
-    parser::parse_single_raw_file_to_json_string(raw_file.as_ref())
+    parser::parse_single_raw_file_to_json_string(raw_file)
 }
 
 /// Parse all info.txt within the modules found in the game directory to JSON.
@@ -436,9 +436,9 @@ pub fn parse_game_raws_with_tauri_emit<P: AsRef<Path>>(
 /// Returns:
 ///
 /// A JSON string of all the mods in the location.
-pub fn parse_module_location_with_tauri_emit<P: AsRef<Path>>(
-    raw_module_location: &P,
+pub fn parse_location_with_tauri_emit<P: AsRef<Path>>(
+    location_path: &P,
     window: &tauri::Window,
 ) -> String {
-    tauri_lib::parse_module_location_with_tauri_emit(raw_module_location, window)
+    tauri_lib::parse_location_with_tauri_emit(location_path, window)
 }

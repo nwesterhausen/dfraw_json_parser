@@ -24,25 +24,29 @@ pub mod plant;
 /// Returns:
 ///
 /// `RawObjectKind` for the type of [OBJECT] tag encountered, and `RawObjectKind::None` if it is unsupported.
-pub fn read_raw_file_type(input_path: &Path) -> RawObjectKind {
+pub fn read_raw_file_type<P: AsRef<Path>>(input_path: &P) -> RawObjectKind {
     let caller = "Raw File Type Checker";
     // Validate file exists
-    if !input_path.exists() {
-        log::error!("{} - Path doesn't exist {}", caller, input_path.display());
+    if !input_path.as_ref().exists() {
+        log::error!(
+            "{} - Path doesn't exist {}",
+            caller,
+            input_path.as_ref().display()
+        );
         return RawObjectKind::None;
     }
-    if !input_path.is_file() {
+    if !input_path.as_ref().is_file() {
         log::error!(
             "{} - Path does not point to a file {}",
             caller,
-            input_path.display(),
+            input_path.as_ref().display(),
         );
         return RawObjectKind::None;
     }
 
     // Open the file
     let Ok(file) = File::open(input_path) else {
-        log::error!("{} - Unable to open file {}",caller, input_path.display());
+        log::error!("{} - Unable to open file {}",caller, input_path.as_ref().display());
         return RawObjectKind::None;
     };
 
@@ -61,7 +65,7 @@ pub fn read_raw_file_type(input_path: &Path) -> RawObjectKind {
             log::error!(
                 "{} - Error processing {}:{}",
                 caller,
-                input_path.display(),
+                input_path.as_ref().display(),
                 index
             );
             continue;
@@ -112,6 +116,10 @@ pub fn read_raw_file_type(input_path: &Path) -> RawObjectKind {
     }
 
     // Reading through the entire file and not finding an [OBJECT] tag means the raw file is invalid
-    log::warn!("{} - no [OBJECT] tag in {}", caller, input_path.display());
+    log::warn!(
+        "{} - no [OBJECT] tag in {}",
+        caller,
+        input_path.as_ref().display()
+    );
     RawObjectKind::None
 }

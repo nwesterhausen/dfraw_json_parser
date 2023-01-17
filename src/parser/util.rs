@@ -50,8 +50,8 @@ pub fn subdirectories(directory: PathBuf) -> Option<Vec<walkdir::DirEntry>> {
 /// Returns:
 ///
 /// A String
-pub fn get_parent_dir_name(full_path: &Path) -> String {
-    match full_path.parent() {
+pub fn get_parent_dir_name<P: AsRef<Path>>(full_path: &P) -> String {
+    match full_path.as_ref().parent() {
         Some(parent_dir) => {
             String::from(parent_dir.file_name().unwrap_or_default().to_string_lossy())
         }

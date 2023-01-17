@@ -10,7 +10,7 @@ use crate::parser::reader::RawObjectKind;
 use crate::parser::refs::{DF_ENCODING, RAW_TOKEN_RE};
 
 #[allow(clippy::too_many_lines)]
-pub fn parse(input_path: &Path, info_text: &DFInfoFile) -> Vec<plant::DFPlant> {
+pub fn parse<P: AsRef<Path>>(input_path: &P, info_text: &DFInfoFile) -> Vec<plant::DFPlant> {
     let caller = "Parse Plant Raw";
     let mut results: Vec<plant::DFPlant> = Vec::new();
 
@@ -45,7 +45,7 @@ pub fn parse(input_path: &Path, info_text: &DFInfoFile) -> Vec<plant::DFPlant> {
             log::error!(
                 "{} - Error processing {}:{}",
                 caller,
-                input_path.display(),
+                input_path.as_ref().display(),
                 index
             );
             continue;

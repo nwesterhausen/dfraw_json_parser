@@ -148,10 +148,10 @@ impl RawModuleLocation {
             }
         }
     }
-    pub fn from_info_text_file_path(full_path: &Path) -> Self {
+    pub fn from_info_text_file_path<P: AsRef<Path>>(full_path: &P) -> Self {
         // info.txt is relative by 2 parents from our module location
         // <MODULE LOCATION>/<RAW MODULE>/info.txt
-        match full_path.parent() {
+        match full_path.as_ref().parent() {
             Some(parent_dir) => match parent_dir.parent() {
                 Some(grandparent_dir) => {
                     let path_string = String::from(

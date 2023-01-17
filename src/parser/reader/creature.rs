@@ -18,7 +18,7 @@ use crate::parser::{
 };
 
 #[allow(clippy::too_many_lines)]
-pub fn parse(input_path: &Path, info_text: &DFInfoFile) -> Vec<creature::DFCreature> {
+pub fn parse<P: AsRef<Path>>(input_path: &P, info_text: &DFInfoFile) -> Vec<creature::DFCreature> {
     let caller = "Parse Creature Raw";
     let mut results: Vec<creature::DFCreature> = Vec::new();
 
@@ -52,7 +52,7 @@ pub fn parse(input_path: &Path, info_text: &DFInfoFile) -> Vec<creature::DFCreat
             log::error!(
                 "{} - Error processing {}:{}",
                 caller,
-                input_path.display(),
+                input_path.as_ref().display(),
                 index
             );
             continue;

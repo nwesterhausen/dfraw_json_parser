@@ -60,82 +60,20 @@ pub fn parse_game_raws_with_tauri_emit<P: AsRef<Path>>(
     let installed_mods_path = data_path.join("installed_mods");
     let workshop_mods_path = game_path.join("mods");
 
-    let vanilla_iter: Vec<DirEntry> = subdirectories(vanilla_path).unwrap_or_default();
-    let installed_iter: Vec<DirEntry> = subdirectories(installed_mods_path).unwrap_or_default();
-    let mods_iter: Vec<DirEntry> = subdirectories(workshop_mods_path).unwrap_or_default();
+    // let vanilla_iter: Vec<DirEntry> = subdirectories(vanilla_path).unwrap_or_default();
+    // let installed_iter: Vec<DirEntry> = subdirectories(installed_mods_path).unwrap_or_default();
+    // let mods_iter: Vec<DirEntry> = subdirectories(workshop_mods_path).unwrap_or_default();
 
     // Calculate total number of modules we will parse:
-    let total_mods = vanilla_iter.len() + installed_iter.len() + mods_iter.len();
-    let mut current_mod: usize = 0;
-    let mut pct = 0.0;
+    // let total_mods = vanilla_iter.len() + installed_iter.len() + mods_iter.len();
+    // let mut current_mod: usize = 0;
+    // let mut pct = 0.0;
 
-    let mut all_json: Vec<String> = Vec::new();
-
-    for entry in vanilla_iter {
-        current_mod += 1;
-        pct = current_mod as f64 / total_mods as f64;
-        if let Err(e) = window.emit(
-            "PROGRESS",
-            ProgressPayload {
-                percentage: pct,
-                current_module: String::from(entry.file_name().to_str().unwrap_or("")),
-                current_task: String::from("Parsing vanilla raw modules"),
-            },
-        ) {
-            log::debug!("Tauri window emit error {:?}", e);
-        };
-
-        all_json.push(parse_raw_module(&entry.path()));
-    }
-    for entry in installed_iter {
-        current_mod += 1;
-        pct = current_mod as f64 / total_mods as f64;
-        if let Err(e) = window.emit(
-            "PROGRESS",
-            ProgressPayload {
-                percentage: pct,
-                current_module: String::from(entry.file_name().to_str().unwrap_or("")),
-                current_task: String::from("Parsing installed_mods raw modules"),
-            },
-        ) {
-            log::debug!("Tauri window emit error {:?}", e);
-        };
-
-        all_json.push(parse_raw_module(&entry.path()));
-    }
-    for entry in mods_iter {
-        current_mod += 1;
-        pct = current_mod as f64 / total_mods as f64;
-        if let Err(e) = window.emit(
-            "PROGRESS",
-            ProgressPayload {
-                percentage: pct,
-                current_module: format!(
-                    "workshop-mod:{}",
-                    entry.file_name().to_str().unwrap_or("unknown")
-                ),
-                current_task: String::from("Parsing workshop raw modules"),
-            },
-        ) {
-            log::debug!("Tauri window emit error {:?}", e);
-        };
-
-        all_json.push(parse_raw_module(&entry.path()));
-    }
-
-    if pct < 1.0 {
-        pct = 1.0;
-        if let Err(e) = window.emit(
-            "PROGRESS",
-            ProgressPayload {
-                percentage: pct,
-                current_module: String::new(),
-                current_task: String::from("None"),
-            },
-        ) {
-            log::debug!("Tauri window emit error {:?}", e);
-        };
-    }
+    let all_json = vec![
+        parse_location_with_tauri_emit(&vanilla_path, window),
+        parse_location_with_tauri_emit(&installed_mods_path, window),
+        parse_location_with_tauri_emit(&workshop_mods_path, window),
+    ];
 
     let non_empty_json: Vec<String> = all_json
         .into_iter()
@@ -159,7 +97,7 @@ pub fn parse_game_raws_with_tauri_emit<P: AsRef<Path>>(
 /// Returns:
 ///
 /// A JSON string of all the mods in the location.
-pub fn parse_module_location_with_tauri_emit<P: AsRef<Path>>(
+pub fn parse_location_with_tauri_emit<P: AsRef<Path>>(
     raw_module_location: &P,
     window: &tauri::Window,
 ) -> String {
@@ -203,6 +141,7 @@ pub fn parse_module_location_with_tauri_emit<P: AsRef<Path>>(
     let total_mods = raw_module_iter.len();
     let mut current_mod: usize = 0;
     let mut pct = 0.0;
+    let current_task = format!("Parsing raws in {:?}", module_location);
 
     let mut all_json: Vec<String> = Vec::new();
     //4. Loop over all raw modules in the raw module directory
@@ -220,7 +159,7 @@ pub fn parse_module_location_with_tauri_emit<P: AsRef<Path>>(
                         .to_str()
                         .unwrap_or("unknown")
                 ),
-                current_task: String::from("Parse modules in one location"),
+                current_task: current_task.clone(),
             },
         ) {
             log::debug!("Tauri window emit error {:?}", e);
