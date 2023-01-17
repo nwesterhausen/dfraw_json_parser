@@ -7,6 +7,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## v0.10.0 (2023-01-17)
 
+<csr-id-d8f6f90df5667470625152ed476b6fa4945de12c/>
+<csr-id-9aaabf7317998f58325feccfddb49c0c9d4a531e/>
+<csr-id-3e363ff91a2f87f4be26593c6cfc6e9e37882494/>
+<csr-id-bac89e814c58315b6629755d25f06ec8d24e4ce2/>
+<csr-id-d1a86054f8995bdb12350ab84f8bf1cdfc9e88f5/>
+<csr-id-2f7e6995b52c09be2cc051ba40c0a71b6a67af2f/>
+<csr-id-417a67917caa8b7f5e1c410da56fa76cac33d4e3/>
+<csr-id-74fca046ff2fe3e26df372d4ed481773301d05b9/>
+<csr-id-15d15708f68bb3ff7d7a61c40742e316c985a46f/>
+<csr-id-d5648c59538e93ad0f9c96e5ce9a6a2e33a41740/>
+<csr-id-8f246a2cb0410202ea54bd581c45ff48306a6f57/>
+
 ### Chore
 
  - <csr-id-d8f6f90df5667470625152ed476b6fa4945de12c/> update rust crate clap to 4.1
@@ -16,6 +28,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
  - <csr-id-d1a86054f8995bdb12350ab84f8bf1cdfc9e88f5/> 🚀 cherry pick clippy.yml and update renovate config
  - <csr-id-2f7e6995b52c09be2cc051ba40c0a71b6a67af2f/> ⚙️ empty renovate config
  - <csr-id-417a67917caa8b7f5e1c410da56fa76cac33d4e3/> 🧑‍💻 rust-analyzer clippy cargo
+
+### Chore
+
+ - <csr-id-a4ff82d5790c6b3b07676eae32b2fbeadb587643/> 🐛 fix keywords
 
 ### Documentation
 
@@ -45,9 +61,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 <csr-read-only-do-not-edit/>
 
- - 21 commits contributed to the release over the course of 5 calendar days.
+ - 23 commits contributed to the release over the course of 5 calendar days.
  - 7 days passed between releases.
- - 17 commits were understood as [conventional](https://www.conventionalcommits.org).
+ - 18 commits were understood as [conventional](https://www.conventionalcommits.org).
  - 0 issues like '(#ID)' were seen in commit messages
 
 ### Commit Details
@@ -57,6 +73,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 <details><summary>view details</summary>
 
  * **Uncategorized**
+    - 🐛 fix keywords ([`a4ff82d`](https://github.com/nwesterhausen/dfraw_json_parser/commit/a4ff82d5790c6b3b07676eae32b2fbeadb587643))
+    - Release dfraw_json_parser v0.10.0 ([`d654a89`](https://github.com/nwesterhausen/dfraw_json_parser/commit/d654a89300ae07a3224d0e25aad18776aa424463))
     - Merge pull request #13 from nwesterhausen/add-items ([`1d3bbdf`](https://github.com/nwesterhausen/dfraw_json_parser/commit/1d3bbdf6bd7bc7a1046cd2f48fcbf30f1002209b))
     - Merge branch 'main' into add-items ([`b053d13`](https://github.com/nwesterhausen/dfraw_json_parser/commit/b053d13cafd92edb24df2861f1a0aca1800b24b6))
     - ⚡️ propogate path as ref ([`b53d1a0`](https://github.com/nwesterhausen/dfraw_json_parser/commit/b53d1a008b109833bdd8ca36ab5c4ca7a9106bfd))
@@ -463,9 +481,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 <csr-id-59e2dff2d583cd8c5c55411688a6c8f4ddcf361a/>
 
 
-
-
-<csr-id-5e6dde45b3489ad93660372f654fa637a4379d98/>
 <csr-id-a6f00156cddc9b0c42b5f0a19883d5382c19d160/>
 <csr-id-5a9740e01528680c3f6543673fbd722913ac57c2/>
 <csr-id-7932e59c509f1da93e8f431fbbef9a164de144d1/>
