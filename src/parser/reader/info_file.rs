@@ -4,61 +4,45 @@ use std::fs::File;
 use std::io::{BufRead, BufReader};
 use std::path::Path;
 
-use crate::parser::raws::info;
+use crate::parser::raws::{info, RawModuleLocation};
 use crate::parser::refs::{DF_ENCODING, NON_DIGIT_RE, RAW_TOKEN_RE};
+use crate::parser::util::get_parent_dir_name;
 
-pub fn parse(info_file_path: &Path, source_dir: &str) -> info::DFInfoFile {
-    let relative_path = match info_file_path.parent() {
-        Some(parent_dir) => {
-            format!(
-                "\"{}/{}/{}\"",
-                source_dir,
-                parent_dir.file_name().unwrap_or_default().to_string_lossy(),
-                info_file_path
-                    .file_name()
-                    .unwrap_or_default()
-                    .to_string_lossy()
-            )
-        }
-        None => format!(
-            "\"{}/<unknown>/{:?}\"",
-            source_dir,
-            info_file_path.file_name()
-        ),
-    };
+#[allow(clippy::too_many_lines)]
+pub fn parse<P: AsRef<Path>>(info_file_path: &P) -> info::DFInfoFile {
+    let parent_dir = get_parent_dir_name(info_file_path);
+    let location = RawModuleLocation::from_info_text_file_path(info_file_path);
 
-    let file = match File::open(&info_file_path) {
+    let file = match File::open(info_file_path) {
         Ok(f) => f,
         Err(e) => {
-            log::error!("DFInfoFile - Error opening raw file for parsing!\n{:?}", e);
-            return info::DFInfoFile::new("error", source_dir, &relative_path);
+            log::error!(
+                "DFInfoFile - Error opening raw file for parsing in \"{}\"\n{:?}",
+                parent_dir,
+                e
+            );
+            return info::DFInfoFile::empty();
         }
     };
 
     let decoding_reader = DecodeReaderBytesBuilder::new()
-        .encoding(*DF_ENCODING)
+        .encoding(Some(*DF_ENCODING))
         .build(file);
     let reader = BufReader::new(decoding_reader);
 
     // info.txt details
-    let mut header = String::from("DFInfoFile");
-    let mut info_file_data: info::DFInfoFile =
-        info::DFInfoFile::new("", source_dir, &relative_path);
+    let mut caller = String::from("DFInfoFile");
+    let mut info_file_data: info::DFInfoFile = info::DFInfoFile::new("", location, &parent_dir);
 
     for (index, line) in reader.lines().enumerate() {
         if line.is_err() {
-            log::error!(
-                "{} - Error processing {:?}:{}",
-                header,
-                relative_path,
-                index
-            );
+            log::error!("{} - Error processing {:?}:{}", caller, parent_dir, index);
             continue;
         }
         let line = match line {
             Ok(l) => l,
             Err(e) => {
-                log::error!("{} - Line-reading error\n{:?}", header, e);
+                log::error!("{} - Line-reading error\n{:?}", caller, e);
                 continue;
             }
         };
@@ -68,16 +52,16 @@ pub fn parse(info_file_path: &Path, source_dir: &str) -> info::DFInfoFile {
                 // SECTION FOR MATCHING info.txt DATA
                 "ID" => {
                     // the [ID:identifier] tag should be the top of the info.txt file
-                    info_file_data = info::DFInfoFile::new(&cap[3], source_dir, &relative_path);
-                    header = format!("DFInfoFile ({})", &cap[3]);
+                    info_file_data = info::DFInfoFile::new(&cap[3], location, &parent_dir);
+                    caller = format!("DFInfoFile ({})", &cap[3]);
                 }
                 "NUMERIC_VERSION" => match cap[3].parse() {
                     Ok(n) => info_file_data.numeric_version = n,
                     Err(_e) => {
                         log::warn!(
                             "{} - 'NUMERIC_VERSION' should be integer {}",
-                            header,
-                            relative_path
+                            caller,
+                            parent_dir
                         );
                         // match on \D to replace any non-digit characters with empty string
                         let digits_only = NON_DIGIT_RE.replace_all(&cap[3], "").to_string();
@@ -86,7 +70,7 @@ pub fn parse(info_file_path: &Path, source_dir: &str) -> info::DFInfoFile {
                             Err(_e) => {
                                 log::error!(
                                     "{} - Unable to parse any numbers from {}",
-                                    header,
+                                    caller,
                                     digits_only
                                 );
                             }
@@ -98,8 +82,8 @@ pub fn parse(info_file_path: &Path, source_dir: &str) -> info::DFInfoFile {
                     Err(_e) => {
                         log::warn!(
                             "{} - 'EARLIEST_COMPATIBLE_NUMERIC_VERSION' should be integer {}",
-                            header,
-                            relative_path
+                            caller,
+                            parent_dir
                         );
                         // match on \D to replace any non-digit characters with empty string
                         let digits_only = NON_DIGIT_RE.replace_all(&cap[3], "").to_string();
@@ -108,7 +92,7 @@ pub fn parse(info_file_path: &Path, source_dir: &str) -> info::DFInfoFile {
                             Err(_e) => {
                                 log::error!(
                                     "{} - Unable to parse any numbers from {}",
-                                    header,
+                                    caller,
                                     digits_only
                                 );
                             }
@@ -117,7 +101,7 @@ pub fn parse(info_file_path: &Path, source_dir: &str) -> info::DFInfoFile {
                 },
                 "DISPLAYED_VERSION" => {
                     info_file_data.displayed_version = String::from(&cap[3]);
-                    header = format!(
+                    caller = format!(
                         "DFInfoFile ({}@v{})",
                         info_file_data.get_identifier(),
                         &cap[3]
@@ -142,8 +126,16 @@ pub fn parse(info_file_path: &Path, source_dir: &str) -> info::DFInfoFile {
 
     // Do some final checks to confirm that the name is set. Specifically in "Dark Ages V - War & Mythos" the
     // [name] Token in the info.txt is written incorrectly as "[name]X" instead of [name:X]
-    if info_file_data.name.is_empty() || info_file_data.name.len() == 0 {
-        info_file_data.name = String::from(info_file_data.get_identifier());
+    if info_file_data.name.is_empty() || info_file_data.name.is_empty() {
+        info_file_data.name = info_file_data.get_identifier();
+    }
+
+    // Check for 'unknown' identifier and try to provide any extra info
+    if info_file_data.get_identifier() == "unknown" {
+        log::error!(
+            "Failure parsing proper info from {}",
+            info_file_path.as_ref().display()
+        );
     }
 
     info_file_data

@@ -8,6 +8,6 @@ lazy_static! {
     pub static ref NON_CHAR_RE: Regex = Regex::new(r"\W").unwrap();
 
     // The file encoding supported by dwarf fortress
-    pub static ref DF_ENCODING: Option<&'static encoding_rs::Encoding> =
-        encoding_rs::Encoding::for_label(b"latin1");
+    pub static ref DF_ENCODING: &'static encoding_rs::Encoding =
+        encoding_rs::Encoding::for_label(b"latin1").unwrap();
 }

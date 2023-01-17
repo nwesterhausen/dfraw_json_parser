@@ -6,21 +6,16 @@ use crate::parser::raws::{
     tags::{self},
 };
 use crate::parser::raws::{material, names};
-use crate::parser::reader::RawObjectKind;
-use serde::{Deserialize, Serialize};
-use slug::slugify;
 
-#[derive(Debug)]
+use serde::{Deserialize, Serialize};
+
+use super::DFRawCommon;
+
+#[derive(Debug, Clone)]
+#[allow(clippy::module_name_repetitions)]
 pub struct DFPlant {
-    // Common Raw file Things
-    identifier: String,
-    parent_raw: String,
-    dfraw_identifier: String,
-    dfraw_version: String,
-    dfraw_found_in: String,
-    dfraw_display: String,
-    dfraw_relative_path: String,
-    raw_type: RawObjectKind,
+    /// Common Raw file Things
+    raw_header: DFRawCommon,
     pub tags: Vec<tags::PlantTag>,
 
     // Basic Tokens
@@ -28,7 +23,7 @@ pub struct DFPlant {
     pub pref_string: Vec<String>,
     pub value: u32,
     pub growth_duration: u32,
-    pub growth_names: HashMap<PlantGrowth, names::SingPlurName>,
+    pub growth_names: HashMap<Growth, names::SingPlurName>,
 
     // Environment Tokens
     pub underground_depth: [u32; 2],
@@ -40,10 +35,11 @@ pub struct DFPlant {
     // pub seed: DFPlantSeed,
     // Sub Tags
     pub materials_vec: Vec<material::SimpleMaterial>,
+    pub reactions: Vec<String>,
 }
 
 #[derive(Serialize, Deserialize, Debug, PartialEq, Eq, Hash, Clone, Copy)]
-pub enum PlantGrowth {
+pub enum Growth {
     None,
     Leaves,
     Spathes,
@@ -68,14 +64,7 @@ pub struct DFPlantSeed {
 impl DFPlant {
     pub fn new(raw: &str, id: &str, info_text: &DFInfoFile) -> Self {
         Self {
-            identifier: String::from(id),
-            parent_raw: String::from(raw),
-            dfraw_identifier: String::from(info_text.get_identifier()),
-            dfraw_version: String::from(info_text.displayed_version.as_str()),
-            dfraw_found_in: String::from(info_text.get_sourced_directory()),
-            dfraw_display: format!("{} v{}", info_text.name, info_text.displayed_version),
-            dfraw_relative_path: String::from(info_text.get_relative_path()),
-            raw_type: RawObjectKind::Plant,
+            raw_header: DFRawCommon::from(id, raw, info_text, super::RawObjectKind::Plant),
             // Boolean Flags
             tags: Vec::new(),
 
@@ -94,42 +83,24 @@ impl DFPlant {
 
             // Simple materials
             materials_vec: Vec::new(),
+
+            // Simple reactions..
+            reactions: Vec::new(),
         }
     }
-
-    pub fn get_identifier(&self) -> String {
-        String::from(&self.identifier)
+    pub fn get_raw_header(&self) -> &DFRawCommon {
+        &self.raw_header
     }
-    pub fn get_raw_module(&self) -> String {
-        String::from(&self.dfraw_identifier)
+    pub fn set_overwrites_raw(&mut self, raw_name: &str) {
+        self.raw_header.overwrites_raw = String::from(raw_name);
     }
-    pub fn get_raw_module_version(&self) -> String {
-        String::from(&self.dfraw_version)
-    }
-    pub fn get_dfraw_found_in(&self) -> String {
-        String::from(&self.dfraw_found_in)
-    }
-    pub fn get_dfraw_display(&self) -> String {
-        String::from(&self.dfraw_display)
-    }
-    pub fn get_dfraw_relative_path(&self) -> String {
-        String::from(&self.dfraw_relative_path)
-    }
-    pub fn get_parent_raw(&self) -> String {
-        String::from(&self.parent_raw)
-    }
-    pub fn get_raw_type(&self) -> String {
-        format!("{:?}", self.raw_type)
-    }
-    pub fn get_object_id(&self) -> String {
-        format!(
-            "{}-{}-{}",
-            self.get_parent_raw(),
-            "PLANT",
-            slugify(self.get_identifier())
-        )
+    pub fn push_cut_tag(&mut self, tag0: &str, tag1: &str) {
+        self.raw_header.push_cut_tag(tag0, tag1);
     }
     pub fn get_general_name(&self) -> String {
+        if !self.get_raw_header().overwrites_raw.is_empty() {
+            return format!("Overwrite {}", self.get_raw_header().overwrites_raw);
+        }
         self.name.to_string_vec()[0].to_string()
     }
 }

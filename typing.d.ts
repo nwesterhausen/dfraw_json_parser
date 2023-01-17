@@ -13,6 +13,7 @@ export type Raw = {
   moduleDisplayName: string;
   rawType: string;
   rawRelativePath: string;
+  overwritesRaw: string;
 };
 
 export type BodySizeRange = {
@@ -33,7 +34,7 @@ export type CasteRange<T> = {
 export type Creature = {
   maxAge: CasteRange<number[]>;
   clutchSize: CasteRange<number[]>;
-  basedOn?: string;
+  basedOn: string;
   biomes: string[];
   clusterRange: number[];
   undergroundDepth: number[];
@@ -100,7 +101,7 @@ export type SimpleMaterial = {
 };
 
 // Plant raw definition
-export type DFPlant = {
+export type Plant = {
   name: string;
   preferenceStrings: string[];
   value: number;
@@ -133,7 +134,7 @@ export type RollChance = {
 };
 
 // Inorganic Raw definition
-export type DFInorganic = {
+export type Inorganic = {
   name: string;
   material: SimpleMaterial;
   environments: Environment[];
@@ -145,7 +146,7 @@ export type DFInorganic = {
 } & Raw;
 
 // info.txt raw definition
-export type DFInfoFile = {
+export type InfoFile = {
   identifier: string;
   sourcedDirectory: string;
   numericVersion: number;

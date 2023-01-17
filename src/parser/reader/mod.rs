@@ -6,19 +6,13 @@ use std::fs::File;
 use std::io::{BufRead, BufReader};
 use std::path::Path;
 
+use super::raws::RawObjectKind;
+
 pub mod creature;
 pub mod info_file;
 pub mod inorganic;
 pub mod plant;
 
-#[derive(serde::Serialize, Debug, serde::Deserialize, Clone, Copy)]
-pub enum RawObjectKind {
-    Creature,
-    Inorganic,
-    Plant,
-    Material,
-    None,
-}
 /// It reads a file, line by line, and checks the first line for the filename, reads lines until it encounters the
 /// [OBJECT:<type>] tag in the file.
 ///
@@ -29,32 +23,36 @@ pub enum RawObjectKind {
 ///
 /// Returns:
 ///
-/// RawObjectKind for the type of [OBJECT] tag encountered, and RawObjectKind::None if it is unsupported.
-pub fn read_raw_file_type(input_path: &Path) -> RawObjectKind {
+/// `RawObjectKind` for the type of [OBJECT] tag encountered, and `RawObjectKind::None` if it is unsupported.
+pub fn read_raw_file_type<P: AsRef<Path>>(input_path: &P) -> RawObjectKind {
     let caller = "Raw File Type Checker";
     // Validate file exists
-    if !input_path.exists() {
-        log::error!("{} - Path doesn't exist {}", caller, input_path.display());
+    if !input_path.as_ref().exists() {
+        log::error!(
+            "{} - Path doesn't exist {}",
+            caller,
+            input_path.as_ref().display()
+        );
         return RawObjectKind::None;
     }
-    if !input_path.is_file() {
+    if !input_path.as_ref().is_file() {
         log::error!(
             "{} - Path does not point to a file {}",
             caller,
-            input_path.display(),
+            input_path.as_ref().display(),
         );
         return RawObjectKind::None;
     }
 
     // Open the file
     let Ok(file) = File::open(input_path) else {
-        log::error!("{} - Unable to open file {}",caller, input_path.display());
+        log::error!("{} - Unable to open file {}",caller, input_path.as_ref().display());
         return RawObjectKind::None;
     };
 
     // Setup a file reader for the encoding used by DF
     let decoding_reader = DecodeReaderBytesBuilder::new()
-        .encoding(*DF_ENCODING)
+        .encoding(Some(*DF_ENCODING))
         .build(file);
     let reader = BufReader::new(decoding_reader);
 
@@ -67,7 +65,7 @@ pub fn read_raw_file_type(input_path: &Path) -> RawObjectKind {
             log::error!(
                 "{} - Error processing {}:{}",
                 caller,
-                input_path.display(),
+                input_path.as_ref().display(),
                 index
             );
             continue;
@@ -118,6 +116,10 @@ pub fn read_raw_file_type(input_path: &Path) -> RawObjectKind {
     }
 
     // Reading through the entire file and not finding an [OBJECT] tag means the raw file is invalid
-    log::warn!("{} - no [OBJECT] tag in {}", caller, input_path.display());
+    log::warn!(
+        "{} - no [OBJECT] tag in {}",
+        caller,
+        input_path.as_ref().display()
+    );
     RawObjectKind::None
 }

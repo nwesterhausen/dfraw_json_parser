@@ -11,11 +11,15 @@ use crate::parser::raws::{inorganic, material, roll_chance, tags};
 use crate::parser::reader::RawObjectKind;
 use crate::parser::refs::{DF_ENCODING, RAW_TOKEN_RE};
 
-pub fn parse(input_path: &Path, info_text: &DFInfoFile) -> Vec<inorganic::DFInorganic> {
+#[allow(clippy::too_many_lines)]
+pub fn parse<P: AsRef<Path>>(
+    input_path: &P,
+    info_text: &DFInfoFile,
+) -> Vec<inorganic::DFInorganic> {
     let caller = "Parse Inorganic Raw";
     let mut results: Vec<inorganic::DFInorganic> = Vec::new();
 
-    let file = match File::open(&input_path) {
+    let file = match File::open(input_path) {
         Ok(f) => f,
         Err(e) => {
             log::error!("{} - Error opening raw file for parsing!\n{:?}", caller, e);
@@ -24,7 +28,7 @@ pub fn parse(input_path: &Path, info_text: &DFInfoFile) -> Vec<inorganic::DFInor
     };
 
     let decoding_reader = DecodeReaderBytesBuilder::new()
-        .encoding(*DF_ENCODING)
+        .encoding(Some(*DF_ENCODING))
         .build(file);
     let reader = BufReader::new(decoding_reader);
 
@@ -47,7 +51,7 @@ pub fn parse(input_path: &Path, info_text: &DFInfoFile) -> Vec<inorganic::DFInor
             log::error!(
                 "{} - Error processing {}:{}",
                 caller,
-                input_path.display(),
+                input_path.as_ref().display(),
                 index
             );
             continue;
@@ -80,46 +84,47 @@ pub fn parse(input_path: &Path, info_text: &DFInfoFile) -> Vec<inorganic::DFInor
                         // current_object = RawObjectKind::None;
                     }
                 },
-                "INORGANIC" => {
+                "INORGANIC" | "SELECT_INORGANIC" => {
                     // We are starting a creature object capture
-                    match current_object {
-                        RawObjectKind::Inorganic => {
-                            if started {
-                                // If we already *were* capturing, export it.
-                                //1. Save material tags
-                                material_temp.tags = material_tags.clone();
-                                //2a. Save inorganic environment
-                                inorganic_temp.environments = environments_temp.clone();
-                                inorganic_temp.environments_specific =
-                                    environments_spec_temp.clone();
-                                //2b. Save inorganic metal produced
-                                inorganic_temp.metal_ores = metal_ores.clone();
-                                inorganic_temp.thread_metals = metal_threads.clone();
-                                //3. Save creature tags
-                                inorganic_temp.tags = inorganic_tags.clone();
-                                //2. Save material
-                                inorganic_temp.material = material_temp.clone();
-                                //5. Save creature
-                                results.push(inorganic_temp);
-                            } else {
-                                started = true;
-                            }
-                            //Reset all temp values
-                            log::debug!("Starting new inorganic {}", &cap[3]);
-                            //1. Make new inorganic from [INORGANIC:<NAME>]
-                            inorganic_temp =
-                                inorganic::DFInorganic::new(&raw_filename, &cap[3], info_text);
-                            //2. Make new material
-                            material_temp = material::SimpleMaterial::empty();
-                            //3. Reset/empty caste tags
-                            material_tags = Vec::new();
-                            environments_temp = Vec::new();
-                            environments_spec_temp = Vec::new();
-                            inorganic_tags = Vec::new();
-                            metal_ores = Vec::new();
-                            metal_threads = Vec::new();
+                    if let RawObjectKind::Inorganic = current_object {
+                        if started {
+                            // If we already *were* capturing, export it.
+                            //1. Save material tags
+                            material_temp.tags = material_tags.clone();
+                            //2a. Save inorganic environment
+                            inorganic_temp.environments = environments_temp.clone();
+                            inorganic_temp.environments_specific = environments_spec_temp.clone();
+                            //2b. Save inorganic metal produced
+                            inorganic_temp.metal_ores = metal_ores.clone();
+                            inorganic_temp.thread_metals = metal_threads.clone();
+                            //3. Save creature tags
+                            inorganic_temp.tags = inorganic_tags.clone();
+                            //2. Save material
+                            inorganic_temp.material = material_temp.clone();
+                            //5. Save creature
+                            results.push(inorganic_temp);
+                        } else {
+                            started = true;
                         }
-                        _ => (),
+                        //Reset all temp values
+                        log::debug!("Starting new inorganic {}", &cap[3]);
+                        //1. Make new inorganic from [INORGANIC:<NAME>]
+                        inorganic_temp =
+                            inorganic::DFInorganic::new(&raw_filename, &cap[3], info_text);
+                        //2. Make new material
+                        material_temp = material::SimpleMaterial::empty();
+                        //3. Reset/empty caste tags
+                        material_tags = Vec::new();
+                        environments_temp = Vec::new();
+                        environments_spec_temp = Vec::new();
+                        inorganic_tags = Vec::new();
+                        metal_ores = Vec::new();
+                        metal_threads = Vec::new();
+
+                        // Apply overwrites_raw if this is a SELECT tag
+                        if cap[2].eq("SELECT_INORGANIC") {
+                            inorganic_temp.set_overwrites_raw(&cap[3]);
+                        }
                     }
                 }
                 "USE_MATERIAL_TEMPLATE" => {
@@ -132,12 +137,16 @@ pub fn parse(input_path: &Path, info_text: &DFInfoFile) -> Vec<inorganic::DFInor
                     // ~~material_tags = Vec::new();~~
                     environments_temp = Vec::new();
                     //5. Get material template to add (known) template tags
-                    material_tags = Vec::clone(&material::material_tags_from_template(&cap[3]));
+                    material_tags = Vec::clone(&material::tags_from_template(&cap[3]));
+                }
+                "CUT_USE_MATERIAL_TEMPLATE" => {
+                    // We will have to add one of these for each tag we support cutting..
+                    inorganic_temp.push_cut_tag(&cap[2], &cap[3]);
                 }
                 "PREFSTRING" => {
                     log::warn!(
                         "THERE INDEED WERE PREF STRING FOR {}: {}",
-                        inorganic_temp.get_object_id(),
+                        inorganic_temp.get_raw_header().get_object_id(),
                         &cap[3]
                     );
                 }
@@ -148,7 +157,7 @@ pub fn parse(input_path: &Path, info_text: &DFInfoFile) -> Vec<inorganic::DFInor
                     Ok(n) => material_temp.material_value = n,
                     Err(e) => log::error!(
                         "{}:{:?}:MATERIAL_VALUE parsing error\n{:?}",
-                        inorganic_temp.get_identifier(),
+                        inorganic_temp.get_raw_header().get_object_id(),
                         material_temp.material_type,
                         e
                     ),
@@ -285,7 +294,7 @@ pub fn parse(input_path: &Path, info_text: &DFInfoFile) -> Vec<inorganic::DFInor
                         Ok(n) => material_temp.temperatures.specific_heat = n,
                         Err(e) => log::error!(
                             "{}:SPEC_HEAT parsing error\n{:?}",
-                            inorganic_temp.get_identifier(),
+                            inorganic_temp.get_raw_header().get_object_id(),
                             e
                         ),
                     }
@@ -300,7 +309,7 @@ pub fn parse(input_path: &Path, info_text: &DFInfoFile) -> Vec<inorganic::DFInor
                         Ok(n) => material_temp.temperatures.ignition_point = n,
                         Err(e) => log::error!(
                             "{}:IGNITE_POINT parsing error\n{:?}",
-                            inorganic_temp.get_identifier(),
+                            inorganic_temp.get_raw_header().get_object_id(),
                             e
                         ),
                     }
@@ -315,7 +324,7 @@ pub fn parse(input_path: &Path, info_text: &DFInfoFile) -> Vec<inorganic::DFInor
                         Ok(n) => material_temp.temperatures.melting_point = n,
                         Err(e) => log::error!(
                             "{}:MELTING_POINT parsing error\n{:?}",
-                            inorganic_temp.get_identifier(),
+                            inorganic_temp.get_raw_header().get_object_id(),
                             e
                         ),
                     }
@@ -330,7 +339,7 @@ pub fn parse(input_path: &Path, info_text: &DFInfoFile) -> Vec<inorganic::DFInor
                         Ok(n) => material_temp.temperatures.boiling_point = n,
                         Err(e) => log::error!(
                             "{}:BOILING_POINT parsing error\n{:?}",
-                            inorganic_temp.get_identifier(),
+                            inorganic_temp.get_raw_header().get_object_id(),
                             e
                         ),
                     }
@@ -345,7 +354,7 @@ pub fn parse(input_path: &Path, info_text: &DFInfoFile) -> Vec<inorganic::DFInor
                         Ok(n) => material_temp.temperatures.heat_damage_point = n,
                         Err(e) => log::error!(
                             "{}:HEATDAM_POINT parsing error\n{:?}",
-                            inorganic_temp.get_identifier(),
+                            inorganic_temp.get_raw_header().get_object_id(),
                             e
                         ),
                     }
@@ -360,7 +369,7 @@ pub fn parse(input_path: &Path, info_text: &DFInfoFile) -> Vec<inorganic::DFInor
                         Ok(n) => material_temp.temperatures.cold_damage_point = n,
                         Err(e) => log::error!(
                             "{}:COLDDAM_POINT parsing error\n{:?}",
-                            inorganic_temp.get_identifier(),
+                            inorganic_temp.get_raw_header().get_object_id(),
                             e
                         ),
                     }
@@ -375,7 +384,7 @@ pub fn parse(input_path: &Path, info_text: &DFInfoFile) -> Vec<inorganic::DFInor
                         Ok(n) => material_temp.temperatures.material_fixed_temp = n,
                         Err(e) => log::error!(
                             "{}:MAT_FIXED_TEMP parsing error\n{:?}",
-                            inorganic_temp.get_identifier(),
+                            inorganic_temp.get_raw_header().get_object_id(),
                             e
                         ),
                     }
@@ -385,34 +394,31 @@ pub fn parse(input_path: &Path, info_text: &DFInfoFile) -> Vec<inorganic::DFInor
         }
     }
 
-    match current_object {
-        RawObjectKind::Inorganic => {
-            // If we already *were* capturing, export it.
-            //1. Save material tags
-            material_tags.extend(material_temp.tags);
-            material_temp.tags = material_tags.clone();
-            //2a. Save inorganic environment
-            inorganic_temp.environments = environments_temp.clone();
-            inorganic_temp.environments_specific = environments_spec_temp.clone();
-            //2b. Save inorganic metal produced
-            inorganic_temp.metal_ores = metal_ores.clone();
-            inorganic_temp.thread_metals = metal_threads.clone();
-            //3. Save creature tags
-            inorganic_temp.tags = inorganic_tags.clone();
-            //2. Save material
-            inorganic_temp.material = material_temp.clone();
-            //5. Save inorganic
-            results.push(inorganic_temp);
-        }
-        _ => (),
+    if let RawObjectKind::Inorganic = current_object {
+        // If we already *were* capturing, export it.
+        //1. Save material tags
+        material_tags.extend(material_temp.tags);
+        material_temp.tags = material_tags.clone();
+        //2a. Save inorganic environment
+        inorganic_temp.environments = environments_temp.clone();
+        inorganic_temp.environments_specific = environments_spec_temp.clone();
+        //2b. Save inorganic metal produced
+        inorganic_temp.metal_ores = metal_ores.clone();
+        inorganic_temp.thread_metals = metal_threads.clone();
+        //3. Save creature tags
+        inorganic_temp.tags = inorganic_tags.clone();
+        //2. Save material
+        inorganic_temp.material = material_temp.clone();
+        //5. Save inorganic
+        results.push(inorganic_temp);
     }
     log::info!(
-        "{} inorganic objects defined in {} ({} {} in {})",
+        "{} inorganic objects defined in {} ({} {} in {:?})",
         results.len(),
         &raw_filename,
         info_text.get_identifier(),
         info_text.displayed_version,
-        info_text.get_sourced_directory(),
+        info_text.get_location(),
     );
     results
 }
