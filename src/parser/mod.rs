@@ -6,7 +6,7 @@ use self::util::get_parent_dir_name;
 
 mod conversion;
 pub mod json_conversion;
-mod parsing;
+pub(crate) mod parsing;
 mod parsing_bits;
 pub mod raws;
 mod reader;

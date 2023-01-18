@@ -417,7 +417,7 @@ pub fn parse_module_location_to_file<P: AsRef<Path>>(
 /// A (large) JSON string with details on all raws in the game path.
 pub fn parse_game_raws_with_tauri_emit<P: AsRef<Path>>(
     df_game_path: &P,
-    window: &tauri::Window,
+    window: tauri::Window,
 ) -> String {
     tauri_lib::parse_game_raws_with_tauri_emit(df_game_path, window)
 }
@@ -438,7 +438,7 @@ pub fn parse_game_raws_with_tauri_emit<P: AsRef<Path>>(
 /// A JSON string of all the mods in the location.
 pub fn parse_location_with_tauri_emit<P: AsRef<Path>>(
     location_path: &P,
-    window: &tauri::Window,
+    window: tauri::Window,
 ) -> String {
     tauri_lib::parse_location_with_tauri_emit(location_path, window)
 }

@@ -165,4 +165,7 @@ export type InfoFile = {
 export type ProgressPayload = {
   currentModule: string;
   percentage: number;
+  currentTask: string;
+  currentFile: string;
+  currentLocation: string;
 };
