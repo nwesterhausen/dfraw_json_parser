@@ -5,6 +5,31 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## v0.10.1 (2023-01-18)
+
+### New Features
+
+ - <csr-id-cf64641d44584997038e558b9eb09b795ce02837/> ✨ add more detail to progress payload
+
+### Commit Statistics
+
+<csr-read-only-do-not-edit/>
+
+ - 1 commit contributed to the release.
+ - 1 day passed between releases.
+ - 1 commit was understood as [conventional](https://www.conventionalcommits.org).
+ - 0 issues like '(#ID)' were seen in commit messages
+
+### Commit Details
+
+<csr-read-only-do-not-edit/>
+
+<details><summary>view details</summary>
+
+ * **Uncategorized**
+    - ✨ add more detail to progress payload ([`cf64641`](https://github.com/nwesterhausen/dfraw_json_parser/commit/cf64641d44584997038e558b9eb09b795ce02837))
+</details>
+
 ## v0.10.0 (2023-01-17)
 
 <csr-id-d8f6f90df5667470625152ed476b6fa4945de12c/>
@@ -18,6 +43,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 <csr-id-15d15708f68bb3ff7d7a61c40742e316c985a46f/>
 <csr-id-d5648c59538e93ad0f9c96e5ce9a6a2e33a41740/>
 <csr-id-8f246a2cb0410202ea54bd581c45ff48306a6f57/>
+<csr-id-a4ff82d5790c6b3b07676eae32b2fbeadb587643/>
 
 ### Chore
 
@@ -61,7 +87,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 <csr-read-only-do-not-edit/>
 
- - 23 commits contributed to the release over the course of 5 calendar days.
+ - 24 commits contributed to the release over the course of 5 calendar days.
  - 7 days passed between releases.
  - 18 commits were understood as [conventional](https://www.conventionalcommits.org).
  - 0 issues like '(#ID)' were seen in commit messages
@@ -73,6 +99,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 <details><summary>view details</summary>
 
  * **Uncategorized**
+    - Release dfraw_json_parser v0.10.0 ([`f062953`](https://github.com/nwesterhausen/dfraw_json_parser/commit/f062953b94ec14c9b3b9df1ac081c8329c79bbb7))
     - 🐛 fix keywords ([`a4ff82d`](https://github.com/nwesterhausen/dfraw_json_parser/commit/a4ff82d5790c6b3b07676eae32b2fbeadb587643))
     - Release dfraw_json_parser v0.10.0 ([`d654a89`](https://github.com/nwesterhausen/dfraw_json_parser/commit/d654a89300ae07a3224d0e25aad18776aa424463))
     - Merge pull request #13 from nwesterhausen/add-items ([`1d3bbdf`](https://github.com/nwesterhausen/dfraw_json_parser/commit/1d3bbdf6bd7bc7a1046cd2f48fcbf30f1002209b))
@@ -481,7 +508,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 <csr-id-59e2dff2d583cd8c5c55411688a6c8f4ddcf361a/>
 
 
-<csr-id-a6f00156cddc9b0c42b5f0a19883d5382c19d160/>
 <csr-id-5a9740e01528680c3f6543673fbd722913ac57c2/>
 <csr-id-7932e59c509f1da93e8f431fbbef9a164de144d1/>
 <csr-id-bb5de4483e6c0b5bfb15a0a5e2defdd067bd6c9d/>
