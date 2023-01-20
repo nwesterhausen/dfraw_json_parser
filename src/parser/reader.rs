@@ -101,6 +101,9 @@ impl super::DFParser {
                             "GRAPHICS" => {
                                 return RawObjectKind::Graphics;
                             }
+                            "TILE_PAGE" => {
+                                return RawObjectKind::GraphicsTilePage;
+                            }
                             // Currently, any other type of raw object is unsupported
                             &_ => {
                                 log::debug!(

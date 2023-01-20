@@ -59,17 +59,6 @@ pub fn get_parent_dir_name<P: AsRef<Path>>(full_path: &P) -> String {
     }
 }
 
-/// It takes a string vec of json and writes it to a file, wrapping it in square brackets to make it a valid
-/// json array
-///
-/// Arguments:
-///
-/// * `parsed_json_string`: String
-/// * `out_filepath`: Path
-pub fn write_json_string_array_to_file(parsed_json_string: &[String], out_filepath: &Path) {
-    write_json_string_to_file(&parsed_json_string.join(","), out_filepath);
-}
-
 /// It takes a string of json and writes it to a file, wrapping it in square brackets to make it a valid
 /// json array
 ///

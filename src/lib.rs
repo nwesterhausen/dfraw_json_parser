@@ -442,3 +442,10 @@ pub fn parse_location_with_tauri_emit<P: AsRef<Path>>(
 ) -> String {
     tauri_lib::parse_location_with_tauri_emit(location_path, window)
 }
+
+pub fn parse_single_graphics_raw<P: AsRef<Path>>(file_path: &P) -> String {
+    DFParser::parse_single_graphics_raw_file_to_json_string(file_path)
+}
+pub fn parse_graphics_raw_module<P: AsRef<Path>>(file_path: &P) -> String {
+    DFParser::parse_graphics_raw_module_to_json_string(file_path)
+}

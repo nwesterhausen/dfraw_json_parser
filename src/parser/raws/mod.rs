@@ -1,4 +1,4 @@
-use std::path::Path;
+use std::path::{Path, PathBuf};
 
 use slug::slugify;
 
@@ -6,6 +6,7 @@ use self::info_txt::DFInfoFile;
 
 pub mod biomes;
 pub mod creature;
+pub mod dimensions;
 pub mod environment;
 pub mod graphics;
 pub mod info_txt;
@@ -16,6 +17,7 @@ pub mod plant;
 pub mod roll_chance;
 pub mod tags;
 pub mod temperatures;
+pub mod tile_page;
 
 #[derive(serde::Serialize, Debug, serde::Deserialize, Clone, Copy)]
 /// There are multiple types of raws, these are the different types handled by `dfraw_json_parser`.
@@ -26,6 +28,7 @@ pub enum RawObjectKind {
     Material,
     None,
     Graphics,
+    GraphicsTilePage,
 }
 
 #[derive(serde::Serialize, Debug, serde::Deserialize, Clone, Copy)]
@@ -36,6 +39,17 @@ pub enum RawModuleLocation {
     Mods,
     Vanilla,
     Unknown,
+}
+
+impl RawModuleLocation {
+    pub fn get_path(&self) -> PathBuf {
+        match self {
+            RawModuleLocation::Mods => PathBuf::from("mods"),
+            RawModuleLocation::InstalledMods => ["data", "installed_mods"].iter().collect(),
+            RawModuleLocation::Vanilla => ["data", "vanilla"].iter().collect(),
+            RawModuleLocation::Unknown => PathBuf::from("unknown"),
+        }
+    }
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash, serde::Serialize, serde::Deserialize)]

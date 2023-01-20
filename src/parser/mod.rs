@@ -1,4 +1,5 @@
 mod parsing_bits;
+mod parsing_info_txt;
 mod parsing_to_json;
 mod parsing_to_serializable;
 pub mod raws;

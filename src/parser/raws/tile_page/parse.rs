@@ -5,23 +5,22 @@ use std::io::{BufRead, BufReader};
 use std::path::Path;
 
 use crate::parser::raws::info_txt::DFInfoFile;
-use crate::parser::raws::{graphics, RawObjectKind};
+use crate::parser::raws::{tile_page, RawObjectKind};
 use crate::parser::refs::{DF_ENCODING, RAW_TOKEN_RE};
 
-impl super::SpriteGraphic {
+impl super::DFTilePage {
     #[allow(clippy::too_many_lines)]
     pub fn parse<P: AsRef<Path>>(
         input_path: &P,
         info_text: &DFInfoFile,
-    ) -> Vec<graphics::SpriteGraphic> {
-        let caller = "Parse Simple Graphic Raw";
-        let mut results: Vec<graphics::SpriteGraphic> = Vec::new();
+    ) -> Vec<tile_page::DFTilePage> {
+        let caller = "Parse Graphic Tile Page Raw";
 
         let file = match File::open(input_path) {
             Ok(f) => f,
             Err(e) => {
                 log::error!("{} - Error opening raw file for parsing!\n{:?}", caller, e);
-                return results;
+                return Vec::new();
             }
         };
 
@@ -33,7 +32,8 @@ impl super::SpriteGraphic {
         let mut raw_filename = String::new();
         let mut current_object = RawObjectKind::None;
         let mut started = false;
-        let mut sprite_temp = graphics::SpriteGraphic::empty();
+        let mut results: Vec<tile_page::DFTilePage> = Vec::new();
+        let mut tile_page_temp = tile_page::DFTilePage::new("None", "None", info_text);
 
         for (index, line) in reader.lines().enumerate() {
             if line.is_err() {
@@ -63,60 +63,46 @@ impl super::SpriteGraphic {
                 log::trace!("{} - Key: {} Value: {}", caller, &cap[2], &cap[3]);
                 match &cap[2] {
                     "OBJECT" => match &cap[3] {
-                        "GRAPHICS" => {
+                        "TILE_PAGE" => {
                             // Discovered raws for plants.
-                            current_object = RawObjectKind::Graphics;
+                            current_object = RawObjectKind::GraphicsTilePage;
                         }
                         &_ => {
                             log::debug!("{} - Wrong type of raw ({})", caller, &cap[3]);
                             return Vec::new();
-                            // current_object = RawObjectKind::None;
                         }
                     },
-                    "CREATURE_GRAPHICS" | "CREATURE_CASTE_GRAPHICS" | "TILE_GRAPHICS" => {
+                    "TILE_PAGE" => {
                         // We are starting a creature object capture
-                        if let RawObjectKind::Graphics = current_object {
+                        if let RawObjectKind::GraphicsTilePage = current_object {
                             if started {
-                                if !&sprite_temp.kind.eq(&graphics::Kind::Empty) {
-                                    results.push(sprite_temp);
-                                }
+                                results.push(tile_page_temp);
                             } else {
                                 started = true;
                             }
                             //Reset all temp values
                             log::trace!("Starting new graphic {}", &cap[3]);
                             //1. Make new sprite from its definition
-                            sprite_temp = match graphics::SpriteGraphic::from_token(format!(
-                                "{}:{}",
-                                &cap[2], &cap[3]
-                            )) {
-                                Some(sprite) => sprite,
-                                _ => {
-                                    log::warn!(
-                                        "Unable to parse usable graphic from {}:{}",
-                                        &cap[2],
-                                        &cap[3]
-                                    );
-                                    graphics::SpriteGraphic::empty()
-                                }
-                            };
+                            tile_page_temp =
+                                tile_page::DFTilePage::new(&raw_filename, &cap[3], info_text);
                         }
                     }
-                    &_ => {
-                        if !&sprite_temp.kind.eq(&graphics::Kind::Empty) {
-                            sprite_temp.add_tile_from_token(format!("{}:{}", &cap[2], &cap[3]))
-                        } else {
-                            log::debug!("Skipping {}:{} because empty sprite", &cap[2], &cap[3]);
-                        }
+                    "FILE" => {
+                        tile_page_temp.set_file(&cap[3]);
                     }
+                    "TILE_DIM" => {
+                        tile_page_temp.set_tile_dim_from_token(&cap[3]);
+                    }
+                    "PAGE_DIM_PIXELS" => {
+                        tile_page_temp.set_page_dim_from_token(&cap[3]);
+                    }
+                    &_ => (),
                 }
             }
         }
 
-        if let RawObjectKind::Graphics = current_object {
-            if !&sprite_temp.kind.eq(&graphics::Kind::Empty) {
-                results.push(sprite_temp);
-            }
+        if let RawObjectKind::GraphicsTilePage = current_object {
+            results.push(tile_page_temp);
         }
         log::info!(
             "{} sprite graphics objects defined in {} ({} {} in {:?})",

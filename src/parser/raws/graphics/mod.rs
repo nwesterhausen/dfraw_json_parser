@@ -1,5 +1,7 @@
 use serde::{Deserialize, Serialize};
 
+use super::dimensions::Dimensions;
+
 mod impl_basic;
 mod impl_enums;
 mod parse;
@@ -25,24 +27,20 @@ pub enum Color {
 }
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
-struct Graphic {
+struct DFGraphic {
     primary_condition: Condition,
     tile_page_id: String,
-    offset_x: i32,
-    offset_y: i32,
+    offset: Dimensions,
     color: Color,
     large_image: bool,
-    offset_x_2: i32,
-    offset_y_2: i32,
+    offset2: Dimensions,
     secondary_condition: Condition,
 }
 
 struct TileGraphicsRectangle {
     tile_page_id: String,
-    offset_x: i32,
-    offset_y: i32,
-    offset_x_2: i32,
-    offset_y_2: i32,
+    offset: Dimensions,
+    offset2: Dimensions,
     body_token: String,
 }
 
@@ -59,5 +57,5 @@ pub struct SpriteGraphic {
     identifier: String,
     caste_identifier: String,
     pub kind: Kind,
-    graphics: Vec<Graphic>,
+    graphics: Vec<DFGraphic>,
 }

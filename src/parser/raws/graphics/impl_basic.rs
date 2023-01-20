@@ -1,4 +1,6 @@
-use super::{Color, Condition, Graphic, Kind, SpriteGraphic};
+use crate::parser::raws::dimensions::Dimensions;
+
+use super::{Color, Condition, DFGraphic, Kind, SpriteGraphic};
 
 impl SpriteGraphic {
     pub fn from_token(token: String) -> Option<SpriteGraphic> {
@@ -22,7 +24,7 @@ impl SpriteGraphic {
                 let Some(identifier) = split.get(4) else {
                     return None;
                 };
-                let graphic = match Graphic::parse(token.clone()) {
+                let graphic = match DFGraphic::parse(token.clone()) {
                     Some(g) => g,
                     None => {
                         return Some(SpriteGraphic {
@@ -45,13 +47,29 @@ impl SpriteGraphic {
         }
     }
     pub fn add_tile_from_token(&mut self, token: String) {
-        let graphic = match Graphic::parse(token) {
-            Some(g) => g,
-            None => {
+        match self.kind {
+            Kind::Creature | Kind::CreatureCaste => {
+                let graphic = match DFGraphic::parse_creature(token) {
+                    Some(g) => g,
+                    None => {
+                        return;
+                    }
+                };
+                self.graphics.push(graphic);
+            }
+            Kind::Tile => {
+                let graphic = match DFGraphic::parse(token) {
+                    Some(g) => g,
+                    None => {
+                        return;
+                    }
+                };
+                self.graphics.push(graphic);
+            }
+            Kind::Empty => {
                 return;
             }
-        };
-        self.graphics.push(graphic);
+        }
     }
     pub fn empty() -> Self {
         Self {
@@ -63,13 +81,16 @@ impl SpriteGraphic {
     }
 }
 
-impl Graphic {
+impl DFGraphic {
     pub fn parse(token: String) -> Option<Self> {
         let split = token.split(':').collect::<Vec<&str>>();
         match split[0] {
             "CREATURE_GRAPHICS" | "CREATURE_CASTE_GRAPHICS" => Self::parse_creature(token),
             "TILE_GRAPHICS" => Self::parse_tile(token),
-            _ => None,
+            _ => {
+                log::debug!("Unable to parse graphic from {}", token);
+                return None;
+            }
         }
     }
     pub fn parse_tile(token: String) -> Option<Self> {
@@ -125,12 +146,10 @@ impl Graphic {
         Some(Self {
             primary_condition: Condition::None,
             tile_page_id,
-            offset_x,
-            offset_y,
+            offset: Dimensions::from_xy(offset_x, offset_y),
             color: Color::AsIs,
             large_image: false,
-            offset_x_2: 0,
-            offset_y_2: 0,
+            offset2: Dimensions::zero(),
             secondary_condition: Condition::None,
         })
     }
@@ -138,11 +157,35 @@ impl Graphic {
         // [<condition>:<tile page identifier>:<x position>:<y position>:<color type>:<secondary condition>]
         // [<condition>:<tile page identifier>:LARGE_IMAGE:<x1>:<y1>:<x2>:<y2>:<color type>:<secondary condition>]
         let split = token.split(':').collect::<Vec<&str>>();
-        let primary_condition = Condition::from_str(split[0]);
-        let tile_page_id = String::from(split[1]);
+
+        let partition0 = split[0];
+
+        match partition0 {
+            "LAYER_SET" | "LAYER" => {
+                return None;
+            }
+            "CONDITION_CHILD" | "CONDITION_NOT_CHILD" | "CONDITION_HAUL_COUNT" => {
+                return None;
+            }
+            "CONDITION_HAUL_COUNT_MIN" | "CONDITION_HAUL_COUNT_MAX" => {
+                return None;
+            }
+            _ => (),
+        }
+
+        let primary_condition = Condition::from_str(partition0);
+        let Some(tile_page_id) = split.get(1) else {
+            log::warn!("Not enough pieces to tokenize in {}", token);
+            return None;
+        };
+
+        let Some(partition2) = split.get(2) else {
+            log::warn!("Not enough pieces to tokenize in {}", token);
+            return None;
+        };
 
         // everything is different if large or not
-        match split[2] {
+        match *partition2 {
             "LARGE_IMAGE" => {
                 let offset_x = match split[3].parse() {
                     Ok(n) => n,
@@ -177,13 +220,11 @@ impl Graphic {
                 if split.len() == 7 {
                     return Some(Self {
                         primary_condition,
-                        tile_page_id,
+                        tile_page_id: String::from(*tile_page_id),
+                        offset: Dimensions::from_xy(offset_x, offset_y),
                         color: Color::AsIs,
                         large_image: true,
-                        offset_x,
-                        offset_x_2,
-                        offset_y,
-                        offset_y_2,
+                        offset2: Dimensions::from_xy(offset_x_2, offset_y_2),
                         secondary_condition: Condition::None,
                     });
                 }
@@ -194,13 +235,11 @@ impl Graphic {
                 if split.len() == 5 {
                     return Some(Self {
                         primary_condition,
-                        tile_page_id,
+                        tile_page_id: String::from(*tile_page_id),
+                        offset: Dimensions::from_xy(offset_x, offset_y),
                         color,
                         large_image: true,
-                        offset_x,
-                        offset_x_2,
-                        offset_y,
-                        offset_y_2,
+                        offset2: Dimensions::from_xy(offset_x_2, offset_y_2),
                         secondary_condition: Condition::None,
                     });
                 }
@@ -209,13 +248,11 @@ impl Graphic {
 
                 return Some(Self {
                     primary_condition,
-                    tile_page_id,
+                    tile_page_id: String::from(*tile_page_id),
+                    offset: Dimensions::from_xy(offset_x, offset_y),
                     color,
                     large_image: true,
-                    offset_x,
-                    offset_x_2,
-                    offset_y,
-                    offset_y_2,
+                    offset2: Dimensions::from_xy(offset_x_2, offset_y_2),
                     secondary_condition,
                 });
             }
@@ -239,13 +276,11 @@ impl Graphic {
                 if split.len() == 4 {
                     return Some(Self {
                         primary_condition,
-                        tile_page_id,
+                        tile_page_id: String::from(*tile_page_id),
+                        offset: Dimensions::from_xy(offset_x, offset_y),
                         color: Color::AsIs,
-                        large_image: true,
-                        offset_x,
-                        offset_x_2: 0,
-                        offset_y,
-                        offset_y_2: 0,
+                        large_image: false,
+                        offset2: Dimensions::zero(),
                         secondary_condition: Condition::None,
                     });
                 }
@@ -256,13 +291,11 @@ impl Graphic {
                 if split.len() == 5 {
                     return Some(Self {
                         primary_condition,
-                        tile_page_id,
+                        tile_page_id: String::from(*tile_page_id),
+                        offset: Dimensions::from_xy(offset_x, offset_y),
                         color,
-                        large_image: true,
-                        offset_x,
-                        offset_x_2: 0,
-                        offset_y,
-                        offset_y_2: 0,
+                        large_image: false,
+                        offset2: Dimensions::zero(),
                         secondary_condition: Condition::None,
                     });
                 }
@@ -271,13 +304,11 @@ impl Graphic {
 
                 return Some(Self {
                     primary_condition,
-                    tile_page_id,
+                    tile_page_id: String::from(*tile_page_id),
+                    offset: Dimensions::from_xy(offset_x, offset_y),
                     color,
-                    large_image: true,
-                    offset_x,
-                    offset_x_2: 0,
-                    offset_y,
-                    offset_y_2: 0,
+                    large_image: false,
+                    offset2: Dimensions::zero(),
                     secondary_condition,
                 });
             }
