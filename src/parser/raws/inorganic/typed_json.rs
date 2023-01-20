@@ -63,13 +63,19 @@ impl TypedJson {
             relative_path: inorganic.get_raw_header().get_dfraw_relative_path(),
             raw_type: inorganic.get_raw_header().get_raw_type(),
             name: inorganic.get_general_name(),
-            overwrites_raw: inorganic.get_raw_header().overwrites_raw.clone(),
+            overwrites_raw: inorganic.get_raw_header().overwrites_raw.to_string(),
 
+            // cloning material
             material: inorganic.material.clone(),
+            // cloning vec
             tags: inorganic.tags.clone(),
+            // cloning vec
             environments: inorganic.environments.clone(),
+            // cloning vec
             specific_environments: inorganic.environments_specific.clone(),
+            // cloning vec
             metal_ores: inorganic.metal_ores.clone(),
+            // cloning vec
             thread_metals: inorganic.thread_metals.clone(),
 
             magma_safe: inorganic.is_magma_safe(),

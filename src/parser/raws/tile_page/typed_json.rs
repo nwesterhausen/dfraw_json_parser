@@ -51,7 +51,7 @@ impl TypedJson {
             relative_path: tile_page.get_raw_header().get_dfraw_relative_path(),
             raw_type: tile_page.get_raw_header().get_raw_type(),
             name: tile_page.get_raw_header().get_identifier(),
-            overwrites_raw: tile_page.get_raw_header().overwrites_raw.clone(),
+            overwrites_raw: tile_page.get_raw_header().overwrites_raw.to_string(),
             tags: Vec::new(),
 
             tile_dim: tile_page.get_tile_dim(),

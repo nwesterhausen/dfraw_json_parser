@@ -147,23 +147,23 @@ impl DFParser {
             RawObjectKind::Creature => {
                 log::debug!("parsing {}", entry_path.as_ref().display());
                 let creature_raw_vec = DFCreature::parse_raw_file(entry_path, info_text_file);
-                for creature in creature_raw_vec {
-                    serializable_raws.push(Box::new(creature.clone()));
-                }
+                creature_raw_vec
+                    .into_iter()
+                    .for_each(|c| serializable_raws.push(Box::new(c)));
             }
             RawObjectKind::Plant => {
                 log::debug!("parsing {}", entry_path.as_ref().display());
                 let plant_raw_vec = DFPlant::parse_raw_file(entry_path, info_text_file);
-                for plant in plant_raw_vec {
-                    serializable_raws.push(Box::new(plant.clone()));
-                }
+                plant_raw_vec
+                    .into_iter()
+                    .for_each(|p| serializable_raws.push(Box::new(p)));
             }
             RawObjectKind::Inorganic => {
                 log::debug!("parsing {}", entry_path.as_ref().display());
                 let inorganic_raw_vec = DFInorganic::parse(entry_path, info_text_file);
-                for inorganic in inorganic_raw_vec {
-                    serializable_raws.push(Box::new(inorganic.clone()));
-                }
+                inorganic_raw_vec
+                    .into_iter()
+                    .for_each(|i| serializable_raws.push(Box::new(i)));
             }
             _ => log::trace!("{} - skipping {}", caller, entry_path.as_ref().display()),
         }
@@ -192,15 +192,15 @@ impl DFParser {
         match DFParser::read_raw_file_type(entry_path) {
             RawObjectKind::Graphics => {
                 let sprite_vec = DFGraphic::parse(entry_path, info_text_file);
-                for sprite in sprite_vec {
-                    serializable_raws.push(Box::new(sprite.clone()));
-                }
+                sprite_vec
+                    .into_iter()
+                    .for_each(|g| serializable_raws.push(Box::new(g)));
             }
             RawObjectKind::GraphicsTilePage => {
                 let tile_page_vec = DFTilePage::parse(entry_path, info_text_file);
-                for tile_page in tile_page_vec {
-                    serializable_raws.push(Box::new(tile_page.clone()));
-                }
+                tile_page_vec
+                    .into_iter()
+                    .for_each(|g| serializable_raws.push(Box::new(g)));
             }
             _ => log::trace!("{} - skipping non-graphics raws", caller),
         }

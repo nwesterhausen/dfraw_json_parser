@@ -91,13 +91,13 @@ impl super::DFCreature {
                             if started {
                                 // If we already *were* capturing a creature, export it.
                                 //1. Save caste tags
-                                caste_temp.tags = caste_tags.clone();
+                                caste_temp.tags = caste_tags;
                                 //2. Save caste
-                                temp_caste_vec.push(caste_temp.clone());
+                                temp_caste_vec.push(caste_temp);
                                 //3. Save creature tags
-                                creature_temp.tags = creature_tags.clone();
+                                creature_temp.tags = creature_tags;
                                 //4. Save tamp_castes to creature
-                                creature_temp.castes = temp_caste_vec.clone();
+                                creature_temp.castes = temp_caste_vec;
                                 //5. Save creature
                                 results.push(creature_temp);
                             } else {
@@ -124,9 +124,9 @@ impl super::DFCreature {
                     }
                     "CASTE" => {
                         //1. Save caste tags
-                        caste_temp.tags = caste_tags.clone();
+                        caste_temp.tags = caste_tags;
                         //2. Save caste
-                        temp_caste_vec.push(caste_temp.clone());
+                        temp_caste_vec.push(caste_temp);
                         //3. Make new caste from [CASTE:<NAME>]
                         caste_temp = creature::DFCreatureCaste::new(&cap[3]);
                         //4. Reset/empty caste tags
@@ -780,9 +780,9 @@ impl super::DFCreature {
                             target_caste_name
                         );
                         //1. Save current tags
-                        caste_temp.tags = caste_tags.clone();
+                        caste_temp.tags = caste_tags;
                         //2. Save caste
-                        temp_caste_vec.push(caste_temp.clone());
+                        temp_caste_vec.push(caste_temp);
                         // (Assume we didn't find a matching caste)
                         //4. Make new caste from [CASTE:<NAME>]
                         caste_temp = creature::DFCreatureCaste::new(&cap[3]);
@@ -805,7 +805,7 @@ impl super::DFCreature {
                             //4. Grab the target caste from the array
                             caste_temp = temp_caste_vec.swap_remove(target_caste_index);
                             //5. Set the tag array to its tags
-                            caste_tags = caste_temp.tags.clone();
+                            caste_tags = caste_temp.tags;
                         }
                     }
                     &_ => (),
@@ -815,13 +815,13 @@ impl super::DFCreature {
         if let RawObjectKind::Creature = current_object {
             // If we already *were* capturing a creature, export it.
             //1. Save caste tags
-            caste_temp.tags = caste_tags.clone();
+            caste_temp.tags = caste_tags;
             //2. Save caste
-            temp_caste_vec.push(caste_temp.clone());
+            temp_caste_vec.push(caste_temp);
             //3. Save creature tags
-            creature_temp.tags = creature_tags.clone();
+            creature_temp.tags = creature_tags;
             //4. Save tamp_castes to creature
-            creature_temp.castes = temp_caste_vec.clone();
+            creature_temp.castes = temp_caste_vec;
             //5. Save creature
             results.push(creature_temp);
         }

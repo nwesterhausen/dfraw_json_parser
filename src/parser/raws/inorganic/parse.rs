@@ -90,18 +90,17 @@ impl super::DFInorganic {
                             if started {
                                 // If we already *were* capturing, export it.
                                 //1. Save material tags
-                                material_temp.tags = material_tags.clone();
+                                material_temp.tags = material_tags;
                                 //2a. Save inorganic environment
-                                inorganic_temp.environments = environments_temp.clone();
-                                inorganic_temp.environments_specific =
-                                    environments_spec_temp.clone();
+                                inorganic_temp.environments = environments_temp;
+                                inorganic_temp.environments_specific = environments_spec_temp;
                                 //2b. Save inorganic metal produced
-                                inorganic_temp.metal_ores = metal_ores.clone();
-                                inorganic_temp.thread_metals = metal_threads.clone();
+                                inorganic_temp.metal_ores = metal_ores;
+                                inorganic_temp.thread_metals = metal_threads;
                                 //3. Save creature tags
-                                inorganic_temp.tags = inorganic_tags.clone();
+                                inorganic_temp.tags = inorganic_tags;
                                 //2. Save material
-                                inorganic_temp.material = material_temp.clone();
+                                inorganic_temp.material = material_temp;
                                 //5. Save creature
                                 results.push(inorganic_temp);
                             } else {
@@ -399,17 +398,17 @@ impl super::DFInorganic {
             // If we already *were* capturing, export it.
             //1. Save material tags
             material_tags.extend(material_temp.tags);
-            material_temp.tags = material_tags.clone();
+            material_temp.tags = material_tags;
             //2a. Save inorganic environment
-            inorganic_temp.environments = environments_temp.clone();
-            inorganic_temp.environments_specific = environments_spec_temp.clone();
+            inorganic_temp.environments = environments_temp;
+            inorganic_temp.environments_specific = environments_spec_temp;
             //2b. Save inorganic metal produced
-            inorganic_temp.metal_ores = metal_ores.clone();
-            inorganic_temp.thread_metals = metal_threads.clone();
+            inorganic_temp.metal_ores = metal_ores;
+            inorganic_temp.thread_metals = metal_threads;
             //3. Save creature tags
-            inorganic_temp.tags = inorganic_tags.clone();
+            inorganic_temp.tags = inorganic_tags;
             //2. Save material
-            inorganic_temp.material = material_temp.clone();
+            inorganic_temp.material = material_temp;
             //5. Save inorganic
             results.push(inorganic_temp);
         }

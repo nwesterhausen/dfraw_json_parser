@@ -95,7 +95,7 @@ impl TypedJson {
             raw_module_display: creature.get_raw_header().get_dfraw_display(),
             raw_type: creature.get_raw_header().get_raw_type(),
             relative_path: creature.get_raw_header().get_dfraw_relative_path(),
-            overwrites_raw: creature.get_raw_header().overwrites_raw.clone(),
+            overwrites_raw: creature.get_raw_header().overwrites_raw.to_string(),
 
             name: creature.get_general_name(),
             descriptions: creature.get_description_by_caste(),
@@ -126,6 +126,7 @@ impl TypedJson {
             lowlight_vision: creature.get_low_light_vision_by_caste(),
             milkable: creature.get_milkable_by_caste(),
             population_ratio: creature.get_pop_ratio_by_caste(),
+            // clone vec
             pref_string: creature.pref_string.clone(),
             population_number: creature.population_number,
         }

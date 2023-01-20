@@ -120,12 +120,13 @@ impl DFGraphic {
         &self.raw_header
     }
     pub fn get_caste_identifier(&self) -> String {
-        self.caste_identifier.clone()
+        self.caste_identifier.to_string()
     }
     pub fn get_kind(&self) -> Kind {
-        self.kind.clone()
+        self.kind
     }
     pub fn get_graphics(&self) -> Vec<SpriteGraphic> {
+        // cloning vec
         self.graphics.clone()
     }
 }

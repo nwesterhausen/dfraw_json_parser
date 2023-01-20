@@ -78,9 +78,10 @@ impl TypedJson {
             relative_path: plant.get_raw_header().get_dfraw_relative_path(),
             raw_type: plant.get_raw_header().get_raw_type(),
             name: plant.get_general_name(),
-            overwrites_raw: plant.get_raw_header().overwrites_raw.clone(),
+            overwrites_raw: plant.get_raw_header().overwrites_raw.to_string(),
 
             frequency: plant.frequency,
+            // cloning vec
             pref_string: plant.pref_string.clone(),
             tags: Vec::clone(&plant.tags),
             biomes: Vec::clone(&plant.biomes),

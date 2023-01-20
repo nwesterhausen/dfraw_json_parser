@@ -33,15 +33,15 @@ pub struct TypedJson {
 impl TypedJson {
     pub fn from(info_file: &DFInfoFile) -> Self {
         Self {
-            author: info_file.author.clone(),
-            description: info_file.description.clone(),
-            displayed_version: info_file.displayed_version.clone(),
+            author: info_file.author.to_string(),
+            description: info_file.description.to_string(),
+            displayed_version: info_file.displayed_version.to_string(),
             earliest_compatible_displayed_version: info_file
                 .earliest_compatible_displayed_version
-                .clone(),
+                .to_string(),
             earliest_compatible_numeric_version: info_file.earliest_compatible_numeric_version,
             identifier: info_file.get_identifier(),
-            name: info_file.name.clone(),
+            name: info_file.name.to_string(),
             numeric_version: info_file.numeric_version,
             sourced_directory: info_file.get_location(),
             display_title: format!("{} v{}", info_file.name, info_file.displayed_version),

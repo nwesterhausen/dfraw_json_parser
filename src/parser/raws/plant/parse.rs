@@ -87,13 +87,13 @@ impl super::DFPlant {
                             if started {
                                 // If we already *were* capturing a creature, export it.
                                 //1. Save caste tags
-                                material_temp.tags = material_tags.clone();
+                                material_temp.tags = material_tags;
                                 //2. Save caste
-                                temp_material_vec.push(material_temp.clone());
+                                temp_material_vec.push(material_temp);
                                 //3. Save creature tags
-                                plant_temp.tags = plant_tags.clone();
+                                plant_temp.tags = plant_tags;
                                 //4. Save tamp_castes to creature
-                                plant_temp.materials_vec = temp_material_vec.clone();
+                                plant_temp.materials_vec = temp_material_vec;
                                 //5. Save creature
                                 results.push(plant_temp);
                             } else {
@@ -125,9 +125,9 @@ impl super::DFPlant {
                     "USE_MATERIAL_TEMPLATE" => {
                         //1. Save caste tags
                         material_tags.extend(material_temp.tags);
-                        material_temp.tags = material_tags.clone();
+                        material_temp.tags = material_tags;
                         //2. Save caste
-                        temp_material_vec.push(material_temp.clone());
+                        temp_material_vec.push(material_temp);
 
                         // Split the value into a descriptor and template
                         let split = cap[3].split(':').collect::<Vec<&str>>();
@@ -270,13 +270,13 @@ impl super::DFPlant {
             // If we already *were* capturing a plant, export it.
             //1. Save caste tags
             material_tags.extend(material_temp.tags);
-            material_temp.tags = material_tags.clone();
+            material_temp.tags = material_tags;
             //2. Save caste
-            temp_material_vec.push(material_temp.clone());
+            temp_material_vec.push(material_temp);
             //3. Save creature tags
             plant_temp.tags = plant_tags;
             //4. Save tamp_castes to creature
-            plant_temp.materials_vec = temp_material_vec.clone();
+            plant_temp.materials_vec = temp_material_vec;
             //5. Save creature
             results.push(plant_temp);
         }

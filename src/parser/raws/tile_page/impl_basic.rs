@@ -26,11 +26,11 @@ impl super::DFTilePage {
         &self.raw_header
     }
     pub fn get_tile_dim(&self) -> Dimensions {
-        self.tile_dim.clone()
+        self.tile_dim
     }
 
     pub fn get_page_dim(&self) -> Dimensions {
-        self.page_dim.clone()
+        self.page_dim
     }
     pub fn get_file_path(&self) -> String {
         let mut images_path = self.raw_header.dfraw_found_in.get_path();
