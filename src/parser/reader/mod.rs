@@ -9,6 +9,7 @@ use std::path::Path;
 use super::raws::RawObjectKind;
 
 pub mod creature;
+pub mod graphics;
 pub mod info_file;
 pub mod inorganic;
 pub mod plant;
@@ -101,6 +102,9 @@ pub fn read_raw_file_type<P: AsRef<Path>>(input_path: &P) -> RawObjectKind {
                         }
                         "INORGANIC" => {
                             return RawObjectKind::Inorganic;
+                        }
+                        "GRAPHICS" => {
+                            return RawObjectKind::Graphics;
                         }
                         // Currently, any other type of raw object is unsupported
                         &_ => {

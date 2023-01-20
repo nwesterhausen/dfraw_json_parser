@@ -7,6 +7,7 @@ use self::info::DFInfoFile;
 pub mod biomes;
 pub mod creature;
 pub mod environment;
+pub mod graphics;
 pub mod info;
 pub mod inorganic;
 pub mod material;
@@ -24,6 +25,7 @@ pub enum RawObjectKind {
     Plant,
     Material,
     None,
+    Graphics,
 }
 
 #[derive(serde::Serialize, Debug, serde::Deserialize, Clone, Copy)]
