@@ -1,94 +1,15 @@
 use std::collections::HashMap;
 
-use serde::{Deserialize, Serialize};
-
 use crate::parser::raws::{
-    info::DFInfoFile,
+    info_txt::DFInfoFile,
     names::{Name, SingPlurName},
-    tags::{self, CasteTag},
+    tags, DFRawCommon, RawObjectKind,
 };
 
-use super::DFRawCommon;
-
-#[derive(Debug, Clone)]
-#[allow(clippy::module_name_repetitions)]
-pub struct DFCreature {
-    raw_header: DFRawCommon,
-
-    // Boolean Flags
-    pub tags: Vec<tags::CreatureTag>,
-
-    // integers
-    pub frequency: u16, //Defaults to 50 if not specified
-
-    // [min, max] ranges
-    pub cluster_number: [u16; 2],    //Defaults to 1:1 if not specified.
-    pub population_number: [u16; 2], //default 1:1
-    pub underground_depth: [u16; 2], //default 0:0 (aboveground)
-
-    // strings
-    pub general_baby_name: SingPlurName,
-    pub general_child_name: SingPlurName,
-    pub name: Name,
-
-    // Arrays
-    pub biomes: Vec<String>,
-    pub pref_string: Vec<String>,
-
-    // sub definitions
-    pub castes: Vec<DFCreatureCaste>,
-
-    // copy_from
-    pub copy_tags_from: Vec<String>, // vec of creature identifiers
-}
-
-#[derive(Serialize, Deserialize, Debug, Clone)]
-pub struct DFCreatureCaste {
-    // Identification
-    pub name: String,
-    // Boolean Flags
-    pub tags: Vec<tags::CasteTag>,
-
-    // [min, max] ranges
-    pub clutch_size: [u16; 2],
-    pub litter_size: [u16; 2],
-    pub max_age: [u16; 2],
-
-    // Combo flags (custom)
-    pub active_time: u8, // MATUTINAL/DIURNAL/NOCTURNAL/CREPUSCULAR/VESPERTINE via binary math
-    pub curious_beast: u8, // EATER/GUZZLER/ITEM via binary math
-    pub no_season: u8,   // NO_SPRING/NO_SUMMER/NO_AUTUMN/NO_WINTER
-    pub trainable: u8,   // trainable_HUNTING/trainable_WAR/BOTH(aka trainable)
-
-    // Integer tokens
-    pub baby: u32,
-    pub child: u32,
-    pub difficulty: u32,
-    pub egg_size: u32,
-    pub grass_trample: u8,
-    pub grazer: u32,
-    pub low_light_vision: u32,
-    pub pet_value: u16,
-    pub pop_ratio: u16,
-
-    // String Tokens
-    pub baby_name: SingPlurName,
-    pub caste_name: Name,
-    pub child_name: SingPlurName,
-    pub description: String,
-
-    // Arrays
-    pub creature_class: Vec<String>,
-
-    // Custom tokens
-    pub body_size: Vec<tags::DFBodySize>,
-    pub milkable: tags::DFMilkable,
-}
-
-impl DFCreature {
+impl super::DFCreature {
     pub fn new(raw: &str, id: &str, info_text: &DFInfoFile) -> Self {
         Self {
-            raw_header: DFRawCommon::from(id, raw, info_text, super::RawObjectKind::Creature),
+            raw_header: DFRawCommon::from(id, raw, info_text, RawObjectKind::Creature),
 
             // Boolean Flags
             tags: Vec::new(),
@@ -255,7 +176,7 @@ impl DFCreature {
             if self_caste.grazer != 0 {
                 grazer.insert(String::from(&self_caste.name), self_caste.grazer);
             }
-            if self_caste.tags.contains(&CasteTag::StandardGrazer) {
+            if self_caste.tags.contains(&tags::CasteTag::StandardGrazer) {
                 if let Some(body_size) = self_caste.body_size.last() {
                     let graze_value: f64 =
                         20_000.0 * 100.0 * (f64::powf(f64::from(body_size.size_cm3() / 10), -0.75));
@@ -406,57 +327,11 @@ impl DFCreature {
         }
         creature_class
     }
-    pub fn get_caste_tags(&self) -> HashMap<String, Vec<CasteTag>> {
-        let mut tags: HashMap<String, Vec<CasteTag>> = HashMap::new();
+    pub fn get_caste_tags(&self) -> HashMap<String, Vec<tags::CasteTag>> {
+        let mut tags: HashMap<String, Vec<tags::CasteTag>> = HashMap::new();
         for self_caste in &self.castes {
             tags.insert(String::from(&self_caste.name), Vec::clone(&self_caste.tags));
         }
         tags
-    }
-}
-
-impl DFCreatureCaste {
-    pub fn new(name: &str) -> Self {
-        Self {
-            // Identification
-            name: String::from(name),
-            // Boolean Flags
-            tags: Vec::new(),
-
-            // [min, max] ranges
-            clutch_size: [0, 0],
-            litter_size: [0, 0],
-            max_age: [0, 0],
-
-            // Combo flags (custom)
-            active_time: 0, // MATUTINAL/DIURNAL/NOCTURNAL/CREPUSCULAR/VESPERTINE via binary math
-            curious_beast: 0, // EATER/GUZZLER/ITEM via binary math
-            no_season: 0,   // NO_SPRING/NO_SUMMER/NO_AUTUMN/NO_WINTER
-            trainable: 0,   // trainable_HUNTING/trainable_WAR/BOTH(aka trainable)
-
-            // Integer tokens
-            baby: 0,
-            child: 0,
-            difficulty: 0,
-            egg_size: 0,
-            grass_trample: 0,
-            grazer: 0,
-            low_light_vision: 0,
-            pet_value: 0,
-            pop_ratio: 0,
-
-            // String Tokens
-            baby_name: SingPlurName::new(""),
-            caste_name: Name::new(""),
-            child_name: SingPlurName::new(""),
-            description: String::new(),
-
-            // Arrays
-            creature_class: Vec::new(),
-
-            // Custom tokens
-            body_size: Vec::new(),
-            milkable: tags::DFMilkable::new("", 0),
-        }
     }
 }

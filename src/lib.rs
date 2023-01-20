@@ -62,14 +62,14 @@ for the steam workshop if it is a mod downloaded from the steam workshop.
 #![warn(clippy::pedantic)]
 
 use parser::raws::RawModuleLocation;
-use parser::util::subdirectories;
-use parser::{json_conversion::TypedJsonSerializable, util::path_from_game_directory};
+use parser::{DFParser, TypedJsonSerializable};
 use std::path::{Path, PathBuf};
 use walkdir::DirEntry;
 
 mod parser;
 #[cfg(feature = "tauri")]
 mod tauri_lib;
+mod util;
 
 //Todo: add an option to apply any COPY_TAG_FROM and APPLY_CREATURE_VARIATION tags
 //Todo: add an option to specify what kinds of raws to parse
@@ -124,7 +124,7 @@ pub fn parse_module_location<P: AsRef<Path>>(raw_module_location: &P) -> String 
 
     //3. Get list of all subdirectories
     let raw_module_iter: Vec<DirEntry> =
-        subdirectories(PathBuf::from(raw_module_location_path)).unwrap_or_default();
+        util::subdirectories(PathBuf::from(raw_module_location_path)).unwrap_or_default();
 
     log::info!(
         "{num} raw modules located in {location:?}",
@@ -185,7 +185,7 @@ pub fn parse_info_txt_in_location<P: AsRef<Path>>(raw_module_location: &P) -> St
 
     //3. Get list of all subdirectories
     let raw_module_iter: Vec<DirEntry> =
-        subdirectories(PathBuf::from(raw_module_location_path)).unwrap_or_default();
+        util::subdirectories(PathBuf::from(raw_module_location_path)).unwrap_or_default();
 
     log::info!(
         "{num} raw modules located in {location:?}",
@@ -266,7 +266,7 @@ pub fn parse_game_raws<P: AsRef<Path>>(df_game_path: &P) -> String {
 /// A JSON string: `<T extends Raw>[][]]`, where T can be `Creature`, `Inorganic`, or `Plant`.
 /// (See [`typings.d.ts`](https://github.com/nwesterhausen/dfraw_json_parser/blob/main/typing.d.ts))
 pub fn parse_raw_module<P: AsRef<Path>>(raw_module_path: &P) -> String {
-    parser::parse_raw_module_to_json_string(raw_module_path)
+    DFParser::parse_raw_module_to_json_string(raw_module_path)
 }
 
 /// Parse all the game raws and saves the result to a JSON file.
@@ -277,7 +277,7 @@ pub fn parse_raw_module<P: AsRef<Path>>(raw_module_path: &P) -> String {
 /// * `out_filepath`: The path to the file to save the parsed raws to. (This should end in `.json`.)
 pub fn parse_game_raws_to_file<P: AsRef<Path>>(df_game_path: &P, out_filepath: &Path) {
     let parsed_json_string = parse_game_raws(df_game_path);
-    parser::util::write_json_string_to_file(&parsed_json_string, out_filepath);
+    util::write_json_string_to_file(&parsed_json_string, out_filepath);
 }
 
 /// Parse all info.txt within the modules found in the game directory and saves a JSON file.
@@ -288,7 +288,7 @@ pub fn parse_game_raws_to_file<P: AsRef<Path>>(df_game_path: &P, out_filepath: &
 /// * `out_filepath`: The path to the file to save the parsed raws to. (This should end in `.json`.)
 pub fn parse_info_txt_in_game_dir_to_file<P: AsRef<Path>>(df_game_path: &P, out_filepath: &Path) {
     let parsed_json_string = parse_info_txt_in_game_dir(df_game_path);
-    parser::util::write_json_string_to_file(&parsed_json_string, out_filepath);
+    util::write_json_string_to_file(&parsed_json_string, out_filepath);
 }
 
 /// Parse an info.txt file from a raw module to JSON.
@@ -302,7 +302,7 @@ pub fn parse_info_txt_in_game_dir_to_file<P: AsRef<Path>>(df_game_path: &P, out_
 /// A JSON string: `InfoFile`
 /// (See [`typings.d.ts`](https://github.com/nwesterhausen/dfraw_json_parser/blob/main/typing.d.ts))
 pub fn parse_info_txt_in_module<P: AsRef<Path>>(raw_module_directory: &P) -> String {
-    let dfraw_module_info = parser::parse_info_file_from_module_directory(raw_module_directory);
+    let dfraw_module_info = DFParser::parse_info_file_from_module_directory(raw_module_directory);
     match dfraw_module_info.to_typed_json_string() {
         Ok(s) => {
             return s;
@@ -326,7 +326,7 @@ pub fn parse_info_txt_in_module<P: AsRef<Path>>(raw_module_directory: &P) -> Str
 /// A JSON string: `<T extends Raw>[]`, where T can be `Creature`, `Inorganic`, or `Plant`.
 /// (See [`typings.d.ts`](https://github.com/nwesterhausen/dfraw_json_parser/blob/main/typing.d.ts))
 pub fn parse_single_raw_file<P: AsRef<Path>>(raw_file: &P) -> String {
-    parser::parse_single_raw_file_to_json_string(raw_file)
+    DFParser::parse_single_raw_file_to_json_string(raw_file)
 }
 
 /// Parse all info.txt within the modules found in the game directory to JSON.
@@ -341,7 +341,7 @@ pub fn parse_single_raw_file<P: AsRef<Path>>(raw_file: &P) -> String {
 /// (See [`typings.d.ts`](https://github.com/nwesterhausen/dfraw_json_parser/blob/main/typing.d.ts))
 pub fn parse_info_txt_in_game_dir<P: AsRef<Path>>(df_game_path: &P) -> String {
     //1. "validate" folder is as expected
-    let game_path = match path_from_game_directory(df_game_path) {
+    let game_path = match util::path_from_game_directory(df_game_path) {
         Ok(p) => p,
         Err(e) => {
             log::error!("Game Path Error: {}", e);
@@ -372,7 +372,7 @@ pub fn parse_info_txt_in_game_dir<P: AsRef<Path>>(df_game_path: &P) -> String {
 /// * `out_filepath`: The path to the file you want to write to.
 pub fn parse_single_raw_file_to_file<P: AsRef<Path>>(raw_file: &P, out_filepath: &Path) {
     let parsed_json_string = parse_single_raw_file(raw_file);
-    parser::util::write_json_string_to_file(&parsed_json_string, out_filepath);
+    util::write_json_string_to_file(&parsed_json_string, out_filepath);
 }
 
 /// Parse a single raw module directory, and writes the parsed JSON string to a file.
@@ -383,7 +383,7 @@ pub fn parse_single_raw_file_to_file<P: AsRef<Path>>(raw_file: &P, out_filepath:
 /// * `out_filepath`: The path to the file you want to write to.
 pub fn parse_raw_module_to_file<P: AsRef<Path>>(module_path: &P, out_filepath: &Path) {
     let parsed_json_string = parse_raw_module(module_path);
-    parser::util::write_json_string_to_file(&parsed_json_string, out_filepath);
+    util::write_json_string_to_file(&parsed_json_string, out_filepath);
 }
 
 /// Parse all the raw modules within a raw module location, and writes the parsed JSON string to a file.
@@ -397,7 +397,7 @@ pub fn parse_module_location_to_file<P: AsRef<Path>>(
     out_filepath: &Path,
 ) {
     let parsed_json_string = parse_module_location(raw_module_location_path);
-    parser::util::write_json_string_to_file(&parsed_json_string, out_filepath);
+    util::write_json_string_to_file(&parsed_json_string, out_filepath);
 }
 
 #[cfg(feature = "tauri")]

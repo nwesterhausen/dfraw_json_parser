@@ -6,7 +6,7 @@ use std::{
 
 use walkdir::WalkDir;
 
-use super::json_conversion;
+use crate::parser::TypedJsonSerializable;
 
 /// Get a vec of subdirectories for a given directory
 ///
@@ -136,7 +136,7 @@ pub fn write_json_string_to_file(parsed_json_string: &String, out_filepath: &Pat
 ///
 /// A vector of JSON strings.
 pub fn stringify_raw_vec(
-    serializable_vec: Vec<Box<impl json_conversion::TypedJsonSerializable + ?Sized>>,
+    serializable_vec: Vec<Box<impl TypedJsonSerializable + ?Sized>>,
 ) -> Vec<String> {
     let mut results: Vec<String> = Vec::new();
     if serializable_vec.is_empty() {

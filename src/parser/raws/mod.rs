@@ -2,13 +2,13 @@ use std::path::Path;
 
 use slug::slugify;
 
-use self::info::DFInfoFile;
+use self::info_txt::DFInfoFile;
 
 pub mod biomes;
 pub mod creature;
 pub mod environment;
 pub mod graphics;
-pub mod info;
+pub mod info_txt;
 pub mod inorganic;
 pub mod material;
 pub mod names;

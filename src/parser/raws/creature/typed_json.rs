@@ -1,9 +1,9 @@
 use std::collections::HashMap;
 
-use super::TypedJsonSerializable;
 use crate::parser::raws::creature::DFCreature;
 use crate::parser::raws::tags::{CasteTag, CreatureTag, DFBodySize, DFMilkable};
 use crate::parser::raws::RawModuleLocation;
+use crate::parser::TypedJsonSerializable;
 use serde::{Deserialize, Serialize};
 
 // Creature Object for Web Consumption

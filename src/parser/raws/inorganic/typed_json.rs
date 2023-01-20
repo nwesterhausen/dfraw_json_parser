@@ -1,9 +1,11 @@
-use crate::parser::raws::{
-    environment, inorganic::DFInorganic, material, roll_chance, tags::InorganicTag,
-    RawModuleLocation,
+use crate::parser::{
+    raws::{
+        environment, inorganic::DFInorganic, material, roll_chance, tags::InorganicTag,
+        RawModuleLocation,
+    },
+    TypedJsonSerializable,
 };
 
-use super::TypedJsonSerializable;
 use serde::{Deserialize, Serialize};
 
 // Creature Object for Web Consumption

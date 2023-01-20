@@ -1,5 +1,7 @@
-use super::TypedJsonSerializable;
-use crate::parser::raws::{info::DFInfoFile, RawModuleLocation};
+use crate::parser::{
+    raws::{info_txt::DFInfoFile, RawModuleLocation},
+    TypedJsonSerializable,
+};
 use serde::{Deserialize, Serialize};
 use slug::slugify;
 

@@ -1,31 +1,9 @@
-use crate::parser::raws::{
-    info::DFInfoFile,
-    tags::{self},
-};
+use crate::parser::raws::{info_txt::DFInfoFile, material, DFRawCommon, RawObjectKind};
 
-use super::{environment, roll_chance};
-use super::{material, DFRawCommon};
-
-#[derive(Debug, Clone)]
-#[allow(clippy::module_name_repetitions)]
-pub struct DFInorganic {
-    // Common Raw file Things
-    raw_header: DFRawCommon,
-    pub tags: Vec<tags::InorganicTag>,
-
-    // Basic Tokens
-    pub material: material::SimpleMaterial,
-    pub environments: Vec<environment::Environment>,
-    pub environments_specific: Vec<environment::Environment>,
-
-    pub metal_ores: Vec<roll_chance::RollChance>,
-    pub thread_metals: Vec<roll_chance::RollChance>,
-}
-
-impl DFInorganic {
+impl super::DFInorganic {
     pub fn new(raw: &str, id: &str, info_text: &DFInfoFile) -> Self {
         Self {
-            raw_header: DFRawCommon::from(id, raw, info_text, super::RawObjectKind::Inorganic),
+            raw_header: DFRawCommon::from(id, raw, info_text, RawObjectKind::Inorganic),
             // Boolean Flags
             tags: Vec::new(),
 

@@ -1,14 +1,16 @@
 use std::collections::HashMap;
 
-use crate::parser::raws::{
-    material::SimpleMaterial,
-    names::SingPlurName,
-    plant::{DFPlant, Growth},
-    tags::PlantTag,
-    RawModuleLocation,
+use crate::parser::{
+    raws::{
+        material::SimpleMaterial,
+        names::SingPlurName,
+        plant::{DFPlant, Growth},
+        tags::PlantTag,
+        RawModuleLocation,
+    },
+    TypedJsonSerializable,
 };
 
-use super::TypedJsonSerializable;
 use serde::{Deserialize, Serialize};
 
 // Creature Object for Web Consumption
