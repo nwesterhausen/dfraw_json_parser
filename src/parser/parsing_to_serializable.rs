@@ -4,8 +4,8 @@ use walkdir::WalkDir;
 
 use crate::parser::{
     raws::{
-        creature::DFCreature, graphics::SpriteGraphic, info_txt::DFInfoFile,
-        inorganic::DFInorganic, plant::DFPlant, RawObjectKind,
+        creature::DFCreature, graphics::DFGraphic, info_txt::DFInfoFile, inorganic::DFInorganic,
+        plant::DFPlant, RawObjectKind,
     },
     TypedJsonSerializable,
 };
@@ -191,7 +191,7 @@ impl DFParser {
 
         match DFParser::read_raw_file_type(entry_path) {
             RawObjectKind::Graphics => {
-                let sprite_vec = SpriteGraphic::parse(entry_path, info_text_file);
+                let sprite_vec = DFGraphic::parse(entry_path, info_text_file);
                 for sprite in sprite_vec {
                     serializable_raws.push(Box::new(sprite.clone()));
                 }

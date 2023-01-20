@@ -8,14 +8,14 @@ use crate::parser::raws::info_txt::DFInfoFile;
 use crate::parser::raws::{graphics, RawObjectKind};
 use crate::parser::refs::{DF_ENCODING, RAW_TOKEN_RE};
 
-impl super::SpriteGraphic {
+impl super::DFGraphic {
     #[allow(clippy::too_many_lines)]
     pub fn parse<P: AsRef<Path>>(
         input_path: &P,
         info_text: &DFInfoFile,
-    ) -> Vec<graphics::SpriteGraphic> {
+    ) -> Vec<graphics::DFGraphic> {
         let caller = "Parse Simple Graphic Raw";
-        let mut results: Vec<graphics::SpriteGraphic> = Vec::new();
+        let mut results: Vec<graphics::DFGraphic> = Vec::new();
 
         let file = match File::open(input_path) {
             Ok(f) => f,
@@ -33,7 +33,7 @@ impl super::SpriteGraphic {
         let mut raw_filename = String::new();
         let mut current_object = RawObjectKind::None;
         let mut started = false;
-        let mut sprite_temp = graphics::SpriteGraphic::empty();
+        let mut sprite_temp = graphics::DFGraphic::new(&raw_filename, "None:None", info_text);
 
         for (index, line) in reader.lines().enumerate() {
             if line.is_err() {
@@ -86,20 +86,11 @@ impl super::SpriteGraphic {
                             //Reset all temp values
                             log::trace!("Starting new graphic {}", &cap[3]);
                             //1. Make new sprite from its definition
-                            sprite_temp = match graphics::SpriteGraphic::from_token(format!(
-                                "{}:{}",
-                                &cap[2], &cap[3]
-                            )) {
-                                Some(sprite) => sprite,
-                                _ => {
-                                    log::warn!(
-                                        "Unable to parse usable graphic from {}:{}",
-                                        &cap[2],
-                                        &cap[3]
-                                    );
-                                    graphics::SpriteGraphic::empty()
-                                }
-                            };
+                            sprite_temp = graphics::DFGraphic::new(
+                                &raw_filename,
+                                format!("{}:{}", &cap[2], &cap[3]).as_str(),
+                                info_text,
+                            );
                         }
                     }
                     &_ => {

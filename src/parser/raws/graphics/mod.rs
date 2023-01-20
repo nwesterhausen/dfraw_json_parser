@@ -1,10 +1,11 @@
 use serde::{Deserialize, Serialize};
 
-use super::dimensions::Dimensions;
+use super::{dimensions::Dimensions, DFRawCommon};
 
 mod impl_basic;
 mod impl_enums;
 mod parse;
+mod sprite_graphic;
 mod typed_json;
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq)]
@@ -27,7 +28,7 @@ pub enum Color {
 }
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
-struct DFGraphic {
+pub struct SpriteGraphic {
     primary_condition: Condition,
     tile_page_id: String,
     offset: Dimensions,
@@ -52,10 +53,12 @@ pub enum Kind {
     Empty,
 }
 
-#[derive(Serialize, Deserialize, Debug, Clone)]
-pub struct SpriteGraphic {
-    identifier: String,
+#[derive(Debug, Clone)]
+pub struct DFGraphic {
+    // Common Raw file Things
+    raw_header: DFRawCommon,
+
     caste_identifier: String,
     pub kind: Kind,
-    graphics: Vec<DFGraphic>,
+    graphics: Vec<SpriteGraphic>,
 }
