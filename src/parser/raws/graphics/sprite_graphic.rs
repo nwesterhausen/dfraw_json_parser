@@ -88,7 +88,21 @@ impl SpriteGraphic {
             | "CONDITION_NOT_CHILD"
             | "CONDITION_HAUL_COUNT"
             | "CONDITION_HAUL_COUNT_MIN"
-            | "CONDITION_HAUL_COUNT_MAX" => {
+            | "CONDITION_HAUL_COUNT_MAX"
+            | "CONDITION_PROFESSION_CATEGORY"
+            | "CONDITION_MATERIAL_FLAG"
+            | "CONDITION_DYE"
+            | "CONDITION_NOT_DYED"
+            | "LAYER_GROUP"
+            | "BODY_UPPER"
+            | "CONDITION_SYN_CLASS"
+            | "CONDITION_CASTE"
+            | "TISSUE_MAY_HAVE_SHAPING"
+            | "TISSUE_NOT_SHAPED"
+            | "TISSUE_MIN_LENGTH"
+            | "TISSUE_MAX_LENGTH"
+            | "CONDITION_GHOST"
+            | "END_LAYER_GROUP" => {
                 return None;
             }
             _ => (),

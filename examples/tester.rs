@@ -24,8 +24,8 @@ fn main() {
         .apply()
         .expect("Failed to start logger");
 
-    let out = dfraw_json_parser::parse_graphics_raw_module(
-        &r"E:\SteamLibrary\steamapps\common\Dwarf Fortress\data\vanilla\vanilla_creatures_graphics",
+    let out = dfraw_json_parser::parse_graphics_raw_location(
+        &r"E:\SteamLibrary\steamapps\common\Dwarf Fortress\data\vanilla\",
     );
     print!("{out}");
 }

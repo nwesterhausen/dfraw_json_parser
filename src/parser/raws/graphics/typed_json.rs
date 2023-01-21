@@ -30,7 +30,9 @@ pub struct TypedJson {
     tags: Vec<usize>,
     name: String,
 
+    #[serde(rename = "targetIdentifier")]
     target_identifier: String,
+    #[serde(rename = "casteIdentifier")]
     caste_identifier: String,
     pub kind: Kind,
     graphics: Vec<SpriteGraphic>,

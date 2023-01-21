@@ -20,6 +20,17 @@ pub enum Condition {
     ListIcon,
     Skeleton,
     SkeletonWithSkull,
+    Zombie,
+    Necromancer,
+    Male,
+    Female,
+    VampireCursed,
+    Ghoul,
+    DisturbedDead,
+    NotArtifact,
+    CraftedArtifact,
+    Dye,
+    NotDyed,
 }
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq)]
@@ -29,12 +40,16 @@ pub enum Color {
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct SpriteGraphic {
+    #[serde(rename = "primaryCondition")]
     primary_condition: Condition,
+    #[serde(rename = "tilePageId")]
     tile_page_id: String,
     offset: Dimensions,
     color: Color,
+    #[serde(rename = "largeImage")]
     large_image: bool,
     offset2: Dimensions,
+    #[serde(rename = "secondaryCondition")]
     secondary_condition: Condition,
 }
 

@@ -33,8 +33,11 @@ pub struct TypedJson {
     tags: Vec<usize>,
     name: String,
 
+    #[serde(rename = "filePath")]
     file_path: String,
+    #[serde(rename = "tileDim")]
     tile_dim: Dimensions,
+    #[serde(rename = "pageDim")]
     page_dim: Dimensions,
 }
 

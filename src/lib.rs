@@ -446,6 +446,104 @@ pub fn parse_location_with_tauri_emit<P: AsRef<Path>>(
 pub fn parse_single_graphics_raw<P: AsRef<Path>>(file_path: &P) -> String {
     DFParser::parse_single_graphics_raw_file_to_json_string(file_path)
 }
-pub fn parse_graphics_raw_module<P: AsRef<Path>>(file_path: &P) -> String {
-    DFParser::parse_graphics_raw_module_to_json_string(file_path)
+pub fn parse_graphics_raw_module<P: AsRef<Path>>(raw_module_path: &P) -> String {
+    DFParser::parse_graphics_raw_module_to_json_string(raw_module_path)
+}
+pub fn parse_graphics_raw_location<P: AsRef<Path>>(raw_module_location: &P) -> String {
+    let raw_module_location_path = raw_module_location.as_ref();
+    // Guard against invalid path
+    if !raw_module_location_path.exists() {
+        log::error!(
+            "Provided module path for parsing doesn't exist!\n{}",
+            raw_module_location_path.display()
+        );
+        return String::new();
+    }
+    if !raw_module_location_path.is_dir() {
+        log::error!(
+            "Raw module path needs to be a directory {}",
+            raw_module_location_path.display()
+        );
+        return String::new();
+    }
+
+    //2. Get module location from provided path
+    let module_location = RawModuleLocation::from_sourced_directory(
+        raw_module_location_path
+            .file_name()
+            .unwrap_or_default()
+            .to_str()
+            .unwrap_or_default(),
+    );
+
+    //3. Get list of all subdirectories
+    let raw_module_iter: Vec<DirEntry> =
+        util::subdirectories(PathBuf::from(raw_module_location_path)).unwrap_or_default();
+
+    log::info!(
+        "{num} raw modules located in {location:?}",
+        num = raw_module_iter.len(),
+        location = module_location
+    );
+
+    let mut all_json: Vec<String> = Vec::new();
+    //4. Loop over all raw modules in the raw module directory
+    for raw_module_directory in raw_module_iter {
+        //2. Parse raws and dump JSON into array
+        all_json.push(parse_graphics_raw_module(&raw_module_directory.path()));
+    }
+
+    format!("[{}]", all_json.join(","))
+}
+
+/// Parse all raw files within the game directory to JSON.
+///
+/// Arguments:
+///
+/// * `df_game_path`: The path to the game directory. This is the directory that contains the data,
+/// mods, and gamelog.txt files.
+///
+/// Returns:
+///
+/// A JSON string: `<T extends Raw>[][][][]`, where T can be `Creature`, `Inorganic`, or `Plant`.
+/// (See [`typings.d.ts`](https://github.com/nwesterhausen/dfraw_json_parser/blob/main/typing.d.ts))
+pub fn parse_game_graphic_raws<P: AsRef<Path>>(df_game_path: &P) -> String {
+    //1. "validate" folder is as expected
+    let game_path = Path::new(df_game_path.as_ref());
+    // Guard against invalid path
+    if !game_path.exists() {
+        log::error!(
+            "Provided game path for parsing doesn't exist!\n{}",
+            game_path.display()
+        );
+        return String::new();
+    }
+    if !game_path.is_dir() {
+        log::error!("Game path needs to be a directory {}", game_path.display());
+        return String::new();
+    }
+
+    // warn on no gamelog.txt
+    if !game_path.join("gamelog.txt").exists() {
+        log::warn!("Unable to find gamelog.txt in game directory. Is it valid?");
+    }
+
+    // Set file paths for vanilla raw modules, workshop mods and installed mods
+    let data_path = game_path.join("data");
+    let vanilla_path = data_path.join("vanilla");
+    let installed_mods_path = data_path.join("installed_mods");
+    let workshop_mods_path = game_path.join("mods");
+
+    let all_json = vec![
+        parse_graphics_raw_location(&vanilla_path),
+        parse_graphics_raw_location(&installed_mods_path),
+        parse_graphics_raw_location(&workshop_mods_path),
+    ];
+
+    let non_empty_json: Vec<String> = all_json
+        .into_iter()
+        .filter(|s| !String::is_empty(s))
+        .collect();
+
+    format!("[{}]", non_empty_json.join(","))
 }

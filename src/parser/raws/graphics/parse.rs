@@ -93,12 +93,15 @@ impl super::DFGraphic {
                             );
                         }
                     }
+                    "DEFAULT" => {
+                        sprite_temp.add_tile_from_token(&format!("{}:{}", &cap[2], &cap[3]));
+                    }
                     &_ => {
-                        if sprite_temp.kind.eq(&graphics::Kind::Empty) {
-                            log::debug!("Skipping {}:{} because empty sprite", &cap[2], &cap[3]);
-                        } else {
-                            sprite_temp.add_tile_from_token(&format!("{}:{}", &cap[2], &cap[3]));
-                        }
+                        // if sprite_temp.kind.eq(&graphics::Kind::Empty) {
+                        //     log::debug!("Skipping {}:{} because empty sprite", &cap[2], &cap[3]);
+                        // } else {
+                        //     sprite_temp.add_tile_from_token(&format!("{}:{}", &cap[2], &cap[3]));
+                        // }
                     }
                 }
             }
