@@ -96,20 +96,20 @@ impl DFParser {
         let objects_path = raw_module_directory.as_ref().join("objects");
         if !objects_path.exists() {
             log::debug!("No objects subdirectory, no raws to parse.");
-            return Vec::new();
         }
         if !objects_path.is_dir() {
             log::error!("Objects subdirectory is not valid subdirectory! Unable to parse raws.");
-            return Vec::new();
         }
         //2. Parse raws in the 'graphics' subdirectory
         let graphics_path = raw_module_directory.as_ref().join("graphics");
         if !graphics_path.exists() {
             log::debug!("No graphics subdirectory, no raws to parse.");
-            return Vec::new();
         }
         if !graphics_path.is_dir() {
             log::error!("Graphics subdirectory is not valid subdirectory! Unable to parse raws.");
+        }
+
+        if !objects_path.exists() && !graphics_path.exists() {
             return Vec::new();
         }
 
