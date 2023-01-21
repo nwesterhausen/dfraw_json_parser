@@ -138,7 +138,7 @@ fn run_for_single_raw_file(raw_file: &str, out_dir: &str) {
     if out_dir.is_empty() {
         log::warn!("No output directory specified, dumping to console.");
         let parsed_raws = dfraw_json_parser::parse_single_raw_file(&raw_file_path);
-        println!("{}", parsed_raws);
+        println!("{parsed_raws}");
         return;
     }
 
@@ -170,7 +170,7 @@ fn run_for_single_raw_module(module_path: &str, out_dir: &str) {
     if out_dir.is_empty() {
         log::warn!("No output directory specified, dumping to console.");
         let parsed_raws = dfraw_json_parser::parse_info_txt_in_module(&raw_module_path);
-        println!("{}", parsed_raws);
+        println!("{parsed_raws}");
         return;
     }
 
@@ -201,7 +201,7 @@ fn run_for_single_raw_module_location(location_path: &str, out_dir: &str) {
     if out_dir.is_empty() {
         log::warn!("No output directory specified, dumping to console.");
         let parsed_raws = dfraw_json_parser::parse_module_location(&raw_module_location_path);
-        println!("[{}]", parsed_raws);
+        println!("[{parsed_raws}]");
         return;
     }
 

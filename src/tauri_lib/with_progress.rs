@@ -1,8 +1,9 @@
 #[cfg(feature = "tauri")]
 extern crate tauri;
 #[cfg(feature = "tauri")]
-use crate::parser::util::{path_from_game_directory, subdirectories};
-use crate::parser::{json_conversion::TypedJsonSerializable, parse_info_file, parsing, util};
+use crate::parser::{DFParser, TypedJsonSerializable};
+#[cfg(feature = "tauri")]
+use crate::util;
 #[cfg(feature = "tauri")]
 use walkdir::DirEntry;
 
@@ -30,7 +31,7 @@ pub fn parse_game_raws<P: AsRef<Path>>(
     progress_helper: &mut ProgressHelper,
 ) -> String {
     // Validate game path
-    let game_path = match path_from_game_directory(df_game_path) {
+    let game_path = match util::path_from_game_directory(df_game_path) {
         Ok(path_buf) => path_buf,
         Err(e) => {
             log::error!("{}", e);
@@ -103,18 +104,19 @@ pub fn parse_location<P: AsRef<Path>>(
 
     //3. Get list of all subdirectories
     let raw_module_iter: Vec<DirEntry> =
-        subdirectories(std::path::PathBuf::from(raw_module_location_path)).unwrap_or_default();
+        util::subdirectories(std::path::PathBuf::from(raw_module_location_path))
+            .unwrap_or_default();
 
     log::info!(
         "{num} raw modules located in {location:?}",
         num = raw_module_iter.len(),
         location = module_location
     );
-    progress_helper.update_current_location(format!("{:?}", module_location).as_str());
+    progress_helper.update_current_location(format!("{module_location:?}").as_str());
 
     // Calculate total number of modules we will parse:
     progress_helper.add_steps(raw_module_iter.len());
-    progress_helper.update_current_task(format!("Parsing raws in {:?}", module_location).as_str());
+    progress_helper.update_current_task(format!("Parsing raws in {module_location:?}").as_str());
 
     let mut all_json: Vec<String> = Vec::new();
     //4. Loop over all raw modules in the raw module directory
@@ -177,7 +179,7 @@ pub fn parse_module<P: AsRef<Path>>(
     }
 
     // Parse info.txt to get raw module information
-    let dfraw_module_info = parse_info_file(&info_txt_path);
+    let dfraw_module_info = DFParser::parse_info_file(&info_txt_path);
     log::info!(
         "Parsing raws for {} v{}",
         dfraw_module_info.get_identifier(),
@@ -195,10 +197,21 @@ pub fn parse_module<P: AsRef<Path>>(
     let objects_path = raw_module_directory.as_ref().join("objects");
     if !objects_path.exists() {
         log::debug!("No objects subdirectory, no raws to parse.");
-        return String::new();
     }
     if !objects_path.is_dir() {
         log::error!("Objects subdirectory is not valid subdirectory! Unable to parse raws.");
+    }
+    //2. Parse raws in the 'object' subdirectory
+    let graphics_path = raw_module_directory.as_ref().join("graphics");
+    if !graphics_path.exists() {
+        log::debug!("No graphics subdirectory, no raws to parse.");
+    }
+    if !graphics_path.is_dir() {
+        log::error!("Graphics subdirectory is not valid subdirectory! Unable to parse raws.");
+    }
+
+    if !objects_path.exists() && !graphics_path.exists() {
+        //exit because nothing to parse
         return String::new();
     }
 
@@ -216,7 +229,24 @@ pub fn parse_module<P: AsRef<Path>>(
             progress_helper.add_steps(1);
             progress_helper.send_update(&f_name);
             let entry_path = entry.path();
-            serializable_raws.extend(parsing::parse_raws_from_single_file_into_serializable(
+            serializable_raws.extend(DFParser::parse_raws_from_single_file_into_serializable(
+                &entry_path,
+                &dfraw_module_info,
+            ));
+        }
+    }
+    // Read all the files in the directory, selectively parse the .txt files
+    for entry in walkdir::WalkDir::new(graphics_path)
+        .into_iter()
+        .filter_map(std::result::Result::ok)
+    {
+        let f_name = entry.file_name().to_string_lossy();
+
+        if f_name.ends_with(".txt") {
+            progress_helper.add_steps(1);
+            progress_helper.send_update(&f_name);
+            let entry_path = entry.path();
+            serializable_raws.extend(DFParser::parse_raws_from_single_file_into_serializable(
                 &entry_path,
                 &dfraw_module_info,
             ));
