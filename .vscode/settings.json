@@ -3,8 +3,7 @@
   "docwriter.style": "RustDoc",
   "cSpell.words": ["dfraw", "gamelog", "Megabeast", "powf", "rouille", "walkdir"],
   "rust-analyzer.cargo.features": ["tauri"],
-  "rust-analyzer.checkOnSave.features": "all",
-  "rust-analyzer.checkOnSave.command": "clippy",
-  "rust-analyzer.checkOnSave.extraArgs": ["--", "-W", "clippy::cargo"],
-  "conventionalCommits.scopes": ["deps"]
+  "conventionalCommits.scopes": ["deps"],
+  "rust-analyzer.check.command": "clippy",
+  "rust-analyzer.check.extraArgs": ["--", "-W", "clippy::pedantic", "-W", "clippy::cargo"]
 }

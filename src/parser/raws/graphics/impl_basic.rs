@@ -12,7 +12,7 @@ impl DFGraphic {
         //idx 0           1           2 3 4
         let split = token.split(':').collect::<Vec<&str>>();
 
-        match split[0] {
+        match *split.first().unwrap_or(&"") {
             "TILE_GRAPHICS" => {
                 let Some(identifier) = split.get(4) else {
                     return Self {
@@ -27,7 +27,7 @@ impl DFGraphic {
                         kind: Kind::Empty,
                     }
                 };
-                let graphic = match SpriteGraphic::parse(String::from(token)) {
+                let graphic = match SpriteGraphic::parse(token) {
                     Some(g) => g,
                     None => {
                         return Self {
@@ -91,7 +91,7 @@ impl DFGraphic {
             },
         }
     }
-    pub fn add_tile_from_token(&mut self, token: String) {
+    pub fn add_tile_from_token(&mut self, token: &str) {
         match self.kind {
             Kind::Creature | Kind::CreatureCaste => {
                 let graphic = match SpriteGraphic::parse_creature(token) {
@@ -111,9 +111,7 @@ impl DFGraphic {
                 };
                 self.graphics.push(graphic);
             }
-            Kind::Empty => {
-                return;
-            }
+            Kind::Empty => {}
         }
     }
     pub fn get_raw_header(&self) -> &DFRawCommon {

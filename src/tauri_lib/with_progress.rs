@@ -112,11 +112,11 @@ pub fn parse_location<P: AsRef<Path>>(
         num = raw_module_iter.len(),
         location = module_location
     );
-    progress_helper.update_current_location(format!("{:?}", module_location).as_str());
+    progress_helper.update_current_location(format!("{module_location:?}").as_str());
 
     // Calculate total number of modules we will parse:
     progress_helper.add_steps(raw_module_iter.len());
-    progress_helper.update_current_task(format!("Parsing raws in {:?}", module_location).as_str());
+    progress_helper.update_current_task(format!("Parsing raws in {module_location:?}").as_str());
 
     let mut all_json: Vec<String> = Vec::new();
     //4. Loop over all raw modules in the raw module directory

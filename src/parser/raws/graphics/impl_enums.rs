@@ -18,10 +18,11 @@ impl Condition {
 }
 
 impl Color {
-    pub fn from_str(color: &str) -> Self {
-        match color {
-            "AS_IS" => Color::AsIs,
-            _ => Color::AsIs,
-        }
+    pub fn from_str(_color: &str) -> Self {
+        Color::AsIs
+        // match color {
+        //     "AS_IS" => Color::AsIs,
+        //     _ => Color::AsIs,
+        // }
     }
 }

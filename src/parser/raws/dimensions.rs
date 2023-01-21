@@ -13,14 +13,11 @@ impl Dimensions {
     pub fn from_xy(x: i32, y: i32) -> Self {
         Self { x, y }
     }
-    pub fn from_tokens(token_x: &str, token_y: &str) -> Self {
-        Self::from_token_xy(format!("{}:{}", token_x, token_y).as_str())
-    }
-    pub fn from_token_xy(token: &str) -> Self {
+    pub fn from_token(token: &str) -> Self {
         let split = token.split(':').collect::<Vec<&str>>();
         //	[TILE_DIM:32:32]
 
-        let Some(dim_x) = split.get(0) else {
+        let Some(dim_x) = split.first() else {
             log::error!(
                 "Missing required number of tokens for Dimensions! {}",
                 token

@@ -1,4 +1,4 @@
-use std::path::{Path, PathBuf};
+use std::path::PathBuf;
 
 use crate::parser::raws::{
     dimensions::Dimensions, info_txt::DFInfoFile, DFRawCommon, RawObjectKind,
@@ -17,10 +17,10 @@ impl super::DFTilePage {
         self.file = file.split('/').collect();
     }
     pub fn set_tile_dim_from_token(&mut self, token: &str) {
-        self.tile_dim = Dimensions::from_token_xy(token);
+        self.tile_dim = Dimensions::from_token(token);
     }
     pub fn set_page_dim_from_token(&mut self, token: &str) {
-        self.page_dim = Dimensions::from_token_xy(token);
+        self.page_dim = Dimensions::from_token(token);
     }
     pub fn get_raw_header(&self) -> &DFRawCommon {
         &self.raw_header

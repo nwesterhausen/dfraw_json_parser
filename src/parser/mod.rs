@@ -6,6 +6,7 @@ pub mod raws;
 mod reader;
 mod refs;
 
+#[allow(clippy::module_name_repetitions)]
 pub struct DFParser;
 
 pub trait TypedJsonSerializable {

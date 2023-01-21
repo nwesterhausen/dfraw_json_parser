@@ -42,7 +42,7 @@ pub enum RawModuleLocation {
 }
 
 impl RawModuleLocation {
-    pub fn get_path(&self) -> PathBuf {
+    pub fn get_path(self) -> PathBuf {
         match self {
             RawModuleLocation::Mods => PathBuf::from("mods"),
             RawModuleLocation::InstalledMods => ["data", "installed_mods"].iter().collect(),

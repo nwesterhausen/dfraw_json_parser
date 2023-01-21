@@ -38,13 +38,6 @@ pub struct SpriteGraphic {
     secondary_condition: Condition,
 }
 
-struct TileGraphicsRectangle {
-    tile_page_id: String,
-    offset: Dimensions,
-    offset2: Dimensions,
-    body_token: String,
-}
-
 #[derive(Serialize, Deserialize, Debug, Clone, Copy, PartialEq, Eq)]
 pub enum Kind {
     Creature,
