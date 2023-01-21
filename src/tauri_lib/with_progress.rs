@@ -203,12 +203,39 @@ pub fn parse_module<P: AsRef<Path>>(
         log::error!("Objects subdirectory is not valid subdirectory! Unable to parse raws.");
         return String::new();
     }
+    //2. Parse raws in the 'object' subdirectory
+    let graphics_path = raw_module_directory.as_ref().join("graphics");
+    if !graphics_path.exists() {
+        log::debug!("No graphics subdirectory, no raws to parse.");
+        return String::new();
+    }
+    if !graphics_path.is_dir() {
+        log::error!("Graphics subdirectory is not valid subdirectory! Unable to parse raws.");
+        return String::new();
+    }
 
     // Setup empty result vector
     let mut serializable_raws: Vec<Box<dyn TypedJsonSerializable>> = Vec::new();
 
     // Read all the files in the directory, selectively parse the .txt files
     for entry in walkdir::WalkDir::new(objects_path)
+        .into_iter()
+        .filter_map(std::result::Result::ok)
+    {
+        let f_name = entry.file_name().to_string_lossy();
+
+        if f_name.ends_with(".txt") {
+            progress_helper.add_steps(1);
+            progress_helper.send_update(&f_name);
+            let entry_path = entry.path();
+            serializable_raws.extend(DFParser::parse_raws_from_single_file_into_serializable(
+                &entry_path,
+                &dfraw_module_info,
+            ));
+        }
+    }
+    // Read all the files in the directory, selectively parse the .txt files
+    for entry in walkdir::WalkDir::new(graphics_path)
         .into_iter()
         .filter_map(std::result::Result::ok)
     {
