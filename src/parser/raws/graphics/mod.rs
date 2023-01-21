@@ -31,6 +31,10 @@ pub enum Condition {
     CraftedArtifact,
     Dye,
     NotDyed,
+    Crop,
+    Seed,
+    Picked,
+    Shrub,
 }
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq)]
@@ -59,6 +63,7 @@ pub enum Kind {
     CreatureCaste,
     Tile,
     Empty,
+    Plant,
 }
 
 #[derive(Debug, Clone)]

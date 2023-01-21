@@ -23,6 +23,10 @@ impl Condition {
             "IS_CRAFTED_ARTIFACT" => Condition::CraftedArtifact,
             "CONDITION_DYE" => Condition::Dye,
             "CONDITION_NOT_DYED" => Condition::NotDyed,
+            "SHRUB" => Condition::Shrub,
+            "PICKED" => Condition::Picked,
+            "SEED" => Condition::Seed,
+            "CROP" => Condition::Crop,
             _ => Condition::None,
         }
     }

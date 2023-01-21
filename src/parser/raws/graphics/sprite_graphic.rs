@@ -8,6 +8,7 @@ impl SpriteGraphic {
         match *split.first().unwrap_or(&"") {
             "CREATURE_GRAPHICS" | "CREATURE_CASTE_GRAPHICS" => Self::parse_creature(token),
             "TILE_GRAPHICS" => Self::parse_tile(token),
+            "SHRUB" | "PICKED" | "SEED" | "CROP" => Self::parse_plant(token),
             _ => {
                 log::debug!("Unable to parse graphic from {}", token);
                 None
@@ -245,5 +246,51 @@ impl SpriteGraphic {
                 secondary_condition,
             })
         }
+    }
+    pub fn parse_plant(token: &str) -> Option<Self> {
+        // 	[SHRUB:DARK_ELF_PLANT_STANDARD:0:0]
+        let split = token.split(':').collect::<Vec<&str>>();
+        log::warn!("Parsing plant from {}", token);
+        let partition0 = split[0];
+
+        let primary_condition = Condition::from_str(partition0);
+        let Some(tile_page_id) = split.get(1) else {
+            log::warn!("Not enough pieces to tokenize in {}", token);
+            return None;
+        };
+
+        let Some(partition2) = split.get(2) else {
+            log::warn!("Not enough pieces to tokenize in {}", token);
+            return None;
+        };
+
+        let Some(partition3) = split.get(3) else {
+            log::warn!("Not enough pieces to tokenize in {}", token);
+            return None;
+        };
+
+        let offset_x = match partition2.parse() {
+            Ok(n) => n,
+            Err(e) => {
+                log::warn!("Failed to parse {} as offset_x, {:?}", partition2, e);
+                return None;
+            }
+        };
+        let offset_y = match partition3.parse() {
+            Ok(n) => n,
+            Err(e) => {
+                log::warn!("Failed to parse {} as offset_y, {:?}", partition3, e);
+                return None;
+            }
+        };
+        Some(Self {
+            primary_condition,
+            tile_page_id: String::from(*tile_page_id),
+            offset: Dimensions::from_xy(offset_x, offset_y),
+            color: Color::AsIs,
+            large_image: false,
+            offset2: Dimensions::zero(),
+            secondary_condition: Condition::None,
+        })
     }
 }

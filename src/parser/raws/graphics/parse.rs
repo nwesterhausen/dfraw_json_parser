@@ -73,7 +73,10 @@ impl super::DFGraphic {
                             // current_object = RawObjectKind::None;
                         }
                     },
-                    "CREATURE_GRAPHICS" | "CREATURE_CASTE_GRAPHICS" | "TILE_GRAPHICS" => {
+                    "CREATURE_GRAPHICS"
+                    | "CREATURE_CASTE_GRAPHICS"
+                    | "TILE_GRAPHICS"
+                    | "PLANT_GRAPHICS" => {
                         // We are starting a creature object capture
                         if let RawObjectKind::Graphics = current_object {
                             if started {
@@ -93,7 +96,7 @@ impl super::DFGraphic {
                             );
                         }
                     }
-                    "DEFAULT" => {
+                    "DEFAULT" | "SHRUB" | "PICKED" | "SEED" | "CROP" => {
                         sprite_temp.add_tile_from_token(&format!("{}:{}", &cap[2], &cap[3]));
                     }
                     &_ => {

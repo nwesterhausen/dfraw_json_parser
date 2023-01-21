@@ -68,6 +68,12 @@ impl DFGraphic {
                 graphics: Vec::new(),
                 kind: Kind::Creature,
             },
+            "PLANT_GRAPHICS" => Self {
+                raw_header: DFRawCommon::from(split[1], raw, info_text, RawObjectKind::Graphics),
+                caste_identifier: String::new(),
+                graphics: Vec::new(),
+                kind: Kind::Plant,
+            },
             _ => Self {
                 raw_header: DFRawCommon::from(token, raw, info_text, RawObjectKind::Graphics),
                 caste_identifier: String::new(),
@@ -89,6 +95,15 @@ impl DFGraphic {
             }
             Kind::Tile => {
                 let graphic = match SpriteGraphic::parse(token) {
+                    Some(g) => g,
+                    None => {
+                        return;
+                    }
+                };
+                self.graphics.push(graphic);
+            }
+            Kind::Plant => {
+                let graphic = match SpriteGraphic::parse_plant(token) {
                     Some(g) => g,
                     None => {
                         return;
