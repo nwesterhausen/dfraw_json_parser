@@ -5,6 +5,57 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## v0.11.0 (2023-01-21)
+
+### New Features
+
+ - <csr-id-648c92071d54b52b0e8fbc5a3dfb2ed680a0c7e2/> ✨ handle some plant graphics
+ - <csr-id-c18a2b1cf2950295a15874962e800f5b96ca3580/> ✨ parse graphics at the same time as other raws
+ - <csr-id-ae7324aec3f997f6cd2399665299b4929868dec7/> ✨ add graphics raw parsing to lib
+ - <csr-id-49bc46ce335cad5db501d2d9e0904e19e6f0c767/> ✨ add proper raw header to graphics
+ - <csr-id-1d2b8915be91857fdb3b12f0d101549fe543b5f6/> ✨ parse graphic tile page raws
+ - <csr-id-a860a99b871c855007d9228190e1b01be64a9dff/> ✨ implement basic graphic parser
+
+### Bug Fixes
+
+ - <csr-id-72c8601830284c46c2dde22c5f2ea38447ca00f5/> 🐛 don't return too early
+ - <csr-id-b0f66ac25811a2445a3156c937059e2fc437134f/> ⚡️ remove un-needed clones
+
+### Refactor
+
+ - <csr-id-5a2f3fdee7fc81636dda87b67e1c187e29965f7e/> 🚨 fix clippy lint warnings
+ - <csr-id-edf44ef452e9952e7ebd7e49a09af69e9ffebf4b/> 🔥 refactor code base
+   Reorganize to sort by thing instead of by action
+
+### Commit Statistics
+
+<csr-read-only-do-not-edit/>
+
+ - 11 commits contributed to the release over the course of 1 calendar day.
+ - 2 days passed between releases.
+ - 10 commits were understood as [conventional](https://www.conventionalcommits.org).
+ - 0 issues like '(#ID)' were seen in commit messages
+
+### Commit Details
+
+<csr-read-only-do-not-edit/>
+
+<details><summary>view details</summary>
+
+ * **Uncategorized**
+    - Merge pull request #18 from nwesterhausen/refactor ([`9f7f359`](https://github.com/nwesterhausen/dfraw_json_parser/commit/9f7f359441d457caa8be271df68cdb761128605c))
+    - 🐛 don't return too early ([`72c8601`](https://github.com/nwesterhausen/dfraw_json_parser/commit/72c8601830284c46c2dde22c5f2ea38447ca00f5))
+    - ✨ handle some plant graphics ([`648c920`](https://github.com/nwesterhausen/dfraw_json_parser/commit/648c92071d54b52b0e8fbc5a3dfb2ed680a0c7e2))
+    - ✨ parse graphics at the same time as other raws ([`c18a2b1`](https://github.com/nwesterhausen/dfraw_json_parser/commit/c18a2b1cf2950295a15874962e800f5b96ca3580))
+    - ✨ add graphics raw parsing to lib ([`ae7324a`](https://github.com/nwesterhausen/dfraw_json_parser/commit/ae7324aec3f997f6cd2399665299b4929868dec7))
+    - 🚨 fix clippy lint warnings ([`5a2f3fd`](https://github.com/nwesterhausen/dfraw_json_parser/commit/5a2f3fdee7fc81636dda87b67e1c187e29965f7e))
+    - ⚡️ remove un-needed clones ([`b0f66ac`](https://github.com/nwesterhausen/dfraw_json_parser/commit/b0f66ac25811a2445a3156c937059e2fc437134f))
+    - ✨ add proper raw header to graphics ([`49bc46c`](https://github.com/nwesterhausen/dfraw_json_parser/commit/49bc46ce335cad5db501d2d9e0904e19e6f0c767))
+    - ✨ parse graphic tile page raws ([`1d2b891`](https://github.com/nwesterhausen/dfraw_json_parser/commit/1d2b8915be91857fdb3b12f0d101549fe543b5f6))
+    - 🔥 refactor code base ([`edf44ef`](https://github.com/nwesterhausen/dfraw_json_parser/commit/edf44ef452e9952e7ebd7e49a09af69e9ffebf4b))
+    - ✨ implement basic graphic parser ([`a860a99`](https://github.com/nwesterhausen/dfraw_json_parser/commit/a860a99b871c855007d9228190e1b01be64a9dff))
+</details>
+
 ## v0.10.1 (2023-01-18)
 
 ### New Features
@@ -15,7 +66,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 <csr-read-only-do-not-edit/>
 
- - 1 commit contributed to the release.
+ - 2 commits contributed to the release.
  - 1 day passed between releases.
  - 1 commit was understood as [conventional](https://www.conventionalcommits.org).
  - 0 issues like '(#ID)' were seen in commit messages
@@ -27,6 +78,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 <details><summary>view details</summary>
 
  * **Uncategorized**
+    - Release dfraw_json_parser v0.10.1 ([`3c0476f`](https://github.com/nwesterhausen/dfraw_json_parser/commit/3c0476f6214d9382c1ff020d9c7a5fc0c61ae618))
     - ✨ add more detail to progress payload ([`cf64641`](https://github.com/nwesterhausen/dfraw_json_parser/commit/cf64641d44584997038e558b9eb09b795ce02837))
 </details>
 
@@ -508,7 +560,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 <csr-id-59e2dff2d583cd8c5c55411688a6c8f4ddcf361a/>
 
 
-<csr-id-5a9740e01528680c3f6543673fbd722913ac57c2/>
 <csr-id-7932e59c509f1da93e8f431fbbef9a164de144d1/>
 <csr-id-bb5de4483e6c0b5bfb15a0a5e2defdd067bd6c9d/>
 <csr-id-a8301caede5aa2090b769c05e19a699267e07b07/>
