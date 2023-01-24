@@ -61,8 +61,9 @@ for the steam workshop if it is a mod downloaded from the steam workshop.
 
 #![warn(clippy::pedantic)]
 
+use parser::inits::announcements::DFAnnouncement;
 use parser::raws::RawModuleLocation;
-use parser::{DFParser, TypedJsonSerializable};
+use parser::{DFParser, RawsStyleSerializable, TypedJsonSerializable};
 use std::path::{Path, PathBuf};
 use walkdir::DirEntry;
 
@@ -275,7 +276,7 @@ pub fn parse_raw_module<P: AsRef<Path>>(raw_module_path: &P) -> String {
 ///
 /// * `df_game_path`: The path to the Dwarf Fortress install directory.
 /// * `out_filepath`: The path to the file to save the parsed raws to. (This should end in `.json`.)
-pub fn parse_game_raws_to_file<P: AsRef<Path>>(df_game_path: &P, out_filepath: &Path) {
+pub fn parse_game_raws_to_file<P: AsRef<Path>>(df_game_path: &P, out_filepath: &P) {
     let parsed_json_string = parse_game_raws(df_game_path);
     util::write_json_string_to_file(&parsed_json_string, out_filepath);
 }
@@ -286,7 +287,7 @@ pub fn parse_game_raws_to_file<P: AsRef<Path>>(df_game_path: &P, out_filepath: &
 ///
 /// * `df_game_path`: The path to the raws folder.
 /// * `out_filepath`: The path to the file to save the parsed raws to. (This should end in `.json`.)
-pub fn parse_info_txt_in_game_dir_to_file<P: AsRef<Path>>(df_game_path: &P, out_filepath: &Path) {
+pub fn parse_info_txt_in_game_dir_to_file<P: AsRef<Path>>(df_game_path: &P, out_filepath: &P) {
     let parsed_json_string = parse_info_txt_in_game_dir(df_game_path);
     util::write_json_string_to_file(&parsed_json_string, out_filepath);
 }
@@ -370,7 +371,7 @@ pub fn parse_info_txt_in_game_dir<P: AsRef<Path>>(df_game_path: &P) -> String {
 ///
 /// * `raw_file`: The path to the raw file to read.
 /// * `out_filepath`: The path to the file you want to write to.
-pub fn parse_single_raw_file_to_file<P: AsRef<Path>>(raw_file: &P, out_filepath: &Path) {
+pub fn parse_single_raw_file_to_file<P: AsRef<Path>>(raw_file: &P, out_filepath: &P) {
     let parsed_json_string = parse_single_raw_file(raw_file);
     util::write_json_string_to_file(&parsed_json_string, out_filepath);
 }
@@ -381,7 +382,7 @@ pub fn parse_single_raw_file_to_file<P: AsRef<Path>>(raw_file: &P, out_filepath:
 ///
 /// * `module_path`: The path to the raw file to read.
 /// * `out_filepath`: The path to the file you want to write to.
-pub fn parse_raw_module_to_file<P: AsRef<Path>>(module_path: &P, out_filepath: &Path) {
+pub fn parse_raw_module_to_file<P: AsRef<Path>>(module_path: &P, out_filepath: &P) {
     let parsed_json_string = parse_raw_module(module_path);
     util::write_json_string_to_file(&parsed_json_string, out_filepath);
 }
@@ -394,7 +395,7 @@ pub fn parse_raw_module_to_file<P: AsRef<Path>>(module_path: &P, out_filepath: &
 /// * `out_filepath`: The path to the file you want to write to.
 pub fn parse_module_location_to_file<P: AsRef<Path>>(
     raw_module_location_path: &P,
-    out_filepath: &Path,
+    out_filepath: &P,
 ) {
     let parsed_json_string = parse_module_location(raw_module_location_path);
     util::write_json_string_to_file(&parsed_json_string, out_filepath);
@@ -441,4 +442,70 @@ pub fn parse_location_with_tauri_emit<P: AsRef<Path>>(
     window: tauri::Window,
 ) -> String {
     tauri_lib::parse_location_with_tauri_emit(location_path, window)
+}
+
+/// `parse_announcements_txt` takes a path to a `announcements.txt` file, parses it, and returns a JSON
+/// string
+///
+/// Arguments:
+///
+/// * `announcements_txt_path`: The path to the announcements.txt file
+///
+/// Returns:
+///
+/// A String of JSON
+pub fn parse_announcements_txt<P: AsRef<Path>>(announcements_txt_path: &P) -> String {
+    let x = DFAnnouncement::parse(announcements_txt_path);
+    let Ok(y) = serde_json::to_string(&x) else {
+        log::error!("Unable to convert into json");
+        return String::new();
+    };
+    y
+}
+
+/// It parses the announcements.txt file and writes the result to a file as JSON.
+///
+/// Arguments:
+///
+/// * `announcements_txt_path`: The path to the announcements.txt file
+/// * `out_filepath`: The path to the file you want to write the JSON to.
+pub fn parse_announcements_txt_to_file<P: AsRef<Path>>(
+    announcements_txt_path: &P,
+    out_filepath: &P,
+) {
+    let x = DFAnnouncement::parse(announcements_txt_path);
+    let Ok(y) = serde_json::to_string(&x) else {
+        log::error!("Unable to convert into json");
+        return;
+    };
+    util::write_json_string_to_file(&y, out_filepath);
+}
+
+/// It takes a JSON string of announcements, converts it to a vector of announcements, then writes it to
+/// a txt file
+///
+/// Arguments:
+///
+/// * `announcements_txt_path`: The path to the announcements.txt file to write
+/// * `announcements_vec_json`: A JSON string representing a vector of `DFAnnouncement` objects.
+pub fn write_announcements_txt_from_json<P: AsRef<Path>>(
+    announcements_txt_path: &P,
+    announcements_vec_json: &str,
+) {
+    let announcements_vec: Vec<DFAnnouncement> = match serde_json::from_str(announcements_vec_json)
+    {
+        Ok(a) => a,
+        Err(e) => {
+            log::error!("{e:?}");
+            return;
+        }
+    };
+
+    let mut serializable_announcements: Vec<Box<dyn RawsStyleSerializable>> = Vec::new();
+    for announcement in announcements_vec {
+        serializable_announcements.push(Box::new(announcement));
+    }
+
+    let x = util::raws_stringify_df_vec(serializable_announcements);
+    util::write_raws_string_vec_to_file(&x, announcements_txt_path);
 }

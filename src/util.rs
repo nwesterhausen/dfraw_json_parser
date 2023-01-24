@@ -6,7 +6,7 @@ use std::{
 
 use walkdir::WalkDir;
 
-use crate::parser::TypedJsonSerializable;
+use crate::parser::{RawsStyleSerializable, TypedJsonSerializable};
 
 /// Get a vec of subdirectories for a given directory
 ///
@@ -66,15 +66,15 @@ pub fn get_parent_dir_name<P: AsRef<Path>>(full_path: &P) -> String {
 ///
 /// * `parsed_json_string`: String
 /// * `out_filepath`: Path
-pub fn write_json_string_to_file(parsed_json_string: &String, out_filepath: &Path) {
-    log::info!("Saving json to to {:?}", out_filepath.display());
+pub fn write_json_string_to_file<P: AsRef<Path>>(parsed_json_string: &String, out_filepath: &P) {
+    log::info!("Saving json to to {:?}", out_filepath.as_ref().display());
 
     let out_file = match File::create(out_filepath) {
         Ok(f) => f,
         Err(e) => {
             log::error!(
                 "Unable to open {} for writing \n{:?}",
-                out_filepath.display(),
+                out_filepath.as_ref().display(),
                 e
             );
             return;
@@ -82,7 +82,10 @@ pub fn write_json_string_to_file(parsed_json_string: &String, out_filepath: &Pat
     };
 
     let mut stream = BufWriter::new(out_file);
-    let write_error = &format!("Unable to write to {}", out_filepath.to_string_lossy());
+    let write_error = &format!(
+        "Unable to write to {}",
+        out_filepath.as_ref().to_string_lossy()
+    );
     match write!(stream, "[") {
         Ok(_x) => (),
         Err(e) => {
@@ -98,6 +101,70 @@ pub fn write_json_string_to_file(parsed_json_string: &String, out_filepath: &Pat
             return;
         }
     };
+
+    match write!(stream, "]") {
+        Ok(_x) => (),
+        Err(e) => {
+            log::error!("{}\n{:?}", write_error, e);
+            return;
+        }
+    };
+    match stream.flush() {
+        Ok(_x) => (),
+        Err(e) => {
+            log::error!("{}\n{:?}", write_error, e);
+        }
+    };
+}
+
+#[allow(dead_code)]
+/// It takes a string of json and writes it to a file, wrapping it in square brackets to make it a valid
+/// json array
+///
+/// Arguments:
+///
+/// * `parsed_json_string_vec`: String
+/// * `out_filepath`: Path
+pub fn write_json_string_vec_to_file<P: AsRef<Path>>(
+    parsed_json_string_vec: &Vec<String>,
+    out_filepath: &P,
+) {
+    log::info!("Saving json to to {:?}", out_filepath.as_ref().display());
+
+    let out_file = match File::create(out_filepath) {
+        Ok(f) => f,
+        Err(e) => {
+            log::error!(
+                "Unable to open {} for writing \n{:?}",
+                out_filepath.as_ref().display(),
+                e
+            );
+            return;
+        }
+    };
+
+    let mut stream = BufWriter::new(out_file);
+    let write_error = &format!(
+        "Unable to write to {}",
+        out_filepath.as_ref().to_string_lossy()
+    );
+    match write!(stream, "[") {
+        Ok(_x) => (),
+        Err(e) => {
+            log::error!("{}\n{:?}", write_error, e);
+            return;
+        }
+    };
+
+    for parsed_json_string in parsed_json_string_vec {
+        match write!(stream, "{parsed_json_string}") {
+            Ok(_x) => (),
+            Err(e) => {
+                log::error!("{}\n{:?}", write_error, e);
+                return;
+            }
+        };
+    }
 
     match write!(stream, "]") {
         Ok(_x) => (),
@@ -145,6 +212,31 @@ pub fn stringify_raw_vec(
     results
 }
 
+/// It takes a vector of objects that implement the `RawsStyleSerializable` trait, and returns a vector
+/// of strings that are the raws-style serialized versions of those objects
+///
+/// Arguments:
+///
+/// * `raws_stringable_vec`: `Vec<Box<impl RawsStyleSerializable + ?Sized>>`
+///
+/// Returns:
+///
+/// A vector of strings.
+pub fn raws_stringify_df_vec(
+    raws_stringable_vec: Vec<Box<impl RawsStyleSerializable + ?Sized>>,
+) -> Vec<String> {
+    let mut results: Vec<String> = Vec::new();
+    if raws_stringable_vec.is_empty() {
+        return results;
+    }
+
+    for df_object in raws_stringable_vec {
+        results.push(df_object.to_raws_style());
+    }
+
+    results
+}
+
 /// "Given a path to a game directory, return a `PathBuf` to that directory if it exists and is a
 /// directory, otherwise return an error."
 ///
@@ -179,4 +271,52 @@ pub fn path_from_game_directory<P: AsRef<Path>>(game_path: &P) -> Result<PathBuf
     }
 
     Ok(game_path.to_path_buf())
+}
+
+/// It takes a string of raws-style strings (i.e. [content]) and writes it to file, one per line.
+///
+/// Arguments:
+///
+/// * `parsed_raws_string_vec`: String
+/// * `out_filepath`: Path
+pub fn write_raws_string_vec_to_file<P: AsRef<Path>>(
+    parsed_raws_string_vec: &Vec<String>,
+    out_filepath: &P,
+) {
+    log::info!("Saving raws to to {:?}", out_filepath.as_ref().display());
+
+    let out_file = match File::create(out_filepath) {
+        Ok(f) => f,
+        Err(e) => {
+            log::error!(
+                "Unable to open {} for writing \n{:?}",
+                out_filepath.as_ref().display(),
+                e
+            );
+            return;
+        }
+    };
+
+    let mut stream = BufWriter::new(out_file);
+    let write_error = &format!(
+        "Unable to write to {}",
+        out_filepath.as_ref().to_string_lossy()
+    );
+
+    for parsed_json_string in parsed_raws_string_vec {
+        match writeln!(stream, "{parsed_json_string}") {
+            Ok(_x) => (),
+            Err(e) => {
+                log::error!("{}\n{:?}", write_error, e);
+                return;
+            }
+        };
+    }
+
+    match stream.flush() {
+        Ok(_x) => (),
+        Err(e) => {
+            log::error!("{}\n{:?}", write_error, e);
+        }
+    };
 }
