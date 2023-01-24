@@ -5,7 +5,35 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## v0.12.0 (2023-01-24)
+
+### New Features
+
+ - <csr-id-50d07775ca1c672936a6811699a077cd19fa173c/> ✨ add announcements.txt parsing and writing
+
+### Commit Statistics
+
+<csr-read-only-do-not-edit/>
+
+ - 1 commit contributed to the release.
+ - 2 days passed between releases.
+ - 1 commit was understood as [conventional](https://www.conventionalcommits.org).
+ - 0 issues like '(#ID)' were seen in commit messages
+
+### Commit Details
+
+<csr-read-only-do-not-edit/>
+
+<details><summary>view details</summary>
+
+ * **Uncategorized**
+    - ✨ add announcements.txt parsing and writing ([`50d0777`](https://github.com/nwesterhausen/dfraw_json_parser/commit/50d07775ca1c672936a6811699a077cd19fa173c))
+</details>
+
 ## v0.11.0 (2023-01-21)
+
+<csr-id-5a2f3fdee7fc81636dda87b67e1c187e29965f7e/>
+<csr-id-edf44ef452e9952e7ebd7e49a09af69e9ffebf4b/>
 
 ### New Features
 
@@ -31,7 +59,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 <csr-read-only-do-not-edit/>
 
- - 11 commits contributed to the release over the course of 1 calendar day.
+ - 12 commits contributed to the release over the course of 1 calendar day.
  - 2 days passed between releases.
  - 10 commits were understood as [conventional](https://www.conventionalcommits.org).
  - 0 issues like '(#ID)' were seen in commit messages
@@ -43,6 +71,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 <details><summary>view details</summary>
 
  * **Uncategorized**
+    - Release dfraw_json_parser v0.11.0 ([`cf0b1c1`](https://github.com/nwesterhausen/dfraw_json_parser/commit/cf0b1c15237ff19b79c22a8b231be7404286be75))
     - Merge pull request #18 from nwesterhausen/refactor ([`9f7f359`](https://github.com/nwesterhausen/dfraw_json_parser/commit/9f7f359441d457caa8be271df68cdb761128605c))
     - 🐛 don't return too early ([`72c8601`](https://github.com/nwesterhausen/dfraw_json_parser/commit/72c8601830284c46c2dde22c5f2ea38447ca00f5))
     - ✨ handle some plant graphics ([`648c920`](https://github.com/nwesterhausen/dfraw_json_parser/commit/648c92071d54b52b0e8fbc5a3dfb2ed680a0c7e2))
@@ -560,7 +589,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 <csr-id-59e2dff2d583cd8c5c55411688a6c8f4ddcf361a/>
 
 
-<csr-id-7932e59c509f1da93e8f431fbbef9a164de144d1/>
 <csr-id-bb5de4483e6c0b5bfb15a0a5e2defdd067bd6c9d/>
 <csr-id-a8301caede5aa2090b769c05e19a699267e07b07/>
 <csr-id-8d79e7bc493584248b8adbc98ae4f178f517a6a6/>
