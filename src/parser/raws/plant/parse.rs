@@ -68,15 +68,34 @@ impl super::DFPlant {
             }
 
             for cap in RAW_TOKEN_RE.captures_iter(&line) {
-                log::trace!("{} - Key: {} Value: {}", caller, &cap[2], &cap[3]);
-                match &cap[2] {
-                    "OBJECT" => match &cap[3] {
+                let captured_key = match cap.get(2) {
+                    Some(v) => v.as_str(),
+                    _ => {
+                        continue;
+                    }
+                };
+                let captured_value = match cap.get(3) {
+                    Some(v) => v.as_str(),
+                    _ => {
+                        continue;
+                    }
+                };
+
+                log::trace!(
+                    "{} - Key: {} Value: {}",
+                    caller,
+                    captured_key,
+                    captured_value
+                );
+
+                match captured_key {
+                    "OBJECT" => match captured_value {
                         "PLANT" => {
                             // Discovered raws for plants.
                             current_object = RawObjectKind::Plant;
                         }
                         &_ => {
-                            log::debug!("{} - Wrong type of raw ({})", caller, &cap[3]);
+                            log::debug!("{} - Wrong type of raw ({})", caller, captured_value);
                             return Vec::new();
                             // current_object = RawObjectKind::None;
                         }
@@ -100,9 +119,10 @@ impl super::DFPlant {
                                 started = true;
                             }
                             //Reset all temp values
-                            log::debug!("Starting new plant {}", &cap[3]);
+                            log::debug!("Starting new plant {}", captured_value);
                             //1. Make new creature from [CREATURE:<NAME>]
-                            plant_temp = plant::DFPlant::new(&raw_filename, &cap[3], info_text);
+                            plant_temp =
+                                plant::DFPlant::new(&raw_filename, captured_value, info_text);
                             //2. Make new caste
                             material_temp = material::SimpleMaterial::empty();
                             //3. Reset/empty caste tags
@@ -113,53 +133,75 @@ impl super::DFPlant {
                             temp_material_vec = Vec::new();
 
                             // Apply overwrites_raw if this is a SELECT tag
-                            if cap[2].eq("SELECT_PLANT") {
-                                plant_temp.set_overwrites_raw(&cap[3]);
+                            if captured_key.eq("SELECT_PLANT") {
+                                plant_temp.set_overwrites_raw(captured_value);
                             }
                         }
                     }
                     "CUT_USE_MATERIAL_TEMPLATE" => {
                         // We will have to add one of these for each tag we support cutting..
-                        plant_temp.push_cut_tag(&cap[2], &cap[3]);
+                        plant_temp.push_cut_tag(captured_key, captured_value);
                     }
                     "USE_MATERIAL_TEMPLATE" => {
                         //1. Save caste tags
                         material_tags.extend(material_temp.tags);
-                        material_temp.tags = material_tags;
+                        material_temp.tags = material_tags.clone();
                         //2. Save caste
-                        temp_material_vec.push(material_temp);
+                        temp_material_vec.push(material_temp.clone());
 
                         // Split the value into a descriptor and template
-                        let split = cap[3].split(':').collect::<Vec<&str>>();
+                        let split = captured_value.split(':').collect::<Vec<&str>>();
                         if split.len() != 2 {
-                            log::error!("Unable to build from material template {}", &cap[3]);
+                            log::error!(
+                                "Unable to build from material template {}",
+                                captured_value
+                            );
                             // When we can't do anything about the template, just use empty one
                             material_temp = material::SimpleMaterial::empty();
                             material_tags = Vec::new();
                             continue;
                         }
 
-                        log::debug!("Found defined template {} {}", &split[0], &split[1]);
+                        let material_type = match split.first() {
+                            Some(v) => *v,
+                            _ => {
+                                continue;
+                            }
+                        };
+                        let material_template = match split.get(1) {
+                            Some(v) => *v,
+                            _ => {
+                                continue;
+                            }
+                        };
+
+                        log::debug!(
+                            "Found defined template {} {}",
+                            material_type,
+                            material_template
+                        );
                         //3. Make new caste from [CASTE:<NAME>]
-                        material_temp = material::SimpleMaterial::new(split[0], split[1]);
+                        material_temp =
+                            material::SimpleMaterial::new(material_type, material_template);
                         //4. Reset/empty caste tags
                         // ~~material_tags = Vec::new();~~
                         //5. Get material template to add (known) template tags
-                        material_tags = Vec::clone(&material::tags_from_template(split[1]));
+                        material_tags =
+                            Vec::clone(&material::tags_from_template(material_template));
                     }
                     "BIOME" => {
-                        if let Some(biome_name) = biomes::BIOMES.get(&cap[3]) {
+                        if let Some(biome_name) = biomes::BIOMES.get(captured_value) {
                             plant_temp.biomes.push((*biome_name).to_string());
                         } else {
                             log::warn!(
                             "BIOME:{} is not a valid token (in {}); Will add it 'as-is' to biome list",
-                            &cap[3],
+                            captured_value,
                             plant_temp.get_raw_header().get_identifier()
                         );
-                            plant_temp.biomes.push(String::from(&cap[3]));
+                            plant_temp.biomes.push(String::from(captured_value));
                         }
                     }
-                    "GROWTH" => match &cap[3] {
+                    "GROWTH" => match captured_value {
                         "LEAVES" => temp_plant_growth = plant::Growth::Leaves,
                         "FLOWERS" => temp_plant_growth = plant::Growth::Flowers,
                         "FRUIT" => temp_plant_growth = plant::Growth::Fruit,
@@ -172,30 +214,30 @@ impl super::DFPlant {
                         "POLLEN_CONE" => temp_plant_growth = plant::Growth::PollenCone,
                         "POD" => temp_plant_growth = plant::Growth::Pod,
                         _ => {
-                            log::debug!("Un-matched plant growth token '{}'", &cap[3]);
+                            log::debug!("Un-matched plant growth token '{}'", captured_value);
                         }
                     },
                     "GROWTH_NAME" => {
                         plant_temp
                             .growth_names
-                            .insert(temp_plant_growth, names::SingPlurName::new(&cap[3]));
+                            .insert(temp_plant_growth, names::SingPlurName::new(captured_value));
                     }
                     "ALL_NAMES" => {
-                        plant_temp.name.set_all(&cap[3]);
+                        plant_temp.name.set_all(captured_value);
                     }
                     "NAME" => {
-                        plant_temp.name.set_singular(&cap[3]);
+                        plant_temp.name.set_singular(captured_value);
                     }
                     "NAME_PLURAL" => {
-                        plant_temp.name.set_plural(&cap[3]);
+                        plant_temp.name.set_plural(captured_value);
                     }
                     "ADJ" => {
-                        plant_temp.name.set_adjective(&cap[3]);
+                        plant_temp.name.set_adjective(captured_value);
                     }
                     "PREFSTRING" => {
-                        plant_temp.pref_string.push(String::from(&cap[3]));
+                        plant_temp.pref_string.push(String::from(captured_value));
                     }
-                    "FREQUENCY" => match cap[3].parse() {
+                    "FREQUENCY" => match captured_value.parse() {
                         Ok(n) => plant_temp.frequency = n,
                         Err(e) => log::error!(
                             "{}:FREQUENCY parsing error\n{:?}",
@@ -203,7 +245,7 @@ impl super::DFPlant {
                             e
                         ),
                     },
-                    "CLUSTERSIZE" => match cap[3].parse() {
+                    "CLUSTERSIZE" => match captured_value.parse() {
                         Ok(n) => plant_temp.cluster_size = n,
                         Err(e) => log::error!(
                             "{}:CLUSTERSIZE parsing error\n{:?}",
@@ -211,7 +253,7 @@ impl super::DFPlant {
                             e
                         ),
                     },
-                    "GROWDUR" => match cap[3].parse() {
+                    "GROWDUR" => match captured_value.parse() {
                         Ok(n) => plant_temp.growth_duration = n,
                         Err(e) => log::error!(
                             "{}:GROWDUR parsing error\n{:?}",
@@ -219,7 +261,7 @@ impl super::DFPlant {
                             e
                         ),
                     },
-                    "VALUE" => match cap[3].parse() {
+                    "VALUE" => match captured_value.parse() {
                         Ok(n) => plant_temp.value = n,
                         Err(e) => log::error!(
                             "{}:VALUE parsing error\n{:?}",
@@ -227,7 +269,7 @@ impl super::DFPlant {
                             e
                         ),
                     },
-                    "MATERIAL_VALUE" => match cap[3].parse() {
+                    "MATERIAL_VALUE" => match captured_value.parse() {
                         Ok(n) => material_temp.material_value = n,
                         Err(e) => log::error!(
                             "{}:{:?}:MATERIAL_VALUE parsing error\n{:?}",
@@ -246,20 +288,20 @@ impl super::DFPlant {
                         material_tags.push(tags::MaterialTag::EdibleCooked);
                     }
                     "STATE_NAME" => {
-                        material_temp.state_name.set_from_tag(&cap[3]);
+                        material_temp.state_name.set_from_tag(captured_value);
                     }
                     "STATE_ADJ" => {
-                        material_temp.state_adj.set_from_tag(&cap[3]);
+                        material_temp.state_adj.set_from_tag(captured_value);
                     }
                     "STATE_NAME_ADJ" => {
-                        material_temp.state_name.set_from_tag(&cap[3]);
-                        material_temp.state_adj.set_from_tag(&cap[3]);
+                        material_temp.state_name.set_from_tag(captured_value);
+                        material_temp.state_adj.set_from_tag(captured_value);
                     }
                     "STATE_COLOR" => {
-                        material_temp.state_color.set_from_tag(&cap[3]);
+                        material_temp.state_color.set_from_tag(captured_value);
                     }
                     "MILL" => {
-                        plant_temp.reactions.push(String::from(&cap[3]));
+                        plant_temp.reactions.push(String::from(captured_value));
                     }
                     &_ => (),
                 }

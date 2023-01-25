@@ -20,6 +20,7 @@ impl super::DFParser {
     /// Returns:
     ///
     /// `RawObjectKind` for the type of [OBJECT] tag encountered, and `RawObjectKind::None` if it is unsupported.
+    #[allow(clippy::too_many_lines)]
     pub fn read_raw_file_type<P: AsRef<Path>>(input_path: &P) -> RawObjectKind {
         let caller = "Raw File Type Checker";
         // Validate file exists
@@ -82,13 +83,37 @@ impl super::DFParser {
             // Multiple matches can occur in a single line, so we loop over all captures within the match
             // for this line.
             for cap in RAW_TOKEN_RE.captures_iter(&line) {
-                log::trace!("{} - Key: {} Value: {}", caller, &cap[2], &cap[3]);
+                let captured_key = match cap.get(2) {
+                    Some(v) => v.as_str(),
+                    _ => {
+                        continue;
+                    }
+                };
+                let captured_value = match cap.get(3) {
+                    Some(v) => v.as_str(),
+                    _ => {
+                        continue;
+                    }
+                };
+
+                log::trace!(
+                    "{} - Key: {} Value: {}",
+                    caller,
+                    captured_key,
+                    captured_value
+                );
+
                 // Match the front part of the tag
-                match &cap[2] {
+                match captured_key {
                     // We are only concerned with the [OBJECT] key
                     "OBJECT" => {
-                        log::trace!("{} - {} is a {} raw file", caller, raw_filename, &cap[3]);
-                        match &cap[3] {
+                        log::trace!(
+                            "{} - {} is a {} raw file",
+                            caller,
+                            raw_filename,
+                            captured_value
+                        );
+                        match captured_value {
                             "CREATURE" => {
                                 return RawObjectKind::Creature;
                             }
@@ -109,7 +134,7 @@ impl super::DFParser {
                                 log::debug!(
                                     "{} - Currently no support for OBJECT:{}",
                                     caller,
-                                    &cap[3]
+                                    captured_value
                                 );
                                 return RawObjectKind::None;
                                 // current_object = RawObjectKind::None;

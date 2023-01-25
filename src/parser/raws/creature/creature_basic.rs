@@ -48,37 +48,71 @@ impl super::DFCreature {
         self.raw_header.push_cut_tag(tag0, tag1);
     }
     pub fn get_general_name(&self) -> String {
-        self.name.to_string_vec()[0].to_string()
+        self.name
+            .to_string_vec()
+            .first()
+            .unwrap_or(&String::new())
+            .to_string()
     }
     pub fn get_names_by_caste(&self) -> HashMap<String, Vec<String>> {
         let mut names_map: HashMap<String, Vec<String>> = HashMap::new();
         names_map.insert("SPECIES".to_string(), self.name.to_string_vec());
-        if !self.general_baby_name.to_string_vec()[0].is_empty() {
+        if !self
+            .general_baby_name
+            .to_string_vec()
+            .first()
+            .unwrap_or(&String::new())
+            .is_empty()
+        {
             names_map.insert(
                 "baby_SPECIES".to_string(),
                 self.general_baby_name.to_string_vec(),
             );
         }
-        if !self.general_child_name.to_string_vec()[0].is_empty() {
+        if !self
+            .general_child_name
+            .to_string_vec()
+            .first()
+            .unwrap_or(&String::new())
+            .is_empty()
+        {
             names_map.insert(
                 "child_SPECIES".to_string(),
                 self.general_child_name.to_string_vec(),
             );
         }
         for self_caste in &self.castes {
-            if !self_caste.baby_name.to_string_vec()[0].is_empty() {
+            if !self_caste
+                .baby_name
+                .to_string_vec()
+                .first()
+                .unwrap_or(&String::new())
+                .is_empty()
+            {
                 names_map.insert(
                     format!("baby_{}", self_caste.name),
                     self_caste.baby_name.to_string_vec(),
                 );
             }
-            if !self_caste.child_name.to_string_vec()[0].is_empty() {
+            if !self_caste
+                .child_name
+                .to_string_vec()
+                .first()
+                .unwrap_or(&String::new())
+                .is_empty()
+            {
                 names_map.insert(
                     format!("child_{}", self_caste.name),
                     self_caste.child_name.to_string_vec(),
                 );
             }
-            if !self_caste.caste_name.to_string_vec()[0].is_empty() {
+            if !self_caste
+                .caste_name
+                .to_string_vec()
+                .first()
+                .unwrap_or(&String::new())
+                .is_empty()
+            {
                 names_map.insert(
                     self_caste.name.to_string(),
                     self_caste.caste_name.to_string_vec(),

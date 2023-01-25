@@ -98,10 +98,28 @@ impl DFAnnouncement {
 
             let mut announcement_temp;
             for cap in RAW_TOKEN_RE.captures_iter(&line) {
-                log::trace!("{} - Key: {} Value: {}", caller, &cap[2], &cap[3]);
+                let captured_key = match cap.get(2) {
+                    Some(v) => v.as_str(),
+                    _ => {
+                        continue;
+                    }
+                };
+                let captured_value = match cap.get(3) {
+                    Some(v) => v.as_str(),
+                    _ => {
+                        continue;
+                    }
+                };
 
-                announcement_temp = DFAnnouncement::new(&cap[2]);
-                let raw_flags = cap[3].split(':');
+                log::trace!(
+                    "{} - Key: {} Value: {}",
+                    caller,
+                    captured_key,
+                    captured_value
+                );
+
+                announcement_temp = DFAnnouncement::new(captured_key);
+                let raw_flags = captured_value.split(':');
                 for (_idx, raw_flag) in raw_flags.enumerate() {
                     match raw_flag {
                         "A_D" | "A_DISPLAY" => announcement_temp.add_flag(Flag::AdventureDisplay),

@@ -60,15 +60,34 @@ impl super::DFGraphic {
             }
 
             for cap in RAW_TOKEN_RE.captures_iter(&line) {
-                log::trace!("{} - Key: {} Value: {}", caller, &cap[2], &cap[3]);
-                match &cap[2] {
-                    "OBJECT" => match &cap[3] {
+                let captured_key = match cap.get(2) {
+                    Some(v) => v.as_str(),
+                    _ => {
+                        continue;
+                    }
+                };
+                let captured_value = match cap.get(3) {
+                    Some(v) => v.as_str(),
+                    _ => {
+                        continue;
+                    }
+                };
+
+                log::trace!(
+                    "{} - Key: {} Value: {}",
+                    caller,
+                    captured_key,
+                    captured_value
+                );
+
+                match captured_key {
+                    "OBJECT" => match captured_value {
                         "GRAPHICS" => {
                             // Discovered raws for plants.
                             current_object = RawObjectKind::Graphics;
                         }
                         &_ => {
-                            log::debug!("{} - Wrong type of raw ({})", caller, &cap[3]);
+                            log::debug!("{} - Wrong type of raw ({})", caller, captured_value);
                             return Vec::new();
                             // current_object = RawObjectKind::None;
                         }
@@ -87,17 +106,18 @@ impl super::DFGraphic {
                                 started = true;
                             }
                             //Reset all temp values
-                            log::trace!("Starting new graphic {}", &cap[3]);
+                            log::trace!("Starting new graphic {}", captured_value);
                             //1. Make new sprite from its definition
                             sprite_temp = graphics::DFGraphic::new(
                                 &raw_filename,
-                                format!("{}:{}", &cap[2], &cap[3]).as_str(),
+                                format!("{captured_key}:{captured_value}").as_str(),
                                 info_text,
                             );
                         }
                     }
                     "DEFAULT" | "SHRUB" | "PICKED" | "SEED" | "CROP" => {
-                        sprite_temp.add_tile_from_token(&format!("{}:{}", &cap[2], &cap[3]));
+                        sprite_temp
+                            .add_tile_from_token(&format!("{captured_key}:{captured_value}"));
                     }
                     &_ => {
                         // if sprite_temp.kind.eq(&graphics::Kind::Empty) {

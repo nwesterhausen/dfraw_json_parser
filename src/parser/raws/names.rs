@@ -11,18 +11,16 @@ pub struct Name {
 impl Name {
     // Take the arguments for a name and split ':' into sing, plural, adjective
     pub fn new(argument_text: &str) -> Self {
-        let mut arg_names: Vec<&str> = argument_text.split(':').collect::<Vec<&str>>();
-        let mut names: Vec<&str> = Vec::new();
-        while !arg_names.is_empty() {
-            names.push(arg_names.remove(0));
-        }
-        while names.len() < 3 {
-            names.push("");
-        }
+        let arg_names: Vec<&str> = argument_text.split(':').collect::<Vec<&str>>();
+
+        let singular_name = *arg_names.first().unwrap_or(&"");
+        let plural_name = *arg_names.get(1).unwrap_or(&"");
+        let adjective_name = *arg_names.get(2).unwrap_or(&"");
+
         Self {
-            singular: String::from(names[0]),
-            plural: String::from(names[1]),
-            adjective: String::from(names[2]),
+            singular: String::from(singular_name),
+            plural: String::from(plural_name),
+            adjective: String::from(adjective_name),
         }
     }
     pub fn to_string_vec(&self) -> Vec<String> {
@@ -59,25 +57,23 @@ pub struct SingPlurName {
 
 impl SingPlurName {
     pub fn new(argument_text: &str) -> Self {
-        let mut arg_names: Vec<&str> = argument_text.split(':').collect::<Vec<&str>>();
-        let mut names: Vec<&str> = Vec::new();
-        while !arg_names.is_empty() {
-            names.push(arg_names.remove(0));
-        }
-        while names.len() < 2 {
-            names.push("");
-        }
-        if names[1].eq("STP") {
+        let arg_names: Vec<&str> = argument_text.split(':').collect::<Vec<&str>>();
+
+        let singular_name = *arg_names.first().unwrap_or(&"");
+        let plural_name = *arg_names.get(1).unwrap_or(&"");
+
+        if plural_name.eq("STP") {
             return Self {
-                singular: String::from(names[0]),
-                plural: String::new(),
+                singular: String::from(singular_name),
+                plural: String::from(singular_name),
             };
         }
         Self {
-            singular: String::from(names[0]),
-            plural: String::from(names[1]),
+            singular: String::from(singular_name),
+            plural: String::from(plural_name),
         }
     }
+
     pub fn to_string_vec(&self) -> Vec<String> {
         vec![String::from(&self.singular), String::from(&self.plural)]
     }
@@ -120,27 +116,33 @@ impl StateName {
     pub fn set_from_tag(&mut self, tag_value: &str) {
         // Split the value into a descriptor and value
         let split = tag_value.split(':').collect::<Vec<&str>>();
+        let tag_key = match split.first() {
+            Some(v) => *v,
+            _ => {
+                return;
+            }
+        };
+        let tag_value = match split.get(1) {
+            Some(v) => *v,
+            _ => {
+                return;
+            }
+        };
 
-        if split.len() != 2 {
-            log::error!("Unable to read name from {}", tag_value);
-            // When we can't do anything about this name, just continue
-            return;
-        }
-
-        match *split.first().unwrap_or(&"") {
+        match tag_key {
             "ALL_SOLID" | "SOLID" => {
-                self.set_solid(split[1]);
+                self.set_solid(tag_value);
             }
             "LIQUID" => {
-                self.set_liquid(split[1]);
+                self.set_liquid(tag_value);
             }
             "GAS" => {
-                self.set_gas(split[1]);
+                self.set_gas(tag_value);
             }
             "ALL" => {
-                self.set_solid(split[1]);
-                self.set_liquid(split[1]);
-                self.set_gas(split[1]);
+                self.set_solid(tag_value);
+                self.set_liquid(tag_value);
+                self.set_gas(tag_value);
             }
             _ => (),
         }

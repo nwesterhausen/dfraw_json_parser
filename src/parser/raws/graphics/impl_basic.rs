@@ -17,7 +17,7 @@ impl DFGraphic {
                 let Some(identifier) = split.get(4) else {
                     return Self {
                         raw_header: DFRawCommon::from(
-                            split[1],
+                            split.get(1).unwrap_or(&""),
                             raw,
                             info_text,
                             RawObjectKind::Graphics,
@@ -32,7 +32,7 @@ impl DFGraphic {
                     None => {
                         return Self {
                             raw_header: DFRawCommon::from(
-                                split[1],
+                                split.get(1).unwrap_or(&""),
                                 raw,
                                 info_text,
                                 RawObjectKind::Graphics,
@@ -56,20 +56,38 @@ impl DFGraphic {
                     kind: Kind::Tile,
                 }
             }
-            "CREATURE_CASTE_GRAPHICS" => Self {
-                raw_header: DFRawCommon::from(split[1], raw, info_text, RawObjectKind::Graphics),
-                caste_identifier: String::from(split[2]),
-                graphics: Vec::new(),
-                kind: Kind::Empty,
-            },
+            "CREATURE_CASTE_GRAPHICS" => {
+                let caste_capture = split.get(2).unwrap_or(&"");
+                Self {
+                    raw_header: DFRawCommon::from(
+                        split.get(1).unwrap_or(&""),
+                        raw,
+                        info_text,
+                        RawObjectKind::Graphics,
+                    ),
+                    caste_identifier: String::from(*caste_capture),
+                    graphics: Vec::new(),
+                    kind: Kind::Empty,
+                }
+            }
             "CREATURE_GRAPHICS" => Self {
-                raw_header: DFRawCommon::from(split[1], raw, info_text, RawObjectKind::Graphics),
+                raw_header: DFRawCommon::from(
+                    split.get(1).unwrap_or(&""),
+                    raw,
+                    info_text,
+                    RawObjectKind::Graphics,
+                ),
                 caste_identifier: String::new(),
                 graphics: Vec::new(),
                 kind: Kind::Creature,
             },
             "PLANT_GRAPHICS" => Self {
-                raw_header: DFRawCommon::from(split[1], raw, info_text, RawObjectKind::Graphics),
+                raw_header: DFRawCommon::from(
+                    split.get(1).unwrap_or(&""),
+                    raw,
+                    info_text,
+                    RawObjectKind::Graphics,
+                ),
                 caste_identifier: String::new(),
                 graphics: Vec::new(),
                 kind: Kind::Plant,

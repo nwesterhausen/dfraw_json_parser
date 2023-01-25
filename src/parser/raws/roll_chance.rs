@@ -10,28 +10,35 @@ pub struct RollChance {
 }
 
 impl RollChance {
-    pub fn empty() -> Self {
-        Self {
-            chance: 0,
-            result: String::new(),
-        }
-    }
-
-    pub fn from_tag(tag_value: &str) -> Self {
+    pub fn from_tag(tag_value: &str) -> Option<Self> {
         // Example COPPER:100
         let split = tag_value.split(':').collect::<Vec<&str>>();
         if split.len() != 2 {
             log::error!("Unable to parse metal and chance from {}", tag_value);
-            return RollChance::empty();
+            return None;
         }
 
-        let result = String::from(split[0]);
+        let Some(result) = split.first() else {
+            log::warn!("Not enough pieces to tokenize in {}", tag_value);
+            return None;
+        };
 
-        match split[1].parse() {
-            Ok(n) => Self { chance: n, result },
+        let Some(chance) = split.get(1) else {
+            log::warn!("Not enough pieces to tokenize in {}", tag_value);
+            return None;
+        };
+
+        match chance.parse() {
+            Ok(n) => Some(Self {
+                chance: n,
+                result: String::from(*result),
+            }),
             Err(e) => {
-                log::warn!("Unable to parse chance from {},{:?}", split[1], e);
-                Self { chance: 0, result }
+                log::warn!("Unable to parse chance from {},{:?}", chance, e);
+                Some(Self {
+                    chance: 0,
+                    result: String::from(*result),
+                })
             }
         }
     }

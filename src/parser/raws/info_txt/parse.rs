@@ -49,15 +49,35 @@ impl super::DFInfoFile {
                 }
             };
             for cap in RAW_TOKEN_RE.captures_iter(&line) {
-                log::trace!("Key: {} Value: {}", &cap[2], &cap[3]);
-                match &cap[2] {
+                let captured_key = match cap.get(2) {
+                    Some(v) => v.as_str(),
+                    _ => {
+                        continue;
+                    }
+                };
+                let captured_value = match cap.get(3) {
+                    Some(v) => v.as_str(),
+                    _ => {
+                        continue;
+                    }
+                };
+
+                log::trace!(
+                    "{} - Key: {} Value: {}",
+                    caller,
+                    captured_key,
+                    captured_value
+                );
+
+                match captured_key {
                     // SECTION FOR MATCHING info.txt DATA
                     "ID" => {
                         // the [ID:identifier] tag should be the top of the info.txt file
-                        info_file_data = info_txt::DFInfoFile::new(&cap[3], location, &parent_dir);
-                        caller = format!("DFInfoFile ({})", &cap[3]);
+                        info_file_data =
+                            info_txt::DFInfoFile::new(captured_value, location, &parent_dir);
+                        caller = format!("DFInfoFile ({})", &captured_value);
                     }
-                    "NUMERIC_VERSION" => match cap[3].parse() {
+                    "NUMERIC_VERSION" => match captured_value.parse() {
                         Ok(n) => info_file_data.numeric_version = n,
                         Err(_e) => {
                             log::warn!(
@@ -66,7 +86,8 @@ impl super::DFInfoFile {
                                 parent_dir
                             );
                             // match on \D to replace any non-digit characters with empty string
-                            let digits_only = NON_DIGIT_RE.replace_all(&cap[3], "").to_string();
+                            let digits_only =
+                                NON_DIGIT_RE.replace_all(captured_value, "").to_string();
                             match digits_only.parse() {
                                 Ok(n) => info_file_data.numeric_version = n,
                                 Err(_e) => {
@@ -79,7 +100,7 @@ impl super::DFInfoFile {
                             }
                         }
                     },
-                    "EARLIEST_COMPATIBLE_NUMERIC_VERSION" => match cap[3].parse() {
+                    "EARLIEST_COMPATIBLE_NUMERIC_VERSION" => match captured_value.parse() {
                         Ok(n) => info_file_data.earliest_compatible_numeric_version = n,
                         Err(_e) => {
                             log::warn!(
@@ -88,7 +109,8 @@ impl super::DFInfoFile {
                                 parent_dir
                             );
                             // match on \D to replace any non-digit characters with empty string
-                            let digits_only = NON_DIGIT_RE.replace_all(&cap[3], "").to_string();
+                            let digits_only =
+                                NON_DIGIT_RE.replace_all(captured_value, "").to_string();
                             match digits_only.parse() {
                                 Ok(n) => info_file_data.earliest_compatible_numeric_version = n,
                                 Err(_e) => {
@@ -102,25 +124,25 @@ impl super::DFInfoFile {
                         }
                     },
                     "DISPLAYED_VERSION" => {
-                        info_file_data.displayed_version = String::from(&cap[3]);
+                        info_file_data.displayed_version = String::from(captured_value);
                         caller = format!(
                             "DFInfoFile ({}@v{})",
                             info_file_data.get_identifier(),
-                            &cap[3]
+                            &captured_value
                         );
                     }
                     "EARLIEST_COMPATIBLE_DISPLAYED_VERSION" => {
                         info_file_data.earliest_compatible_displayed_version =
-                            String::from(&cap[3]);
+                            String::from(captured_value);
                     }
                     "AUTHOR" => {
-                        info_file_data.author = String::from(&cap[3]);
+                        info_file_data.author = String::from(captured_value);
                     }
                     "NAME" => {
-                        info_file_data.name = String::from(&cap[3]);
+                        info_file_data.name = String::from(captured_value);
                     }
                     "DESCRIPTION" => {
-                        info_file_data.description = String::from(&cap[3]);
+                        info_file_data.description = String::from(captured_value);
                     }
                     &_ => (),
                 }
