@@ -5,5 +5,5 @@
   "rust-analyzer.cargo.features": ["tauri"],
   "conventionalCommits.scopes": ["deps"],
   "rust-analyzer.check.command": "clippy",
-  "rust-analyzer.check.extraArgs": ["--", "-W", "clippy::pedantic", "-W", "clippy::cargo"]
+  "rust-analyzer.check.extraArgs": ["--", "-W", "clippy::pedantic", "-W", "clippy::cargo", "-W", "clippy::indexing_slicing"]
 }

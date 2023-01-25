@@ -42,6 +42,10 @@ impl super::DFPlant {
         if !self.get_raw_header().overwrites_raw.is_empty() {
             return format!("Overwrite {}", self.get_raw_header().overwrites_raw);
         }
-        self.name.to_string_vec()[0].to_string()
+        self.name
+            .to_string_vec()
+            .first()
+            .unwrap_or(&String::new())
+            .to_string()
     }
 }

@@ -71,15 +71,34 @@ impl super::DFInorganic {
             }
 
             for cap in RAW_TOKEN_RE.captures_iter(&line) {
-                log::trace!("{} - Key: {} Value: {}", caller, &cap[2], &cap[3]);
-                match &cap[2] {
-                    "OBJECT" => match &cap[3] {
+                let captured_key = match cap.get(2) {
+                    Some(v) => v.as_str(),
+                    _ => {
+                        continue;
+                    }
+                };
+                let captured_value = match cap.get(3) {
+                    Some(v) => v.as_str(),
+                    _ => {
+                        continue;
+                    }
+                };
+
+                log::trace!(
+                    "{} - Key: {} Value: {}",
+                    caller,
+                    captured_key,
+                    captured_value
+                );
+
+                match captured_key {
+                    "OBJECT" => match captured_value {
                         "INORGANIC" => {
                             // Discovered raws for plants.
                             current_object = RawObjectKind::Inorganic;
                         }
                         &_ => {
-                            log::debug!("{} - Wrong type of raw ({})", caller, &cap[3]);
+                            log::debug!("{} - Wrong type of raw ({})", caller, captured_value);
                             return Vec::new();
                             // current_object = RawObjectKind::None;
                         }
@@ -99,7 +118,7 @@ impl super::DFInorganic {
                                 inorganic_temp.thread_metals = metal_threads;
                                 //3. Save creature tags
                                 inorganic_temp.tags = inorganic_tags;
-                                //2. Save material
+                                //2. Save material&cap\[3\]
                                 inorganic_temp.material = material_temp;
                                 //5. Save creature
                                 results.push(inorganic_temp);
@@ -107,10 +126,13 @@ impl super::DFInorganic {
                                 started = true;
                             }
                             //Reset all temp values
-                            log::debug!("Starting new inorganic {}", &cap[3]);
+                            log::debug!("Starting new inorganic {}", captured_value);
                             //1. Make new inorganic from [INORGANIC:<NAME>]
-                            inorganic_temp =
-                                inorganic::DFInorganic::new(&raw_filename, &cap[3], info_text);
+                            inorganic_temp = inorganic::DFInorganic::new(
+                                &raw_filename,
+                                captured_value,
+                                info_text,
+                            );
                             //2. Make new material
                             material_temp = material::SimpleMaterial::empty();
                             //3. Reset/empty caste tags
@@ -122,38 +144,41 @@ impl super::DFInorganic {
                             metal_threads = Vec::new();
 
                             // Apply overwrites_raw if this is a SELECT tag
-                            if cap[2].eq("SELECT_INORGANIC") {
-                                inorganic_temp.set_overwrites_raw(&cap[3]);
+                            if captured_key.eq("SELECT_INORGANIC") {
+                                inorganic_temp.set_overwrites_raw(captured_value);
                             }
                         }
                     }
                     "USE_MATERIAL_TEMPLATE" => {
                         // As far as I know, inorganics have a single material template.
 
-                        log::debug!("Found defined template {}", &cap[3]);
+                        log::debug!("Found defined template {}", captured_value);
                         //3. Make new caste from [CASTE:<NAME>]
-                        material_temp = material::SimpleMaterial::new(&cap[3], &cap[3]);
+                        material_temp =
+                            material::SimpleMaterial::new(captured_value, captured_value);
                         //4. Reset/empty caste tags
                         // ~~material_tags = Vec::new();~~
                         environments_temp = Vec::new();
                         //5. Get material template to add (known) template tags
-                        material_tags = Vec::clone(&material::tags_from_template(&cap[3]));
+                        material_tags = Vec::clone(&material::tags_from_template(captured_value));
                     }
                     "CUT_USE_MATERIAL_TEMPLATE" => {
                         // We will have to add one of these for each tag we support cutting..
-                        inorganic_temp.push_cut_tag(&cap[2], &cap[3]);
+                        inorganic_temp.push_cut_tag(captured_key, captured_value);
                     }
                     "PREFSTRING" => {
                         log::warn!(
                             "THERE INDEED WERE PREF STRING FOR {}: {}",
                             inorganic_temp.get_raw_header().get_object_id(),
-                            &cap[3]
+                            captured_value
                         );
                     }
                     "REACTION_CLASS" => {
-                        material_temp.reaction_classes.push(String::from(&cap[3]));
+                        material_temp
+                            .reaction_classes
+                            .push(String::from(captured_value));
                     }
-                    "MATERIAL_VALUE" => match cap[3].parse() {
+                    "MATERIAL_VALUE" => match captured_value.parse() {
                         Ok(n) => material_temp.material_value = n,
                         Err(e) => log::error!(
                             "{}:{:?}:MATERIAL_VALUE parsing error\n{:?}",
@@ -163,17 +188,17 @@ impl super::DFInorganic {
                         ),
                     },
                     "STATE_NAME" => {
-                        material_temp.state_name.set_from_tag(&cap[3]);
+                        material_temp.state_name.set_from_tag(captured_value);
                     }
                     "STATE_ADJ" => {
-                        material_temp.state_adj.set_from_tag(&cap[3]);
+                        material_temp.state_adj.set_from_tag(captured_value);
                     }
                     "STATE_NAME_ADJ" => {
-                        material_temp.state_name.set_from_tag(&cap[3]);
-                        material_temp.state_adj.set_from_tag(&cap[3]);
+                        material_temp.state_name.set_from_tag(captured_value);
+                        material_temp.state_adj.set_from_tag(captured_value);
                     }
                     "STATE_COLOR" => {
-                        material_temp.state_color.set_from_tag(&cap[3]);
+                        material_temp.state_color.set_from_tag(captured_value);
                     }
 
                     "NO_STONE_STOCKPILE" => {
@@ -273,24 +298,28 @@ impl super::DFInorganic {
                         inorganic_tags.push(tags::InorganicTag::SoilSand);
                     }
                     "ENVIRONMENT" => {
-                        environments_temp.push(Environment::from_tag(&cap[3]));
+                        environments_temp.push(Environment::from_tag(captured_value));
                     }
                     "ENVIRONMENT_SPEC" => {
-                        environments_spec_temp.push(Environment::from_tag(&cap[3]));
+                        environments_spec_temp.push(Environment::from_tag(captured_value));
                     }
                     "METAL_ORE" => {
-                        metal_ores.push(RollChance::from_tag(&cap[3]));
+                        if let Some(rc) = RollChance::from_tag(captured_value) {
+                            metal_ores.push(rc);
+                        }
                     }
                     "THREAD_METAL" => {
-                        metal_threads.push(RollChance::from_tag(&cap[3]));
+                        if let Some(rc) = RollChance::from_tag(captured_value) {
+                            metal_threads.push(rc);
+                        }
                     }
                     "SPEC_HEAT" => {
-                        if cap[3].eq("NONE") {
+                        if captured_value.eq("NONE") {
                             material_temp.temperatures.material_fixed_temp = 0;
                             continue;
                         }
 
-                        match cap[3].parse() {
+                        match captured_value.parse() {
                             Ok(n) => material_temp.temperatures.specific_heat = n,
                             Err(e) => log::error!(
                                 "{}:SPEC_HEAT parsing error\n{:?}",
@@ -300,12 +329,12 @@ impl super::DFInorganic {
                         }
                     }
                     "IGNITE_POINT" => {
-                        if cap[3].eq("NONE") {
+                        if captured_value.eq("NONE") {
                             material_temp.temperatures.material_fixed_temp = 0;
                             continue;
                         }
 
-                        match cap[3].parse() {
+                        match captured_value.parse() {
                             Ok(n) => material_temp.temperatures.ignition_point = n,
                             Err(e) => log::error!(
                                 "{}:IGNITE_POINT parsing error\n{:?}",
@@ -315,12 +344,12 @@ impl super::DFInorganic {
                         }
                     }
                     "MELTING_POINT" => {
-                        if cap[3].eq("NONE") {
+                        if captured_value.eq("NONE") {
                             material_temp.temperatures.material_fixed_temp = 0;
                             continue;
                         }
 
-                        match cap[3].parse() {
+                        match captured_value.parse() {
                             Ok(n) => material_temp.temperatures.melting_point = n,
                             Err(e) => log::error!(
                                 "{}:MELTING_POINT parsing error\n{:?}",
@@ -330,12 +359,12 @@ impl super::DFInorganic {
                         }
                     }
                     "BOILING_POINT" => {
-                        if cap[3].eq("NONE") {
+                        if captured_value.eq("NONE") {
                             material_temp.temperatures.material_fixed_temp = 0;
                             continue;
                         }
 
-                        match cap[3].parse() {
+                        match captured_value.parse() {
                             Ok(n) => material_temp.temperatures.boiling_point = n,
                             Err(e) => log::error!(
                                 "{}:BOILING_POINT parsing error\n{:?}",
@@ -345,12 +374,12 @@ impl super::DFInorganic {
                         }
                     }
                     "HEATDAM_POINT" => {
-                        if cap[3].eq("NONE") {
+                        if captured_value.eq("NONE") {
                             material_temp.temperatures.material_fixed_temp = 0;
                             continue;
                         }
 
-                        match cap[3].parse() {
+                        match captured_value.parse() {
                             Ok(n) => material_temp.temperatures.heat_damage_point = n,
                             Err(e) => log::error!(
                                 "{}:HEATDAM_POINT parsing error\n{:?}",
@@ -360,12 +389,12 @@ impl super::DFInorganic {
                         }
                     }
                     "COLDDAM_POINT" => {
-                        if cap[3].eq("NONE") {
+                        if captured_value.eq("NONE") {
                             material_temp.temperatures.material_fixed_temp = 0;
                             continue;
                         }
 
-                        match cap[3].parse() {
+                        match captured_value.parse() {
                             Ok(n) => material_temp.temperatures.cold_damage_point = n,
                             Err(e) => log::error!(
                                 "{}:COLDDAM_POINT parsing error\n{:?}",
@@ -375,12 +404,12 @@ impl super::DFInorganic {
                         }
                     }
                     "MAT_FIXED_TEMP" => {
-                        if cap[3].eq("NONE") {
+                        if captured_value.eq("NONE") {
                             material_temp.temperatures.material_fixed_temp = 0;
                             continue;
                         }
 
-                        match cap[3].parse() {
+                        match captured_value.parse() {
                             Ok(n) => material_temp.temperatures.material_fixed_temp = n,
                             Err(e) => log::error!(
                                 "{}:MAT_FIXED_TEMP parsing error\n{:?}",

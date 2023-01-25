@@ -72,15 +72,34 @@ impl super::DFCreature {
                 continue;
             }
             for cap in RAW_TOKEN_RE.captures_iter(&line) {
-                log::trace!("{} - Key: {} Value: {}", caller, &cap[2], &cap[3]);
-                match &cap[2] {
-                    "OBJECT" => match &cap[3] {
+                let captured_key = match cap.get(2) {
+                    Some(v) => v.as_str(),
+                    _ => {
+                        continue;
+                    }
+                };
+                let captured_value = match cap.get(3) {
+                    Some(v) => v.as_str(),
+                    _ => {
+                        continue;
+                    }
+                };
+
+                log::trace!(
+                    "{} - Key: {} Value: {}",
+                    caller,
+                    captured_key,
+                    captured_value
+                );
+
+                match captured_key {
+                    "OBJECT" => match captured_value {
                         "CREATURE" => {
                             // Discovered raws for creatures.
                             current_object = RawObjectKind::Creature;
                         }
                         &_ => {
-                            log::debug!("{} - Wrong type of raw ({})", caller, &cap[3]);
+                            log::debug!("{} - Wrong type of raw ({})", caller, captured_value);
                             return Vec::new();
                             // current_object = RawObjectKind::None;
                         }
@@ -106,7 +125,7 @@ impl super::DFCreature {
                             //Reset all temp values
                             //1. Make new creature from [CREATURE:<NAME>]
                             creature_temp =
-                                creature::DFCreature::new(&raw_filename, &cap[3], info_text);
+                                creature::DFCreature::new(&raw_filename, captured_value, info_text);
                             //2. Make new caste
                             caste_temp = creature::DFCreatureCaste::new("ALL");
                             //3. Reset/empty caste tags
@@ -117,8 +136,8 @@ impl super::DFCreature {
                             temp_caste_vec = Vec::new();
 
                             // Apply overwrites_raw if this is a SELECT tag
-                            if cap[2].eq("SELECT_CREATURE") {
-                                creature_temp.set_overwrites_raw(&cap[3]);
+                            if captured_key.eq("SELECT_CREATURE") {
+                                creature_temp.set_overwrites_raw(captured_value);
                             }
                         }
                     }
@@ -128,28 +147,28 @@ impl super::DFCreature {
                         //2. Save caste
                         temp_caste_vec.push(caste_temp);
                         //3. Make new caste from [CASTE:<NAME>]
-                        caste_temp = creature::DFCreatureCaste::new(&cap[3]);
+                        caste_temp = creature::DFCreatureCaste::new(captured_value);
                         //4. Reset/empty caste tags
                         caste_tags = Vec::new();
                     }
                     "CUT_USE_MATERIAL_TEMPLATE" => {
                         // We will have to add one of these for each tag we support cutting..
-                        creature_temp.push_cut_tag(&cap[2], &cap[3]);
+                        creature_temp.push_cut_tag(captured_key, captured_value);
                     }
                     "BIOME" => {
-                        if let Some(biome_name) = biomes::BIOMES.get(&cap[3]) {
+                        if let Some(biome_name) = biomes::BIOMES.get(captured_value) {
                             creature_temp.biomes.push((*biome_name).to_string());
                         } else {
                             log::warn!(
                             "BIOME:{} is not a valid token (in {}); Will add it 'as-is' to biome list",
-                            &cap[3],
+                            captured_value,
                             creature_temp.get_raw_header().get_identifier()
                         );
-                            creature_temp.biomes.push(String::from(&cap[3]));
+                            creature_temp.biomes.push(String::from(captured_value));
                         }
                     }
                     "BODY_SIZE" => {
-                        let split = cap[3].split(':').collect::<Vec<&str>>();
+                        let split = captured_value.split(':').collect::<Vec<&str>>();
                         if split.len() == 3 {
                             match DFParser::parse_body_size(&split) {
                                 Ok(size) => caste_temp.body_size.push(size),
@@ -166,9 +185,9 @@ impl super::DFCreature {
                         }
                     }
                     "MILKABLE" => {
-                        let split = cap[3].split(':').collect::<Vec<&str>>();
+                        let split = captured_value.split(':').collect::<Vec<&str>>();
                         if split.len() == 3 {
-                            let freq: u32 = match split[2].parse() {
+                            let freq: u32 = match split.get(2).unwrap_or(&"").parse() {
                                 Ok(n) => n,
                                 Err(e) => {
                                     log::error!(
@@ -180,32 +199,38 @@ impl super::DFCreature {
                                     break;
                                 }
                             };
-                            caste_temp.milkable =
-                                tags::DFMilkable::new(&format!("{}:{}", split[0], split[1]), freq);
+                            caste_temp.milkable = tags::DFMilkable::new(
+                                &format!(
+                                    "{}:{}",
+                                    split.first().unwrap_or(&""),
+                                    split.get(1).unwrap_or(&"")
+                                ),
+                                freq,
+                            );
                         }
                     }
                     "PREFSTRING" => {
-                        creature_temp.pref_string.push(String::from(&cap[3]));
+                        creature_temp.pref_string.push(String::from(captured_value));
                     }
                     "CREATURE_CLASS" => {
-                        caste_temp.creature_class.push(String::from(&cap[3]));
+                        caste_temp.creature_class.push(String::from(captured_value));
                     }
                     "NAME" => {
-                        creature_temp.name = names::Name::new(&cap[3]);
+                        creature_temp.name = names::Name::new(captured_value);
                     }
                     "CASTE_NAME" => {
-                        caste_temp.caste_name = names::Name::new(&cap[3]);
+                        caste_temp.caste_name = names::Name::new(captured_value);
                     }
                     "GENERAL_BABY_NAME" => {
-                        creature_temp.general_baby_name = names::SingPlurName::new(&cap[3]);
+                        creature_temp.general_baby_name = names::SingPlurName::new(captured_value);
                     }
                     "GENERAL_CHILD_NAME" => {
-                        creature_temp.general_child_name = names::SingPlurName::new(&cap[3]);
+                        creature_temp.general_child_name = names::SingPlurName::new(captured_value);
                     }
                     "LAYS_EGGS" => {
                         caste_tags.push(tags::CasteTag::LaysEggs);
                     }
-                    "EGG_SIZE" => match cap[3].parse() {
+                    "EGG_SIZE" => match captured_value.parse() {
                         Ok(n) => caste_temp.egg_size = n,
                         Err(e) => log::error!(
                             "{}:{}:EGG_SIZE parsing error\n{:?}",
@@ -214,7 +239,7 @@ impl super::DFCreature {
                             e
                         ),
                     },
-                    "BABY" => match cap[3].parse() {
+                    "BABY" => match captured_value.parse() {
                         Ok(n) => caste_temp.baby = n,
                         Err(e) => log::error!(
                             "{}:{}:BABY parsing error\n{:?}",
@@ -223,7 +248,7 @@ impl super::DFCreature {
                             e
                         ),
                     },
-                    "CHILD" => match cap[3].parse() {
+                    "CHILD" => match captured_value.parse() {
                         Ok(n) => caste_temp.child = n,
                         Err(e) => log::error!(
                             "{}:{}:CHILD parsing error\n{:?}",
@@ -232,7 +257,7 @@ impl super::DFCreature {
                             e
                         ),
                     },
-                    "DIFFICULTY" => match cap[3].parse() {
+                    "DIFFICULTY" => match captured_value.parse() {
                         Ok(n) => caste_temp.difficulty = n,
                         Err(e) => log::error!(
                             "{}:{}:DIFFICULTY parsing error\n{:?}",
@@ -241,7 +266,7 @@ impl super::DFCreature {
                             e
                         ),
                     },
-                    "GRASSTRAMPLE" => match cap[3].parse() {
+                    "GRASSTRAMPLE" => match captured_value.parse() {
                         Ok(n) => caste_temp.grass_trample = n,
                         Err(e) => log::error!(
                             "{}:{}:GRASSTRAMPLE parsing error\n{:?}",
@@ -250,7 +275,7 @@ impl super::DFCreature {
                             e
                         ),
                     },
-                    "GRAZER" => match cap[3].parse() {
+                    "GRAZER" => match captured_value.parse() {
                         Ok(n) => caste_temp.grazer = n,
                         Err(e) => log::error!(
                             "{}:{}:GRAZER parsing error\n{:?}",
@@ -259,7 +284,7 @@ impl super::DFCreature {
                             e
                         ),
                     },
-                    "LOW_LIGHT_VISION" => match cap[3].parse() {
+                    "LOW_LIGHT_VISION" => match captured_value.parse() {
                         Ok(n) => caste_temp.low_light_vision = n,
                         Err(e) => log::error!(
                             "{}:{}:LOW_LIGHT_VISION parsing error\n{:?}",
@@ -268,7 +293,7 @@ impl super::DFCreature {
                             e
                         ),
                     },
-                    "PETVALUE" => match cap[3].parse() {
+                    "PETVALUE" => match captured_value.parse() {
                         Ok(n) => caste_temp.pet_value = n,
                         Err(e) => log::error!(
                             "{}:{}:PETVALUE parsing error\n{:?}",
@@ -277,7 +302,7 @@ impl super::DFCreature {
                             e
                         ),
                     },
-                    "POP_RATIO" => match cap[3].parse() {
+                    "POP_RATIO" => match captured_value.parse() {
                         Ok(n) => caste_temp.pop_ratio = n,
                         Err(e) => log::error!(
                             "{}:{}:POP_RATIO parsing error\n{:?}",
@@ -287,7 +312,7 @@ impl super::DFCreature {
                         ),
                     },
                     "CLUTCH_SIZE" => {
-                        let split = cap[3].split(':').collect::<Vec<&str>>();
+                        let split = captured_value.split(':').collect::<Vec<&str>>();
                         match DFParser::parse_min_max_range(&split) {
                             Ok(range) => {
                                 caste_temp.clutch_size[0] = range[0];
@@ -301,7 +326,7 @@ impl super::DFCreature {
                         }
                     }
                     "LITTERSIZE" => {
-                        let split = cap[3].split(':').collect::<Vec<&str>>();
+                        let split = captured_value.split(':').collect::<Vec<&str>>();
                         match DFParser::parse_min_max_range(&split) {
                             Ok(range) => {
                                 caste_temp.litter_size[0] = range[0];
@@ -315,10 +340,10 @@ impl super::DFCreature {
                         }
                     }
                     "DESCRIPTION" => {
-                        caste_temp.description = String::from(&cap[3]);
+                        caste_temp.description = String::from(captured_value);
                     }
                     "MAXAGE" => {
-                        let split = cap[3].split(':').collect::<Vec<&str>>();
+                        let split = captured_value.split(':').collect::<Vec<&str>>();
                         match DFParser::parse_min_max_range(&split) {
                             Ok(range) => {
                                 caste_temp.max_age[0] = range[0];
@@ -336,7 +361,7 @@ impl super::DFCreature {
                             "{}-{}-{}",
                             raw_filename,
                             "CREATURE",
-                            slugify(&cap[3])
+                            slugify(captured_value)
                         ));
                     }
                     "ALL_ACTIVE" => {
@@ -401,7 +426,7 @@ impl super::DFCreature {
                         creature_tags.push(tags::CreatureTag::ArtificialHiveable);
                     }
                     "CLUSTER_NUMBER" => {
-                        let split = cap[3].split(':').collect::<Vec<&str>>();
+                        let split = captured_value.split(':').collect::<Vec<&str>>();
                         match DFParser::parse_min_max_range(&split) {
                             Ok(range) => {
                                 creature_temp.cluster_number[0] = range[0];
@@ -414,7 +439,7 @@ impl super::DFCreature {
                         }
                     }
                     "POPULATION_NUMBER" => {
-                        let split = cap[3].split(':').collect::<Vec<&str>>();
+                        let split = captured_value.split(':').collect::<Vec<&str>>();
                         match DFParser::parse_min_max_range(&split) {
                             Ok(range) => {
                                 creature_temp.population_number[0] = range[0];
@@ -465,7 +490,7 @@ impl super::DFCreature {
                     "VERMIN_EATER" => {
                         creature_tags.push(tags::CreatureTag::VerminEater);
                     }
-                    "FREQUENCY" => match cap[3].parse() {
+                    "FREQUENCY" => match captured_value.parse() {
                         Ok(n) => creature_temp.frequency = n,
                         Err(_e) => log::error!(
                             "{}:Unable to parse FREQUENCY",
@@ -473,7 +498,7 @@ impl super::DFCreature {
                         ),
                     },
                     "UNDERGROUND_DEPTH" => {
-                        let split = cap[3].split(':').collect::<Vec<&str>>();
+                        let split = captured_value.split(':').collect::<Vec<&str>>();
                         match DFParser::parse_min_max_range(&split) {
                             Ok(range) => {
                                 creature_temp.underground_depth[0] = range[0];
@@ -773,7 +798,7 @@ impl super::DFCreature {
                     }
                     "SELECT_CASTE" => {
                         //SELECT_CASTE:<CASTE_NAME> --> retrieve tags for this
-                        let target_caste_name = &cap[3];
+                        let target_caste_name = captured_value;
                         log::trace!(
                             "{}: selecting caste {}",
                             creature_temp.get_raw_header().get_identifier(),
@@ -785,7 +810,7 @@ impl super::DFCreature {
                         temp_caste_vec.push(caste_temp);
                         // (Assume we didn't find a matching caste)
                         //4. Make new caste from [CASTE:<NAME>]
-                        caste_temp = creature::DFCreatureCaste::new(&cap[3]);
+                        caste_temp = creature::DFCreatureCaste::new(captured_value);
                         //5. Reset/empty caste tags
                         caste_tags = Vec::new();
                         //3. Find and get the caste we select

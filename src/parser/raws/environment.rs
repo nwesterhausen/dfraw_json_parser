@@ -36,7 +36,10 @@ impl Environment {
             return Environment::empty();
         }
 
-        let rock_layer = String::from(split[0]);
+        let rock_layer = match split.first() {
+            Some(s) => String::from(*s),
+            None => String::new(),
+        };
 
         let grouping = match *split.get(1).unwrap_or(&"") {
             "CLUSTER" => GroupingStyle::Custer,
@@ -44,19 +47,22 @@ impl Environment {
             "CLUSTER_SMALL" => GroupingStyle::ClusterSmall,
             "VEIN" => GroupingStyle::Vein,
             _ => {
-                log::info!("Unmatched environment grouping style: {}", &split[1]);
+                log::info!(
+                    "Unmatched environment grouping style at idx 1: {}",
+                    tag_value
+                );
                 GroupingStyle::None
             }
         };
 
-        match split[2].parse() {
+        match split.get(2).unwrap_or(&"").parse() {
             Ok(n) => Self {
                 grouping,
                 surrounding_rock: rock_layer,
                 frequency: n,
             },
             Err(e) => {
-                log::warn!("Unable to parse size from {},{:?}", split[2], e);
+                log::warn!("Unable to parse size from idx 2 {},{:?}", tag_value, e);
                 Self {
                     grouping,
                     surrounding_rock: rock_layer,

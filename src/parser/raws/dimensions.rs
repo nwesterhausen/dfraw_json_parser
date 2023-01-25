@@ -41,14 +41,14 @@ impl Dimensions {
         let x: i32 = match dim_x.parse() {
             Ok(n) => n,
             Err(e) => {
-                log::warn!("Failed to parse {} as Dimensions:x, {:?}", split[2], e);
+                log::warn!("Failed to parse {} as Dimensions:x, {:?}", token, e);
                 0
             }
         };
         let y: i32 = match dim_y.parse() {
             Ok(n) => n,
             Err(e) => {
-                log::warn!("Failed to parse {} as Dimensions:y, {:?}", split[2], e);
+                log::warn!("Failed to parse {} as Dimensions:y, {:?}", token, e);
                 0
             }
         };
