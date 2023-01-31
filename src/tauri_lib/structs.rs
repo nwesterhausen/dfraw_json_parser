@@ -1,5 +1,6 @@
 #[cfg(feature = "tauri")]
 #[derive(Clone, serde::Serialize)]
+#[serde(rename_all = "camelCase")]
 /// It's a struct to represent the progress of the current job. This is emitted back to the Tauri app using the `PROGRESS` event.
 ///
 /// Properties:
@@ -7,14 +8,10 @@
 /// * `percentage`: The percentage of completed steps out of total steps.
 /// * `current_module`: The name of the module that is currently being processed.
 pub struct ProgressPayload {
-    #[serde(rename = "currentTask")]
     current_task: String,
     percentage: f64,
-    #[serde(rename = "currentModule")]
     current_module: String,
-    #[serde(rename = "currentFile")]
     current_file: String,
-    #[serde(rename = "currentLocation")]
     current_location: String,
 }
 

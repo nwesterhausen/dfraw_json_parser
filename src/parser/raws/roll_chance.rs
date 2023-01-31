@@ -1,6 +1,7 @@
 use serde::{Deserialize, Serialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
+#[serde(rename_all = "camelCase")]
 /// Allows the ore to be smelted into metal in the smelter. Each token with a
 /// non-zero chance causes the game to roll d100 four times, each time creating
 /// one bar of the type requested on success.

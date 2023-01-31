@@ -27,6 +27,7 @@ pub enum SimpleMaterialType {
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
 #[allow(clippy::module_name_repetitions)]
 pub struct SimpleMaterial {
     #[serde(rename = "type")]

@@ -8,78 +8,50 @@ use serde::{Deserialize, Serialize};
 
 // Creature Object for Web Consumption
 #[derive(Serialize, Deserialize, Debug, Clone)]
+#[serde(rename_all = "camelCase")]
 pub struct TypedJson {
     identifier: String,
-    #[serde(rename = "parentRaw")]
     parent_raw: String,
-    #[serde(rename = "rawModule")]
     raw_module: String,
-    #[serde(rename = "moduleVersion")]
     raw_module_version: String,
-    #[serde(rename = "moduleSourceDirectory")]
     raw_module_found_in: RawModuleLocation,
-    #[serde(rename = "moduleDisplayName")]
     raw_module_display: String,
-    #[serde(rename = "rawType")]
     raw_type: String,
-    #[serde(rename = "rawRelativePath")]
     relative_path: String,
-    #[serde(rename = "objectId")]
     object_id: String,
-    #[serde(rename = "overwriteRaw")]
     overwrites_raw: String,
 
     name: String,
     tags: Vec<CreatureTag>,
 
-    #[serde(rename = "namesMap")]
     names_map: HashMap<String, Vec<String>>,
     descriptions: HashMap<String, String>,
-    #[serde(rename = "maxAge")]
     max_age: HashMap<String, [u16; 2]>,
-    #[serde(rename = "clutchSize")]
     clutch_size: HashMap<String, [u16; 2]>,
-    #[serde(rename = "basedOn")]
     based_on: String,
     biomes: Vec<String>,
-    #[serde(rename = "clusterRange")]
     cluster_range: [u16; 2],
-    #[serde(rename = "undergroundDepth")]
     underground_depth: [u16; 2],
-    #[serde(rename = "bodySize")]
     body_size: HashMap<String, Vec<DFBodySize>>,
-    #[serde(rename = "grownAt")]
     grown_at: HashMap<String, u32>,
-    #[serde(rename = "childAt")]
     child_at: HashMap<String, u32>,
-    #[serde(rename = "eggSizes")]
     egg_sizes: HashMap<String, u32>,
-    #[serde(rename = "petValue")]
     pet_value: HashMap<String, u16>,
     intelligence: HashMap<String, [bool; 2]>,
     flier: HashMap<String, bool>,
     gnawer: HashMap<String, bool>,
     trainable: HashMap<String, u8>,
-    #[serde(rename = "activeTime")]
     active_time: HashMap<String, u8>,
-    #[serde(rename = "inactiveSeason")]
     inactive_season: HashMap<String, u8>,
-    #[serde(rename = "creatureClass")]
     creature_class: HashMap<String, Vec<String>>,
-    #[serde(rename = "casteTags")]
     caste_tags: HashMap<String, Vec<CasteTag>>,
     difficulty: HashMap<String, u32>,
-    #[serde(rename = "grassTrample")]
     grass_trample: HashMap<String, u8>,
     grazer: HashMap<String, u32>,
-    #[serde(rename = "lowlightVision")]
     lowlight_vision: HashMap<String, u32>,
-    #[serde(rename = "populationRatio")]
     population_ratio: HashMap<String, u16>,
     milkable: HashMap<String, DFMilkable>,
-    #[serde(rename = "preferenceStrings")]
     pref_string: Vec<String>,
-    #[serde(rename = "populationNumber")]
     population_number: [u16; 2],
 }
 
