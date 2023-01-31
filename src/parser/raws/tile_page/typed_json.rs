@@ -8,36 +8,25 @@ use crate::parser::{
 use super::DFTilePage;
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
+#[serde(rename_all = "camelCase")]
 pub struct TypedJson {
     // Common Raw file Things
     identifier: String,
-    #[serde(rename = "parentRaw")]
     parent_raw: String,
-    #[serde(rename = "rawModule")]
     raw_module: String,
-    #[serde(rename = "moduleVersion")]
     raw_module_version: String,
-    #[serde(rename = "moduleSourceDirectory")]
     raw_module_found_in: RawModuleLocation,
-    #[serde(rename = "moduleDisplayName")]
     raw_module_display: String,
-    #[serde(rename = "rawType")]
     raw_type: String,
-    #[serde(rename = "rawRelativePath")]
     relative_path: String,
-    #[serde(rename = "objectId")]
     object_id: String,
-    #[serde(rename = "overwriteRaw")]
     overwrites_raw: String,
 
     tags: Vec<usize>,
     name: String,
 
-    #[serde(rename = "filePath")]
     file_path: String,
-    #[serde(rename = "tileDim")]
     tile_dim: Dimensions,
-    #[serde(rename = "pageDim")]
     page_dim: Dimensions,
 }
 

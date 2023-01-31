@@ -15,38 +15,28 @@ use serde::{Deserialize, Serialize};
 
 // Creature Object for Web Consumption
 #[derive(Serialize, Deserialize, Debug, Clone)]
+#[serde(rename_all = "camelCase")]
 pub struct TypedJson {
     // Common Raw file Things
     identifier: String,
-    #[serde(rename = "parentRaw")]
     parent_raw: String,
-    #[serde(rename = "rawModule")]
     raw_module: String,
-    #[serde(rename = "moduleVersion")]
     raw_module_version: String,
-    #[serde(rename = "moduleSourceDirectory")]
     raw_module_found_in: RawModuleLocation,
-    #[serde(rename = "moduleDisplayName")]
     raw_module_display: String,
-    #[serde(rename = "rawType")]
     raw_type: String,
-    #[serde(rename = "rawRelativePath")]
     relative_path: String,
-    #[serde(rename = "objectId")]
     object_id: String,
-    #[serde(rename = "overwriteRaw")]
     overwrites_raw: String,
 
     tags: Vec<PlantTag>,
     name: String,
 
     // Basic Tokens
-    #[serde(rename = "preferenceStrings")]
     pref_string: Vec<String>,
     value: u32,
 
     // Environment Tokens
-    #[serde(rename = "undergroundDepth")]
     underground_depth: [u32; 2],
     frequency: u32,
     #[serde(rename = "clusterSize")]
@@ -57,9 +47,7 @@ pub struct TypedJson {
     // pub seed: DFPlantSeed,
     // Sub Tags
     materials: Vec<SimpleMaterial>,
-    #[serde(rename = "growthNames")]
     growth_names: HashMap<Growth, SingPlurName>,
-    #[serde(rename = "growthDuration")]
     growth_duration: u32,
 
     reactions: Vec<String>,

@@ -10,8 +10,8 @@ pub enum GroupingStyle {
 }
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
+#[serde(rename_all = "camelCase")]
 pub struct Environment {
-    #[serde(rename = "surroundingRock")]
     surrounding_rock: String,
     grouping: GroupingStyle,
     frequency: u32,

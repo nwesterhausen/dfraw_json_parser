@@ -2,6 +2,7 @@ use serde::{Deserialize, Serialize};
 use std::fmt::Debug;
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
+#[serde(rename_all = "camelCase")]
 pub struct Name {
     singular: String,
     plural: String,
@@ -50,6 +51,7 @@ impl Name {
 }
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
+#[serde(rename_all = "camelCase")]
 pub struct SingPlurName {
     singular: String,
     plural: String,
@@ -80,6 +82,7 @@ impl SingPlurName {
 }
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
+#[serde(rename_all = "camelCase")]
 pub struct StateName {
     solid: String,
     liquid: String,
