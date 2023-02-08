@@ -22,7 +22,7 @@ jobs:
         with:
           shared-key: clippy
           cache-on-failure: true
-      - uses: nwesterhausen/clippy-check@main
+      - uses: nwesterhausen/clippy-check@v1
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
           options: |
