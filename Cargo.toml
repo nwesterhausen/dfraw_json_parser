@@ -47,7 +47,7 @@ features = ["derive"]
 chrono = "0.4"
 
 [dev-dependencies.fern]
-version = "0.6.1"
+version = "0.6.2"
 features = ["colored"]
 
 [dev-dependencies.clap]
