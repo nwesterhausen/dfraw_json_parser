@@ -51,6 +51,6 @@ version = "0.6.2"
 features = ["colored"]
 
 [dev-dependencies.clap]
-version = "4.2"
+version = "4.3"
 default-features = true
 features = ["derive"]
