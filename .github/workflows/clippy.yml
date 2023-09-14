@@ -7,7 +7,7 @@ jobs:
     name: 'Clippy Nightly'
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - name: Install dependencies (for 'tauri' flag)
         # You can remove libayatana-appindicator3-dev if you don't use the system tray feature.
         run: |
