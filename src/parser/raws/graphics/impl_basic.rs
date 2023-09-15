@@ -25,23 +25,20 @@ impl DFGraphic {
                         caste_identifier: String::new(),
                         graphics: Vec::new(),
                         kind: Kind::Empty,
-                    }
+                    };
                 };
-                let graphic = match SpriteGraphic::parse(token) {
-                    Some(g) => g,
-                    None => {
-                        return Self {
-                            raw_header: DFRawCommon::from(
-                                split.get(1).unwrap_or(&""),
-                                raw,
-                                info_text,
-                                RawObjectKind::Graphics,
-                            ),
-                            caste_identifier: String::new(),
-                            graphics: Vec::new(),
-                            kind: Kind::Empty,
-                        }
-                    }
+                let Some(graphic) = SpriteGraphic::parse(token) else {
+                    return Self {
+                        raw_header: DFRawCommon::from(
+                            split.get(1).unwrap_or(&""),
+                            raw,
+                            info_text,
+                            RawObjectKind::Graphics,
+                        ),
+                        caste_identifier: String::new(),
+                        graphics: Vec::new(),
+                        kind: Kind::Empty,
+                    };
                 };
 
                 Self {
@@ -103,29 +100,20 @@ impl DFGraphic {
     pub fn add_tile_from_token(&mut self, token: &str) {
         match self.kind {
             Kind::Creature | Kind::CreatureCaste => {
-                let graphic = match SpriteGraphic::parse_creature(token) {
-                    Some(g) => g,
-                    None => {
-                        return;
-                    }
+                let Some(graphic) = SpriteGraphic::parse_creature(token) else {
+                    return;
                 };
                 self.graphics.push(graphic);
             }
             Kind::Tile => {
-                let graphic = match SpriteGraphic::parse(token) {
-                    Some(g) => g,
-                    None => {
-                        return;
-                    }
+                let Some(graphic) = SpriteGraphic::parse(token) else {
+                    return;
                 };
                 self.graphics.push(graphic);
             }
             Kind::Plant => {
-                let graphic = match SpriteGraphic::parse_plant(token) {
-                    Some(g) => g,
-                    None => {
-                        return;
-                    }
+                let Some(graphic) = SpriteGraphic::parse_plant(token) else {
+                    return;
                 };
                 self.graphics.push(graphic);
             }
