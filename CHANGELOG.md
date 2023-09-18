@@ -5,6 +5,82 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## v0.13.0 (2023-09-18)
+
+### Changed
+
+ - <csr-id-c95096e0e85d7e19fd9bdfa56176729d2eb0b97e/> include library methods for dynamic return
+
+### Chore
+
+ - <csr-id-1a1950a5b43bb0474355ce2f7e29a78bdffd081e/> update actions/checkout action to v4
+ - <csr-id-c1ff0a07d29ae8213e3070ffc3d78c674f766832/> update rust crate clap to 4.4
+ - <csr-id-946b03da912a6028cdec964373b0a34f0af55317/> update rust crate clap to 4.3
+ - <csr-id-5c07ce1c3df8ba57c87d2e4dcae6f808ff49e319/> update rust crate clap to 4.2
+ - <csr-id-238e76e7008f7a90b2fe10cb2f7122d5b06b2ef4/> update rust crate fern to 0.6.2
+
+### New Features
+
+ - <csr-id-fd3d92fae81b4a5f855fa9bfd8bcea80cb3cb41d/> include sapling sprites
+
+### Bug Fixes
+
+ - <csr-id-0bcac7e447473577396fa317959b55e3663d3628/> update rust crate log to 0.4.20
+ - <csr-id-6c8ab8132385f83e447c557dd09626c10b54d976/> update rust crate regex to 1.9
+ - <csr-id-080fade8efc95aa9b3bb95b7a26fbc046f9d5829/> update rust crate phf to 0.11.2
+ - <csr-id-561c95598d64e444f4d2803d31533cdc714f2103/> update rust crate tauri to 1.4
+ - <csr-id-f0f97723d32725d63611fea545bd71b01a7d201a/> update rust crate log to 0.4.19
+ - <csr-id-7b516eabb1630e3e4f51b6c6c3e3151727a010be/> update rust crate log to 0.4.18
+ - <csr-id-ff9da26d227f3f792479c5b0d38c60427496531c/> update rust crate tauri to 1.3
+ - <csr-id-cf8952ac17ccbe4ab01d0729b01d59327ab56ff6/> update rust crate regex to 1.8
+
+### Other
+
+ - <csr-id-03501d4430066100dfeac48740851eba34be0f01/> proper version tag for clippy-check
+
+### Refactor
+
+ - <csr-id-891a33a87ab43f793aafc6477e83ce976f9e0a6e/> replace with let .. else
+ - <csr-id-de14e788e06faa5d35092219aabb8b5a4370dd44/> 🔥 use serde rename_all camelCase
+ - <csr-id-7bb7703c8f4ac0c60b6d6f696ac6fe1ea32b1eab/> 🔥 removed manual vector slicing
+
+### Commit Statistics
+
+<csr-read-only-do-not-edit/>
+
+ - 19 commits contributed to the release over the course of 222 calendar days.
+ - 237 days passed between releases.
+ - 19 commits were understood as [conventional](https://www.conventionalcommits.org).
+ - 0 issues like '(#ID)' were seen in commit messages
+
+### Commit Details
+
+<csr-read-only-do-not-edit/>
+
+<details><summary>view details</summary>
+
+ * **Uncategorized**
+    - include sapling sprites ([`fd3d92f`](https://github.com/nwesterhausen/dfraw_json_parser/commit/fd3d92fae81b4a5f855fa9bfd8bcea80cb3cb41d))
+    - include library methods for dynamic return ([`c95096e`](https://github.com/nwesterhausen/dfraw_json_parser/commit/c95096e0e85d7e19fd9bdfa56176729d2eb0b97e))
+    - replace with let .. else ([`891a33a`](https://github.com/nwesterhausen/dfraw_json_parser/commit/891a33a87ab43f793aafc6477e83ce976f9e0a6e))
+    - update actions/checkout action to v4 ([`1a1950a`](https://github.com/nwesterhausen/dfraw_json_parser/commit/1a1950a5b43bb0474355ce2f7e29a78bdffd081e))
+    - 🔥 use serde rename_all camelCase ([`de14e78`](https://github.com/nwesterhausen/dfraw_json_parser/commit/de14e788e06faa5d35092219aabb8b5a4370dd44))
+    - 🔥 removed manual vector slicing ([`7bb7703`](https://github.com/nwesterhausen/dfraw_json_parser/commit/7bb7703c8f4ac0c60b6d6f696ac6fe1ea32b1eab))
+    - update rust crate clap to 4.4 ([`c1ff0a0`](https://github.com/nwesterhausen/dfraw_json_parser/commit/c1ff0a07d29ae8213e3070ffc3d78c674f766832))
+    - update rust crate log to 0.4.20 ([`0bcac7e`](https://github.com/nwesterhausen/dfraw_json_parser/commit/0bcac7e447473577396fa317959b55e3663d3628))
+    - update rust crate regex to 1.9 ([`6c8ab81`](https://github.com/nwesterhausen/dfraw_json_parser/commit/6c8ab8132385f83e447c557dd09626c10b54d976))
+    - update rust crate phf to 0.11.2 ([`080fade`](https://github.com/nwesterhausen/dfraw_json_parser/commit/080fade8efc95aa9b3bb95b7a26fbc046f9d5829))
+    - update rust crate tauri to 1.4 ([`561c955`](https://github.com/nwesterhausen/dfraw_json_parser/commit/561c95598d64e444f4d2803d31533cdc714f2103))
+    - update rust crate log to 0.4.19 ([`f0f9772`](https://github.com/nwesterhausen/dfraw_json_parser/commit/f0f97723d32725d63611fea545bd71b01a7d201a))
+    - update rust crate log to 0.4.18 ([`7b516ea`](https://github.com/nwesterhausen/dfraw_json_parser/commit/7b516eabb1630e3e4f51b6c6c3e3151727a010be))
+    - update rust crate clap to 4.3 ([`946b03d`](https://github.com/nwesterhausen/dfraw_json_parser/commit/946b03da912a6028cdec964373b0a34f0af55317))
+    - update rust crate tauri to 1.3 ([`ff9da26`](https://github.com/nwesterhausen/dfraw_json_parser/commit/ff9da26d227f3f792479c5b0d38c60427496531c))
+    - update rust crate regex to 1.8 ([`cf8952a`](https://github.com/nwesterhausen/dfraw_json_parser/commit/cf8952ac17ccbe4ab01d0729b01d59327ab56ff6))
+    - update rust crate clap to 4.2 ([`5c07ce1`](https://github.com/nwesterhausen/dfraw_json_parser/commit/5c07ce1c3df8ba57c87d2e4dcae6f808ff49e319))
+    - update rust crate fern to 0.6.2 ([`238e76e`](https://github.com/nwesterhausen/dfraw_json_parser/commit/238e76e7008f7a90b2fe10cb2f7122d5b06b2ef4))
+    - proper version tag for clippy-check ([`03501d4`](https://github.com/nwesterhausen/dfraw_json_parser/commit/03501d4430066100dfeac48740851eba34be0f01))
+</details>
+
 ## v0.12.0 (2023-01-24)
 
 ### New Features
@@ -15,7 +91,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 <csr-read-only-do-not-edit/>
 
- - 1 commit contributed to the release.
+ - 2 commits contributed to the release.
  - 2 days passed between releases.
  - 1 commit was understood as [conventional](https://www.conventionalcommits.org).
  - 0 issues like '(#ID)' were seen in commit messages
@@ -27,6 +103,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 <details><summary>view details</summary>
 
  * **Uncategorized**
+    - Release dfraw_json_parser v0.12.0 ([`a5fad8f`](https://github.com/nwesterhausen/dfraw_json_parser/commit/a5fad8fa479829fea5c9433d92344f6c16932461))
     - ✨ add announcements.txt parsing and writing ([`50d0777`](https://github.com/nwesterhausen/dfraw_json_parser/commit/50d07775ca1c672936a6811699a077cd19fa173c))
 </details>
 
@@ -589,7 +666,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 <csr-id-59e2dff2d583cd8c5c55411688a6c8f4ddcf361a/>
 
 
-<csr-id-bb5de4483e6c0b5bfb15a0a5e2defdd067bd6c9d/>
 <csr-id-a8301caede5aa2090b769c05e19a699267e07b07/>
 <csr-id-8d79e7bc493584248b8adbc98ae4f178f517a6a6/>
 <csr-id-59e2dff2d583cd8c5c55411688a6c8f4ddcf361a/>
