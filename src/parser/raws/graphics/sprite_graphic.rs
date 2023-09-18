@@ -8,7 +8,7 @@ impl SpriteGraphic {
         match *split.first().unwrap_or(&"") {
             "CREATURE_GRAPHICS" | "CREATURE_CASTE_GRAPHICS" => Self::parse_creature(token),
             "TILE_GRAPHICS" => Self::parse_tile(token),
-            "SHRUB" | "PICKED" | "SEED" | "CROP" => Self::parse_plant(token),
+            "SHRUB" | "PICKED" | "SEED" | "CROP" | "SAPLING" => Self::parse_plant(token),
             _ => {
                 log::debug!("Unable to parse graphic from {}", token);
                 None
