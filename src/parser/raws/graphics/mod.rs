@@ -64,6 +64,7 @@ pub enum Kind {
     Tile,
     Empty,
     Plant,
+    Sapling,
 }
 
 #[derive(Debug, Clone)]

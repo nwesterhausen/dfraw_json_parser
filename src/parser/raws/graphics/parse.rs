@@ -115,7 +115,7 @@ impl super::DFGraphic {
                             );
                         }
                     }
-                    "DEFAULT" | "SHRUB" | "PICKED" | "SEED" | "CROP" => {
+                    "DEFAULT" | "SHRUB" | "PICKED" | "SEED" | "CROP" | "SAPLING" => {
                         sprite_temp
                             .add_tile_from_token(&format!("{captured_key}:{captured_value}"));
                     }

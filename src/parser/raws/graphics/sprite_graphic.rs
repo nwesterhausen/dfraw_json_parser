@@ -313,6 +313,7 @@ impl SpriteGraphic {
     }
     pub fn parse_plant(token: &str) -> Option<Self> {
         // 	[SHRUB:DARK_ELF_PLANT_STANDARD:0:0]
+        //  [SAPLING:TREE_SAPLINGS:0:8]
         let split = token.split(':').collect::<Vec<&str>>();
         log::warn!("Parsing plant from {}", token);
         let plant_type = match split.first() {

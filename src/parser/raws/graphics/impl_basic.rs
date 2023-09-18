@@ -111,7 +111,7 @@ impl DFGraphic {
                 };
                 self.graphics.push(graphic);
             }
-            Kind::Plant => {
+            Kind::Plant | Kind::Sapling => {
                 let Some(graphic) = SpriteGraphic::parse_plant(token) else {
                     return;
                 };
