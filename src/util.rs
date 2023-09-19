@@ -6,8 +6,6 @@ use std::{
 
 use walkdir::WalkDir;
 
-use crate::parser::{RawsStyleSerializable, TypedJsonSerializable};
-
 /// Get a vec of subdirectories for a given directory
 ///
 /// Using the `WalkDir` crate:
@@ -179,62 +177,6 @@ pub fn write_json_string_vec_to_file<P: AsRef<Path>>(
             log::error!("{}\n{:?}", write_error, e);
         }
     };
-}
-
-/// Takes a vector of objects that implement a trait, and returns a vector of JSON strings representing
-/// those objects.
-///
-/// Arguments:
-///
-/// * `serializable_vec`: `Vec<Box<impl json_conversion::TypedJsonSerializable + ?Sized>>`
-///
-/// Returns:
-///
-/// A vector of JSON strings.
-pub fn stringify_raw_vec(
-    serializable_vec: Vec<Box<impl TypedJsonSerializable + ?Sized>>,
-) -> Vec<String> {
-    let mut results: Vec<String> = Vec::new();
-    if serializable_vec.is_empty() {
-        return results;
-    }
-
-    for raw_object in serializable_vec {
-        match raw_object.to_typed_json_string() {
-            Ok(s) => {
-                results.push(s.to_string());
-            }
-            Err(e) => {
-                log::error!("Failure to serialize parsed raw data\n{}", e);
-            }
-        }
-    }
-    results
-}
-
-/// It takes a vector of objects that implement the `RawsStyleSerializable` trait, and returns a vector
-/// of strings that are the raws-style serialized versions of those objects
-///
-/// Arguments:
-///
-/// * `raws_stringable_vec`: `Vec<Box<impl RawsStyleSerializable + ?Sized>>`
-///
-/// Returns:
-///
-/// A vector of strings.
-pub fn raws_stringify_df_vec(
-    raws_stringable_vec: Vec<Box<impl RawsStyleSerializable + ?Sized>>,
-) -> Vec<String> {
-    let mut results: Vec<String> = Vec::new();
-    if raws_stringable_vec.is_empty() {
-        return results;
-    }
-
-    for df_object in raws_stringable_vec {
-        results.push(df_object.to_raws_style());
-    }
-
-    results
 }
 
 /// "Given a path to a game directory, return a `PathBuf` to that directory if it exists and is a

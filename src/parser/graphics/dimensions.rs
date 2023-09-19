@@ -22,20 +22,14 @@ impl Dimensions {
                 "Missing required number of tokens for Dimensions! {}",
                 token
             );
-            return Self {
-                x: 0,
-                y: 0,
-            };
+            return Self { x: 0, y: 0 };
         };
         let Some(dim_y) = split.get(1) else {
             log::error!(
                 "Missing required number of tokens for Dimensions! {}",
                 token
             );
-            return Self {
-                x: 0,
-                y: 0,
-            };
+            return Self { x: 0, y: 0 };
         };
 
         let x: i32 = match dim_x.parse() {

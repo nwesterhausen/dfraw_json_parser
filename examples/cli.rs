@@ -32,11 +32,6 @@ const HELP_SINGLE_RAWS_LOCATION: &str = "Specify a single raw module container d
 Details will be filled in based on provided path and its contents. This should then output all the parsed raws
 from the raw modules within the location path specified.";
 
-const HELP_ANNOUNCEMENTS_TXT: &str =
-    "Specify an announcements.txt file to parse, output is saved or put to console.
-
-It will only display the same information in the file, but as JSON adhering to the types defined.";
-
 #[derive(Parser, Debug)]
 #[command(author, version, about, long_about = None)] // Read from `Cargo.toml`
 struct Args {
@@ -59,10 +54,6 @@ struct Args {
     /// Single raw modules location to parse
     #[clap(short, long, default_value_t = String::new(), long_help = HELP_SINGLE_RAWS_LOCATION)]
     location_path: String,
-
-    /// Announcements.txt to parse
-    #[clap(short, long, default_value_t = String::new(), long_help = HELP_ANNOUNCEMENTS_TXT)]
-    announcements_file: String,
 }
 
 fn main() {
@@ -107,10 +98,6 @@ fn main() {
     if !args.location_path.is_empty() {
         run_for_single_raw_module_location(args.location_path.as_str(), args.out_dir.as_str());
     }
-
-    if !args.announcements_file.is_empty() {
-        run_for_announcements_txt(args.announcements_file.as_str(), args.out_dir.as_str());
-    }
 }
 
 fn run_for_game_dir(game_dir: &str, out_dir: &str) {
@@ -119,7 +106,10 @@ fn run_for_game_dir(game_dir: &str, out_dir: &str) {
         return;
     }
     let Ok(out_path) = std::fs::canonicalize(Path::new(&out_dir)) else {
-        log::error!("Unable to standardize output path {} for writing.", &out_dir);
+        log::error!(
+            "Unable to standardize output path {} for writing.",
+            &out_dir
+        );
         return;
     };
     if !out_path.exists() {
@@ -133,10 +123,11 @@ fn run_for_game_dir(game_dir: &str, out_dir: &str) {
         let raws_out_file = out_path.join("raws.json");
         let info_out_file = out_path.join("modules.json");
         // If a directory for raws was specified, we will parse what raws we find
-        dfraw_json_parser::parse_game_raws_to_file(
-            &game_dir,
-            &raws_out_file.to_str().unwrap_or_default(),
-        );
+        let parsed = dfraw_json_parser::parse_game_raws(&game_dir);
+        // Use serde to convert the parsed raws into a JSON string
+        let raws_json = serde_json::to_string_pretty(&parsed).unwrap_or_default();
+        // Write the JSON string to the file
+        dfraw_json_parser::util::write_json_string_to_file(&raws_json, &raws_out_file);
         // Also save the modules info
         dfraw_json_parser::parse_info_txt_in_game_dir_to_file(
             &game_dir,
@@ -161,7 +152,10 @@ fn run_for_single_raw_file(raw_file: &str, out_dir: &str) {
     }
 
     let Ok(out_path) = std::fs::canonicalize(Path::new(&out_dir)) else {
-        log::error!("Unable to standardize output path {} for writing.", &out_dir);
+        log::error!(
+            "Unable to standardize output path {} for writing.",
+            &out_dir
+        );
         return;
     };
     if !out_path.exists() {
@@ -181,7 +175,10 @@ fn run_for_single_raw_file(raw_file: &str, out_dir: &str) {
 
 fn run_for_single_raw_module(module_path: &str, out_dir: &str) {
     let Ok(raw_module_path) = std::fs::canonicalize(Path::new(&module_path)) else {
-        log::error!("Unable to standardize raw file path to read. {}", &module_path);
+        log::error!(
+            "Unable to standardize raw file path to read. {}",
+            &module_path
+        );
         return;
     };
 
@@ -193,8 +190,12 @@ fn run_for_single_raw_module(module_path: &str, out_dir: &str) {
     }
 
     let Ok(out_path) = std::fs::canonicalize(Path::new(&out_dir)) else {
-        log::error!("Unable to standardize output path {} for writing.", &out_dir);
-        return;    };
+        log::error!(
+            "Unable to standardize output path {} for writing.",
+            &out_dir
+        );
+        return;
+    };
     if !out_path.exists() {
         log::error!(
             "Non-existent path specified for saving file to {:?}",
@@ -212,19 +213,26 @@ fn run_for_single_raw_module(module_path: &str, out_dir: &str) {
 
 fn run_for_single_raw_module_location(location_path: &str, out_dir: &str) {
     let Ok(raw_module_location_path) = std::fs::canonicalize(Path::new(&location_path)) else {
-        log::error!("Unable to standardize raw file path to read. {}", &location_path);
+        log::error!(
+            "Unable to standardize raw file path to read. {}",
+            &location_path
+        );
         return;
     };
 
     if out_dir.is_empty() {
         log::warn!("No output directory specified, dumping to console.");
         let parsed_raws = dfraw_json_parser::parse_module_location(&raw_module_location_path);
-        println!("[{parsed_raws}]");
+        let json_of_raws = serde_json::to_string_pretty(&parsed_raws).unwrap_or_default();
+        println!("[{json_of_raws}]");
         return;
     }
 
     let Ok(out_path) = std::fs::canonicalize(Path::new(&out_dir)) else {
-        log::error!("Unable to standardize output path {} for writing.", &out_dir);
+        log::error!(
+            "Unable to standardize output path {} for writing.",
+            &out_dir
+        );
         return;
     };
     if !out_path.exists() {
@@ -239,41 +247,5 @@ fn run_for_single_raw_module_location(location_path: &str, out_dir: &str) {
             &raw_module_location_path,
             &out_path.join("single-location.json"),
         );
-    }
-}
-
-fn run_for_announcements_txt(announcements_path: &str, out_dir: &str) {
-    let Ok(announcements_txt_path) = std::fs::canonicalize(Path::new(&announcements_path)) else {
-        log::error!("Unable to standardize raw file path to read. {}", &announcements_path);
-        return;
-    };
-
-    if out_dir.is_empty() {
-        log::warn!("No output directory specified, dumping to console.");
-        let parsed = dfraw_json_parser::parse_announcements_txt(&announcements_txt_path);
-        println!("{parsed:?}");
-        return;
-    }
-
-    let Ok(out_path) = std::fs::canonicalize(Path::new(&out_dir)) else {
-        log::error!("Unable to standardize output path {} for writing.", &out_dir);
-        return;    };
-    if !out_path.exists() {
-        log::error!(
-            "Non-existent path specified for saving file to {:?}",
-            out_path
-        );
-        return;
-    }
-    if out_path.is_dir() {
-        let announcements_out_file = out_path.join("announcements.json");
-        let announcements_text_out = out_path.join("a.txt");
-
-        dfraw_json_parser::parse_announcements_txt_to_file(
-            &announcements_txt_path,
-            &announcements_out_file,
-        );
-        let parsed = dfraw_json_parser::parse_announcements_txt(&announcements_txt_path);
-        dfraw_json_parser::write_announcements_txt_from_json(&announcements_text_out, &parsed);
     }
 }

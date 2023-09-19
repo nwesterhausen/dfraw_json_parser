@@ -1,7 +1,8 @@
 #[cfg(feature = "tauri")]
 extern crate tauri;
 #[cfg(feature = "tauri")]
-use crate::parser::{DFParser, TypedJsonSerializable};
+use crate::parser;
+use crate::parser::raws::DFRaw;
 #[cfg(feature = "tauri")]
 use crate::util;
 #[cfg(feature = "tauri")]
@@ -94,7 +95,7 @@ pub fn parse_location<P: AsRef<Path>>(
     }
 
     //2. Get module location from provided path
-    let module_location = crate::parser::raws::RawModuleLocation::from_sourced_directory(
+    let module_location = crate::parser::raw_locations::RawModuleLocation::from_sourced_directory(
         raw_module_location_path
             .file_name()
             .unwrap_or_default()
@@ -179,7 +180,7 @@ pub fn parse_module<P: AsRef<Path>>(
     }
 
     // Parse info.txt to get raw module information
-    let dfraw_module_info = DFParser::parse_info_file(&info_txt_path);
+    let dfraw_module_info = parser::mod_info_file::ModuleInfoFile::parse(&info_txt_path);
     log::info!(
         "Parsing raws for {} v{}",
         dfraw_module_info.get_identifier(),
@@ -216,7 +217,8 @@ pub fn parse_module<P: AsRef<Path>>(
     }
 
     // Setup empty result vector
-    let mut serializable_raws: Vec<Box<dyn TypedJsonSerializable>> = Vec::new();
+    // let mut serializable_raws: Vec<Box<dyn TypedJsonSerializable>> = Vec::new();
+    let mut serializable_raws: Vec<DFRaw> = Vec::new();
 
     // Read all the files in the directory, selectively parse the .txt files
     for entry in walkdir::WalkDir::new(objects_path)
@@ -229,7 +231,7 @@ pub fn parse_module<P: AsRef<Path>>(
             progress_helper.add_steps(1);
             progress_helper.send_update(&f_name);
             let entry_path = entry.path();
-            serializable_raws.extend(DFParser::parse_raws_from_single_file_into_serializable(
+            serializable_raws.extend(parser::parse_raws_from_single_file(
                 &entry_path,
                 &dfraw_module_info,
             ));
@@ -246,7 +248,7 @@ pub fn parse_module<P: AsRef<Path>>(
             progress_helper.add_steps(1);
             progress_helper.send_update(&f_name);
             let entry_path = entry.path();
-            serializable_raws.extend(DFParser::parse_raws_from_single_file_into_serializable(
+            serializable_raws.extend(parser::parse_raws_from_single_file(
                 &entry_path,
                 &dfraw_module_info,
             ));
@@ -254,8 +256,9 @@ pub fn parse_module<P: AsRef<Path>>(
     }
 
     // Convert those raws into JSON strings
-    let json_vec = util::stringify_raw_vec(serializable_raws);
+    // let json_vec = util::stringify_raw_vec(serializable_raws);
 
     //3. Return the object array for this dfraw dir
-    format!("[{}]", json_vec.join(","))
+    // format!("[{}]", json_vec.join(","))
+    format!("[{}]", "{message:\"not implemented\"}")
 }

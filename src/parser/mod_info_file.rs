@@ -1,16 +1,79 @@
+use std::{
+    fs::File,
+    io::{BufRead, BufReader},
+    path::Path,
+};
+
 use encoding_rs_io::DecodeReaderBytesBuilder;
+use serde::{Deserialize, Serialize};
 
-use std::fs::File;
-use std::io::{BufRead, BufReader};
-use std::path::Path;
+use crate::{parser::refs::NON_DIGIT_RE, util::get_parent_dir_name};
 
-use crate::parser::raws::{info_txt, RawModuleLocation};
-use crate::parser::refs::{DF_ENCODING, NON_DIGIT_RE, RAW_TOKEN_RE};
-use crate::util::get_parent_dir_name;
+use super::{
+    raw_locations::RawModuleLocation,
+    refs::{DF_ENCODING, RAW_TOKEN_RE},
+};
 
-impl super::DFInfoFile {
+// Struct for info about a raw module
+#[derive(Serialize, Deserialize)]
+pub(crate) struct ModuleInfoFile {
+    identifier: String,
+    location: RawModuleLocation,
+    parent_directory: String,
+    pub numeric_version: u32,
+    pub displayed_version: String,
+    pub earliest_compatible_numeric_version: u32,
+    pub earliest_compatible_displayed_version: String,
+    pub author: String,
+    pub name: String,
+    pub description: String,
+}
+
+impl ModuleInfoFile {
+    pub fn empty() -> Self {
+        Self {
+            identifier: String::new(),
+            location: RawModuleLocation::Unknown,
+            parent_directory: String::new(),
+            numeric_version: 0,
+            displayed_version: String::new(),
+            earliest_compatible_numeric_version: 0,
+            earliest_compatible_displayed_version: String::new(),
+            author: String::new(),
+            name: String::new(),
+            description: String::new(),
+        }
+    }
+    pub fn new(id: &str, location: RawModuleLocation, parent_directory: &str) -> Self {
+        Self {
+            identifier: id.to_string(),
+            location,
+            parent_directory: parent_directory.to_owned(),
+            numeric_version: 0,
+            displayed_version: "0".to_string(),
+            earliest_compatible_numeric_version: 0,
+            earliest_compatible_displayed_version: "0".to_string(),
+            author: String::new(),
+            name: String::new(),
+            description: String::new(),
+        }
+    }
+    pub fn from_raw_file_path<P: AsRef<Path>>(full_path: &P) -> Self {
+        // Take the full path for the raw file and navigate up to the parent directory
+        // e.g from `data/vanilla/vanilla_creatures/objects/creature_standard.txt` to `data/vanilla/vanilla_creatures`
+        // Then run parse on `data/vanilla/vanilla_creatures/info.txt`
+        let parent_directory = full_path
+            .as_ref()
+            .parent()
+            .unwrap_or(Path::new(""))
+            .to_string_lossy()
+            .to_string();
+        let info_file_path = Path::new(parent_directory.as_str()).join("info.txt");
+        log::info!("ModuleInfoFile - Parsing info.txt for {:?}", info_file_path);
+        Self::parse(&info_file_path)
+    }
     #[allow(clippy::too_many_lines)]
-    pub fn parse<P: AsRef<Path>>(info_file_path: &P) -> info_txt::DFInfoFile {
+    pub fn parse<P: AsRef<Path>>(info_file_path: &P) -> ModuleInfoFile {
         let parent_dir = get_parent_dir_name(info_file_path);
         let location = RawModuleLocation::from_info_text_file_path(info_file_path);
 
@@ -22,7 +85,7 @@ impl super::DFInfoFile {
                     parent_dir,
                     e
                 );
-                return info_txt::DFInfoFile::empty();
+                return ModuleInfoFile::empty();
             }
         };
 
@@ -33,8 +96,7 @@ impl super::DFInfoFile {
 
         // info.txt details
         let mut caller = String::from("DFInfoFile");
-        let mut info_file_data: info_txt::DFInfoFile =
-            info_txt::DFInfoFile::new("", location, &parent_dir);
+        let mut info_file_data: ModuleInfoFile = ModuleInfoFile::new("", location, &parent_dir);
 
         for (index, line) in reader.lines().enumerate() {
             if line.is_err() {
@@ -73,8 +135,7 @@ impl super::DFInfoFile {
                     // SECTION FOR MATCHING info.txt DATA
                     "ID" => {
                         // the [ID:identifier] tag should be the top of the info.txt file
-                        info_file_data =
-                            info_txt::DFInfoFile::new(captured_value, location, &parent_dir);
+                        info_file_data = ModuleInfoFile::new(captured_value, location, &parent_dir);
                         caller = format!("DFInfoFile ({})", &captured_value);
                     }
                     "NUMERIC_VERSION" => match captured_value.parse() {
@@ -164,5 +225,15 @@ impl super::DFInfoFile {
         }
 
         info_file_data
+    }
+
+    pub fn get_identifier(&self) -> String {
+        String::from(&self.identifier)
+    }
+    pub fn get_location(&self) -> RawModuleLocation {
+        self.location
+    }
+    pub fn get_parent_directory(&self) -> String {
+        String::from(&self.parent_directory)
     }
 }

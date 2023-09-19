@@ -61,31 +61,21 @@ for the steam workshop if it is a mod downloaded from the steam workshop.
 
 #![warn(clippy::pedantic)]
 
-use parser::inits::announcements::DFAnnouncement;
-use parser::raws::RawModuleLocation;
-use parser::{DFParser, RawsStyleSerializable, TypedJsonSerializable};
 use std::path::{Path, PathBuf};
 use walkdir::DirEntry;
+
+use crate::parser::{raw_locations::RawModuleLocation, raws::DFRaw};
 
 mod parser;
 #[cfg(feature = "tauri")]
 mod tauri_lib;
-mod util;
+pub mod util;
 
 //Todo: add an option to apply any COPY_TAG_FROM and APPLY_CREATURE_VARIATION tags
 //Todo: add an option to specify what kinds of raws to parse
 //Todo: add a parameter for JSON_FILE name (currently hard-coded to out.json)
 
 /// Parse all raws within the module location to JSON.
-///
-/// The actual structure of the array returned is `<T extends Raw>[][][]`, where T can be `Creature`,
-/// `Inorganic`, or `Plant`. (See `typings.d.ts`)
-///
-/// The three levels of arrays are:
-///
-/// 1. Raw Modules (within this location)
-/// 2. Raw Files (within each module)
-/// 3. Raws (within each raw file)
 ///
 /// Arguments:
 ///
@@ -94,9 +84,8 @@ mod util;
 ///
 /// Returns:
 ///
-/// A JSON string: `<T extends Raw>[][][]`, where T can be `Creature`, `Inorganic`, or `Plant`.
-/// (See [`typings.d.ts`](https://github.com/nwesterhausen/dfraw_json_parser/blob/main/typing.d.ts))
-pub fn parse_module_location<P: AsRef<Path>>(raw_module_location: &P) -> String {
+/// A vector of raw file information
+pub fn parse_module_location<P: AsRef<Path>>(raw_module_location: &P) -> Vec<DFRaw> {
     let raw_module_location_path = raw_module_location.as_ref();
     // Guard against invalid path
     if !raw_module_location_path.exists() {
@@ -104,14 +93,14 @@ pub fn parse_module_location<P: AsRef<Path>>(raw_module_location: &P) -> String 
             "Provided module path for parsing doesn't exist!\n{}",
             raw_module_location_path.display()
         );
-        return String::new();
+        return Vec::new();
     }
     if !raw_module_location_path.is_dir() {
         log::error!(
             "Raw module path needs to be a directory {}",
             raw_module_location_path.display()
         );
-        return String::new();
+        return Vec::new();
     }
 
     //2. Get module location from provided path
@@ -133,14 +122,15 @@ pub fn parse_module_location<P: AsRef<Path>>(raw_module_location: &P) -> String 
         location = module_location
     );
 
-    let mut all_json: Vec<String> = Vec::new();
+    let mut all_raws: Vec<DFRaw> = Vec::new();
     //4. Loop over all raw modules in the raw module directory
     for raw_module_directory in raw_module_iter {
         //2. Parse raws and dump JSON into array
-        all_json.push(parse_raw_module(&raw_module_directory.path()));
+        let mut module_raws = parse_raw_module(&raw_module_directory.path());
+        all_raws.append(&mut module_raws);
     }
 
-    format!("[{}]", all_json.join(","))
+    all_raws
 }
 
 /// Parse all info.txt files within the module location to JSON.
@@ -215,7 +205,7 @@ pub fn parse_info_txt_in_location<P: AsRef<Path>>(raw_module_location: &P) -> St
 ///
 /// A JSON string: `<T extends Raw>[][][][]`, where T can be `Creature`, `Inorganic`, or `Plant`.
 /// (See [`typings.d.ts`](https://github.com/nwesterhausen/dfraw_json_parser/blob/main/typing.d.ts))
-pub fn parse_game_raws<P: AsRef<Path>>(df_game_path: &P) -> String {
+pub fn parse_game_raws<P: AsRef<Path>>(df_game_path: &P) -> Vec<DFRaw> {
     //1. "validate" folder is as expected
     let game_path = Path::new(df_game_path.as_ref());
     // Guard against invalid path
@@ -224,11 +214,11 @@ pub fn parse_game_raws<P: AsRef<Path>>(df_game_path: &P) -> String {
             "Provided game path for parsing doesn't exist!\n{}",
             game_path.display()
         );
-        return String::new();
+        return Vec::new();
     }
     if !game_path.is_dir() {
         log::error!("Game path needs to be a directory {}", game_path.display());
-        return String::new();
+        return Vec::new();
     }
 
     // warn on no gamelog.txt
@@ -242,134 +232,19 @@ pub fn parse_game_raws<P: AsRef<Path>>(df_game_path: &P) -> String {
     let installed_mods_path = data_path.join("installed_mods");
     let workshop_mods_path = game_path.join("mods");
 
-    let all_json = vec![
+    let all_raws = vec![
         parse_module_location(&vanilla_path),
         parse_module_location(&installed_mods_path),
         parse_module_location(&workshop_mods_path),
     ];
 
-    let non_empty_json: Vec<String> = all_json
+    let flattened_raws: Vec<DFRaw> = all_raws
         .into_iter()
-        .filter(|s| !String::is_empty(s))
+        .flatten()
+        .filter(|s| !s.is_empty())
         .collect();
 
-    format!("[{}]", non_empty_json.join(","))
-}
-
-/// The function `parse_game_raws_into_serializable` takes a game path as input, validates the path, and
-/// returns a vector of serialized game data.
-///
-/// Arguments:
-///
-/// * `df_game_path`: The `df_game_path` parameter is the path to the Dwarf Fortress game directory. It
-/// should be a valid directory path where the game files are located.
-///
-/// Returns:
-///
-/// a vector of boxed dynamic objects that implement the `TypedJsonSerializable` trait.
-pub fn parse_game_raws_into_serializable<P: AsRef<Path>>(
-    df_game_path: &P,
-) -> Vec<Box<dyn TypedJsonSerializable>> {
-    //1. "validate" folder is as expected
-    let game_path = Path::new(df_game_path.as_ref());
-    // Guard against invalid path
-    if !game_path.exists() {
-        log::error!(
-            "Provided game path for parsing doesn't exist!\n{}",
-            game_path.display()
-        );
-        return Vec::new();
-    }
-    if !game_path.is_dir() {
-        log::error!("Game path needs to be a directory {}", game_path.display());
-        return Vec::new();
-    }
-
-    // warn on no gamelog.txt
-    if !game_path.join("gamelog.txt").exists() {
-        log::warn!("Unable to find gamelog.txt in game directory. Is it valid?");
-    }
-
-    // Set file paths for vanilla raw modules, workshop mods and installed mods
-    let data_path = game_path.join("data");
-    let vanilla_path = data_path.join("vanilla");
-    let installed_mods_path = data_path.join("installed_mods");
-    let workshop_mods_path = game_path.join("mods");
-
-    let all_serialized = vec![
-        parse_module_location_into_serializable(&vanilla_path),
-        parse_module_location_into_serializable(&installed_mods_path),
-        parse_module_location_into_serializable(&workshop_mods_path),
-    ];
-
-    let non_empty_serialized: Vec<Box<dyn TypedJsonSerializable>> =
-        all_serialized.into_iter().flatten().collect();
-
-    non_empty_serialized
-}
-
-/// The function `parse_module_location_into_serializable` takes a raw module location path, checks if
-/// it exists and is a directory, retrieves the module location from the path, gets a list of all
-/// subdirectories, and then loops over each subdirectory to parse the raw modules into JSON and return
-/// them as a vector of serializable objects.
-///
-/// Arguments:
-///
-/// * `raw_module_location`: A reference to the path of the raw module location.
-///
-/// Returns:
-///
-/// The function `parse_module_location_into_serializable` returns a vector of `Box<dyn
-/// TypedJsonSerializable>`.
-pub fn parse_module_location_into_serializable<P: AsRef<Path>>(
-    raw_module_location: &P,
-) -> Vec<Box<dyn TypedJsonSerializable>> {
-    let raw_module_location_path = raw_module_location.as_ref();
-    // Guard against invalid path
-    if !raw_module_location_path.exists() {
-        log::error!(
-            "Provided module path for parsing doesn't exist!\n{}",
-            raw_module_location_path.display()
-        );
-        return Vec::new();
-    }
-    if !raw_module_location_path.is_dir() {
-        log::error!(
-            "Raw module path needs to be a directory {}",
-            raw_module_location_path.display()
-        );
-        return Vec::new();
-    }
-
-    //2. Get module location from provided path
-    let module_location = RawModuleLocation::from_sourced_directory(
-        raw_module_location_path
-            .file_name()
-            .unwrap_or_default()
-            .to_str()
-            .unwrap_or_default(),
-    );
-
-    //3. Get list of all subdirectories
-    let raw_module_iter: Vec<DirEntry> =
-        util::subdirectories(PathBuf::from(raw_module_location_path)).unwrap_or_default();
-
-    log::info!(
-        "{num} raw modules located in {location:?}",
-        num = raw_module_iter.len(),
-        location = module_location
-    );
-
-    let mut all_json: Vec<Box<dyn TypedJsonSerializable>> = Vec::new();
-    //4. Loop over all raw modules in the raw module directory
-    for raw_module_directory in raw_module_iter {
-        //2. Parse raws and dump JSON into array
-        all_json.append(&mut parse_raw_module_into_serializable(
-            &raw_module_directory.path(),
-        ));
-    }
-
-    all_json
+    flattened_raws
 }
 
 /// Parse a raw module to JSON.
@@ -382,25 +257,8 @@ pub fn parse_module_location_into_serializable<P: AsRef<Path>>(
 ///
 /// A JSON string: `<T extends Raw>[][]]`, where T can be `Creature`, `Inorganic`, or `Plant`.
 /// (See [`typings.d.ts`](https://github.com/nwesterhausen/dfraw_json_parser/blob/main/typing.d.ts))
-pub fn parse_raw_module<P: AsRef<Path>>(raw_module_path: &P) -> String {
-    DFParser::parse_raw_module_to_json_string(raw_module_path)
-}
-
-/// The function `parse_raw_module_into_serializable` takes a path to a raw module file, parses it, and
-/// returns a vector of serializable objects.
-///
-/// Arguments:
-///
-/// * `raw_module_path`: A reference to a path that represents the location of the raw module file.
-///
-/// Returns:
-///
-/// The function `parse_raw_module_into_serializable` returns a vector of boxed dynamic trait objects
-/// that implement the `TypedJsonSerializable` trait.
-pub fn parse_raw_module_into_serializable<P: AsRef<Path>>(
-    raw_module_path: &P,
-) -> Vec<Box<dyn TypedJsonSerializable>> {
-    DFParser::parse_raw_module_into_serializable(raw_module_path)
+pub fn parse_raw_module<P: AsRef<Path>>(raw_module_path: &P) -> Vec<DFRaw> {
+    parser::parse_raw_module(raw_module_path)
 }
 
 /// Parse all the game raws and saves the result to a JSON file.
@@ -410,7 +268,8 @@ pub fn parse_raw_module_into_serializable<P: AsRef<Path>>(
 /// * `df_game_path`: The path to the Dwarf Fortress install directory.
 /// * `out_filepath`: The path to the file to save the parsed raws to. (This should end in `.json`.)
 pub fn parse_game_raws_to_file<P: AsRef<Path>>(df_game_path: &P, out_filepath: &P) {
-    let parsed_json_string = parse_game_raws(df_game_path);
+    let all_game_raws = parse_game_raws(df_game_path);
+    let parsed_json_string = serde_json::to_string(&all_game_raws).unwrap_or_default();
     util::write_json_string_to_file(&parsed_json_string, out_filepath);
 }
 
@@ -436,17 +295,7 @@ pub fn parse_info_txt_in_game_dir_to_file<P: AsRef<Path>>(df_game_path: &P, out_
 /// A JSON string: `InfoFile`
 /// (See [`typings.d.ts`](https://github.com/nwesterhausen/dfraw_json_parser/blob/main/typing.d.ts))
 pub fn parse_info_txt_in_module<P: AsRef<Path>>(raw_module_directory: &P) -> String {
-    let dfraw_module_info = DFParser::parse_info_file_from_module_directory(raw_module_directory);
-    match dfraw_module_info.to_typed_json_string() {
-        Ok(s) => {
-            return s;
-        }
-        Err(e) => {
-            log::error!("Failure to serialize parsed raw data\n{}", e);
-        }
-    }
-
-    String::new()
+    parser::parse_info_file_from_module_directory(raw_module_directory)
 }
 
 /// Parse a single raw file to JSON.
@@ -460,7 +309,7 @@ pub fn parse_info_txt_in_module<P: AsRef<Path>>(raw_module_directory: &P) -> Str
 /// A JSON string: `<T extends Raw>[]`, where T can be `Creature`, `Inorganic`, or `Plant`.
 /// (See [`typings.d.ts`](https://github.com/nwesterhausen/dfraw_json_parser/blob/main/typing.d.ts))
 pub fn parse_single_raw_file<P: AsRef<Path>>(raw_file: &P) -> String {
-    DFParser::parse_single_raw_file_to_json_string(raw_file)
+    parser::parse_single_raw_file_to_json_string(raw_file)
 }
 
 /// Parse all info.txt within the modules found in the game directory to JSON.
@@ -516,7 +365,8 @@ pub fn parse_single_raw_file_to_file<P: AsRef<Path>>(raw_file: &P, out_filepath:
 /// * `module_path`: The path to the raw file to read.
 /// * `out_filepath`: The path to the file you want to write to.
 pub fn parse_raw_module_to_file<P: AsRef<Path>>(module_path: &P, out_filepath: &P) {
-    let parsed_json_string = parse_raw_module(module_path);
+    let file_raws = parse_raw_module(module_path);
+    let parsed_json_string = serde_json::to_string(&file_raws).unwrap_or_default();
     util::write_json_string_to_file(&parsed_json_string, out_filepath);
 }
 
@@ -530,7 +380,8 @@ pub fn parse_module_location_to_file<P: AsRef<Path>>(
     raw_module_location_path: &P,
     out_filepath: &P,
 ) {
-    let parsed_json_string = parse_module_location(raw_module_location_path);
+    let module_raws = parse_module_location(raw_module_location_path);
+    let parsed_json_string = serde_json::to_string(&module_raws).unwrap_or_default();
     util::write_json_string_to_file(&parsed_json_string, out_filepath);
 }
 
@@ -575,70 +426,4 @@ pub fn parse_location_with_tauri_emit<P: AsRef<Path>>(
     window: tauri::Window,
 ) -> String {
     tauri_lib::parse_location_with_tauri_emit(location_path, window)
-}
-
-/// `parse_announcements_txt` takes a path to a `announcements.txt` file, parses it, and returns a JSON
-/// string
-///
-/// Arguments:
-///
-/// * `announcements_txt_path`: The path to the announcements.txt file
-///
-/// Returns:
-///
-/// A String of JSON
-pub fn parse_announcements_txt<P: AsRef<Path>>(announcements_txt_path: &P) -> String {
-    let x = DFAnnouncement::parse(announcements_txt_path);
-    let Ok(y) = serde_json::to_string(&x) else {
-        log::error!("Unable to convert into json");
-        return String::new();
-    };
-    y
-}
-
-/// It parses the announcements.txt file and writes the result to a file as JSON.
-///
-/// Arguments:
-///
-/// * `announcements_txt_path`: The path to the announcements.txt file
-/// * `out_filepath`: The path to the file you want to write the JSON to.
-pub fn parse_announcements_txt_to_file<P: AsRef<Path>>(
-    announcements_txt_path: &P,
-    out_filepath: &P,
-) {
-    let x = DFAnnouncement::parse(announcements_txt_path);
-    let Ok(y) = serde_json::to_string(&x) else {
-        log::error!("Unable to convert into json");
-        return;
-    };
-    util::write_json_string_to_file(&y, out_filepath);
-}
-
-/// It takes a JSON string of announcements, converts it to a vector of announcements, then writes it to
-/// a txt file
-///
-/// Arguments:
-///
-/// * `announcements_txt_path`: The path to the announcements.txt file to write
-/// * `announcements_vec_json`: A JSON string representing a vector of `DFAnnouncement` objects.
-pub fn write_announcements_txt_from_json<P: AsRef<Path>>(
-    announcements_txt_path: &P,
-    announcements_vec_json: &str,
-) {
-    let announcements_vec: Vec<DFAnnouncement> = match serde_json::from_str(announcements_vec_json)
-    {
-        Ok(a) => a,
-        Err(e) => {
-            log::error!("{e:?}");
-            return;
-        }
-    };
-
-    let mut serializable_announcements: Vec<Box<dyn RawsStyleSerializable>> = Vec::new();
-    for announcement in announcements_vec {
-        serializable_announcements.push(Box::new(announcement));
-    }
-
-    let x = util::raws_stringify_df_vec(serializable_announcements);
-    util::write_raws_string_vec_to_file(&x, announcements_txt_path);
 }
