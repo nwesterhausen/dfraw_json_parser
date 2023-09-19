@@ -9,6 +9,7 @@ mod names;
 pub(crate) mod raw_locations;
 mod raw_object_kind;
 pub(crate) mod raws;
+mod reader;
 mod refs;
 mod tags;
 
@@ -24,11 +25,8 @@ pub(crate) fn parse_single_raw_file_to_json_string<P: AsRef<Path>>(raw_file: &P)
     String::from("Not implemented")
 }
 
-pub(crate) fn parse_raws_from_single_file<P: AsRef<Path>>(
-    entry_path: &P,
-    info_text_file: &ModuleInfoFile,
-) -> Vec<DFRaw> {
-    Vec::new()
+pub(crate) fn parse_raws_from_single_file<P: AsRef<Path>>(entry_path: &P) -> Vec<DFRaw> {
+    reader::parse_file::parse_raw_file(entry_path)
 }
 
 pub(crate) fn parse_raw_module<P: AsRef<Path>>(raw_module_path: &P) -> Vec<DFRaw> {

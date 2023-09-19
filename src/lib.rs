@@ -354,7 +354,8 @@ pub fn parse_info_txt_in_game_dir<P: AsRef<Path>>(df_game_path: &P) -> String {
 /// * `raw_file`: The path to the raw file to read.
 /// * `out_filepath`: The path to the file you want to write to.
 pub fn parse_single_raw_file_to_file<P: AsRef<Path>>(raw_file: &P, out_filepath: &P) {
-    let parsed_json_string = parse_single_raw_file(raw_file);
+    let file_raws = parser::parse_raws_from_single_file(raw_file);
+    let parsed_json_string = serde_json::to_string(&file_raws).unwrap_or_default();
     util::write_json_string_to_file(&parsed_json_string, out_filepath);
 }
 

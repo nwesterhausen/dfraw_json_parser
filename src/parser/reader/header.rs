@@ -4,6 +4,7 @@ use std::fs::File;
 use std::io::{BufRead, BufReader};
 use std::path::Path;
 
+use crate::parser::raw_object_kind::RawObjectKind;
 use crate::parser::refs::{DF_ENCODING, RAW_TOKEN_RE};
 
 /// It reads a file, line by line, and checks the first line for the filename, reads lines until it encounters the
@@ -114,7 +115,7 @@ pub fn read_raw_file_type<P: AsRef<Path>>(input_path: &P) -> RawObjectKind {
                         raw_filename,
                         captured_value
                     );
-                    return RawObjectKind.from_str(captured_value);
+                    return RawObjectKind::from_string(captured_value);
                 }
                 &_ => (),
             }

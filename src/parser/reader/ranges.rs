@@ -1,3 +1,5 @@
+use std::num::ParseIntError;
+
 /// It takes a slice of strings, parses the first two strings as unsigned 16-bit integers, and returns a
 /// two-element array of unsigned 16-bit integers
 ///
@@ -35,7 +37,7 @@ pub fn parse_min_max_range(split: &[&str]) -> Result<[u16; 2], ParseIntError> {
 /// Returns:
 ///
 /// A `Result<[u16; 3], ParseIntError>` of the 3 numbers in the body size
-pub fn parse_body_size(split: &[&str]) -> Result<[u16; 3], ParseIntError> {
+pub fn parse_body_size(split: &[&str]) -> Result<[u32; 3], ParseIntError> {
     let years: u32 = match split.first().unwrap_or(&"").parse() {
         Ok(n) => n,
         Err(e) => {

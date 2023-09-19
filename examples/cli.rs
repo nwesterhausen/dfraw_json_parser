@@ -73,7 +73,7 @@ fn main() {
             ));
         })
         // Add blanket level filter -
-        .level(log::LevelFilter::Info)
+        .level(log::LevelFilter::Debug)
         // Output to stdout, files, and other Dispatch configurations
         .chain(std::io::stdout())
         // Apply globally

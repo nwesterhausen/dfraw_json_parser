@@ -3,7 +3,7 @@ use serde::{Deserialize, Serialize};
 use super::refs::RAW_TOKEN_RE;
 
 // The type of raw describes the type of object it is.
-#[derive(Serialize, Deserialize)]
+#[derive(Serialize, Deserialize, Clone)]
 pub enum RawObjectKind {
     // Allowed Top-Level Raw Object Type (for entire file)
     Body,

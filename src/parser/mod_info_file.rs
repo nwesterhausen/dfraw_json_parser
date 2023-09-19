@@ -16,7 +16,7 @@ use super::{
 
 // Struct for info about a raw module
 #[derive(Serialize, Deserialize)]
-pub(crate) struct ModuleInfoFile {
+pub struct ModuleInfoFile {
     identifier: String,
     location: RawModuleLocation,
     parent_directory: String,
@@ -64,6 +64,8 @@ impl ModuleInfoFile {
         // Then run parse on `data/vanilla/vanilla_creatures/info.txt`
         let parent_directory = full_path
             .as_ref()
+            .parent()
+            .unwrap_or(Path::new(""))
             .parent()
             .unwrap_or(Path::new(""))
             .to_string_lossy()
@@ -232,6 +234,15 @@ impl ModuleInfoFile {
     }
     pub fn get_location(&self) -> RawModuleLocation {
         self.location
+    }
+    pub fn get_description(&self) -> String {
+        String::from(&self.description)
+    }
+    pub fn get_name(&self) -> String {
+        String::from(&self.name)
+    }
+    pub fn get_version(&self) -> String {
+        String::from(&self.displayed_version)
     }
     pub fn get_parent_directory(&self) -> String {
         String::from(&self.parent_directory)
