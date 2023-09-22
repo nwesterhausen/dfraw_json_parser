@@ -48,6 +48,13 @@ impl Name {
         self.plural = String::from(name);
         self.adjective = String::from(name);
     }
+    pub fn empty() -> Self {
+        Self {
+            singular: String::new(),
+            plural: String::new(),
+            adjective: String::new(),
+        }
+    }
 }
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
@@ -78,6 +85,12 @@ impl SingPlurName {
 
     pub fn to_string_vec(&self) -> Vec<String> {
         vec![String::from(&self.singular), String::from(&self.plural)]
+    }
+    pub fn empty() -> Self {
+        Self {
+            singular: String::new(),
+            plural: String::new(),
+        }
     }
 }
 

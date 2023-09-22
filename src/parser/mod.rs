@@ -6,6 +6,7 @@ mod biomes;
 mod graphics;
 pub(crate) mod mod_info_file;
 mod names;
+pub(crate) mod object_types;
 pub(crate) mod raw_locations;
 mod raw_object_kind;
 pub(crate) mod raws;

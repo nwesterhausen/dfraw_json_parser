@@ -10,7 +10,7 @@ use std::num::ParseIntError;
 /// Returns:
 ///
 /// A Result<[u16; 2], `ParseIntError`>
-pub fn parse_min_max_range(split: &[&str]) -> Result<[u16; 2], ParseIntError> {
+pub fn parse_min_max_range_from_vec(split: &Vec<&str>) -> Result<[u16; 2], ParseIntError> {
     let min: u16 = match split.first().unwrap_or(&"").parse() {
         Ok(n) => n,
         Err(e) => {
@@ -26,6 +26,11 @@ pub fn parse_min_max_range(split: &[&str]) -> Result<[u16; 2], ParseIntError> {
         }
     };
     Ok([min, max])
+}
+
+pub fn parse_min_max_range(value: &str) -> Result<[u16; 2], ParseIntError> {
+    let split: Vec<&str> = value.split(':').collect::<Vec<&str>>();
+    parse_min_max_range_from_vec(&split)
 }
 
 /// It takes a slice of strings, parses them into integers, and returns a `DFBodySize` struct

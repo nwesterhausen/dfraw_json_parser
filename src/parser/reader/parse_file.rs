@@ -9,6 +9,7 @@ use encoding_rs_io::DecodeReaderBytesBuilder;
 
 use crate::parser::{
     mod_info_file::ModuleInfoFile,
+    object_types::{ObjectType, OBJECT_TOKENS},
     raw_object_kind::RawObjectKind,
     raws::{DFRaw, RawMetadata, RawProperties},
     refs::{DF_ENCODING, RAW_TOKEN_RE},
@@ -36,7 +37,7 @@ pub fn parse_raw_file<P: AsRef<Path>>(raw_file_path: &P) -> Vec<DFRaw> {
     let reader = BufReader::new(decoding_reader);
 
     // Mutable Temp Vars
-    let mut current_object: DFRaw = DFRaw::empty();
+    let mut current_object: &ObjectType = &ObjectType::Unknown;
     let mut started = false;
     let mut gathered_tags: Vec<DFTag> = Vec::new();
     let mut castes_temp: HashMap<String, RawProperties> = HashMap::new();
@@ -103,37 +104,28 @@ pub fn parse_raw_file<P: AsRef<Path>>(raw_file_path: &P) -> Vec<DFRaw> {
             );
 
             match captured_key {
-                "OBJECT" => {}
+                "OBJECT" => {
+                    if !OBJECT_TOKENS.contains_key(captured_value) {
+                        // We don't know what this object is, so we can't parse it.
+                        // We should log this as an error.
+                        log::error!(
+                            "{} - Unknown object type: {}",
+                            caller,
+                            captured_value.to_uppercase()
+                        );
+                        return created_raws;
+                    }
+                    // We have an object token we understand (or should)
+                    // So we can save it as the type for the file.
+                    current_object = OBJECT_TOKENS.get(captured_value).unwrap().clone();
+                }
                 "CREATURE" | "SELECT_CREATURE" => {
                     if started {
                         // We've already started a raw, so we need to finish it.
                         // This is a new creature, so we need to finish the old one.
-
-                        // Flush the gathered tags to the current object.
-                        current_object.set_tags(gathered_tags);
-
-                        // Flush the castes to the current object.
-                        current_object.set_castes(castes_temp);
-
-                        // Add the current object to the list of raws.
-                        created_raws.push(current_object);
                     } else {
                         // We haven't started a creature yet, so we need to start one.
                         started = true;
-                    }
-                    // Creating a creature raw
-                    current_object =
-                        DFRaw::new(captured_value, RawObjectKind::Creature, &raw_metadata);
-                    // Reset the tags
-                    gathered_tags = Vec::new();
-                    // Reset the castes
-                    castes_temp = HashMap::new();
-                    current_caste = String::new();
-
-                    // Add an extra tag to help indicate SELECT_CREATURE
-                    if captured_key == "SELECT_CREATURE" {
-                        current_object
-                            .add_other_property(format!("SELECT_CREATURE:{}", captured_value));
                     }
                 }
                 "CASTE" => {
@@ -144,51 +136,14 @@ pub fn parse_raw_file<P: AsRef<Path>>(raw_file_path: &P) -> Vec<DFRaw> {
                     if started {
                         // We've already started a raw, so we need to finish it.
                         // This is a new creature, so we need to finish the old one.
-
-                        // Flush the gathered tags to the current object.
-                        current_object.set_tags(gathered_tags);
-
-                        // Flush the castes to the current object.
-                        current_object.set_castes(castes_temp);
-
-                        // Add the current object to the list of raws.
-                        created_raws.push(current_object);
                     } else {
                         started = true;
                     }
-
-                    // Creating an inorganic raw
-                    current_object =
-                        DFRaw::new(captured_value, RawObjectKind::Inorganic, &raw_metadata);
-
-                    // Reset the tags
-                    gathered_tags = Vec::new();
-                    // Reset the castes
-                    castes_temp = HashMap::new();
-
-                    // Add an extra tag to help indicate SELECT_INORGANIC
-                    if captured_key == "SELECT_INORGANIC" {
-                        current_object
-                            .add_other_property(format!("SELECT_INORGANIC:{}", captured_value));
-                    }
                 }
-                _ => {
-                    if started {
-                        current_object
-                            .add_other_property(format!("{}:{}", captured_key, captured_value));
-                    }
-                }
+                _ => {}
             }
         }
     }
-
-    // We've reached the end of the file, so we need to finish the last object.
-    // Flush the gathered tags to the current object.
-    current_object.set_tags(gathered_tags);
-    // Flush the castes to current object
-    current_object.set_castes(castes_temp);
-    // Add the current object to the list of raws.
-    created_raws.push(current_object);
 
     // Return the created raws.
     created_raws
