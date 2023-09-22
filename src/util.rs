@@ -193,6 +193,10 @@ pub fn write_json_string_vec_to_file<P: AsRef<Path>>(
 /// Returns:
 ///
 /// A Result<PathBuf, String>
+///
+/// # Errors
+///
+/// * If the path doesn't exist
 pub fn path_from_game_directory<P: AsRef<Path>>(game_path: &P) -> Result<PathBuf, String> {
     //1. "validate" folder is as expected
     let game_path = Path::new(game_path.as_ref());

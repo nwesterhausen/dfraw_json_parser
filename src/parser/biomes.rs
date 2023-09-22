@@ -1,5 +1,6 @@
 use phf::phf_map;
 
+#[allow(dead_code)]
 pub static BIOMES: phf::Map<&'static str, &'static str> = phf_map! {
     "MOUNTAIN" => "Mountain",
     "MOUNTAINS" => "Mountain",

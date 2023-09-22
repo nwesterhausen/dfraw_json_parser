@@ -49,9 +49,9 @@ pub fn parse_raw_file_with_info<P: AsRef<Path>>(
     // Metadata
     let object_type = read_raw_file_type(raw_file_path);
     let mut raw_metadata = RawMetadata::new(
-        &mod_info_file,
+        mod_info_file,
         &object_type,
-        &raw_filename.as_str(),
+        raw_filename.as_str(),
         &raw_file_path,
     );
 
@@ -76,9 +76,9 @@ pub fn parse_raw_file_with_info<P: AsRef<Path>>(
         if index == 0 {
             raw_filename = String::from(&line);
             raw_metadata = RawMetadata::new(
-                &mod_info_file,
+                mod_info_file,
                 &object_type,
-                &raw_filename.as_str(),
+                raw_filename.as_str(),
                 &raw_file_path,
             );
             continue;
@@ -188,6 +188,7 @@ pub fn parse_raw_file_with_info<P: AsRef<Path>>(
         // If we did indeed start capture, we need to complete the final raw by adding it to the list
         match object_type {
             ObjectType::Creature => created_raws.push(Box::new(temp_creature.clone())),
+            ObjectType::Inorganic => log::info!("Pretend to parse inorganics...."),
             _ => {}
         }
     }

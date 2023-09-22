@@ -6,6 +6,7 @@ pub struct Dimensions {
     y: i32,
 }
 
+#[allow(dead_code)] // Until we add graphics parsing
 impl Dimensions {
     pub fn zero() -> Self {
         Self { x: 0, y: 0 }

@@ -1,7 +1,7 @@
 {
   "cSpell.enabled": true,
   "docwriter.style": "RustDoc",
-  "cSpell.words": ["dfraw", "gamelog", "Megabeast", "powf", "rouille", "walkdir"],
+  "cSpell.words": ["dfraw", "gamelog", "Megabeast", "powf", "rouille", "typetag", "walkdir"],
   "rust-analyzer.cargo.features": ["tauri"],
   "conventionalCommits.scopes": ["deps"],
   "rust-analyzer.check.command": "clippy",

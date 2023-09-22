@@ -5,7 +5,6 @@ use std::io::{BufRead, BufReader};
 use std::path::Path;
 
 use crate::parser::object_types::{ObjectType, OBJECT_TOKENS};
-use crate::parser::raw_object_kind::RawObjectKind;
 use crate::parser::refs::{DF_ENCODING, RAW_TOKEN_RE};
 
 /// It reads a file, line by line, and checks the first line for the filename, reads lines until it encounters the

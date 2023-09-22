@@ -296,7 +296,8 @@ pub fn parse_info_txt_in_game_dir_to_file<P: AsRef<Path>>(df_game_path: &P, out_
 /// A JSON string: `InfoFile`
 /// (See [`typings.d.ts`](https://github.com/nwesterhausen/dfraw_json_parser/blob/main/typing.d.ts))
 pub fn parse_info_txt_in_module<P: AsRef<Path>>(raw_module_directory: &P) -> String {
-    parser::parse_info_file_from_module_directory(raw_module_directory)
+    let result = parser::parse_info_file_from_module_directory(raw_module_directory);
+    serde_json::to_string(&result).unwrap_or_default()
 }
 
 /// Parse a single raw file to JSON.
@@ -310,7 +311,8 @@ pub fn parse_info_txt_in_module<P: AsRef<Path>>(raw_module_directory: &P) -> Str
 /// A JSON string: `<T extends Raw>[]`, where T can be `Creature`, `Inorganic`, or `Plant`.
 /// (See [`typings.d.ts`](https://github.com/nwesterhausen/dfraw_json_parser/blob/main/typing.d.ts))
 pub fn parse_single_raw_file<P: AsRef<Path>>(raw_file: &P) -> String {
-    parser::parse_single_raw_file_to_json_string(raw_file)
+    let result = parser::parse_raws_from_single_file(raw_file);
+    serde_json::to_string(&result).unwrap_or_default()
 }
 
 /// Parse all info.txt within the modules found in the game directory to JSON.

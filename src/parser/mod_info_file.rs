@@ -15,27 +15,37 @@ use super::{
 };
 
 // Struct for info about a raw module
-#[derive(Serialize, Deserialize)]
+#[derive(Serialize, Deserialize, Default)]
 pub struct ModuleInfoFile {
     identifier: String,
     location: RawModuleLocation,
     parent_directory: String,
-    pub numeric_version: u32,
-    pub displayed_version: String,
-    pub earliest_compatible_numeric_version: u32,
-    pub earliest_compatible_displayed_version: String,
-    pub author: String,
-    pub name: String,
-    pub description: String,
+    numeric_version: u32,
+    displayed_version: String,
+    earliest_compatible_numeric_version: u32,
+    earliest_compatible_displayed_version: String,
+    author: String,
+    name: String,
+    description: String,
+    #[serde(skip_serializing_if = "Vec::is_empty")]
     requires_ids: Vec<String>,
+    #[serde(skip_serializing_if = "Vec::is_empty")]
     conflicts_with_ids: Vec<String>,
+    #[serde(skip_serializing_if = "Vec::is_empty")]
     requires_ids_before: Vec<String>,
+    #[serde(skip_serializing_if = "Vec::is_empty")]
     requires_ids_after: Vec<String>,
+    #[serde(skip_serializing_if = "String::is_empty")]
     steam_title: String,
+    #[serde(skip_serializing_if = "String::is_empty")]
     steam_description: String,
+    #[serde(skip_serializing_if = "Vec::is_empty")]
     steam_tags: Vec<String>,
+    #[serde(skip_serializing_if = "Vec::is_empty")]
     steam_key_value_tags: Vec<String>,
+    #[serde(skip_serializing_if = "Vec::is_empty")]
     steam_metadata: Vec<String>,
+    #[serde(skip_serializing_if = "String::is_empty")]
     steam_changelog: String,
     steam_file_id: u64,
 }

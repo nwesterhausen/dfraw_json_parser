@@ -1,4 +1,4 @@
-use std::{path::Path, result};
+use std::path::Path;
 
 use walkdir::WalkDir;
 
@@ -17,25 +17,15 @@ mod names;
 pub(crate) mod object_types;
 pub(crate) mod ranges;
 pub(crate) mod raw_locations;
-mod raw_object_kind;
 pub(crate) mod raws;
 mod reader;
 mod refs;
-mod tags;
 pub(crate) mod tile;
 
-pub(crate) fn parse_raw_module_to_json_string<P: AsRef<Path>>(raw_module_path: &P) -> String {
-    let result = parse_raw_module(raw_module_path);
-    serde_json::to_string_pretty(&result).unwrap_or_default()
-}
 pub(crate) fn parse_info_file_from_module_directory<P: AsRef<Path>>(
     raw_module_directory: &P,
-) -> String {
-    String::from("Not implemented")
-}
-pub(crate) fn parse_single_raw_file_to_json_string<P: AsRef<Path>>(raw_file: &P) -> String {
-    let result = parse_raws_from_single_file(raw_file);
-    serde_json::to_string_pretty(&result).unwrap_or_default()
+) -> ModuleInfoFile {
+    ModuleInfoFile::parse(&raw_module_directory.as_ref().join("info.txt"))
 }
 
 pub(crate) fn parse_raws_from_single_file<P: AsRef<Path>>(
@@ -93,7 +83,7 @@ pub(crate) fn parse_raw_module<P: AsRef<Path>>(
     log::info!(
         "Parsing raws for {} v{}",
         info_text_file.get_identifier(),
-        info_text_file.displayed_version
+        info_text_file.get_version(),
     );
 
     //2. Parse raws in the 'object' subdirectory

@@ -32,12 +32,6 @@ impl DFTile {
     pub fn set_glow_character(&mut self, character: &str) {
         self.glow_character = String::from(character);
     }
-    pub fn new() -> Self {
-        DFTile::default()
-    }
-    pub fn empty() -> Self {
-        DFTile::default()
-    }
     pub fn is_default(&self) -> bool {
         self.character.is_empty()
             && self.alt_character.is_empty()

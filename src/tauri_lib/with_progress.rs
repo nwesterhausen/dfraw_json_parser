@@ -184,13 +184,13 @@ pub fn parse_module<P: AsRef<Path>>(
     log::info!(
         "Parsing raws for {} v{}",
         dfraw_module_info.get_identifier(),
-        dfraw_module_info.displayed_version
+        dfraw_module_info.get_version()
     );
     progress_helper.update_current_module(
         format!(
             "{} v{}",
             dfraw_module_info.get_identifier(),
-            dfraw_module_info.displayed_version
+            dfraw_module_info.get_version()
         )
         .as_str(),
     );

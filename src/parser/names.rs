@@ -24,37 +24,6 @@ impl Name {
             adjective: String::from(adjective_name),
         }
     }
-    pub fn to_string_vec(&self) -> Vec<String> {
-        if self.singular.eq(&self.adjective) {
-            return vec![String::from(&self.singular), String::from(&self.plural)];
-        }
-        vec![
-            String::from(&self.singular),
-            String::from(&self.plural),
-            String::from(&self.adjective),
-        ]
-    }
-    pub fn set_singular(&mut self, name: &str) {
-        self.singular = String::from(name);
-    }
-    pub fn set_plural(&mut self, name: &str) {
-        self.plural = String::from(name);
-    }
-    pub fn set_adjective(&mut self, name: &str) {
-        self.adjective = String::from(name);
-    }
-    pub fn set_all(&mut self, name: &str) {
-        self.singular = String::from(name);
-        self.plural = String::from(name);
-        self.adjective = String::from(name);
-    }
-    pub fn empty() -> Self {
-        Self {
-            singular: String::new(),
-            plural: String::new(),
-            adjective: String::new(),
-        }
-    }
     pub fn is_empty(&self) -> bool {
         self.singular.is_empty() && self.plural.is_empty() && self.adjective.is_empty()
     }
@@ -85,23 +54,12 @@ impl SingPlurName {
             plural: String::from(plural_name),
         }
     }
-
-    pub fn to_string_vec(&self) -> Vec<String> {
-        vec![String::from(&self.singular), String::from(&self.plural)]
-    }
-    pub fn empty() -> Self {
-        Self {
-            singular: String::new(),
-            plural: String::new(),
-        }
-    }
-
     pub fn is_empty(&self) -> bool {
         self.singular.is_empty() && self.plural.is_empty()
     }
 }
 
-#[derive(Serialize, Deserialize, Debug, Clone)]
+#[derive(Serialize, Deserialize, Debug, Clone, Default)]
 #[serde(rename_all = "camelCase")]
 pub struct StateName {
     solid: String,
@@ -109,21 +67,8 @@ pub struct StateName {
     gas: String,
 }
 
+#[allow(dead_code)] // Until we add material parsing
 impl StateName {
-    pub fn new() -> Self {
-        Self {
-            solid: String::new(),
-            liquid: String::new(),
-            gas: String::new(),
-        }
-    }
-    pub fn from(solid: &str, liquid: &str, gas: &str) -> Self {
-        Self {
-            solid: String::from(solid),
-            liquid: String::from(liquid),
-            gas: String::from(gas),
-        }
-    }
     pub fn set_solid(&mut self, name: &str) {
         self.solid = String::from(name);
     }
@@ -136,9 +81,9 @@ impl StateName {
     pub fn get_solid(&self) -> &str {
         self.solid.as_str()
     }
-    pub fn set_from_tag(&mut self, tag_value: &str) {
+    pub fn add_from_value(&mut self, value: &str) {
         // Split the value into a descriptor and value
-        let split = tag_value.split(':').collect::<Vec<&str>>();
+        let split = value.split(':').collect::<Vec<&str>>();
         let tag_key = match split.first() {
             Some(v) => *v,
             _ => {

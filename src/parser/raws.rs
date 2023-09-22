@@ -69,7 +69,4 @@ impl RawMetadata {
     pub(crate) fn is_hidden(&self) -> bool {
         self.hidden
     }
-    pub(crate) fn empty() -> RawMetadata {
-        RawMetadata::default()
-    }
 }
