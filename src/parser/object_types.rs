@@ -1,4 +1,6 @@
-use phf::phf_map;
+use std::fmt::{Debug, Display};
+
+use serde::{Deserialize, Serialize};
 
 pub static OBJECT_TOKENS: phf::Map<&'static str, ObjectType> = phf::phf_map! {
     "CREATURE" => ObjectType::Creature,
@@ -32,6 +34,7 @@ pub static OBJECT_TOKENS: phf::Map<&'static str, ObjectType> = phf::phf_map! {
     "TISSUE_TEMPLATE" => ObjectType::TissueTemplate,
 };
 
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize, Default)]
 pub enum ObjectType {
     Creature,
     Inorganic,
@@ -62,5 +65,12 @@ pub enum ObjectType {
     Language,
     Translation,
     TissueTemplate,
+    #[default]
     Unknown,
+}
+
+impl Display for ObjectType {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        Debug::fmt(self, f)
+    }
 }

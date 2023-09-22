@@ -1,15 +1,33 @@
-use std::{collections::HashMap, path::Path};
+use std::{any::Any, path::Path};
 
 use serde::{Deserialize, Serialize};
 
 use super::{
-    mod_info_file::ModuleInfoFile, raw_locations::RawModuleLocation,
-    raw_object_kind::RawObjectKind, tags::DFTag,
+    mod_info_file::ModuleInfoFile, object_types::ObjectType, raw_locations::RawModuleLocation,
 };
+
+#[typetag::serde]
+pub trait RawObject: RawObjectToAny {
+    fn get_metadata(&self) -> &RawMetadata;
+    fn get_identifier(&self) -> &str;
+    fn is_empty(&self) -> bool;
+    fn get_type(&self) -> &ObjectType;
+    fn parse_tag(&mut self, key: &str, value: &str);
+}
+
+pub trait RawObjectToAny: 'static {
+    fn as_any(&self) -> &dyn Any;
+}
+
+impl<T: 'static> RawObjectToAny for T {
+    fn as_any(&self) -> &dyn Any {
+        self
+    }
+}
 
 // The metadata for a DF Raw. This includes information about the raw module
 // the raw is from, and which file contains the raw.
-#[derive(Serialize, Deserialize, Clone)]
+#[derive(Serialize, Deserialize, Clone, Debug, Default)]
 #[serde(rename_all = "camelCase")]
 pub struct RawMetadata {
     // The name of the raw module the raw is from.
@@ -22,16 +40,19 @@ pub struct RawMetadata {
     raw_identifier: String,
     // The type of raw (creature, plant, etc).
     // Example: [OBJECT:TYPE]
-    raw_type: RawObjectKind,
+    object_type: ObjectType,
     // The location of the owning raw module
     // i.e. installed_mods, mods, or vanilla
     raw_module_location: RawModuleLocation,
+    // Optionally hide or unhide from exporting
+    // By default will be hidden
+    hidden: bool,
 }
 
 impl RawMetadata {
     pub fn new<P: AsRef<Path>>(
         module_info: &ModuleInfoFile,
-        raw_variant: &RawObjectKind,
+        object_type: &ObjectType,
         raw_identifier: &str,
         raw_file_path: &P,
     ) -> Self {
@@ -40,95 +61,15 @@ impl RawMetadata {
             module_version: module_info.get_version(),
             raw_file_path: String::from(raw_file_path.as_ref().to_str().unwrap_or_default()),
             raw_identifier: String::from(raw_identifier),
-            raw_type: raw_variant.clone(),
+            object_type: object_type.clone(),
             raw_module_location: module_info.get_location(),
+            hidden: true,
         }
     }
-}
-
-// A very generic raw object.
-#[derive(Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
-pub struct DFRaw {
-    // The raw identifier (first line of the raw includes type and identifier)
-    // Example: [TYPE:IDENTIFIER]
-    identifier: String,
-    // The type of raw (creature, plant, etc).
-    raw_type: RawObjectKind,
-    // The metadata for the raw.
-    metadata: RawMetadata,
-    // The raw properties.
-    properties: RawProperties,
-}
-
-// The properties of a raw object.
-#[derive(Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
-pub struct RawProperties {
-    // Any free-standing tags in the raw.
-    // Example: [TAG]
-    tags: Vec<DFTag>,
-    // Any key-value pairs in the raw.
-    // Example: [KEY:VALUE]
-    basic_properties: HashMap<String, String>,
-    // Sub-properties for castes
-    castes: HashMap<String, RawProperties>,
-    // Any other values in the raw.
-    // I expect as we parse the raws, we'll need to expand our properties.
-    other: Vec<String>,
-}
-
-impl DFRaw {
-    pub fn empty() -> Self {
-        Self {
-            identifier: String::new(),
-            raw_type: RawObjectKind::None,
-            metadata: RawMetadata {
-                module_name: String::new(),
-                module_version: String::new(),
-                raw_file_path: String::new(),
-                raw_identifier: String::new(),
-                raw_type: RawObjectKind::None,
-                raw_module_location: RawModuleLocation::Unknown,
-            },
-            properties: RawProperties {
-                tags: Vec::new(),
-                basic_properties: HashMap::new(),
-                other: Vec::new(),
-                castes: HashMap::new(),
-            },
-        }
+    pub(crate) fn is_hidden(&self) -> bool {
+        self.hidden
     }
-    pub fn new(identifier: &str, variant: RawObjectKind, metadata: &RawMetadata) -> Self {
-        Self {
-            identifier: String::from(identifier),
-            raw_type: variant,
-            metadata: metadata.clone(),
-            properties: RawProperties {
-                tags: Vec::new(),
-                basic_properties: HashMap::new(),
-                other: Vec::new(),
-                castes: HashMap::new(),
-            },
-        }
-    }
-
-    pub fn get_identifier(&self) -> &str {
-        &self.identifier
-    }
-    pub fn is_empty(&self) -> bool {
-        self.identifier.is_empty()
-    }
-    pub fn set_tags(&mut self, tags: Vec<DFTag>) {
-        self.properties.tags = tags;
-    }
-    pub(crate) fn set_castes(&mut self, castes_temp: HashMap<String, RawProperties>) {
-        self.properties.castes = castes_temp;
-    }
-    pub(crate) fn add_basic_property(&mut self, key: String, value: String) {
-        self.properties.basic_properties.insert(key, value);
-    }
-    pub(crate) fn add_other_property(&mut self, property: String) {
-        self.properties.other.push(property);
+    pub(crate) fn empty() -> RawMetadata {
+        RawMetadata::default()
     }
 }

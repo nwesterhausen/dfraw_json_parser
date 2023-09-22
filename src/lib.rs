@@ -61,10 +61,11 @@ for the steam workshop if it is a mod downloaded from the steam workshop.
 
 #![warn(clippy::pedantic)]
 
+use parser::raws::RawObject;
 use std::path::{Path, PathBuf};
 use walkdir::DirEntry;
 
-use crate::parser::{raw_locations::RawModuleLocation, raws::DFRaw};
+use crate::parser::raw_locations::RawModuleLocation;
 
 mod parser;
 #[cfg(feature = "tauri")]
@@ -85,7 +86,7 @@ pub mod util;
 /// Returns:
 ///
 /// A vector of raw file information
-pub fn parse_module_location<P: AsRef<Path>>(raw_module_location: &P) -> Vec<DFRaw> {
+pub fn parse_module_location<P: AsRef<Path>>(raw_module_location: &P) -> Vec<Box<dyn RawObject>> {
     let raw_module_location_path = raw_module_location.as_ref();
     // Guard against invalid path
     if !raw_module_location_path.exists() {
@@ -122,7 +123,7 @@ pub fn parse_module_location<P: AsRef<Path>>(raw_module_location: &P) -> Vec<DFR
         location = module_location
     );
 
-    let mut all_raws: Vec<DFRaw> = Vec::new();
+    let mut all_raws: Vec<Box<dyn RawObject>> = Vec::new();
     //4. Loop over all raw modules in the raw module directory
     for raw_module_directory in raw_module_iter {
         //2. Parse raws and dump JSON into array
@@ -205,7 +206,7 @@ pub fn parse_info_txt_in_location<P: AsRef<Path>>(raw_module_location: &P) -> St
 ///
 /// A JSON string: `<T extends Raw>[][][][]`, where T can be `Creature`, `Inorganic`, or `Plant`.
 /// (See [`typings.d.ts`](https://github.com/nwesterhausen/dfraw_json_parser/blob/main/typing.d.ts))
-pub fn parse_game_raws<P: AsRef<Path>>(df_game_path: &P) -> Vec<DFRaw> {
+pub fn parse_game_raws<P: AsRef<Path>>(df_game_path: &P) -> Vec<Box<dyn RawObject>> {
     //1. "validate" folder is as expected
     let game_path = Path::new(df_game_path.as_ref());
     // Guard against invalid path
@@ -238,7 +239,7 @@ pub fn parse_game_raws<P: AsRef<Path>>(df_game_path: &P) -> Vec<DFRaw> {
         parse_module_location(&workshop_mods_path),
     ];
 
-    let flattened_raws: Vec<DFRaw> = all_raws
+    let flattened_raws: Vec<Box<dyn RawObject>> = all_raws
         .into_iter()
         .flatten()
         .filter(|s| !s.is_empty())
@@ -257,7 +258,7 @@ pub fn parse_game_raws<P: AsRef<Path>>(df_game_path: &P) -> Vec<DFRaw> {
 ///
 /// A JSON string: `<T extends Raw>[][]]`, where T can be `Creature`, `Inorganic`, or `Plant`.
 /// (See [`typings.d.ts`](https://github.com/nwesterhausen/dfraw_json_parser/blob/main/typing.d.ts))
-pub fn parse_raw_module<P: AsRef<Path>>(raw_module_path: &P) -> Vec<DFRaw> {
+pub fn parse_raw_module<P: AsRef<Path>>(raw_module_path: &P) -> Vec<Box<dyn RawObject>> {
     parser::parse_raw_module(raw_module_path)
 }
 

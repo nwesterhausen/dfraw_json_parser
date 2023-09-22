@@ -66,3 +66,28 @@ pub fn parse_body_size(split: &[&str]) -> Result<[u32; 3], ParseIntError> {
     };
     Ok([years, days, size])
 }
+
+pub struct Ranges {}
+
+impl Ranges {
+    /// This is only used for serialize
+    #[allow(clippy::trivially_copy_pass_by_ref)]
+    pub fn min_max_is_ones(min_max: &[u16; 2]) -> bool {
+        min_max[0] == 1 && min_max[1] == 1
+    }
+    /// This is only used for serialize
+    #[allow(clippy::trivially_copy_pass_by_ref)]
+    pub fn min_max_is_zeroes(min_max: &[u16; 2]) -> bool {
+        min_max[0] == 0 && min_max[1] == 0
+    }
+    /// This is only used for serialize
+    #[allow(clippy::trivially_copy_pass_by_ref)]
+    pub fn is_zero(num: &u32) -> bool {
+        *num == 0
+    }
+    /// This is only used for serialize
+    #[allow(clippy::trivially_copy_pass_by_ref)]
+    pub fn is_zero_u8(num: &u8) -> bool {
+        *num == 0
+    }
+}

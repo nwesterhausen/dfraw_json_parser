@@ -49,4 +49,10 @@ impl Dimensions {
 
         Self { x, y }
     }
+    pub fn empty() -> Self {
+        Dimensions::zero()
+    }
+    pub fn new() -> Self {
+        Dimensions::zero()
+    }
 }

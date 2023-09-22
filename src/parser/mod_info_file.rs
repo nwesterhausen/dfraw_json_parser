@@ -27,6 +27,17 @@ pub struct ModuleInfoFile {
     pub author: String,
     pub name: String,
     pub description: String,
+    requires_ids: Vec<String>,
+    conflicts_with_ids: Vec<String>,
+    requires_ids_before: Vec<String>,
+    requires_ids_after: Vec<String>,
+    steam_title: String,
+    steam_description: String,
+    steam_tags: Vec<String>,
+    steam_key_value_tags: Vec<String>,
+    steam_metadata: Vec<String>,
+    steam_changelog: String,
+    steam_file_id: u64,
 }
 
 impl ModuleInfoFile {
@@ -42,21 +53,25 @@ impl ModuleInfoFile {
             author: String::new(),
             name: String::new(),
             description: String::new(),
+            requires_ids: Vec::new(),
+            conflicts_with_ids: Vec::new(),
+            requires_ids_before: Vec::new(),
+            requires_ids_after: Vec::new(),
+            steam_title: String::new(),
+            steam_description: String::new(),
+            steam_tags: Vec::new(),
+            steam_key_value_tags: Vec::new(),
+            steam_metadata: Vec::new(),
+            steam_changelog: String::new(),
+            steam_file_id: 0,
         }
     }
     pub fn new(id: &str, location: RawModuleLocation, parent_directory: &str) -> Self {
-        Self {
-            identifier: id.to_string(),
-            location,
-            parent_directory: parent_directory.to_owned(),
-            numeric_version: 0,
-            displayed_version: "0".to_string(),
-            earliest_compatible_numeric_version: 0,
-            earliest_compatible_displayed_version: "0".to_string(),
-            author: String::new(),
-            name: String::new(),
-            description: String::new(),
-        }
+        let mut info = Self::empty();
+        info.identifier = String::from(id);
+        info.location = location;
+        info.parent_directory = String::from(parent_directory);
+        info
     }
     pub fn from_raw_file_path<P: AsRef<Path>>(full_path: &P) -> Self {
         // Take the full path for the raw file and navigate up to the parent directory
@@ -207,6 +222,71 @@ impl ModuleInfoFile {
                     "DESCRIPTION" => {
                         info_file_data.description = String::from(captured_value);
                     }
+                    "REQUIRES_ID" => {
+                        info_file_data
+                            .requires_ids
+                            .push(String::from(captured_value));
+                    }
+                    "CONFLICTS_WITH_ID" => {
+                        info_file_data
+                            .conflicts_with_ids
+                            .push(String::from(captured_value));
+                    }
+                    "REQUIRES_ID_BEFORE_ME" => {
+                        info_file_data
+                            .requires_ids_before
+                            .push(String::from(captured_value));
+                    }
+                    "REQUIRES_ID_AFTER_ME" => {
+                        info_file_data
+                            .requires_ids_after
+                            .push(String::from(captured_value));
+                    }
+                    "STEAM_TITLE" => {
+                        info_file_data.steam_title = String::from(captured_value);
+                    }
+                    "STEAM_DESCRIPTION" => {
+                        info_file_data.steam_description = String::from(captured_value);
+                    }
+                    "STEAM_TAG" => {
+                        info_file_data.steam_tags.push(String::from(captured_value));
+                    }
+                    "STEAM_KEY_VALUE_TAG" => {
+                        info_file_data
+                            .steam_key_value_tags
+                            .push(String::from(captured_value));
+                    }
+                    "STEAM_METADATA" => {
+                        info_file_data
+                            .steam_metadata
+                            .push(String::from(captured_value));
+                    }
+                    "STEAM_CHANGELOG" => {
+                        info_file_data.steam_changelog = String::from(captured_value);
+                    }
+                    "STEAM_FILE_ID" => match captured_value.parse() {
+                        Ok(n) => info_file_data.steam_file_id = n,
+                        Err(_e) => {
+                            log::warn!(
+                                "{} - 'STEAM_FILE_ID' should be integer {}",
+                                caller,
+                                parent_dir
+                            );
+                            // match on \D to replace any non-digit characters with empty string
+                            let digits_only =
+                                NON_DIGIT_RE.replace_all(captured_value, "").to_string();
+                            match digits_only.parse() {
+                                Ok(n) => info_file_data.steam_file_id = n,
+                                Err(_e) => {
+                                    log::error!(
+                                        "{} - Unable to parse any numbers from {}",
+                                        caller,
+                                        digits_only
+                                    );
+                                }
+                            }
+                        }
+                    },
                     &_ => (),
                 }
             }

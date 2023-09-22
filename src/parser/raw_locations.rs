@@ -1,12 +1,15 @@
 use std::path::{Path, PathBuf};
 
-#[derive(serde::Serialize, Debug, serde::Deserialize, Clone, Copy, PartialEq, Eq)]
+use serde::{Deserialize, Serialize};
+
+#[derive(Serialize, Debug, Deserialize, Clone, Copy, PartialEq, Eq, Default)]
 /// Raws are part of modules since 50.xx. Raw modules are loaded from 3 common locations:
 /// `{df_directory}/data/vanilla`, `{df_directory}/mods`, and `{df_directory/data/installed_mods}`
 pub enum RawModuleLocation {
     InstalledMods,
     Mods,
     Vanilla,
+    #[default]
     Unknown,
 }
 impl RawModuleLocation {

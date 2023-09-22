@@ -1,5 +1,4 @@
 use std::{
-    collections::HashMap,
     fs::File,
     io::{BufRead, BufReader},
     path::Path,
@@ -8,20 +7,28 @@ use std::{
 use encoding_rs_io::DecodeReaderBytesBuilder;
 
 use crate::parser::{
+    creature::raw::DFCreature,
     mod_info_file::ModuleInfoFile,
     object_types::{ObjectType, OBJECT_TOKENS},
-    raw_object_kind::RawObjectKind,
-    raws::{DFRaw, RawMetadata, RawProperties},
+    raws::{RawMetadata, RawObject},
     refs::{DF_ENCODING, RAW_TOKEN_RE},
-    tags::DFTag,
 };
 
 use super::header::read_raw_file_type;
 
+pub fn parse_raw_file<P: AsRef<Path>>(raw_file_path: &P) -> Vec<Box<dyn RawObject>> {
+    let mod_info_file = ModuleInfoFile::from_raw_file_path(raw_file_path);
+
+    parse_raw_file_with_info(raw_file_path, &mod_info_file)
+}
+
 #[allow(clippy::too_many_lines)]
-pub fn parse_raw_file<P: AsRef<Path>>(raw_file_path: &P) -> Vec<DFRaw> {
+pub fn parse_raw_file_with_info<P: AsRef<Path>>(
+    raw_file_path: &P,
+    mod_info_file: &ModuleInfoFile,
+) -> Vec<Box<dyn RawObject>> {
     let caller = "Parse Raw (Generically)";
-    let mut created_raws: Vec<DFRaw> = Vec::new();
+    let mut created_raws: Vec<Box<dyn RawObject>> = Vec::new();
 
     let file = match File::open(raw_file_path) {
         Ok(f) => f,
@@ -35,21 +42,15 @@ pub fn parse_raw_file<P: AsRef<Path>>(raw_file_path: &P) -> Vec<DFRaw> {
         .encoding(Some(*DF_ENCODING))
         .build(file);
     let reader = BufReader::new(decoding_reader);
-
-    // Mutable Temp Vars
-    let mut current_object: &ObjectType = &ObjectType::Unknown;
     let mut started = false;
-    let mut gathered_tags: Vec<DFTag> = Vec::new();
-    let mut castes_temp: HashMap<String, RawProperties> = HashMap::new();
-    let mut current_caste: String = String::new();
     let mut raw_filename = String::new();
+    let mut temp_creature = DFCreature::empty();
 
     // Metadata
-    let mod_info_file = ModuleInfoFile::from_raw_file_path(raw_file_path);
-    let raw_variant = read_raw_file_type(raw_file_path);
+    let object_type = read_raw_file_type(raw_file_path);
     let mut raw_metadata = RawMetadata::new(
         &mod_info_file,
-        &raw_variant,
+        &object_type,
         &raw_filename.as_str(),
         &raw_file_path,
     );
@@ -76,7 +77,7 @@ pub fn parse_raw_file<P: AsRef<Path>>(raw_file_path: &P) -> Vec<DFRaw> {
             raw_filename = String::from(&line);
             raw_metadata = RawMetadata::new(
                 &mod_info_file,
-                &raw_variant,
+                &object_type,
                 &raw_filename.as_str(),
                 &raw_file_path,
             );
@@ -115,22 +116,42 @@ pub fn parse_raw_file<P: AsRef<Path>>(raw_file_path: &P) -> Vec<DFRaw> {
                         );
                         return created_raws;
                     }
-                    // We have an object token we understand (or should)
-                    // So we can save it as the type for the file.
-                    current_object = OBJECT_TOKENS.get(captured_value).unwrap().clone();
+                    // Check of object_type matches the captured_value as ObjectType.
+                    // If it doesn't, we should log this as an error.
+                    if &object_type != OBJECT_TOKENS.get(captured_value).unwrap() {
+                        log::error!(
+                            "{} - Object type mismatch: {} != {}",
+                            caller,
+                            object_type,
+                            captured_value.to_uppercase()
+                        );
+                        return created_raws;
+                    }
                 }
                 "CREATURE" | "SELECT_CREATURE" => {
                     if started {
-                        // We've already started a raw, so we need to finish it.
-                        // This is a new creature, so we need to finish the old one.
-                    } else {
-                        // We haven't started a creature yet, so we need to start one.
-                        started = true;
+                        // We need to add the creature to the list.
+                        created_raws.push(Box::new(temp_creature.clone()));
                     }
+                    // We haven't started a creature yet, so we need to start one.
+                    started = true;
+                    temp_creature = DFCreature::new(captured_value, raw_metadata.clone());
                 }
                 "CASTE" => {
-                    // We're starting a new caste, so just update the current caste key.
-                    current_caste = String::from(captured_value);
+                    // Starting a new caste (in creature), so we can just add a caste to the last creature we started.
+                    if started {
+                        // We have a creature, so we can add a caste to it.
+                        // First we have to cast the dyn RawObject to a DFCreature.
+                        temp_creature.add_caste(captured_value);
+                    }
+                }
+                "SELECT_CASTE" => {
+                    // Starting a new caste (in creature), so we can just add a caste to the last creature we started.
+                    if started {
+                        // We have a creature, so we can add a caste to it.
+                        // First we have to cast the dyn RawObject to a DFCreature.
+                        temp_creature.select_caste(captured_value);
+                    }
                 }
                 "INORGANIC" | "SELECT_INORGANIC" => {
                     if started {
@@ -140,8 +161,34 @@ pub fn parse_raw_file<P: AsRef<Path>>(raw_file_path: &P) -> Vec<DFRaw> {
                         started = true;
                     }
                 }
-                _ => {}
+                _ => {
+                    // This should be a tag for the current object.
+                    // We should check if we have a current object, and if we do, we should add the tag to it.
+                    // If we haven't started yet, we should do nothing.
+                    if started {
+                        match object_type {
+                            ObjectType::Creature => {
+                                // We have a creature, so we can add a tag to it.
+                                // First we have to cast the dyn RawObject to a DFCreature.
+                                temp_creature.parse_tag(captured_key, captured_value);
+                            }
+                            ObjectType::Inorganic => {
+                                log::info!("Pretend to parse inorganics....");
+                            }
+                            _ => {
+                                // We don't have a known raw yet. So do nothing.
+                            }
+                        }
+                    }
+                }
             }
+        }
+    }
+    if started {
+        // If we did indeed start capture, we need to complete the final raw by adding it to the list
+        match object_type {
+            ObjectType::Creature => created_raws.push(Box::new(temp_creature.clone())),
+            _ => {}
         }
     }
 

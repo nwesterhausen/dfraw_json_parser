@@ -4,6 +4,7 @@ use std::fs::File;
 use std::io::{BufRead, BufReader};
 use std::path::Path;
 
+use crate::parser::object_types::{ObjectType, OBJECT_TOKENS};
 use crate::parser::raw_object_kind::RawObjectKind;
 use crate::parser::refs::{DF_ENCODING, RAW_TOKEN_RE};
 
@@ -19,7 +20,7 @@ use crate::parser::refs::{DF_ENCODING, RAW_TOKEN_RE};
 ///
 /// `RawObjectKind` for the type of [OBJECT] tag encountered, and `RawObjectKind::None` if it is unsupported.
 #[allow(clippy::too_many_lines)]
-pub fn read_raw_file_type<P: AsRef<Path>>(input_path: &P) -> RawObjectKind {
+pub fn read_raw_file_type<P: AsRef<Path>>(input_path: &P) -> ObjectType {
     let caller = "Raw File Type Checker";
     // Validate file exists
     if !input_path.as_ref().exists() {
@@ -28,7 +29,7 @@ pub fn read_raw_file_type<P: AsRef<Path>>(input_path: &P) -> RawObjectKind {
             caller,
             input_path.as_ref().display()
         );
-        return RawObjectKind::None;
+        return ObjectType::Unknown;
     }
     if !input_path.as_ref().is_file() {
         log::error!(
@@ -36,7 +37,7 @@ pub fn read_raw_file_type<P: AsRef<Path>>(input_path: &P) -> RawObjectKind {
             caller,
             input_path.as_ref().display(),
         );
-        return RawObjectKind::None;
+        return ObjectType::Unknown;
     }
 
     // Open the file
@@ -46,7 +47,7 @@ pub fn read_raw_file_type<P: AsRef<Path>>(input_path: &P) -> RawObjectKind {
             caller,
             input_path.as_ref().display()
         );
-        return RawObjectKind::None;
+        return ObjectType::Unknown;
     };
 
     // Setup a file reader for the encoding used by DF
@@ -115,7 +116,10 @@ pub fn read_raw_file_type<P: AsRef<Path>>(input_path: &P) -> RawObjectKind {
                         raw_filename,
                         captured_value
                     );
-                    return RawObjectKind::from_string(captured_value);
+                    return OBJECT_TOKENS
+                        .get(captured_value)
+                        .cloned()
+                        .unwrap_or_default();
                 }
                 &_ => (),
             }
@@ -128,5 +132,5 @@ pub fn read_raw_file_type<P: AsRef<Path>>(input_path: &P) -> RawObjectKind {
         caller,
         input_path.as_ref().display()
     );
-    RawObjectKind::None
+    ObjectType::Unknown
 }

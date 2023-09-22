@@ -2,7 +2,7 @@
 extern crate tauri;
 #[cfg(feature = "tauri")]
 use crate::parser;
-use crate::parser::raws::DFRaw;
+use crate::parser::raws::RawObject;
 #[cfg(feature = "tauri")]
 use crate::util;
 #[cfg(feature = "tauri")]
@@ -218,7 +218,7 @@ pub fn parse_module<P: AsRef<Path>>(
 
     // Setup empty result vector
     // let mut serializable_raws: Vec<Box<dyn TypedJsonSerializable>> = Vec::new();
-    let mut serializable_raws: Vec<DFRaw> = Vec::new();
+    let mut serializable_raws: Vec<Box<dyn RawObject>> = Vec::new();
 
     // Read all the files in the directory, selectively parse the .txt files
     for entry in walkdir::WalkDir::new(objects_path)

@@ -127,6 +127,16 @@ pub static CASTE_TOKENS: phf::Map<&'static str, CasteTag> = phf_map! {
     "DESCRIPTION" => CasteTag::Description,
     "MAXAGE" => CasteTag::MaxAge,
     "ALL_ACTIVE" => CasteTag::AllActive,
+    "CREATURE_CLASS" => CasteTag::CreatureClass,
+    "BABY_NAME" => CasteTag::BabyName,
+    "CHILD_NAME" => CasteTag::ChildName,
+    "CASTE_NAME" => CasteTag::CasteName,
+    "CASTE_TILE" => CasteTag::CasteTile,
+    "CASTE_ALTTILE" => CasteTag::CasteAltTile,
+    "CASTE_COLOR" => CasteTag::CasteColor,
+    "CASTE_GLOWTILE" => CasteTag::CasteGlowTile,
+    "CASTE_GLOWCOLOR" => CasteTag::CasteGlowColor,
+    "CHANGE_BODY_SIZE_PERC" => CasteTag::ChangeBodySizePercent,
 };
 
 pub static CREATURE_TOKENS: phf::Map<&'static str, CreatureTag> = phf_map! {
@@ -157,4 +167,13 @@ pub static CREATURE_TOKENS: phf::Map<&'static str, CreatureTag> = phf_map! {
     "GENERAL_BABY_NAME" => CreatureTag::GeneralBabyName,
     "GENERAL_CHILD_NAME" => CreatureTag::GeneralChildName,
     "POPULATION_NUMBER" => CreatureTag::PopulationNumber,
+    "COPY_TAGS_FROM" => CreatureTag::CopyTagsFrom,
+    "APPLY_CREATURE_VARIATION" => CreatureTag::ApplyCreatureVariation,
+    "CREATURE_TILE" => CreatureTag::CreatureTile,
+    "ALTTILE" => CreatureTag::AltTile,
+    "COLOR" => CreatureTag::Color,
+    "GLOWCOLOR" => CreatureTag::GlowColor,
+    "GLOWTILE" => CreatureTag::GlowTile,
+    "CHANGE_FREQUENCY_PERC" => CreatureTag::ChangeFrequencyPercent,
+    "CLUSTER_NUMBER" => CreatureTag::ClusterNumber,
 };

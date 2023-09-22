@@ -1,7 +1,7 @@
 use serde::{Deserialize, Serialize};
 use std::fmt::Debug;
 
-#[derive(Serialize, Deserialize, Debug, Clone)]
+#[derive(Serialize, Deserialize, Debug, Clone, Default)]
 #[serde(rename_all = "camelCase")]
 pub struct Name {
     singular: String,
@@ -11,8 +11,8 @@ pub struct Name {
 
 impl Name {
     // Take the arguments for a name and split ':' into sing, plural, adjective
-    pub fn new(argument_text: &str) -> Self {
-        let arg_names: Vec<&str> = argument_text.split(':').collect::<Vec<&str>>();
+    pub fn from_value(value: &str) -> Self {
+        let arg_names: Vec<&str> = value.split(':').collect::<Vec<&str>>();
 
         let singular_name = *arg_names.first().unwrap_or(&"");
         let plural_name = *arg_names.get(1).unwrap_or(&"");
@@ -55,9 +55,12 @@ impl Name {
             adjective: String::new(),
         }
     }
+    pub fn is_empty(&self) -> bool {
+        self.singular.is_empty() && self.plural.is_empty() && self.adjective.is_empty()
+    }
 }
 
-#[derive(Serialize, Deserialize, Debug, Clone)]
+#[derive(Serialize, Deserialize, Debug, Clone, Default)]
 #[serde(rename_all = "camelCase")]
 pub struct SingPlurName {
     singular: String,
@@ -65,8 +68,8 @@ pub struct SingPlurName {
 }
 
 impl SingPlurName {
-    pub fn new(argument_text: &str) -> Self {
-        let arg_names: Vec<&str> = argument_text.split(':').collect::<Vec<&str>>();
+    pub fn from_value(value: &str) -> Self {
+        let arg_names: Vec<&str> = value.split(':').collect::<Vec<&str>>();
 
         let singular_name = *arg_names.first().unwrap_or(&"");
         let plural_name = *arg_names.get(1).unwrap_or(&"");
@@ -91,6 +94,10 @@ impl SingPlurName {
             singular: String::new(),
             plural: String::new(),
         }
+    }
+
+    pub fn is_empty(&self) -> bool {
+        self.singular.is_empty() && self.plural.is_empty()
     }
 }
 

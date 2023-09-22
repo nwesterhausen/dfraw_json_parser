@@ -29,6 +29,15 @@ pub enum CreatureTag {
     Frequency,
     UndergroundDepth,
     PopulationNumber,
+    CopyTagsFrom,
+    ApplyCreatureVariation,
+    CreatureTile,
+    AltTile,
+    Color,
+    GlowColor,
+    GlowTile,
+    ChangeFrequencyPercent,
+    ClusterNumber,
 }
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq)]
@@ -158,4 +167,13 @@ pub enum CasteTag {
     Description,
     MaxAge,
     AllActive,
+    CreatureClass,
+    BabyName,
+    ChildName,
+    CasteTile,
+    CasteAltTile,
+    CasteColor,
+    CasteGlowTile,
+    CasteGlowColor,
+    ChangeBodySizePercent,
 }
