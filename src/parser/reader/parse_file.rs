@@ -110,9 +110,10 @@ pub fn parse_raw_file_with_info<P: AsRef<Path>>(
                         // We don't know what this object is, so we can't parse it.
                         // We should log this as an error.
                         log::error!(
-                            "{} - Unknown object type: {}",
+                            "{} - Unknown object type: {} Raw: {}",
                             caller,
-                            captured_value.to_uppercase()
+                            captured_value.to_uppercase(),
+                            raw_filename
                         );
                         return created_raws;
                     }

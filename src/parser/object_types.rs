@@ -32,6 +32,8 @@ pub static OBJECT_TOKENS: phf::Map<&'static str, ObjectType> = phf::phf_map! {
     "LANGUAGE" => ObjectType::Language,
     "TRANSLATION" => ObjectType::Translation,
     "TISSUE_TEMPLATE" => ObjectType::TissueTemplate,
+    "CREATURE_VARIATION" => ObjectType::CreatureVariation,
+    "TEXT_SET" => ObjectType::TextSet,
 };
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize, Default)]
@@ -65,6 +67,8 @@ pub enum ObjectType {
     Language,
     Translation,
     TissueTemplate,
+    CreatureVariation,
+    TextSet,
     #[default]
     Unknown,
 }
