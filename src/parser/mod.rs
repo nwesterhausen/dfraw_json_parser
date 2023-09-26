@@ -10,6 +10,7 @@ mod biomes;
 pub(crate) mod body_size;
 pub(crate) mod color;
 pub(crate) mod creature;
+pub mod creature_variation;
 mod graphics;
 pub(crate) mod milkable;
 pub(crate) mod mod_info_file;

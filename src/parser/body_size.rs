@@ -1,7 +1,7 @@
 use serde::{Deserialize, Serialize};
 
 #[allow(clippy::module_name_repetitions)]
-#[derive(Serialize, Deserialize, Debug, Clone, Default)]
+#[derive(Serialize, Deserialize, Debug, Clone, Default, PartialEq, Eq)]
 pub struct DFBodySize {
     years: u32,
     days: u32,

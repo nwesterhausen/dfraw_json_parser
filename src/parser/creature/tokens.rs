@@ -1,6 +1,6 @@
 use serde::{Deserialize, Serialize};
 
-#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq)]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, Default)]
 pub enum CreatureTag {
     ArtificialHiveable,
     DoesNotExist,
@@ -38,9 +38,11 @@ pub enum CreatureTag {
     GlowTile,
     ChangeFrequencyPercent,
     ClusterNumber,
+    #[default]
+    Unknown,
 }
 
-#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq)]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, Default)]
 pub enum CasteTag {
     LaysEggs,
     AmbushPredator,
@@ -63,7 +65,7 @@ pub enum CasteTag {
     FeatureBeast,
     Female,
     FireImmune,
-    FireimmuneSuper,
+    FireImmuneSuper,
     FishItem,
     Flier,
     Gnawer,
@@ -104,7 +106,7 @@ pub enum CasteTag {
     NoSkull,
     NoSmellyRot,
     NoStuckIns,
-    NoStrun,
+    NoStun,
     NotButcherable,
     NotLiving,
     NoThought,
@@ -137,9 +139,9 @@ pub enum CasteTag {
     Vegetation,
     VerminHateable,
     VerminMicro,
-    VerminNofish,
-    VerminNoroam,
-    VerminNotrap,
+    VerminNoFish,
+    VerminNoRoam,
+    VerminNoTrap,
     WagonPuller,
     WebImmune,
     CuriousItem,
@@ -176,4 +178,6 @@ pub enum CasteTag {
     CasteGlowTile,
     CasteGlowColor,
     ChangeBodySizePercent,
+    #[default]
+    Unknown,
 }

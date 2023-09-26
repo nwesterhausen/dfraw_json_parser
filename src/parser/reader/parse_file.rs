@@ -7,7 +7,7 @@ use std::{
 use encoding_rs_io::DecodeReaderBytesBuilder;
 
 use crate::parser::{
-    creature::raw::DFCreature,
+    creature::{apply_copy_from::apply_copy_tags_from, raw::DFCreature},
     mod_info_file::ModuleInfoFile,
     object_types::{ObjectType, OBJECT_TOKENS},
     raws::{RawMetadata, RawObject},
@@ -192,6 +192,11 @@ pub fn parse_raw_file_with_info<P: AsRef<Path>>(
             ObjectType::Inorganic => log::info!("Pretend to parse inorganics...."),
             _ => {}
         }
+    }
+
+    // Apply copy_tags_from
+    if object_type == ObjectType::Creature {
+        apply_copy_tags_from(&mut created_raws);
     }
 
     // Return the created raws.
