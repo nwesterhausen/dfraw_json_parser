@@ -249,10 +249,5 @@ pub fn parse_module<P: AsRef<Path>>(
         }
     }
 
-    // Convert those raws into JSON strings
-    // let json_vec = util::stringify_raw_vec(serializable_raws);
-
-    //3. Return the object array for this dfraw dir
-    // format!("[{}]", json_vec.join(","))
-    format!("[{}]", "{message:\"not implemented\"}")
+    serde_json::to_string(&serializable_raws).unwrap_or_default()
 }
