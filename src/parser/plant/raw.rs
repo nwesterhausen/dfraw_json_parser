@@ -18,7 +18,7 @@ use super::{phf_table::PLANT_TOKENS, tokens::PlantTag};
 #[serde(rename_all = "camelCase")]
 pub struct DFPlant {
     /// Common Raw file Things
-    #[serde(skip_serializing_if = "RawMetadata::is_hidden")]
+    // #[serde(skip_serializing_if = "RawMetadata::is_hidden")]
     metadata: RawMetadata,
     identifier: String,
     object_id: String,

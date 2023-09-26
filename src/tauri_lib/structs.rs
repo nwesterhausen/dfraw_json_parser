@@ -1,6 +1,8 @@
 #[cfg(feature = "tauri")]
 #[derive(Clone, serde::Serialize)]
 #[serde(rename_all = "camelCase")]
+#[derive(ts_rs::TS)]
+#[ts(export)]
 /// It's a struct to represent the progress of the current job. This is emitted back to the Tauri app using the `PROGRESS` event.
 ///
 /// Properties:
