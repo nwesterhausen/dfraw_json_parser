@@ -1,0 +1,22 @@
+use phf::phf_map;
+
+use super::tokens::PlantTag;
+pub static PLANT_TOKENS: phf::Map<&'static str, PlantTag> = phf_map! {
+    "NAME" => PlantTag::NameSingular,
+    "NAME_PLURAL" => PlantTag::NamePlural,
+    "ADJ" => PlantTag::NameAdjective,
+    "ALL_NAMES" => PlantTag::AllNames,
+    "PREFSTRING" => PlantTag::PrefString,
+    "MATERIAL" => PlantTag::Material,
+    "USE_MATERIAL" => PlantTag::UseMaterial,
+    "BASIC_MAT" => PlantTag::BasicMat,
+    "USE_MATERIAL_TEMPLATE" => PlantTag::UseMaterialTemplate,
+    "UNDERGROUND_DEPTH" => PlantTag::UndergroundDepth,
+    "GOOD" => PlantTag::Good,
+    "EVIL" => PlantTag::Evil,
+    "SAVAGE" => PlantTag::Savage,
+    "FREQUENCY" => PlantTag::Frequency,
+    "WET" => PlantTag::Wet,
+    "DRY" => PlantTag::Dry,
+    "BIOME" => PlantTag::Biome,
+};

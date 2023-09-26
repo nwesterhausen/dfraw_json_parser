@@ -1,6 +1,8 @@
 use serde::{Deserialize, Serialize};
 use std::fmt::Debug;
 
+#[derive(ts_rs::TS)]
+#[ts(export)]
 #[derive(Serialize, Deserialize, Debug, Clone, Default)]
 #[serde(rename_all = "camelCase")]
 pub struct Name {
@@ -27,8 +29,19 @@ impl Name {
     pub fn is_empty(&self) -> bool {
         self.singular.is_empty() && self.plural.is_empty() && self.adjective.is_empty()
     }
+    pub fn update_singular(&mut self, name: &str) {
+        self.singular = String::from(name);
+    }
+    pub fn update_plural(&mut self, name: &str) {
+        self.plural = String::from(name);
+    }
+    pub fn update_adjective(&mut self, name: &str) {
+        self.adjective = String::from(name);
+    }
 }
 
+#[derive(ts_rs::TS)]
+#[ts(export)]
 #[derive(Serialize, Deserialize, Debug, Clone, Default)]
 #[serde(rename_all = "camelCase")]
 pub struct SingPlurName {
@@ -59,6 +72,8 @@ impl SingPlurName {
     }
 }
 
+#[derive(ts_rs::TS)]
+#[ts(export)]
 #[derive(Serialize, Deserialize, Debug, Clone, Default)]
 #[serde(rename_all = "camelCase")]
 pub struct StateName {

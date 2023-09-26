@@ -10,22 +10,27 @@ use crate::parser::{
     creature::{apply_copy_from::apply_copy_tags_from, raw::DFCreature},
     mod_info_file::ModuleInfoFile,
     object_types::{ObjectType, OBJECT_TOKENS},
+    plant::raw::DFPlant,
     raws::{RawMetadata, RawObject},
     refs::{DF_ENCODING, RAW_TOKEN_RE},
 };
 
 use super::header::read_raw_file_type;
 
-pub fn parse_raw_file<P: AsRef<Path>>(raw_file_path: &P) -> Vec<Box<dyn RawObject>> {
+pub fn parse_raw_file<P: AsRef<Path>>(
+    raw_file_path: &P,
+    hide_metadata_in_result: bool,
+) -> Vec<Box<dyn RawObject>> {
     let mod_info_file = ModuleInfoFile::from_raw_file_path(raw_file_path);
 
-    parse_raw_file_with_info(raw_file_path, &mod_info_file)
+    parse_raw_file_with_info(raw_file_path, &mod_info_file, hide_metadata_in_result)
 }
 
 #[allow(clippy::too_many_lines)]
 pub fn parse_raw_file_with_info<P: AsRef<Path>>(
     raw_file_path: &P,
     mod_info_file: &ModuleInfoFile,
+    hide_metadata_in_result: bool,
 ) -> Vec<Box<dyn RawObject>> {
     let caller = "Parse Raw (Generically)";
     let mut created_raws: Vec<Box<dyn RawObject>> = Vec::new();
@@ -44,7 +49,9 @@ pub fn parse_raw_file_with_info<P: AsRef<Path>>(
     let reader = BufReader::new(decoding_reader);
     let mut started = false;
     let mut raw_filename = String::new();
+
     let mut temp_creature = DFCreature::empty();
+    let mut temp_plant = DFPlant::empty();
 
     // Metadata
     let object_type = read_raw_file_type(raw_file_path);
@@ -54,6 +61,7 @@ pub fn parse_raw_file_with_info<P: AsRef<Path>>(
         raw_filename.as_str(),
         &raw_file_path,
     );
+    raw_metadata.set_hidden(hide_metadata_in_result);
 
     for (index, line) in reader.lines().enumerate() {
         if line.is_err() {
@@ -136,7 +144,7 @@ pub fn parse_raw_file_with_info<P: AsRef<Path>>(
                     }
                     // We haven't started a creature yet, so we need to start one.
                     started = true;
-                    temp_creature = DFCreature::new(captured_value, raw_metadata.clone());
+                    temp_creature = DFCreature::new(captured_value, &raw_metadata.clone());
                 }
                 "CASTE" => {
                     // Starting a new caste (in creature), so we can just add a caste to the last creature we started.
@@ -153,6 +161,16 @@ pub fn parse_raw_file_with_info<P: AsRef<Path>>(
                         // First we have to cast the dyn RawObject to a DFCreature.
                         temp_creature.select_caste(captured_value);
                     }
+                }
+                "PLANT" => {
+                    // Starting a new plant, so we can just add a plant to the list.
+                    if started {
+                        // We need to add the plant to the list.
+                        created_raws.push(Box::new(temp_plant.clone()));
+                    }
+                    // We haven't started a plant yet, so we need to start one.
+                    started = true;
+                    temp_plant = DFPlant::new(captured_value, &raw_metadata.clone());
                 }
                 "INORGANIC" | "SELECT_INORGANIC" => {
                     if started {
@@ -176,6 +194,11 @@ pub fn parse_raw_file_with_info<P: AsRef<Path>>(
                             ObjectType::Inorganic => {
                                 log::info!("Pretend to parse inorganics....");
                             }
+                            ObjectType::Plant => {
+                                // We have a plant, so we can add a tag to it.
+                                // First we have to cast the dyn RawObject to a DFPlant.
+                                temp_plant.parse_tag(captured_key, captured_value);
+                            }
                             _ => {
                                 // We don't have a known raw yet. So do nothing.
                             }
@@ -189,6 +212,7 @@ pub fn parse_raw_file_with_info<P: AsRef<Path>>(
         // If we did indeed start capture, we need to complete the final raw by adding it to the list
         match object_type {
             ObjectType::Creature => created_raws.push(Box::new(temp_creature.clone())),
+            ObjectType::Plant => created_raws.push(Box::new(temp_plant.clone())),
             ObjectType::Inorganic => log::info!("Pretend to parse inorganics...."),
             _ => {}
         }

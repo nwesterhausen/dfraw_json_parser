@@ -231,7 +231,7 @@ pub fn parse_module<P: AsRef<Path>>(
             progress_helper.add_steps(1);
             progress_helper.send_update(&f_name);
             let entry_path = entry.path();
-            serializable_raws.extend(parser::parse_raws_from_single_file(&entry_path));
+            serializable_raws.extend(parser::parse_raws_from_single_file(&entry_path, false));
         }
     }
     // Read all the files in the directory, selectively parse the .txt files
@@ -245,7 +245,7 @@ pub fn parse_module<P: AsRef<Path>>(
             progress_helper.add_steps(1);
             progress_helper.send_update(&f_name);
             let entry_path = entry.path();
-            serializable_raws.extend(parser::parse_raws_from_single_file(&entry_path));
+            serializable_raws.extend(parser::parse_raws_from_single_file(&entry_path, false));
         }
     }
 

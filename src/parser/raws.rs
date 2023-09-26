@@ -6,13 +6,14 @@ use super::{
     mod_info_file::ModuleInfoFile, object_types::ObjectType, raw_locations::RawModuleLocation,
 };
 
-#[typetag::serde]
+#[typetag::serde(tag = "type")]
 pub trait RawObject: RawObjectToAny {
     fn get_metadata(&self) -> &RawMetadata;
     fn get_identifier(&self) -> &str;
     fn is_empty(&self) -> bool;
     fn get_type(&self) -> &ObjectType;
     fn parse_tag(&mut self, key: &str, value: &str);
+    fn get_object_id(&self) -> &str;
 }
 
 pub trait RawObjectToAny: 'static {
@@ -29,6 +30,8 @@ impl<T: 'static> RawObjectToAny for T {
 // the raw is from, and which file contains the raw.
 #[derive(Serialize, Deserialize, Clone, Debug, Default)]
 #[serde(rename_all = "camelCase")]
+#[derive(ts_rs::TS)]
+#[ts(export)]
 pub struct RawMetadata {
     // The name of the raw module the raw is from.
     module_name: String,
@@ -68,5 +71,12 @@ impl RawMetadata {
     }
     pub(crate) fn is_hidden(&self) -> bool {
         self.hidden
+    }
+    pub fn get_raw_identifier(&self) -> &str {
+        &self.raw_identifier
+    }
+
+    pub(crate) fn set_hidden(&mut self, hide_metadata_in_result: bool) {
+        self.hidden = hide_metadata_in_result;
     }
 }

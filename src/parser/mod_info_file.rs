@@ -16,6 +16,9 @@ use super::{
 
 // Struct for info about a raw module
 #[derive(Serialize, Deserialize, Default)]
+#[serde(rename_all = "camelCase")]
+#[derive(ts_rs::TS)]
+#[ts(export)]
 pub struct ModuleInfoFile {
     identifier: String,
     location: RawModuleLocation,

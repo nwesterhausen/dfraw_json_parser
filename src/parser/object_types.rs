@@ -36,6 +36,8 @@ pub static OBJECT_TOKENS: phf::Map<&'static str, ObjectType> = phf::phf_map! {
     "TEXT_SET" => ObjectType::TextSet,
 };
 
+#[derive(ts_rs::TS)]
+#[ts(export)]
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize, Default)]
 pub enum ObjectType {
     Creature,

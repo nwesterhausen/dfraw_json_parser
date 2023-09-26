@@ -11,8 +11,11 @@ use crate::parser::{
 
 use super::{phf_table::CASTE_TOKENS, tokens::CasteTag};
 
+#[derive(ts_rs::TS)]
+#[ts(export)]
 #[allow(clippy::module_name_repetitions)]
 #[derive(Serialize, Deserialize, Debug, Clone, Default)]
+#[serde(rename_all = "camelCase")]
 pub struct DFCaste {
     identifier: String,
     #[serde(skip_serializing_if = "Vec::is_empty")]

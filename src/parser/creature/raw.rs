@@ -1,6 +1,8 @@
 use serde::{Deserialize, Serialize};
+use slug::slugify;
 
 use crate::parser::{
+    creature_caste::{phf_table::CASTE_TOKENS, raw::DFCaste},
     creature_variation::raw::CreatureVariationRequirements,
     names::{Name, SingPlurName},
     object_types::ObjectType,
@@ -10,13 +12,12 @@ use crate::parser::{
     tile::DFTile,
 };
 
-use super::{
-    caste::DFCaste,
-    phf_table::{CASTE_TOKENS, CREATURE_TOKENS},
-    tokens::CreatureTag,
-};
+use super::{phf_table::CREATURE_TOKENS, tokens::CreatureTag};
 
+#[derive(ts_rs::TS)]
+#[ts(export)]
 #[derive(Serialize, Deserialize, Debug, Clone, Default)]
+#[serde(rename_all = "camelCase")]
 pub struct DFCreature {
     #[serde(skip_serializing_if = "RawMetadata::is_hidden")]
     metadata: RawMetadata,
@@ -31,7 +32,7 @@ pub struct DFCreature {
     #[serde(skip_serializing_if = "DFTile::is_default")]
     tile: DFTile,
     // integers
-    #[serde(skip_serializing_if = "DFCreature::is_default_frequency")]
+    #[serde(skip_serializing_if = "Ranges::is_default_frequency")]
     frequency: u16, //Defaults to 50 if not specified
     // [min, max] ranges
     /// Default [1, 1]
@@ -48,13 +49,13 @@ pub struct DFCreature {
     general_baby_name: SingPlurName,
     #[serde(skip_serializing_if = "SingPlurName::is_empty")]
     general_child_name: SingPlurName,
-    #[serde(skip_serializing_if = "Name::is_empty")]
     name: Name,
     // Special tokens
     #[serde(skip_serializing_if = "String::is_empty")]
     copy_tags_from: String,
     #[serde(skip_serializing_if = "Vec::is_empty")]
     apply_creature_variation: Vec<String>,
+    object_id: String,
 }
 
 impl DFCreature {
@@ -67,14 +68,20 @@ impl DFCreature {
             ..DFCreature::default()
         }
     }
-    pub fn new(identifier: &str, metadata: RawMetadata) -> DFCreature {
+    pub fn new(identifier: &str, metadata: &RawMetadata) -> DFCreature {
         DFCreature {
             identifier: String::from(identifier),
-            metadata,
+            metadata: metadata.clone(),
             frequency: 50,
             castes: vec![DFCaste::new("ALL")],
             population_number: [1, 1],
             cluster_number: [1, 1],
+            object_id: format!(
+                "{}-{}-{}",
+                metadata.get_raw_identifier(),
+                "CREATURE",
+                slugify(identifier)
+            ),
             ..DFCreature::default()
         }
     }
@@ -102,11 +109,6 @@ impl DFCreature {
         // Move the caste to the end of the list
         let caste = self.castes.remove(index);
         self.castes.push(caste);
-    }
-    /// This is only used for serialize
-    #[allow(clippy::trivially_copy_pass_by_ref)]
-    fn is_default_frequency(frequency: &u16) -> bool {
-        *frequency == 50
     }
 
     pub fn has_caste(&self, name: &str) -> bool {
@@ -280,6 +282,9 @@ impl RawObject for DFCreature {
                 self.tags.push(tag.clone());
             }
         }
+    }
+    fn get_object_id(&self) -> &str {
+        &self.object_id
     }
 }
 

@@ -56,4 +56,9 @@ impl Ranges {
     pub fn is_zero_u8(num: &u8) -> bool {
         *num == 0
     }
+    /// This is only used for serialize
+    #[allow(clippy::trivially_copy_pass_by_ref)]
+    pub fn is_default_frequency(frequency: &u16) -> bool {
+        *frequency == 50
+    }
 }

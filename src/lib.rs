@@ -86,7 +86,10 @@ pub mod util;
 /// Returns:
 ///
 /// A vector of raw file information
-pub fn parse_module_location<P: AsRef<Path>>(raw_module_location: &P) -> Vec<Box<dyn RawObject>> {
+pub fn parse_module_location<P: AsRef<Path>>(
+    raw_module_location: &P,
+    hide_metadata_in_result: bool,
+) -> Vec<Box<dyn RawObject>> {
     let raw_module_location_path = raw_module_location.as_ref();
     // Guard against invalid path
     if !raw_module_location_path.exists() {
@@ -127,7 +130,8 @@ pub fn parse_module_location<P: AsRef<Path>>(raw_module_location: &P) -> Vec<Box
     //4. Loop over all raw modules in the raw module directory
     for raw_module_directory in raw_module_iter {
         //2. Parse raws and dump JSON into array
-        let mut module_raws = parse_raw_module(&raw_module_directory.path());
+        let mut module_raws =
+            parse_raw_module(&raw_module_directory.path(), hide_metadata_in_result);
         all_raws.append(&mut module_raws);
     }
 
@@ -206,7 +210,10 @@ pub fn parse_info_txt_in_location<P: AsRef<Path>>(raw_module_location: &P) -> St
 ///
 /// A JSON string: `<T extends Raw>[][][][]`, where T can be `Creature`, `Inorganic`, or `Plant`.
 /// (See [`typings.d.ts`](https://github.com/nwesterhausen/dfraw_json_parser/blob/main/typing.d.ts))
-pub fn parse_game_raws<P: AsRef<Path>>(df_game_path: &P) -> Vec<Box<dyn RawObject>> {
+pub fn parse_game_raws<P: AsRef<Path>>(
+    df_game_path: &P,
+    hide_metadata_in_result: bool,
+) -> Vec<Box<dyn RawObject>> {
     //1. "validate" folder is as expected
     let game_path = Path::new(df_game_path.as_ref());
     // Guard against invalid path
@@ -234,9 +241,9 @@ pub fn parse_game_raws<P: AsRef<Path>>(df_game_path: &P) -> Vec<Box<dyn RawObjec
     let workshop_mods_path = game_path.join("mods");
 
     let all_raws = vec![
-        parse_module_location(&vanilla_path),
-        parse_module_location(&installed_mods_path),
-        parse_module_location(&workshop_mods_path),
+        parse_module_location(&vanilla_path, hide_metadata_in_result),
+        parse_module_location(&installed_mods_path, hide_metadata_in_result),
+        parse_module_location(&workshop_mods_path, hide_metadata_in_result),
     ];
 
     let flattened_raws: Vec<Box<dyn RawObject>> = all_raws
@@ -258,8 +265,11 @@ pub fn parse_game_raws<P: AsRef<Path>>(df_game_path: &P) -> Vec<Box<dyn RawObjec
 ///
 /// A JSON string: `<T extends Raw>[][]]`, where T can be `Creature`, `Inorganic`, or `Plant`.
 /// (See [`typings.d.ts`](https://github.com/nwesterhausen/dfraw_json_parser/blob/main/typing.d.ts))
-pub fn parse_raw_module<P: AsRef<Path>>(raw_module_path: &P) -> Vec<Box<dyn RawObject>> {
-    parser::parse_raw_module(raw_module_path)
+pub fn parse_raw_module<P: AsRef<Path>>(
+    raw_module_path: &P,
+    hide_metadata_in_result: bool,
+) -> Vec<Box<dyn RawObject>> {
+    parser::parse_raw_module(raw_module_path, hide_metadata_in_result)
 }
 
 /// Parse all the game raws and saves the result to a JSON file.
@@ -268,8 +278,12 @@ pub fn parse_raw_module<P: AsRef<Path>>(raw_module_path: &P) -> Vec<Box<dyn RawO
 ///
 /// * `df_game_path`: The path to the Dwarf Fortress install directory.
 /// * `out_filepath`: The path to the file to save the parsed raws to. (This should end in `.json`.)
-pub fn parse_game_raws_to_file<P: AsRef<Path>>(df_game_path: &P, out_filepath: &P) {
-    let all_game_raws = parse_game_raws(df_game_path);
+pub fn parse_game_raws_to_file<P: AsRef<Path>>(
+    df_game_path: &P,
+    out_filepath: &P,
+    hide_metadata_in_result: bool,
+) {
+    let all_game_raws = parse_game_raws(df_game_path, hide_metadata_in_result);
     let parsed_json_string = serde_json::to_string(&all_game_raws).unwrap_or_default();
     util::write_json_string_to_file(&parsed_json_string, out_filepath);
 }
@@ -310,8 +324,11 @@ pub fn parse_info_txt_in_module<P: AsRef<Path>>(raw_module_directory: &P) -> Str
 ///
 /// A JSON string: `<T extends Raw>[]`, where T can be `Creature`, `Inorganic`, or `Plant`.
 /// (See [`typings.d.ts`](https://github.com/nwesterhausen/dfraw_json_parser/blob/main/typing.d.ts))
-pub fn parse_single_raw_file<P: AsRef<Path>>(raw_file: &P) -> String {
-    let result = parser::parse_raws_from_single_file(raw_file);
+pub fn parse_single_raw_file<P: AsRef<Path>>(
+    raw_file: &P,
+    hide_metadata_in_result: bool,
+) -> String {
+    let result = parser::parse_raws_from_single_file(raw_file, hide_metadata_in_result);
     serde_json::to_string(&result).unwrap_or_default()
 }
 
@@ -356,8 +373,12 @@ pub fn parse_info_txt_in_game_dir<P: AsRef<Path>>(df_game_path: &P) -> String {
 ///
 /// * `raw_file`: The path to the raw file to read.
 /// * `out_filepath`: The path to the file you want to write to.
-pub fn parse_single_raw_file_to_file<P: AsRef<Path>>(raw_file: &P, out_filepath: &P) {
-    let file_raws = parser::parse_raws_from_single_file(raw_file);
+pub fn parse_single_raw_file_to_file<P: AsRef<Path>>(
+    raw_file: &P,
+    out_filepath: &P,
+    hide_metadata_in_result: bool,
+) {
+    let file_raws = parser::parse_raws_from_single_file(raw_file, hide_metadata_in_result);
     let parsed_json_string = serde_json::to_string(&file_raws).unwrap_or_default();
     util::write_json_string_to_file(&parsed_json_string, out_filepath);
 }
@@ -368,8 +389,12 @@ pub fn parse_single_raw_file_to_file<P: AsRef<Path>>(raw_file: &P, out_filepath:
 ///
 /// * `module_path`: The path to the raw file to read.
 /// * `out_filepath`: The path to the file you want to write to.
-pub fn parse_raw_module_to_file<P: AsRef<Path>>(module_path: &P, out_filepath: &P) {
-    let file_raws = parse_raw_module(module_path);
+pub fn parse_raw_module_to_file<P: AsRef<Path>>(
+    module_path: &P,
+    out_filepath: &P,
+    hide_metadata_in_result: bool,
+) {
+    let file_raws = parse_raw_module(module_path, hide_metadata_in_result);
     let parsed_json_string = serde_json::to_string(&file_raws).unwrap_or_default();
     util::write_json_string_to_file(&parsed_json_string, out_filepath);
 }
@@ -383,8 +408,9 @@ pub fn parse_raw_module_to_file<P: AsRef<Path>>(module_path: &P, out_filepath: &
 pub fn parse_module_location_to_file<P: AsRef<Path>>(
     raw_module_location_path: &P,
     out_filepath: &P,
+    hide_metadata_in_result: bool,
 ) {
-    let module_raws = parse_module_location(raw_module_location_path);
+    let module_raws = parse_module_location(raw_module_location_path, hide_metadata_in_result);
     let parsed_json_string = serde_json::to_string(&module_raws).unwrap_or_default();
     util::write_json_string_to_file(&parsed_json_string, out_filepath);
 }

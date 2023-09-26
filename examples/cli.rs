@@ -123,7 +123,7 @@ fn run_for_game_dir(game_dir: &str, out_dir: &str) {
         let raws_out_file = out_path.join("raws.json");
         let info_out_file = out_path.join("modules.json");
         // If a directory for raws was specified, we will parse what raws we find
-        let parsed = dfraw_json_parser::parse_game_raws(&game_dir);
+        let parsed = dfraw_json_parser::parse_game_raws(&game_dir, true);
         // Use serde to convert the parsed raws into a JSON string
         let raws_json = serde_json::to_string_pretty(&parsed).unwrap_or_default();
         // Write the JSON string to the file
@@ -146,7 +146,7 @@ fn run_for_single_raw_file(raw_file: &str, out_dir: &str) {
 
     if out_dir.is_empty() {
         log::warn!("No output directory specified, dumping to console.");
-        let parsed_raws = dfraw_json_parser::parse_single_raw_file(&raw_file_path);
+        let parsed_raws = dfraw_json_parser::parse_single_raw_file(&raw_file_path, true);
         println!("{parsed_raws}");
         return;
     }
@@ -169,6 +169,7 @@ fn run_for_single_raw_file(raw_file: &str, out_dir: &str) {
         dfraw_json_parser::parse_single_raw_file_to_file(
             &raw_file_path,
             &out_path.join("single-raw.json"),
+            true,
         );
     }
 }
@@ -207,6 +208,7 @@ fn run_for_single_raw_module(module_path: &str, out_dir: &str) {
         dfraw_json_parser::parse_raw_module_to_file(
             &raw_module_path,
             &out_path.join("single-module.json"),
+            true,
         );
     }
 }
@@ -222,7 +224,7 @@ fn run_for_single_raw_module_location(location_path: &str, out_dir: &str) {
 
     if out_dir.is_empty() {
         log::warn!("No output directory specified, dumping to console.");
-        let parsed_raws = dfraw_json_parser::parse_module_location(&raw_module_location_path);
+        let parsed_raws = dfraw_json_parser::parse_module_location(&raw_module_location_path, true);
         let json_of_raws = serde_json::to_string_pretty(&parsed_raws).unwrap_or_default();
         println!("[{json_of_raws}]");
         return;
@@ -246,6 +248,7 @@ fn run_for_single_raw_module_location(location_path: &str, out_dir: &str) {
         dfraw_json_parser::parse_module_location_to_file(
             &raw_module_location_path,
             &out_path.join("single-location.json"),
+            true,
         );
     }
 }

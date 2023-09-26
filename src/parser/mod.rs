@@ -9,13 +9,16 @@ use crate::parser::{
 mod biomes;
 pub(crate) mod body_size;
 pub(crate) mod color;
-pub(crate) mod creature;
+pub mod creature;
+pub mod creature_caste;
 pub mod creature_variation;
 mod graphics;
 pub(crate) mod milkable;
 pub(crate) mod mod_info_file;
 mod names;
 pub(crate) mod object_types;
+pub mod plant;
+pub mod plant_growth;
 pub(crate) mod ranges;
 pub(crate) mod raw_locations;
 pub(crate) mod raws;
@@ -31,12 +34,14 @@ pub(crate) fn parse_info_file_from_module_directory<P: AsRef<Path>>(
 
 pub(crate) fn parse_raws_from_single_file<P: AsRef<Path>>(
     entry_path: &P,
+    hide_metadata_in_result: bool,
 ) -> Vec<Box<dyn raws::RawObject>> {
-    reader::parse_file::parse_raw_file(entry_path)
+    reader::parse_file::parse_raw_file(entry_path, hide_metadata_in_result)
 }
 
 pub(crate) fn parse_raw_module<P: AsRef<Path>>(
     raw_module_directory: &P,
+    hide_metadata_in_result: bool,
 ) -> Vec<Box<dyn raws::RawObject>> {
     //1. Get information from the info.txt file
     if !raw_module_directory.as_ref().exists() {
@@ -120,7 +125,11 @@ pub(crate) fn parse_raw_module<P: AsRef<Path>>(
 
         if f_name.ends_with(".txt") {
             let entry_path = entry.path();
-            serializable_raws.extend(parse_raw_file_with_info(&entry_path, &info_text_file));
+            serializable_raws.extend(parse_raw_file_with_info(
+                &entry_path,
+                &info_text_file,
+                hide_metadata_in_result,
+            ));
         }
     }
     // Read all the files in the directory, selectively parse the .txt files
@@ -132,7 +141,11 @@ pub(crate) fn parse_raw_module<P: AsRef<Path>>(
 
         if f_name.ends_with(".txt") {
             let entry_path = entry.path();
-            serializable_raws.extend(parse_raw_file_with_info(&entry_path, &info_text_file));
+            serializable_raws.extend(parse_raw_file_with_info(
+                &entry_path,
+                &info_text_file,
+                hide_metadata_in_result,
+            ));
         }
     }
 
