@@ -61,4 +61,19 @@ impl Ranges {
     pub fn is_default_frequency(frequency: &u16) -> bool {
         *frequency == 50
     }
+    /// This is only used for serialize
+    #[allow(clippy::trivially_copy_pass_by_ref)]
+    pub fn is_default_trunk_height_percentage(values: &[i32; 2]) -> bool {
+        values[0] == 0 && values[1] == -1
+    }
+    /// This is only used for serialize
+    #[allow(clippy::trivially_copy_pass_by_ref)]
+    pub fn is_default_growth_density(density: &u32) -> bool {
+        *density == 0
+    }
+    /// This is only used for serialize
+    #[allow(clippy::trivially_copy_pass_by_ref)]
+    pub fn is_default_growth_timing(values: &[u32; 2]) -> bool {
+        values[0] == 0 && values[1] == 403_200
+    }
 }

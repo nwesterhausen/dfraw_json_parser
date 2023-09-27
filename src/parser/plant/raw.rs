@@ -4,6 +4,7 @@ use slug::slugify;
 use crate::parser::{
     names::Name,
     object_types::ObjectType,
+    plant_growth::raw::PlantGrowth,
     ranges::parse_min_max_range,
     ranges::Ranges,
     raws::{RawMetadata, RawObject},
@@ -40,6 +41,10 @@ pub struct DFPlant {
     /// List of biomes this plant can grow in
     #[serde(skip_serializing_if = "Vec::is_empty")]
     biomes: Vec<String>,
+
+    /// Growth Tokens define the growths of the plant (leaves, fruit, etc.)
+    #[serde(skip_serializing_if = "Vec::is_empty")]
+    growths: Vec<PlantGrowth>,
 }
 
 impl DFPlant {
