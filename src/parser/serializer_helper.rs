@@ -40,6 +40,11 @@ pub fn is_one_u8(value: &u8) -> bool {
 }
 /// This is only used for serialize
 #[allow(clippy::trivially_copy_pass_by_ref)]
+pub fn is_one(value: &u32) -> bool {
+    *value == 1
+}
+/// This is only used for serialize
+#[allow(clippy::trivially_copy_pass_by_ref)]
 pub fn is_zero_u8(value: &u8) -> bool {
     *value == 0
 }
@@ -91,4 +96,14 @@ pub fn is_default_dead_picked_tile(tile_code: &u8) -> bool {
 #[allow(clippy::trivially_copy_pass_by_ref)]
 pub fn is_default_picked_tile(tile_code: &u8) -> bool {
     *tile_code == 231
+}
+/// This is only used for serialize
+#[allow(clippy::trivially_copy_pass_by_ref)]
+pub fn is_false(boolean: &bool) -> bool {
+    !*boolean
+}
+/// This is only used for serialize
+#[allow(clippy::trivially_copy_pass_by_ref)]
+pub fn is_true(boolean: &bool) -> bool {
+    *boolean
 }

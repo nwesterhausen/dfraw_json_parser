@@ -13,7 +13,7 @@ pub enum PlantTag {
     Biome,
     Frequency,
     UseMaterialTemplate,
-    BasicMat,
+    BasicMaterial,
     UseMaterial,
     Material,
     PrefString,

@@ -2,6 +2,10 @@ use serde::{Deserialize, Serialize};
 use slug::slugify;
 
 use crate::parser::{
+    material::{
+        phf_table::{MATERIAL_PROPERTY_TOKENS, MATERIAL_USAGE_TOKENS},
+        raw::Material,
+    },
     names::Name,
     object_types::ObjectType,
     plant_growth::{
@@ -58,11 +62,8 @@ pub struct DFPlant {
     #[serde(skip_serializing_if = "Option::is_none")]
     shrub_details: Option<Shrub>,
 
-    // Todo fix later
     #[serde(skip_serializing_if = "Vec::is_empty")]
-    material_templates: Vec<String>,
-    #[serde(skip_serializing_if = "Vec::is_empty")]
-    materials: Vec<String>,
+    materials: Vec<Material>,
 }
 
 impl DFPlant {
@@ -105,8 +106,19 @@ impl RawObject for DFPlant {
     fn get_type(&self) -> &ObjectType {
         &ObjectType::Plant
     }
-
+    #[allow(clippy::too_many_lines)]
     fn parse_tag(&mut self, key: &str, value: &str) {
+        if (MATERIAL_PROPERTY_TOKENS.contains_key(key) || MATERIAL_USAGE_TOKENS.contains_key(key))
+            && !key.eq("USE_MATERIAL_TEMPLATE")
+        {
+            // have our latest material parse the tag
+            self.materials
+                .last_mut()
+                .unwrap_or(&mut Material::default())
+                .parse_tag(key, value);
+            return;
+        }
+
         if TREE_TOKENS.contains_key(key) {
             if self.tree_details.is_none() {
                 self.tree_details = Some(Tree::new(value));
@@ -185,10 +197,19 @@ impl RawObject for DFPlant {
                 self.frequency = value.parse::<u16>().unwrap_or(50);
             }
             PlantTag::UseMaterialTemplate => {
-                self.material_templates.push(String::from(value));
+                self.materials
+                    .push(Material::use_material_template_from_value(value));
             }
             PlantTag::UseMaterial => {
-                self.materials.push(String::from(value));
+                self.materials
+                    .push(Material::use_material_from_value(value));
+            }
+            PlantTag::BasicMaterial => {
+                self.materials
+                    .push(Material::basic_material_from_value(value));
+            }
+            PlantTag::Material => {
+                self.materials.push(Material::from_value(value));
             }
             _ => {
                 self.tags.push(tag.clone());
