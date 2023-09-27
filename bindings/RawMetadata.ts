@@ -2,12 +2,4 @@
 import type { ObjectType } from "./ObjectType";
 import type { RawModuleLocation } from "./RawModuleLocation";
 
-export interface RawMetadata {
-  moduleName: string;
-  moduleVersion: string;
-  rawFilePath: string;
-  rawIdentifier: string;
-  objectType: ObjectType;
-  rawModuleLocation: RawModuleLocation;
-  hidden: boolean;
-}
+export interface RawMetadata { moduleName: string, moduleVersion: string, rawFilePath: string, rawIdentifier: string, objectType: ObjectType, rawModuleLocation: RawModuleLocation, hidden: boolean, }

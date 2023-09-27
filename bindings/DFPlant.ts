@@ -5,16 +5,4 @@ import type { PlantTag } from "./PlantTag";
 import type { RawMetadata } from "./RawMetadata";
 import type { Tree } from "./Tree";
 
-export interface DFPlant {
-  metadata: RawMetadata;
-  identifier: string;
-  objectId: string;
-  name: Name;
-  prefStrings: Array<string>;
-  tags: Array<PlantTag>;
-  undergroundDepth: Array<number>;
-  frequency: number;
-  biomes: Array<string>;
-  growths: Array<PlantGrowth>;
-  treeDetails?: Tree;
-}
+export interface DFPlant { metadata: RawMetadata, identifier: string, objectId: string, name: Name, prefStrings: Array<string>, tags: Array<PlantTag>, undergroundDepth: Array<number>, frequency: number, biomes: Array<string>, growths: Array<PlantGrowth>, treeDetails?: Tree, materialTemplates: Array<string>, materials: Array<string>, }

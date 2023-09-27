@@ -6,22 +6,4 @@ import type { Name } from "./Name";
 import type { RawMetadata } from "./RawMetadata";
 import type { SingPlurName } from "./SingPlurName";
 
-export interface DFCreature {
-  metadata: RawMetadata;
-  identifier: string;
-  castes: Array<DFCaste>;
-  tags: Array<CreatureTag>;
-  biomes: Array<string>;
-  prefStrings: Array<string>;
-  tile: DFTile;
-  frequency: number;
-  clusterNumber: Array<number>;
-  populationNumber: Array<number>;
-  undergroundDepth: Array<number>;
-  generalBabyName: SingPlurName;
-  generalChildName: SingPlurName;
-  name: Name;
-  copyTagsFrom: string;
-  applyCreatureVariation: Array<string>;
-  objectId: string;
-}
+export interface DFCreature { metadata: RawMetadata, identifier: string, castes: Array<DFCaste>, tags: Array<CreatureTag>, biomes: Array<string>, prefStrings: Array<string>, tile: DFTile, frequency: number, clusterNumber: Array<number>, populationNumber: Array<number>, undergroundDepth: Array<number>, generalBabyName: SingPlurName, generalChildName: SingPlurName, name: Name, copyTagsFrom: string, applyCreatureVariation: Array<string>, objectId: string, }
