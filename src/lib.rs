@@ -60,6 +60,7 @@ for the steam workshop if it is a mod downloaded from the steam workshop.
 */
 
 #![warn(clippy::pedantic)]
+#![allow(clippy::must_use_candidate)]
 
 use options::ParserOptions;
 use parser::raws::RawObject;
@@ -68,11 +69,11 @@ use walkdir::DirEntry;
 
 use crate::parser::raw_locations::RawModuleLocation;
 
+pub mod options;
 pub mod parser;
 #[cfg(feature = "tauri")]
 mod tauri_lib;
 pub mod util;
-pub mod options;
 
 /// Parse all raws within the module location to JSON.
 ///
@@ -128,8 +129,7 @@ pub fn parse_module_location<P: AsRef<Path>>(
     //4. Loop over all raw modules in the raw module directory
     for raw_module_directory in raw_module_iter {
         //2. Parse raws and dump JSON into array
-        let mut module_raws =
-            parse_raw_module(&raw_module_directory.path(), options);
+        let mut module_raws = parse_raw_module(&raw_module_directory.path(), options);
         all_raws.append(&mut module_raws);
     }
 
