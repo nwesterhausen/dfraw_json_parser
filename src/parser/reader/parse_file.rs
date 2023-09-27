@@ -6,31 +6,31 @@ use std::{
 
 use encoding_rs_io::DecodeReaderBytesBuilder;
 
-use crate::parser::{
+use crate::{parser::{
     creature::{apply_copy_from::apply_copy_tags_from, raw::DFCreature},
     module_info_file::ModuleInfoFile,
     object_types::{ObjectType, OBJECT_TOKENS},
     plant::raw::DFPlant,
     raws::{RawMetadata, RawObject},
     refs::{DF_ENCODING, RAW_TOKEN_RE},
-};
+}, options::ParserOptions};
 
 use super::header::read_raw_file_type;
 
 pub fn parse_raw_file<P: AsRef<Path>>(
     raw_file_path: &P,
-    hide_metadata_in_result: bool,
+    options: Option<&ParserOptions>,
 ) -> Vec<Box<dyn RawObject>> {
     let mod_info_file = ModuleInfoFile::from_raw_file_path(raw_file_path);
 
-    parse_raw_file_with_info(raw_file_path, &mod_info_file, hide_metadata_in_result)
+    parse_raw_file_with_info(raw_file_path, &mod_info_file, options)
 }
 
 #[allow(clippy::too_many_lines)]
 pub fn parse_raw_file_with_info<P: AsRef<Path>>(
     raw_file_path: &P,
     mod_info_file: &ModuleInfoFile,
-    hide_metadata_in_result: bool,
+    options: Option<&ParserOptions>,
 ) -> Vec<Box<dyn RawObject>> {
     let caller = "Parse Raw (Generically)";
     let mut created_raws: Vec<Box<dyn RawObject>> = Vec::new();
@@ -61,7 +61,7 @@ pub fn parse_raw_file_with_info<P: AsRef<Path>>(
         raw_filename.as_str(),
         &raw_file_path,
     );
-    raw_metadata.set_hidden(hide_metadata_in_result);
+    raw_metadata.set_hidden(options.unwrap_or(&ParserOptions::default()).hide_metadata_in_result);
 
     for (index, line) in reader.lines().enumerate() {
         if line.is_err() {

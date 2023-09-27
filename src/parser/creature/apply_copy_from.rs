@@ -2,12 +2,18 @@ use crate::parser::{object_types::ObjectType, raws::RawObject};
 
 use super::raw::DFCreature;
 
-pub fn apply_copy_tags_from(all_raws: &mut Vec<Box<dyn RawObject>>) {
-    let all_creatures = all_raws
+fn get_only_creatures_from_raws(all_raws: &[Box<dyn RawObject>]) -> Vec<DFCreature> {
+    all_raws
         .iter()
         .filter(|r| r.get_type() == &ObjectType::Creature)
-        .map(|r| r.as_any().downcast_ref::<DFCreature>().unwrap().clone())
-        .collect::<Vec<_>>();
+        .map(|r| r.as_any().downcast_ref::<DFCreature>())
+        .map(|r| r.unwrap().clone())
+        .collect::<Vec<DFCreature>>()
+}
+
+pub fn apply_copy_tags_from(all_raws: &mut Vec<Box<dyn RawObject>>) {
+    let all_creatures = {get_only_creatures_from_raws(all_raws)};
+
     let mut creatures_to_replace: Vec<DFCreature> = Vec::new();
 
     for raw in &mut *all_raws {
@@ -15,7 +21,13 @@ pub fn apply_copy_tags_from(all_raws: &mut Vec<Box<dyn RawObject>>) {
             continue;
         }
 
-        let creature = raw.as_any().downcast_ref::<DFCreature>().unwrap();
+        let Some(creature) = raw.as_any().downcast_ref::<DFCreature>() else {
+                log::error!(
+                    "Unable to downcast raw object to creature raw:{}",
+                    raw.get_identifier()
+                );
+                continue;            
+        };
 
         if !creature.get_copy_tags_from().is_empty() {
             let target_creature_identifier = creature.get_copy_tags_from();

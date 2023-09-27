@@ -1,6 +1,6 @@
 use serde::{Deserialize, Serialize};
 
-use crate::parser::names::{Name, SingPlurName};
+use crate::parser::names::SingPlurName;
 use crate::parser::ranges::Ranges;
 
 use super::tokens::{GrowthTag, GrowthType, PlantPart};

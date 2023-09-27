@@ -69,6 +69,7 @@ impl RawMetadata {
             hidden: true,
         }
     }
+    /// Used only for serialization
     pub(crate) fn is_hidden(&self) -> bool {
         self.hidden
     }

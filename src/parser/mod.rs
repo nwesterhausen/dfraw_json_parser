@@ -2,9 +2,9 @@ use std::path::Path;
 
 use walkdir::WalkDir;
 
-use crate::parser::{
+use crate::{parser::{
     module_info_file::ModuleInfoFile, raws::RawObject, reader::parse_file::parse_raw_file_with_info,
-};
+}, options::ParserOptions};
 
 mod biomes;
 pub(crate) mod body_size;
@@ -16,11 +16,11 @@ mod graphics;
 pub(crate) mod milkable;
 pub(crate) mod module_info_file;
 mod names;
-pub(crate) mod object_types;
+pub mod object_types;
 pub mod plant;
 pub mod plant_growth;
 pub(crate) mod ranges;
-pub(crate) mod raw_locations;
+pub mod raw_locations;
 pub(crate) mod raws;
 mod reader;
 mod refs;
@@ -34,14 +34,14 @@ pub(crate) fn parse_info_file_from_module_directory<P: AsRef<Path>>(
 
 pub(crate) fn parse_raws_from_single_file<P: AsRef<Path>>(
     entry_path: &P,
-    hide_metadata_in_result: bool,
+    options: Option<&ParserOptions>,
 ) -> Vec<Box<dyn raws::RawObject>> {
-    reader::parse_file::parse_raw_file(entry_path, hide_metadata_in_result)
+    reader::parse_file::parse_raw_file(entry_path, options)
 }
 
 pub(crate) fn parse_raw_module<P: AsRef<Path>>(
     raw_module_directory: &P,
-    hide_metadata_in_result: bool,
+    options: Option<&ParserOptions>,
 ) -> Vec<Box<dyn raws::RawObject>> {
     //1. Get information from the info.txt file
     if !raw_module_directory.as_ref().exists() {
@@ -128,7 +128,7 @@ pub(crate) fn parse_raw_module<P: AsRef<Path>>(
             serializable_raws.extend(parse_raw_file_with_info(
                 &entry_path,
                 &info_text_file,
-                hide_metadata_in_result,
+                options,
             ));
         }
     }
@@ -144,7 +144,7 @@ pub(crate) fn parse_raw_module<P: AsRef<Path>>(
             serializable_raws.extend(parse_raw_file_with_info(
                 &entry_path,
                 &info_text_file,
-                hide_metadata_in_result,
+                options,
             ));
         }
     }

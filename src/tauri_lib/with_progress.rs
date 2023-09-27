@@ -30,6 +30,7 @@ use std::path::Path;
 pub fn parse_game_raws<P: AsRef<Path>>(
     df_game_path: &P,
     progress_helper: &mut ProgressHelper,
+    options: Option<&crate::options::ParserOptions>,
 ) -> String {
     // Validate game path
     let game_path = match util::path_from_game_directory(df_game_path) {
@@ -46,9 +47,9 @@ pub fn parse_game_raws<P: AsRef<Path>>(
     let workshop_mods_path = game_path.join("mods");
 
     let all_json = vec![
-        parse_location(&vanilla_path, progress_helper),
-        parse_location(&installed_mods_path, progress_helper),
-        parse_location(&workshop_mods_path, progress_helper),
+        parse_location(&vanilla_path, progress_helper, options),
+        parse_location(&installed_mods_path, progress_helper, options),
+        parse_location(&workshop_mods_path, progress_helper, options),
     ];
 
     let non_empty_json: Vec<String> = all_json
@@ -76,6 +77,7 @@ pub fn parse_game_raws<P: AsRef<Path>>(
 pub fn parse_location<P: AsRef<Path>>(
     raw_module_location: &P,
     progress_helper: &mut ProgressHelper,
+    options: Option<&crate::options::ParserOptions>,
 ) -> String {
     let raw_module_location_path = raw_module_location.as_ref();
     // Guard against invalid path
@@ -123,7 +125,7 @@ pub fn parse_location<P: AsRef<Path>>(
     //4. Loop over all raw modules in the raw module directory
     for raw_module_directory in raw_module_iter {
         //2. Parse raws and dump JSON into array
-        all_json.push(parse_module(&raw_module_directory.path(), progress_helper));
+        all_json.push(parse_module(&raw_module_directory.path(), progress_helper, options));
     }
 
     let non_empty_json: Vec<String> = all_json
@@ -137,6 +139,7 @@ pub fn parse_location<P: AsRef<Path>>(
 pub fn parse_module<P: AsRef<Path>>(
     raw_module_directory: &P,
     progress_helper: &mut ProgressHelper,
+    options: Option<&crate::options::ParserOptions>,
 ) -> String {
     //1. Get information from the info.txt file
     if !raw_module_directory.as_ref().exists() {
@@ -231,7 +234,7 @@ pub fn parse_module<P: AsRef<Path>>(
             progress_helper.add_steps(1);
             progress_helper.send_update(&f_name);
             let entry_path = entry.path();
-            serializable_raws.extend(parser::parse_raws_from_single_file(&entry_path, false));
+            serializable_raws.extend(parser::parse_raws_from_single_file(&entry_path, options));
         }
     }
     // Read all the files in the directory, selectively parse the .txt files
@@ -245,7 +248,7 @@ pub fn parse_module<P: AsRef<Path>>(
             progress_helper.add_steps(1);
             progress_helper.send_update(&f_name);
             let entry_path = entry.path();
-            serializable_raws.extend(parser::parse_raws_from_single_file(&entry_path, false));
+            serializable_raws.extend(parser::parse_raws_from_single_file(&entry_path, options));
         }
     }
 

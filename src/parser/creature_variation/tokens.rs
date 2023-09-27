@@ -21,11 +21,10 @@ pub enum CVTag {
 
 impl CVTag {
     pub fn from_key(key: &str) -> Self {
-        if CV_TOKENS.contains_key(key) {
-            CV_TOKENS.get(key).unwrap().clone()
-        } else {
-            log::error!("Invalid Creature Variation key: {}", key);
-            CVTag::Unknown
+        let tag = CV_TOKENS.get(key).unwrap_or(&CVTag::Unknown);
+        if tag == &CVTag::Unknown {
+            log::warn!("Unknown creature variation (CV) tag: {}", key);
         }
+        tag.clone()
     }
 }
