@@ -46,7 +46,7 @@ features = ["derive"]
 [dependencies.ts-rs]
 version = "7.0"
 default-features = true
-features = ["serde-compat"]
+features = ["serde-compat","format"]
 
 [dev-dependencies]
 chrono = "0.4"
