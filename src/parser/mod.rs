@@ -28,6 +28,8 @@ pub mod raw_locations;
 pub(crate) mod raws;
 mod reader;
 mod refs;
+pub(crate) mod serializer_helper;
+pub mod shrub;
 pub(crate) mod tile;
 pub(crate) mod tree;
 

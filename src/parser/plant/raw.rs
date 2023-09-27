@@ -10,8 +10,9 @@ use crate::parser::{
         tokens::{GrowthTag, GrowthType},
     },
     ranges::parse_min_max_range,
-    ranges::Ranges,
     raws::{RawMetadata, RawObject},
+    serializer_helper,
+    shrub::{phf_table::SHRUB_TOKENS, raw::Shrub},
     tree::{phf_table::TREE_TOKENS, raw::Tree},
 };
 
@@ -38,10 +39,10 @@ pub struct DFPlant {
 
     // Environment Tokens
     /// Default [0, 0] (aboveground)
-    #[serde(skip_serializing_if = "Ranges::min_max_is_zeroes")]
+    #[serde(skip_serializing_if = "serializer_helper::min_max_is_zeroes")]
     underground_depth: [u16; 2],
     /// Default frequency is 50
-    #[serde(skip_serializing_if = "Ranges::is_default_frequency")]
+    #[serde(skip_serializing_if = "serializer_helper::is_default_frequency")]
     frequency: u16,
     /// List of biomes this plant can grow in
     #[serde(skip_serializing_if = "Vec::is_empty")]
@@ -53,6 +54,9 @@ pub struct DFPlant {
     /// If plant is a tree, it will have details about the tree.
     #[serde(skip_serializing_if = "Option::is_none")]
     tree_details: Option<Tree>,
+    /// If plant is a shrub, it will have details about the shrub.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    shrub_details: Option<Shrub>,
 
     // Todo fix later
     #[serde(skip_serializing_if = "Vec::is_empty")]
@@ -130,6 +134,16 @@ impl RawObject for DFPlant {
                 .unwrap_or(&mut PlantGrowth::default())
                 .parse_tag(key, value);
             return;
+        }
+
+        if SHRUB_TOKENS.contains_key(key) {
+            if self.shrub_details.is_none() {
+                self.shrub_details = Some(Shrub::new());
+            }
+            self.shrub_details
+                .as_mut()
+                .unwrap_or(&mut Shrub::default())
+                .parse_tag(key, value);
         }
 
         if !PLANT_TOKENS.contains_key(key) {

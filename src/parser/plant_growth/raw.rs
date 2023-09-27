@@ -1,7 +1,7 @@
 use serde::{Deserialize, Serialize};
 
 use crate::parser::names::SingPlurName;
-use crate::parser::ranges::Ranges;
+use crate::parser::serializer_helper;
 
 use super::{
     phf_table::{GROWTH_TOKENS, PLANT_PART_TOKENS},
@@ -33,10 +33,10 @@ pub struct PlantGrowth {
     /// at the topmost trunk tile. Can be larger than 100 to cause it to appear above the trunk.
     /// The second value must be -1, but might be intended to control whether it starts height counting
     /// from the bottom or top.
-    #[serde(skip_serializing_if = "Ranges::is_default_trunk_height_percentage")]
+    #[serde(skip_serializing_if = "serializer_helper::is_default_trunk_height_percentage")]
     trunk_height_percentage: [i32; 2],
     /// Currently has no effect.
-    #[serde(skip_serializing_if = "Ranges::is_default_growth_density")]
+    #[serde(skip_serializing_if = "serializer_helper::is_default_growth_density")]
     density: u32,
     /// Specifies the appearance of the growth. This is defined with "GROWTH_PRINT" key.
     /// This is a string until we make a proper print structure.
@@ -44,7 +44,7 @@ pub struct PlantGrowth {
     print: String,
     /// Specifies at which part of the year the growth appears. Default is all year round.
     /// Minimum: 0, Maximum: 402_200. This is defined with "GROWTH_TIMING" key.
-    #[serde(skip_serializing_if = "Ranges::is_default_growth_timing")]
+    #[serde(skip_serializing_if = "serializer_helper::is_default_growth_timing")]
     timing: [u32; 2],
     /// Where we gather some of the growth's tags.
     #[serde(skip_serializing_if = "Vec::is_empty")]

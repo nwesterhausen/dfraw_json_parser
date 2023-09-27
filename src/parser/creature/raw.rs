@@ -7,8 +7,8 @@ use crate::parser::{
     names::{Name, SingPlurName},
     object_types::ObjectType,
     ranges::parse_min_max_range,
-    ranges::Ranges,
     raws::{RawMetadata, RawObject},
+    serializer_helper,
     tile::DFTile,
 };
 
@@ -32,17 +32,17 @@ pub struct DFCreature {
     #[serde(skip_serializing_if = "DFTile::is_default")]
     tile: DFTile,
     // integers
-    #[serde(skip_serializing_if = "Ranges::is_default_frequency")]
+    #[serde(skip_serializing_if = "serializer_helper::is_default_frequency")]
     frequency: u16, //Defaults to 50 if not specified
     // [min, max] ranges
     /// Default [1, 1]
-    #[serde(skip_serializing_if = "Ranges::min_max_is_ones")]
+    #[serde(skip_serializing_if = "serializer_helper::min_max_is_ones")]
     cluster_number: [u16; 2],
     /// Default [1, 1]
-    #[serde(skip_serializing_if = "Ranges::min_max_is_ones")]
+    #[serde(skip_serializing_if = "serializer_helper::min_max_is_ones")]
     population_number: [u16; 2],
     /// Default [0, 0] (aboveground)
-    #[serde(skip_serializing_if = "Ranges::min_max_is_zeroes")]
+    #[serde(skip_serializing_if = "serializer_helper::min_max_is_zeroes")]
     underground_depth: [u16; 2],
     // strings
     #[serde(skip_serializing_if = "SingPlurName::is_empty")]

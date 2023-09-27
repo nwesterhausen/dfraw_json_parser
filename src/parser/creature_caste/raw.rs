@@ -5,7 +5,7 @@ use crate::parser::{
     milkable::DFMilkable,
     names::{Name, SingPlurName},
     ranges::parse_min_max_range,
-    ranges::Ranges,
+    serializer_helper,
     tile::DFTile,
 };
 
@@ -31,34 +31,34 @@ pub struct DFCaste {
     child_name: SingPlurName,
     // [min, max] ranges
     /// Default [0,0]
-    #[serde(skip_serializing_if = "Ranges::min_max_is_zeroes")]
+    #[serde(skip_serializing_if = "serializer_helper::min_max_is_zeroes")]
     clutch_size: [u16; 2],
     /// Default [0,0]
-    #[serde(skip_serializing_if = "Ranges::min_max_is_zeroes")]
+    #[serde(skip_serializing_if = "serializer_helper::min_max_is_zeroes")]
     litter_size: [u16; 2],
     /// Default [0,0]
-    #[serde(skip_serializing_if = "Ranges::min_max_is_zeroes")]
+    #[serde(skip_serializing_if = "serializer_helper::min_max_is_zeroes")]
     max_age: [u16; 2],
     // Integer tokens
-    #[serde(skip_serializing_if = "Ranges::is_zero")]
+    #[serde(skip_serializing_if = "serializer_helper::is_zero")]
     baby: u32,
-    #[serde(skip_serializing_if = "Ranges::is_zero")]
+    #[serde(skip_serializing_if = "serializer_helper::is_zero")]
     child: u32,
-    #[serde(skip_serializing_if = "Ranges::is_zero")]
+    #[serde(skip_serializing_if = "serializer_helper::is_zero")]
     difficulty: u32,
-    #[serde(skip_serializing_if = "Ranges::is_zero")]
+    #[serde(skip_serializing_if = "serializer_helper::is_zero")]
     egg_size: u32,
-    #[serde(skip_serializing_if = "Ranges::is_zero_u8")]
+    #[serde(skip_serializing_if = "serializer_helper::is_zero_u8")]
     grass_trample: u8,
-    #[serde(skip_serializing_if = "Ranges::is_zero")]
+    #[serde(skip_serializing_if = "serializer_helper::is_zero")]
     grazer: u32,
-    #[serde(skip_serializing_if = "Ranges::is_zero")]
+    #[serde(skip_serializing_if = "serializer_helper::is_zero")]
     low_light_vision: u32,
-    #[serde(skip_serializing_if = "Ranges::is_zero")]
+    #[serde(skip_serializing_if = "serializer_helper::is_zero")]
     pet_value: u32,
-    #[serde(skip_serializing_if = "Ranges::is_zero")]
+    #[serde(skip_serializing_if = "serializer_helper::is_zero")]
     pop_ratio: u32,
-    #[serde(skip_serializing_if = "Ranges::is_zero")]
+    #[serde(skip_serializing_if = "serializer_helper::is_zero")]
     change_body_size_percentage: u32,
     // Arrays
     #[serde(skip_serializing_if = "Vec::is_empty")]

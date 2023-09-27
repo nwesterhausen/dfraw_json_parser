@@ -6,14 +6,17 @@ use std::{
 
 use encoding_rs_io::DecodeReaderBytesBuilder;
 
-use crate::{parser::{
-    creature::{apply_copy_from::apply_copy_tags_from, raw::DFCreature},
-    module_info_file::ModuleInfoFile,
-    object_types::{ObjectType, OBJECT_TOKENS},
-    plant::raw::DFPlant,
-    raws::{RawMetadata, RawObject},
-    refs::{DF_ENCODING, RAW_TOKEN_RE},
-}, options::ParserOptions};
+use crate::{
+    options::ParserOptions,
+    parser::{
+        creature::{apply_copy_from::apply_copy_tags_from, raw::DFCreature},
+        module_info_file::ModuleInfoFile,
+        object_types::{ObjectType, OBJECT_TOKENS},
+        plant::raw::DFPlant,
+        raws::{RawMetadata, RawObject},
+        refs::{DF_ENCODING, RAW_TOKEN_RE},
+    },
+};
 
 use super::header::read_raw_file_type;
 
@@ -61,7 +64,11 @@ pub fn parse_raw_file_with_info<P: AsRef<Path>>(
         raw_filename.as_str(),
         &raw_file_path,
     );
-    raw_metadata.set_hidden(options.unwrap_or(&ParserOptions::default()).hide_metadata_in_result);
+    raw_metadata.set_hidden(
+        options
+            .unwrap_or(&ParserOptions::default())
+            .hide_metadata_in_result,
+    );
 
     for (index, line) in reader.lines().enumerate() {
         if line.is_err() {
@@ -190,9 +197,6 @@ pub fn parse_raw_file_with_info<P: AsRef<Path>>(
                                 // We have a creature, so we can add a tag to it.
                                 // First we have to cast the dyn RawObject to a DFCreature.
                                 temp_creature.parse_tag(captured_key, captured_value);
-                            }
-                            ObjectType::Inorganic => {
-                                log::info!("Pretend to parse inorganics....");
                             }
                             ObjectType::Plant => {
                                 // We have a plant, so we can add a tag to it.

@@ -1,6 +1,6 @@
 use serde::{Deserialize, Serialize};
 
-use crate::parser::{color::DFColor, names::Name, ranges::Ranges};
+use crate::parser::{color::DFColor, names::Name, serializer_helper};
 
 use super::{
     phf_table::TREE_TOKENS,
@@ -20,49 +20,49 @@ pub struct Tree {
     trunk_name: Name,
     /// The maximum z-level height of the trunk, starting from +2 z-levels above the ground.
     /// Valid values: 1-8
-    #[serde(skip_serializing_if = "Ranges::is_one_u8")]
+    #[serde(skip_serializing_if = "serializer_helper::is_one_u8")]
     max_trunk_height: u8,
     /// Upper limit of trunk thickness, in tiles. Has a geometric effect on log yield.
     /// Valid values: 1-3
-    #[serde(skip_serializing_if = "Ranges::is_one_u8")]
+    #[serde(skip_serializing_if = "serializer_helper::is_one_u8")]
     max_trunk_diameter: u8,
     /// The number of years the trunk takes to grow one z-level upward.
-    #[serde(skip_serializing_if = "Ranges::is_one_u8")]
+    #[serde(skip_serializing_if = "serializer_helper::is_one_u8")]
     trunk_period: u8,
     /// The number of years the trunk takes to grow one tile wider.
-    #[serde(skip_serializing_if = "Ranges::is_one_u8")]
+    #[serde(skip_serializing_if = "serializer_helper::is_one_u8")]
     trunk_width_period: u8,
     /// What thin branches of the tree are named.
     #[serde(skip_serializing_if = "Name::is_empty")]
     branch_name: Name,
     /// How dense the branches grow on this tree.
-    #[serde(skip_serializing_if = "Ranges::is_zero_u8")]
+    #[serde(skip_serializing_if = "serializer_helper::is_zero_u8")]
     branch_density: u8,
     /// The radius to which branches can reach. Appears to never reach further than seven tiles from the centre.
     /// Does not depend on the trunk branching amount or where trunks are.
     /// The values used in the game go from 0-3. Higher values than that can cause crashes.
-    #[serde(skip_serializing_if = "Ranges::is_zero_u8")]
+    #[serde(skip_serializing_if = "serializer_helper::is_zero_u8")]
     branch_radius: u8,
     /// What thick branches of the tree are named.
     #[serde(skip_serializing_if = "Name::is_empty")]
     heavy_branches_name: Name,
     /// Similar to BRANCH_DENSITY for thick branches.
-    #[serde(skip_serializing_if = "Ranges::is_zero_u8")]
+    #[serde(skip_serializing_if = "serializer_helper::is_zero_u8")]
     heavy_branch_density: u8,
     /// Similar as BRANCH_DENSITY for thick branches. Values outside 0-3 can cause crashes.
-    #[serde(skip_serializing_if = "Ranges::is_zero_u8")]
+    #[serde(skip_serializing_if = "serializer_helper::is_zero_u8")]
     heavy_branch_radius: u8,
     /// How much the trunk branches out. 0 makes the trunk straight.
-    #[serde(skip_serializing_if = "Ranges::is_zero_u8")]
+    #[serde(skip_serializing_if = "serializer_helper::is_zero_u8")]
     trunk_branching: u8,
     /// What the roots of the tree are named.
     #[serde(skip_serializing_if = "Name::is_empty")]
     root_name: Name,
     /// Density of the root growth.
-    #[serde(skip_serializing_if = "Ranges::is_zero_u8")]
+    #[serde(skip_serializing_if = "serializer_helper::is_zero_u8")]
     root_density: u8,
     /// How wide the roots reach out.
-    #[serde(skip_serializing_if = "Ranges::is_zero_u8")]
+    #[serde(skip_serializing_if = "serializer_helper::is_zero_u8")]
     root_radius: u8,
     /// What the twigs of the tree are named.
     #[serde(skip_serializing_if = "Name::is_empty")]
@@ -74,10 +74,10 @@ pub struct Tree {
     #[serde(skip_serializing_if = "Name::is_empty")]
     cap_name: Name,
     /// Similar to the other PERIOD tags, influences the rate of the mushroom cap growth. Only makes sense with TREE_HAS_MUSHROOM_CAP.
-    #[serde(skip_serializing_if = "Ranges::is_one_u8")]
+    #[serde(skip_serializing_if = "serializer_helper::is_one_u8")]
     cap_period: u8,
     /// The radius of a mushroom cap. Only makes sense with TREE_HAS_MUSHROOM_CAP.
-    #[serde(skip_serializing_if = "Ranges::is_zero_u8")]
+    #[serde(skip_serializing_if = "serializer_helper::is_zero_u8")]
     cap_radius: u8,
     /// The tile used for trees of this type on the world map. Defaults to 24 (↑).
     #[serde(skip_serializing_if = "String::is_empty")]
@@ -104,10 +104,10 @@ pub struct Tree {
     #[serde(skip_serializing_if = "DFColor::is_default")]
     dead_sapling_color: DFColor,
     /// The sapling of this tree will drown once the water on its tile reaches this level. Defaults to 4.
-    #[serde(skip_serializing_if = "Ranges::is_default_sapling_drown_level")]
+    #[serde(skip_serializing_if = "serializer_helper::is_default_sapling_drown_level")]
     sapling_drown_level: u8,
     /// The water depth at which this tree will drown. Exact behavior is unknown. Defaults to 7.
-    #[serde(skip_serializing_if = "Ranges::is_default_tree_drown_level")]
+    #[serde(skip_serializing_if = "serializer_helper::is_default_tree_drown_level")]
     tree_drown_level: u8,
     /// Token tags for the tree.
     #[serde(skip_serializing_if = "Vec::is_empty")]
@@ -138,6 +138,11 @@ impl Tree {
             );
             return;
         };
+
+        if tag == &TreeToken::Tree {
+            // Skip because it's the root tag
+            return;
+        }
 
         match tag {
             TreeToken::TrunkName => {

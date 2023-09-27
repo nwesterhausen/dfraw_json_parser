@@ -6,6 +6,7 @@ pub static OBJECT_TOKENS: phf::Map<&'static str, ObjectType> = phf::phf_map! {
     "CREATURE" => ObjectType::Creature,
     "INORGANIC" => ObjectType::Inorganic,
     "PLANT" => ObjectType::Plant,
+    "ITEM" => ObjectType::Item,
     "ITEM_AMMO" => ObjectType::ItemAmmo,
     "ITEM_ARMOR" => ObjectType::ItemArmor,
     "ITEM_FOOD" => ObjectType::ItemFood,
@@ -34,6 +35,14 @@ pub static OBJECT_TOKENS: phf::Map<&'static str, ObjectType> = phf::phf_map! {
     "TISSUE_TEMPLATE" => ObjectType::TissueTemplate,
     "CREATURE_VARIATION" => ObjectType::CreatureVariation,
     "TEXT_SET" => ObjectType::TextSet,
+    "TILE_PAGE" => ObjectType::TilePage,
+    "DESCRIPTOR_COLOR" => ObjectType::DescriptorColor,
+    "DESCRIPTOR_PATTERN" => ObjectType::DescriptorPattern,
+    "DESCRIPTOR_SHAPE" => ObjectType::DescriptorShape,
+    "PALETTE" => ObjectType::Palette,
+    "MUSIC" => ObjectType::Music,
+    "SOUND" => ObjectType::Sound,
+    "INTERACTION" => ObjectType::Interaction,
 };
 
 #[derive(ts_rs::TS)]
@@ -43,6 +52,7 @@ pub enum ObjectType {
     Creature,
     Inorganic,
     Plant,
+    Item,
     ItemAmmo,
     ItemArmor,
     ItemFood,
@@ -71,6 +81,14 @@ pub enum ObjectType {
     TissueTemplate,
     CreatureVariation,
     TextSet,
+    TilePage,
+    DescriptorColor,
+    DescriptorPattern,
+    DescriptorShape,
+    Palette,
+    Music,
+    Sound,
+    Interaction,
     #[default]
     Unknown,
 }

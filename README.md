@@ -21,6 +21,7 @@ include a lot of items that were not important to me when looking up creatures. 
 the description of the animal, if they laid eggs, if they were milkable, and how big they were.
 
 - Parses raw files for creatures
+- Parses raw files for plants
 
 ### Outputs
 
