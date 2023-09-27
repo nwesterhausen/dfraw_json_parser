@@ -1,6 +1,7 @@
 use serde::{Deserialize, Serialize};
 
 use crate::parser::color::DFColor;
+use crate::parser::seed_material::raw::SeedMaterial;
 use crate::parser::serializer_helper;
 
 use super::phf_table::SHRUB_TOKENS;
@@ -72,7 +73,8 @@ pub struct Shrub {
     thread: String,
     /// Causes the plant to yield plantable seeds made of this material and having these properties.
     /// Said material should have [SEED_MAT] to permit proper stockpiling.
-    seed: String,
+    #[serde(skip_serializing_if = "SeedMaterial::is_empty")]
+    seed: SeedMaterial,
     /// Permits processing the plant into a vial at a still to yield extract made of this material.
     /// Said material should have [EXTRACT_STORAGE:FLASK].
     extract_still_vial: String,
@@ -211,7 +213,7 @@ impl Shrub {
                 self.thread = value.to_string();
             }
             ShrubToken::Seed => {
-                self.seed = value.to_string();
+                self.seed = SeedMaterial::from_value(value);
             }
             ShrubToken::ExtractStillVial => {
                 self.extract_still_vial = value.to_string();
