@@ -53,11 +53,6 @@ impl Ranges {
     }
     /// This is only used for serialize
     #[allow(clippy::trivially_copy_pass_by_ref)]
-    pub fn is_zero_u8(num: &u8) -> bool {
-        *num == 0
-    }
-    /// This is only used for serialize
-    #[allow(clippy::trivially_copy_pass_by_ref)]
     pub fn is_default_frequency(frequency: &u16) -> bool {
         *frequency == 50
     }
@@ -75,5 +70,25 @@ impl Ranges {
     #[allow(clippy::trivially_copy_pass_by_ref)]
     pub fn is_default_growth_timing(values: &[u32; 2]) -> bool {
         values[0] == 0 && values[1] == 403_200
+    }
+    /// This is only used for serialize
+    #[allow(clippy::trivially_copy_pass_by_ref)]
+    pub fn is_one_u8(value: &u8) -> bool {
+        *value == 0
+    }
+    /// This is only used for serialize
+    #[allow(clippy::trivially_copy_pass_by_ref)]
+    pub fn is_zero_u8(value: &u8) -> bool {
+        *value == 0
+    }
+    /// This is only used for serialize
+    #[allow(clippy::trivially_copy_pass_by_ref)]
+    pub fn is_default_sapling_drown_level(depth: &u8) -> bool {
+        *depth == 4
+    }
+    /// This is only used for serialize
+    #[allow(clippy::trivially_copy_pass_by_ref)]
+    pub fn is_default_tree_drown_level(depth: &u8) -> bool {
+        *depth == 7
     }
 }

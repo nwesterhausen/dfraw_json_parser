@@ -25,6 +25,14 @@ pub enum GrowthType {
 #[ts(export)]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, Default)]
 pub enum GrowthTag {
+    Growth,
+    GrowthName,
+    GrowthItem,
+    GrowthHostTile,
+    GrowthTrunkHeightPercent,
+    GrowthDensity,
+    GrowthTiming,
+    GrowthPrint,
     GrowthHasSeed,
     GrowthDropsOff,
     GrowthDropsOffNoCloud,
@@ -39,13 +47,9 @@ pub enum PlantPart {
     Twigs,
     Branches,
     BranchesAndTwigs,
-    LightBranches,
-    LightBranchesAndTwigs,
     AllBranchesAndTwigs,
     HeavyBranches,
     HeavyBranchesAndTrunk,
-    DirectedBranches,
-    DirectedBranchesAndTrunk,
     Trunk,
     Roots,
     Cap,

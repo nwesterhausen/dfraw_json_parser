@@ -82,7 +82,7 @@ impl DFCaste {
     pub fn parse_tag(&mut self, key: &str, value: &str) {
         let Some(tag) = CASTE_TOKENS.get(key) else {
             log::warn!(
-                "CreatureParsing: called `Option::unwrap()` on a `None` value for presumed caste tag: {}",
+                "CasteParsing: called `Option::unwrap()` on a `None` value for presumed caste tag: {}",
                 key
             );
             return;

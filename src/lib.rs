@@ -11,8 +11,8 @@ currently useful for getting some basic information from from a limited set of r
 
 It functions using a regular expression to break apart the tokens and then checks the
 key in the token against a long list of ones it knows about. Any matches are utilized to
-build its own representation of the raw before a final step where it dumps it to JSON and
-returns a JSON string.
+build its own representation of the raw. Optionally you can turn this result into JSON using
+the `serde_json` library. Or I guess turn it into anything serde supports.
 
 ## Tauri Support
 

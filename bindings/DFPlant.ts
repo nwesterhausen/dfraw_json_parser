@@ -3,6 +3,7 @@ import type { Name } from "./Name";
 import type { PlantGrowth } from "./PlantGrowth";
 import type { PlantTag } from "./PlantTag";
 import type { RawMetadata } from "./RawMetadata";
+import type { Tree } from "./Tree";
 
 export interface DFPlant {
   metadata: RawMetadata;
@@ -15,4 +16,5 @@ export interface DFPlant {
   frequency: number;
   biomes: Array<string>;
   growths: Array<PlantGrowth>;
+  treeDetails?: Tree;
 }

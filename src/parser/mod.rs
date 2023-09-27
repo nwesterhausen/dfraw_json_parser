@@ -2,9 +2,13 @@ use std::path::Path;
 
 use walkdir::WalkDir;
 
-use crate::{parser::{
-    module_info_file::ModuleInfoFile, raws::RawObject, reader::parse_file::parse_raw_file_with_info,
-}, options::ParserOptions};
+use crate::{
+    options::ParserOptions,
+    parser::{
+        module_info_file::ModuleInfoFile, raws::RawObject,
+        reader::parse_file::parse_raw_file_with_info,
+    },
+};
 
 mod biomes;
 pub(crate) mod body_size;
@@ -25,6 +29,7 @@ pub(crate) mod raws;
 mod reader;
 mod refs;
 pub(crate) mod tile;
+pub(crate) mod tree;
 
 pub(crate) fn parse_info_file_from_module_directory<P: AsRef<Path>>(
     raw_module_directory: &P,

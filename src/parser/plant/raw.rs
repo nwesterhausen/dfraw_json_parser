@@ -4,10 +4,15 @@ use slug::slugify;
 use crate::parser::{
     names::Name,
     object_types::ObjectType,
-    plant_growth::raw::PlantGrowth,
+    plant_growth::{
+        phf_table::{GROWTH_TOKENS, GROWTH_TYPE_TOKENS},
+        raw::PlantGrowth,
+        tokens::{GrowthTag, GrowthType},
+    },
     ranges::parse_min_max_range,
     ranges::Ranges,
     raws::{RawMetadata, RawObject},
+    tree::{phf_table::TREE_TOKENS, raw::Tree},
 };
 
 use super::{phf_table::PLANT_TOKENS, tokens::PlantTag};
@@ -45,6 +50,15 @@ pub struct DFPlant {
     /// Growth Tokens define the growths of the plant (leaves, fruit, etc.)
     #[serde(skip_serializing_if = "Vec::is_empty")]
     growths: Vec<PlantGrowth>,
+    /// If plant is a tree, it will have details about the tree.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    tree_details: Option<Tree>,
+
+    // Todo fix later
+    #[serde(skip_serializing_if = "Vec::is_empty")]
+    material_templates: Vec<String>,
+    #[serde(skip_serializing_if = "Vec::is_empty")]
+    materials: Vec<String>,
 }
 
 impl DFPlant {
@@ -89,6 +103,35 @@ impl RawObject for DFPlant {
     }
 
     fn parse_tag(&mut self, key: &str, value: &str) {
+        if TREE_TOKENS.contains_key(key) {
+            if self.tree_details.is_none() {
+                self.tree_details = Some(Tree::new(value));
+            }
+            let tree = self.tree_details.as_mut().unwrap();
+            tree.parse_tag(key, value);
+            return;
+        }
+
+        if GROWTH_TOKENS.contains_key(key) {
+            let token = GROWTH_TOKENS.get(key).unwrap_or(&GrowthTag::Unknown);
+            if token == &GrowthTag::Growth {
+                // If we are defining a new growth, we need to create a new PlantGrowth
+                let growth_type = GROWTH_TYPE_TOKENS
+                    .get(value)
+                    .unwrap_or(&GrowthType::None)
+                    .clone();
+                let growth = PlantGrowth::new(growth_type);
+                self.growths.push(growth);
+                return;
+            }
+            // Otherwise, we are defining a tag for the current growth (most recently added)
+            self.growths
+                .last_mut()
+                .unwrap_or(&mut PlantGrowth::default())
+                .parse_tag(key, value);
+            return;
+        }
+
         if !PLANT_TOKENS.contains_key(key) {
             log::debug!("PlantParsing: Unknown tag {} with value {}", key, value);
             return;
@@ -126,6 +169,12 @@ impl RawObject for DFPlant {
             }
             PlantTag::Frequency => {
                 self.frequency = value.parse::<u16>().unwrap_or(50);
+            }
+            PlantTag::UseMaterialTemplate => {
+                self.material_templates.push(String::from(value));
+            }
+            PlantTag::UseMaterial => {
+                self.materials.push(String::from(value));
             }
             _ => {
                 self.tags.push(tag.clone());
