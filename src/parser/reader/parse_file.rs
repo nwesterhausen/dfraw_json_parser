@@ -8,7 +8,7 @@ use encoding_rs_io::DecodeReaderBytesBuilder;
 
 use crate::parser::{
     creature::{apply_copy_from::apply_copy_tags_from, raw::DFCreature},
-    mod_info_file::ModuleInfoFile,
+    module_info_file::ModuleInfoFile,
     object_types::{ObjectType, OBJECT_TOKENS},
     plant::raw::DFPlant,
     raws::{RawMetadata, RawObject},

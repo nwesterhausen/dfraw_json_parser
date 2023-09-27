@@ -6,6 +6,7 @@ use std::{
 
 use encoding_rs_io::DecodeReaderBytesBuilder;
 use serde::{Deserialize, Serialize};
+use slug::slugify;
 
 use crate::{parser::refs::NON_DIGIT_RE, util::get_parent_dir_name};
 
@@ -21,6 +22,7 @@ use super::{
 #[ts(export)]
 pub struct ModuleInfoFile {
     identifier: String,
+    object_id: String,
     location: RawModuleLocation,
     parent_directory: String,
     numeric_version: u32,
@@ -54,37 +56,17 @@ pub struct ModuleInfoFile {
 }
 
 impl ModuleInfoFile {
-    pub fn empty() -> Self {
-        Self {
-            identifier: String::new(),
-            location: RawModuleLocation::Unknown,
-            parent_directory: String::new(),
-            numeric_version: 0,
-            displayed_version: String::new(),
-            earliest_compatible_numeric_version: 0,
-            earliest_compatible_displayed_version: String::new(),
-            author: String::new(),
-            name: String::new(),
-            description: String::new(),
-            requires_ids: Vec::new(),
-            conflicts_with_ids: Vec::new(),
-            requires_ids_before: Vec::new(),
-            requires_ids_after: Vec::new(),
-            steam_title: String::new(),
-            steam_description: String::new(),
-            steam_tags: Vec::new(),
-            steam_key_value_tags: Vec::new(),
-            steam_metadata: Vec::new(),
-            steam_changelog: String::new(),
-            steam_file_id: 0,
+    pub fn new(id: &str, location: RawModuleLocation, parent_directory: &str) -> Self {
+        ModuleInfoFile {
+            identifier: String::from(id),
+            location,
+            parent_directory: String::from(parent_directory),
+            object_id: format!("{}-{}-{}", location, "MODULE", slugify(id)),
+            ..ModuleInfoFile::default()
         }
     }
-    pub fn new(id: &str, location: RawModuleLocation, parent_directory: &str) -> Self {
-        let mut info = Self::empty();
-        info.identifier = String::from(id);
-        info.location = location;
-        info.parent_directory = String::from(parent_directory);
-        info
+    pub fn empty() -> Self {
+        ModuleInfoFile::default()
     }
     pub fn from_raw_file_path<P: AsRef<Path>>(full_path: &P) -> Self {
         // Take the full path for the raw file and navigate up to the parent directory

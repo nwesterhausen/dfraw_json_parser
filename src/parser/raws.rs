@@ -3,7 +3,7 @@ use std::{any::Any, path::Path};
 use serde::{Deserialize, Serialize};
 
 use super::{
-    mod_info_file::ModuleInfoFile, object_types::ObjectType, raw_locations::RawModuleLocation,
+    module_info_file::ModuleInfoFile, object_types::ObjectType, raw_locations::RawModuleLocation,
 };
 
 #[typetag::serde(tag = "type")]

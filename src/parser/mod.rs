@@ -3,7 +3,7 @@ use std::path::Path;
 use walkdir::WalkDir;
 
 use crate::parser::{
-    mod_info_file::ModuleInfoFile, raws::RawObject, reader::parse_file::parse_raw_file_with_info,
+    module_info_file::ModuleInfoFile, raws::RawObject, reader::parse_file::parse_raw_file_with_info,
 };
 
 mod biomes;
@@ -14,7 +14,7 @@ pub mod creature_caste;
 pub mod creature_variation;
 mod graphics;
 pub(crate) mod milkable;
-pub(crate) mod mod_info_file;
+pub(crate) mod module_info_file;
 mod names;
 pub(crate) mod object_types;
 pub mod plant;

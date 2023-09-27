@@ -180,7 +180,7 @@ pub fn parse_module<P: AsRef<Path>>(
     }
 
     // Parse info.txt to get raw module information
-    let dfraw_module_info = parser::mod_info_file::ModuleInfoFile::parse(&info_txt_path);
+    let dfraw_module_info = parser::module_info_file::ModuleInfoFile::parse(&info_txt_path);
     log::info!(
         "Parsing raws for {} v{}",
         dfraw_module_info.get_identifier(),
