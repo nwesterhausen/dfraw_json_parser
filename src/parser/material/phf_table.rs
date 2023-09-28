@@ -95,6 +95,7 @@ pub static MATERIAL_USAGE_TOKENS: phf::Map<&'static str, MaterialUsage> = phf::p
     "ITEMS_SOFT" => MaterialUsage::ItemsSoft,
     "ITEMS_HARD" => MaterialUsage::ItemsHard,
     "IS_STONE" => MaterialUsage::IsStone,
+    "IS_CERAMIC" => MaterialUsage::IsCeramic,
     "UNDIGGABLE" => MaterialUsage::Undiggable,
     "DISPLAY_UNGLAZED" => MaterialUsage::DisplayUnglazed,
     "YARN" => MaterialUsage::Yarn,

@@ -199,6 +199,8 @@ pub enum MaterialUsage {
     ItemsHard,
     /// Used to define that the material is a stone. Allows its usage in masonry and stonecrafting and storage in stone stockpiles, among other effects.
     IsStone,
+    /// Defines the material is a ceramic.
+    IsCeramic,
     /// Used for a stone that cannot be dug into.
     Undiggable,
     /// Causes containers made of this material to be prefixed with "unglazed" if they have not yet been glazed.

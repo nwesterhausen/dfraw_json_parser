@@ -1,7 +1,6 @@
-use phf::phf_map;
-
 use super::tokens::PlantTag;
-pub static PLANT_TOKENS: phf::Map<&'static str, PlantTag> = phf_map! {
+
+pub static PLANT_TOKENS: phf::Map<&'static str, PlantTag> = phf::phf_map! {
     "NAME" => PlantTag::NameSingular,
     "NAME_PLURAL" => PlantTag::NamePlural,
     "ADJ" => PlantTag::NameAdjective,

@@ -10,6 +10,7 @@ use crate::{
     options::ParserOptions,
     parser::{
         creature::{apply_copy_from::apply_copy_tags_from, raw::DFCreature},
+        inorganic::raw::Inorganic,
         module_info_file::ModuleInfoFile,
         object_types::{ObjectType, OBJECT_TOKENS},
         plant::raw::DFPlant,
@@ -35,7 +36,8 @@ pub fn parse_raw_file_with_info<P: AsRef<Path>>(
     mod_info_file: &ModuleInfoFile,
     options: Option<&ParserOptions>,
 ) -> Vec<Box<dyn RawObject>> {
-    let caller = "Parse Raw (Generically)";
+    let caller = "Parse Raw File";
+    // log::info!("Parsing raw file: {}", raw_file_path.as_ref().display());
     let mut created_raws: Vec<Box<dyn RawObject>> = Vec::new();
 
     let file = match File::open(raw_file_path) {
@@ -55,6 +57,7 @@ pub fn parse_raw_file_with_info<P: AsRef<Path>>(
 
     let mut temp_creature = DFCreature::empty();
     let mut temp_plant = DFPlant::empty();
+    let mut temp_inorganic = Inorganic::empty();
 
     // Metadata
     let object_type = read_raw_file_type(raw_file_path);
@@ -183,9 +186,11 @@ pub fn parse_raw_file_with_info<P: AsRef<Path>>(
                     if started {
                         // We've already started a raw, so we need to finish it.
                         // This is a new creature, so we need to finish the old one.
+                        created_raws.push(Box::new(temp_inorganic.clone()));
                     } else {
                         started = true;
                     }
+                    temp_inorganic = Inorganic::new(captured_value, &raw_metadata.clone());
                 }
                 _ => {
                     // This should be a tag for the current object.
@@ -203,6 +208,11 @@ pub fn parse_raw_file_with_info<P: AsRef<Path>>(
                                 // First we have to cast the dyn RawObject to a DFPlant.
                                 temp_plant.parse_tag(captured_key, captured_value);
                             }
+                            ObjectType::Inorganic => {
+                                // We have an inorganic, so we can add a tag to it.
+                                // First we have to cast the dyn RawObject to a DFPlant.
+                                temp_inorganic.parse_tag(captured_key, captured_value);
+                            }
                             _ => {
                                 // We don't have a known raw yet. So do nothing.
                             }
@@ -217,7 +227,7 @@ pub fn parse_raw_file_with_info<P: AsRef<Path>>(
         match object_type {
             ObjectType::Creature => created_raws.push(Box::new(temp_creature.clone())),
             ObjectType::Plant => created_raws.push(Box::new(temp_plant.clone())),
-            ObjectType::Inorganic => log::info!("Pretend to parse inorganics...."),
+            ObjectType::Inorganic => created_raws.push(Box::new(temp_inorganic.clone())),
             _ => {}
         }
     }
