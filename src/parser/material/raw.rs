@@ -80,12 +80,6 @@ impl Material {
             ..Material::default()
         }
     }
-    pub fn material_from_value(value: &str) -> Material {
-        Material {
-            name: String::from(value),
-            ..Material::new()
-        }
-    }
     /// This may not be correct. This should be for [`USE_MATERIAL:XX:XX`] but couldn't find an example for Plant.
     pub fn use_material_from_value(value: &str) -> Material {
         // Start defining a new material with a name and properties of another local material

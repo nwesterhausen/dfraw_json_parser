@@ -1,16 +1,17 @@
 #[cfg(feature = "tauri")]
 extern crate tauri;
 #[cfg(feature = "tauri")]
+use super::structs::ProgressHelper;
+#[cfg(feature = "tauri")]
 use crate::parser;
+#[cfg(feature = "tauri")]
 use crate::parser::raws::RawObject;
 #[cfg(feature = "tauri")]
 use crate::util;
 #[cfg(feature = "tauri")]
-use walkdir::DirEntry;
-
-#[cfg(feature = "tauri")]
-use super::structs::ProgressHelper;
 use std::path::Path;
+#[cfg(feature = "tauri")]
+use walkdir::DirEntry;
 
 #[cfg(feature = "tauri")]
 /// Parse a directory of raws, and return a JSON string of the parsed raws. While parsing, this will
@@ -51,22 +52,22 @@ pub fn parse(
             let workshop_mods_path = target_path.join("mods");
 
             // Parse each location
-            results.extend(parse_location(&vanilla_path, &options, progress_helper));
+            results.extend(parse_location(&vanilla_path, options, progress_helper));
             results.extend(parse_location(
                 &installed_mods_path,
-                &options,
+                options,
                 progress_helper,
             ));
             results.extend(parse_location(
                 &workshop_mods_path,
-                &options,
+                options,
                 progress_helper,
             ));
         }
         crate::options::ParsingJob::SingleLocation => {
             // Set the file path for the chosen location
-            let location_path = match options.locations_to_parse.first() {
-                Some(location) => match location {
+            let location_path = if let Some(location) = options.locations_to_parse.first() {
+                match location {
                     parser::raw_locations::RawModuleLocation::Vanilla => {
                         target_path.join("data").join("vanilla")
                     }
@@ -81,18 +82,17 @@ pub fn parse(
                         );
                         return String::from("[]");
                     }
-                },
-                None => {
-                    log::error!(
-                        "No location provided to parse! Provided options:\n{:#?}",
-                        options
-                    );
-                    return String::from("[]");
                 }
+            } else {
+                log::error!(
+                    "No location provided to parse! Provided options:\n{:#?}",
+                    options
+                );
+                return String::from("[]");
             };
 
             // Parse the location
-            results.extend(parse_location(&location_path, &options, progress_helper));
+            results.extend(parse_location(&location_path, options, progress_helper));
         }
         crate::options::ParsingJob::SingleModule => {
             // The provided path should be a module directory
@@ -117,11 +117,11 @@ pub fn parse(
                 return String::from("[]");
             }
 
-            results.extend(parser::parse_raw_module(&target_path, &options));
+            results.extend(parse_module(&target_path, options, progress_helper));
         }
         crate::options::ParsingJob::SingleRaw => {
             // The provided path should be a raw file directly
-            results.extend(parser::parse_raws_from_single_file(&target_path, &options));
+            results.extend(parser::parse_raws_from_single_file(&target_path, options));
         }
         crate::options::ParsingJob::SingleModuleInfoFile => {
             // The provided path should be the info.txt file for a module
@@ -196,7 +196,7 @@ fn parse_location<P: AsRef<Path>>(
 
     // Loop over each module and parse it
     for raw_module in raw_modules_in_location {
-        let module = parse_module(&raw_module.path(), &options, progress_helper);
+        let module = parse_module(&raw_module.path(), options, progress_helper);
         results.extend(module);
     }
 
@@ -284,10 +284,13 @@ fn parse_module<P: AsRef<Path>>(
                 let file_name = file_path.file_name().unwrap_or_default();
                 let file_name_str = file_name.to_str().unwrap_or_default();
 
-                if file_name_str.ends_with(".txt") {
+                if std::path::Path::new(file_name_str)
+                    .extension()
+                    .map_or(false, |ext| ext.eq_ignore_ascii_case("txt"))
+                {
                     progress_helper.add_steps(1);
-                    progress_helper.send_update(&file_name_str);
-                    results.extend(parser::parse_raws_from_single_file(&file_path, &options));
+                    progress_helper.send_update(file_name_str);
+                    results.extend(parser::parse_raws_from_single_file(&file_path, options));
                 }
             }
         }

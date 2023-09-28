@@ -103,6 +103,7 @@ pub fn is_false(boolean: &bool) -> bool {
     !*boolean
 }
 /// This is only used for serialize
+#[allow(dead_code)]
 #[allow(clippy::trivially_copy_pass_by_ref)]
 pub fn is_true(boolean: &bool) -> bool {
     *boolean

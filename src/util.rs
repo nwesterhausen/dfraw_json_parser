@@ -6,7 +6,7 @@ use std::{
 
 use walkdir::WalkDir;
 
-use crate::{options::ParsingJob, parser::raws::RawObject};
+use crate::options::ParsingJob;
 
 /// Get a vec of subdirectories for a given directory
 ///
@@ -136,7 +136,7 @@ pub fn write_json_string_vec_to_file<P: AsRef<Path>>(strings_vec: &Vec<String>, 
     );
 
     if strings_vec.len() == 1 {
-        match writeln!(stream, "{}", strings_vec[0]) {
+        match writeln!(stream, "{}", strings_vec.first().unwrap_or(&String::new())) {
             Ok(_x) => (),
             Err(e) => {
                 log::error!("{}\n{:?}", write_error, e);
@@ -152,20 +152,20 @@ pub fn write_json_string_vec_to_file<P: AsRef<Path>>(strings_vec: &Vec<String>, 
         return;
     }
 
-    let strings_vec = strings_vec.into_iter();
+    let strings_vec = strings_vec.iter();
     // Write the first value with an open bracket '[' at the beginning
     // Write all next values with a comma ',' in front
     // Finish with a closing bracket ']'
     for (i, string) in strings_vec.enumerate() {
         match i {
-            0 => match write!(stream, "[{}", string) {
+            0 => match write!(stream, "[{string}") {
                 Ok(_x) => (),
                 Err(e) => {
                     log::error!("{}\n{:?}", write_error, e);
                     return;
                 }
             },
-            _ => match write!(stream, ",{}", string) {
+            _ => match write!(stream, ",{string}") {
                 Ok(_x) => (),
                 Err(e) => {
                     log::error!("{}\n{:?}", write_error, e);

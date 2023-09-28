@@ -75,6 +75,7 @@ impl Syndrome {
             SyndromeToken::Contact => self.tags.push(SyndromeToken::Contact),
             SyndromeToken::Inhaled => self.tags.push(SyndromeToken::Inhaled),
             SyndromeToken::Ingested => self.tags.push(SyndromeToken::Ingested),
+
             SyndromeToken::Unknown => {
                 log::warn!("Unknown syndrome token: {}", key);
             }

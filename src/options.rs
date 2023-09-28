@@ -6,6 +6,7 @@ use crate::parser::{object_types::ObjectType, raw_locations::RawModuleLocation};
 
 /// Option struct for passing to any parse function.
 #[allow(clippy::module_name_repetitions)]
+#[allow(clippy::struct_excessive_bools)]
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 #[derive(ts_rs::TS)]
@@ -91,7 +92,7 @@ impl Default for ParserOptions {
 }
 
 impl ParserOptions {
-    /// Creates a new ParserOptions struct with the default values.
+    /// Creates a new `ParserOptions` struct with the default values.
     /// * `target_path` is the path to parse in.
     ///
     /// For `ParsingJob::ALL` or `ParsingJob::SingleLocation`, this should be the path to the dwarf fortress directory.
@@ -109,25 +110,22 @@ impl ParserOptions {
 
     /// If applied, all raws will have a `metadata` field which shows information about the
     /// raw file, its path, its module, and its parent directory.
-    pub fn attach_metadata_to_raws(mut self) -> Self {
+    pub fn attach_metadata_to_raws(&mut self) {
         self.attach_metadata_to_raws = true;
-        self
     }
 
     /// Skip the "copy tags from" resolution step.
     ///
     /// Default: true.
-    pub fn skip_apply_copy_tags_from(mut self) -> Self {
+    pub fn skip_apply_copy_tags_from(&mut self) {
         self.skip_apply_copy_tags_from = true;
-        self
     }
 
     /// Skip the apply "creature variations" resolution step.
     ///
     /// Note: This is currently not implemented.
-    pub fn skip_apply_creature_variations(mut self) -> Self {
+    pub fn skip_apply_creature_variations(&mut self) {
         self.skip_apply_creature_variations = true;
-        self
     }
 
     /// Sets what kind of raws to parse.
@@ -136,9 +134,8 @@ impl ParserOptions {
     /// * `ObjectType::Plant`
     /// * `ObjectType::Inorganic`
     /// * `ObjectType::MaterialTemplate`
-    pub fn raws_to_parse(mut self, raws_to_parse: Vec<ObjectType>) -> Self {
+    pub fn set_raws_to_parse(&mut self, raws_to_parse: Vec<ObjectType>) {
         self.raws_to_parse = raws_to_parse;
-        self
     }
 
     /// Sets what locations to parse raws from.
@@ -147,22 +144,20 @@ impl ParserOptions {
     /// * `RawModuleLocation::Mods` will parse the downloaded mods folder.
     ///
     /// If left unset, only `RawModuleLocation::Vanilla` will be parsed.
-    pub fn locations_to_parse(mut self, locations_to_parse: Vec<RawModuleLocation>) -> Self {
+    pub fn set_locations_to_parse(&mut self, locations_to_parse: Vec<RawModuleLocation>) {
         self.locations_to_parse = locations_to_parse;
-        self
     }
 
     /// Sets the job to perform.
-    /// * `ParsingJob::SingleRaw` will parse a single raw file. (e.g. creature_standard.txt in data/vanilla/vanilla_creatures/objects/)
-    /// * `ParsingJob::SingleModule` will parse a single module (e.g. vanilla_creatures in data/vanilla/)
-    /// * `ParsingJob::SingleLocation` will parse a single location (e.g. data/vanilla)
+    /// * `ParsingJob::SingleRaw` will parse a single raw file. (e.g. `creature_standard.txt` in `data/vanilla/vanilla_creatures/objects/`)
+    /// * `ParsingJob::SingleModule` will parse a single module (e.g. `vanilla_creatures` in `data/vanilla/`)
+    /// * `ParsingJob::SingleLocation` will parse a single location (e.g. `data/vanilla`)
     /// * `ParsingJob::All` will parse all raws in all locations (i.e. all locations in `locations_to_parse`)
     /// * `ParsingJob::SingleModuleInfoFile` will parse the info.txt file at the provided path.
     ///
     /// Default: All
-    pub fn job(mut self, job: ParsingJob) -> Self {
+    pub fn set_job(&mut self, job: ParsingJob) {
         self.job = job;
-        self
     }
 
     /// Whether to serialize the result to json. If true, the result will be serialized to json before
@@ -170,16 +165,14 @@ impl ParserOptions {
     /// (This means the result will be a `Vec` of `String` instead of a `Vec` of `Box<dyn RawObject>`.)
     ///
     /// Default: false
-    pub fn serialize_result_to_json(mut self) -> Self {
+    pub fn serialize_result_to_json(&mut self) {
         self.serialize_result_to_json = true;
-        self
     }
 
     /// Sets the path to write the json output to. This is only used if `serialize_result_to_json` is true.
     ///
     /// If left empty, ./output.json will be used.
-    pub fn output_path<P: AsRef<Path>>(mut self, output_path: P) -> Self {
+    pub fn set_output_path<P: AsRef<Path>>(&mut self, output_path: P) {
         self.output_path = output_path.as_ref().to_path_buf();
-        self
     }
 }
