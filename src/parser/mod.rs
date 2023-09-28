@@ -19,6 +19,7 @@ pub mod creature_variation;
 mod graphics;
 pub mod inorganic;
 pub(crate) mod material;
+pub mod material_template;
 pub(crate) mod milkable;
 pub(crate) mod module_info_file;
 mod names;

@@ -11,6 +11,7 @@ use crate::{
     parser::{
         creature::{apply_copy_from::apply_copy_tags_from, raw::DFCreature},
         inorganic::raw::Inorganic,
+        material_template::raw::MaterialTemplate,
         module_info_file::ModuleInfoFile,
         object_types::{ObjectType, OBJECT_TOKENS},
         plant::raw::DFPlant,
@@ -58,6 +59,7 @@ pub fn parse_raw_file_with_info<P: AsRef<Path>>(
     let mut temp_creature = DFCreature::empty();
     let mut temp_plant = DFPlant::empty();
     let mut temp_inorganic = Inorganic::empty();
+    let mut temp_material_template = MaterialTemplate::empty();
 
     // Metadata
     let object_type = read_raw_file_type(raw_file_path);
@@ -192,6 +194,17 @@ pub fn parse_raw_file_with_info<P: AsRef<Path>>(
                     }
                     temp_inorganic = Inorganic::new(captured_value, &raw_metadata.clone());
                 }
+                "MATERIAL_TEMPLATE" => {
+                    // Starting a new material template, so we can just add a material template to the list.
+                    if started {
+                        // We need to add the material template to the list.
+                        created_raws.push(Box::new(temp_material_template.clone()));
+                    }
+                    // We haven't started a material template yet, so we need to start one.
+                    started = true;
+                    temp_material_template =
+                        MaterialTemplate::new(captured_value, &raw_metadata.clone());
+                }
                 _ => {
                     // This should be a tag for the current object.
                     // We should check if we have a current object, and if we do, we should add the tag to it.
@@ -213,6 +226,11 @@ pub fn parse_raw_file_with_info<P: AsRef<Path>>(
                                 // First we have to cast the dyn RawObject to a DFPlant.
                                 temp_inorganic.parse_tag(captured_key, captured_value);
                             }
+                            ObjectType::MaterialTemplate => {
+                                // We have a material template, so we can add a tag to it.
+                                // First we have to cast the dyn RawObject to a DFPlant.
+                                temp_material_template.parse_tag(captured_key, captured_value);
+                            }
                             _ => {
                                 // We don't have a known raw yet. So do nothing.
                             }
@@ -228,6 +246,9 @@ pub fn parse_raw_file_with_info<P: AsRef<Path>>(
             ObjectType::Creature => created_raws.push(Box::new(temp_creature.clone())),
             ObjectType::Plant => created_raws.push(Box::new(temp_plant.clone())),
             ObjectType::Inorganic => created_raws.push(Box::new(temp_inorganic.clone())),
+            ObjectType::MaterialTemplate => {
+                created_raws.push(Box::new(temp_material_template.clone()));
+            }
             _ => {}
         }
     }
