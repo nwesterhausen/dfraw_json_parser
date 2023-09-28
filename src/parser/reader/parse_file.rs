@@ -254,7 +254,11 @@ pub fn parse_raw_file_with_info<P: AsRef<Path>>(
     }
 
     // Apply copy_tags_from
-    if object_type == ObjectType::Creature {
+    if object_type == ObjectType::Creature
+        && options
+            .unwrap_or(&ParserOptions::default())
+            .apply_copy_tags_from
+    {
         apply_copy_tags_from(&mut created_raws);
     }
 
