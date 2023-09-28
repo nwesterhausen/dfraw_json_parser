@@ -68,6 +68,7 @@ pub enum ParsingJob {
     SingleLocation,
     All,
     SingleModuleInfoFile,
+    AllModuleInfoFiles,
 }
 
 impl Default for ParserOptions {
@@ -154,6 +155,7 @@ impl ParserOptions {
     /// * `ParsingJob::SingleLocation` will parse a single location (e.g. `data/vanilla`)
     /// * `ParsingJob::All` will parse all raws in all locations (i.e. all locations in `locations_to_parse`)
     /// * `ParsingJob::SingleModuleInfoFile` will parse the info.txt file at the provided path.
+    /// * `ParsingJob::AllModuleInfoFiles` will parse all info.txt files in all locations (i.e. all locations in `locations_to_parse`)
     ///
     /// Default: All
     pub fn set_job(&mut self, job: ParsingJob) {

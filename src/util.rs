@@ -6,7 +6,7 @@ use std::{
 
 use walkdir::WalkDir;
 
-use crate::options::ParsingJob;
+use crate::options::{ParserOptions, ParsingJob};
 
 /// Get a vec of subdirectories for a given directory
 ///
@@ -191,35 +191,42 @@ pub fn write_json_string_vec_to_file<P: AsRef<Path>>(strings_vec: &Vec<String>, 
     };
 }
 
-/// Check if the provided path is valid for the given job.
-///
-/// Arguments:
-///
-/// * `path`: The path to check
-/// * `job`: The job to check against
-///
-/// Returns:
-///
-/// A bool. Will log an error if the path is invalid.
-pub fn is_valid_path<P: AsRef<Path>>(path: P, job: &ParsingJob) -> bool {
-    let path = path.as_ref();
+pub fn options_has_valid_paths(options: &ParserOptions) -> bool {
+    let target_path = &options.target_path;
     // Guard against invalid path
-    if !path.exists() {
+    if !target_path.exists() {
         log::error!(
             "Provided path for parsing doesn't exist!\n{}",
-            path.display()
+            target_path.display()
         );
         return false;
     }
-    if job == &ParsingJob::SingleRaw || job == &ParsingJob::SingleModule {
-        if !path.is_file() {
-            log::error!("Path needs to be a file {}", path.display());
-            return false;
-        }
-        return true;
+    if (options.job == ParsingJob::All
+        || options.job == ParsingJob::SingleModule
+        || options.job == ParsingJob::SingleLocation
+        || options.job == ParsingJob::AllModuleInfoFiles)
+        && target_path.is_file()
+    {
+        log::error!(
+            "Target path needs to be a directory for parsing {:?}\n{}",
+            options.job,
+            target_path.display()
+        );
+        return false;
     }
-    if !path.is_dir() {
-        log::error!("Path needs to be a directory {}", path.display());
+
+    let output_path = &options.output_path;
+    // Guard against invalid path
+    if !target_path.exists() {
+        log::error!(
+            "Provided path for parsing doesn't exist!\n{}",
+            output_path.display()
+        );
+        return false;
+    }
+    // Output path needs to be a file (always)
+    if !output_path.is_file() {
+        log::error!("Output path needs to be a file\n{}", output_path.display());
         return false;
     }
     true

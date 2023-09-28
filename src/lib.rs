@@ -65,7 +65,7 @@ for the steam workshop if it is a mod downloaded from the steam workshop.
 use options::{ParserOptions, ParsingJob};
 use parser::{module_info_file::ModuleInfoFile, raws::RawObject};
 use std::path::{Path, PathBuf};
-use util::is_valid_path;
+use util::options_has_valid_paths;
 use walkdir::{DirEntry, WalkDir};
 
 use crate::parser::raw_locations::RawModuleLocation;
@@ -89,7 +89,7 @@ pub mod util;
 /// A vector of boxed dynamic raw objects.
 pub fn parse(options: &ParserOptions) -> Vec<Box<dyn RawObject>> {
     // Guard against invalid path
-    if !is_valid_path(&options.target_path, &options.job) {
+    if !options_has_valid_paths(options) {
         log::error!(
             "Returning early for bad path. Provided options:\n{:#?}",
             options
@@ -169,7 +169,7 @@ pub fn parse(options: &ParserOptions) -> Vec<Box<dyn RawObject>> {
             // The provided path should be a raw file directly
             results.extend(parser::parse_raws_from_single_file(&target_path, options));
         }
-        ParsingJob::SingleModuleInfoFile => {
+        ParsingJob::SingleModuleInfoFile | ParsingJob::AllModuleInfoFiles => {
             // The provided path should be the info.txt file for a module
             log::warn!(
                 "Unable to parse info.txt file in this dispatch. Provided options:\n{:#?}",
@@ -196,7 +196,7 @@ pub fn parse(options: &ParserOptions) -> Vec<Box<dyn RawObject>> {
 /// Returns a `ModuleInfoFile` struct containing the parsed module information.
 pub fn parse_module_info_file(options: &ParserOptions) -> ModuleInfoFile {
     // Guard against invalid path
-    if !is_valid_path(&options.target_path, &options.job) {
+    if !options_has_valid_paths(options) {
         log::error!(
             "Returning early for bad path. Provided options:\n{:#?}",
             options
@@ -242,7 +242,7 @@ pub fn parse_to_json(options: &ParserOptions) -> Vec<String> {
 /// * `options` - A reference to a `ParserOptions` struct that contains the parsing options.
 pub fn parse_to_file(options: &ParserOptions) {
     // Guard against bad output path
-    if !is_valid_path(&options.output_path, &options.job) {
+    if !options_has_valid_paths(options) {
         log::error!(
             "Returning early for bad output path. Provided options:\n{:#?}",
             options
@@ -433,7 +433,7 @@ fn parse_module<P: AsRef<Path>>(
 
 pub fn parse_info_modules(options: &ParserOptions) -> Vec<ModuleInfoFile> {
     // Guard against invalid path
-    if !is_valid_path(&options.target_path, &options.job) {
+    if !options_has_valid_paths(options) {
         log::error!(
             "Returning early for bad path. Provided options:\n{:#?}",
             options
@@ -444,7 +444,7 @@ pub fn parse_info_modules(options: &ParserOptions) -> Vec<ModuleInfoFile> {
     let mut results: Vec<ModuleInfoFile> = Vec::new();
 
     match options.job {
-        ParsingJob::All => {
+        ParsingJob::All | ParsingJob::AllModuleInfoFiles => {
             // Set file paths for each location
             let data_path = target_path.join("data");
             let vanilla_path = data_path.join("vanilla");
@@ -537,7 +537,7 @@ pub fn parse_info_modules_to_json(options: &ParserOptions) -> Vec<String> {
 
 pub fn parse_info_modules_to_file(options: &ParserOptions) {
     // Guard against bad output path
-    if !is_valid_path(&options.output_path, &options.job) {
+    if !options_has_valid_paths(options) {
         log::error!(
             "Returning early for bad output path. Provided options:\n{:#?}",
             options

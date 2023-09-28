@@ -33,7 +33,7 @@ pub fn parse(
     progress_helper: &mut ProgressHelper,
 ) -> String {
     // Guard against invalid path
-    if !crate::util::is_valid_path(&options.target_path, &options.job) {
+    if !crate::util::options_has_valid_paths(options) {
         log::error!(
             "Returning early for bad path. Provided options:\n{:#?}",
             options
@@ -117,7 +117,12 @@ pub fn parse(
                 return String::from("[]");
             }
 
-            results.extend(parse_module(&target_path, options, progress_helper));
+            let module = parse_module(&target_path, options, progress_helper);
+            return serde_json::to_string(&module).unwrap_or_default();
+        }
+        crate::options::ParsingJob::AllModuleInfoFiles => {
+            let modules = crate::parse_info_modules_to_json(options);
+            return format!("[{}]", modules.join(","));
         }
         crate::options::ParsingJob::SingleRaw => {
             // The provided path should be a raw file directly

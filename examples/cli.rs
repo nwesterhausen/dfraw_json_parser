@@ -1,4 +1,4 @@
-use std::path::PathBuf;
+use std::path::{Component, Path, PathBuf};
 
 use clap::{Parser, ValueEnum};
 use dfraw_json_parser::{
@@ -55,19 +55,19 @@ struct Args {
     parse: ParseTarget,
 
     /// Parse vanilla location
-    #[clap(long, default_value_t = true, long_help = "Parse vanilla raws")]
+    #[clap(long, default_value_t = false, long_help = "Parse vanilla raws")]
     parse_vanilla: bool,
 
     /// Parse workshop mods location (downloaded mods)
     #[clap(
         long,
-        default_value_t = true,
+        default_value_t = false,
         long_help = "Parse downloaded workshop mods"
     )]
     parse_mods_downloaded: bool,
 
     /// Parse installed mods location
-    #[clap(long, default_value_t = true, long_help = "Parse installed mods")]
+    #[clap(long, default_value_t = false, long_help = "Parse installed mods")]
     parse_mods_installed: bool,
 }
 
@@ -109,11 +109,24 @@ fn main() {
 
     let args = Args::parse();
 
-    let target_path = clean_path(args.target_path.as_str());
-    let output_path = clean_path(args.out_dir.as_str());
+    let target_path = normalize_path(Path::new(args.target_path.as_str()));
+    let mut output_path = normalize_path(Path::new(args.out_dir.as_str()));
+
+    // Check if output path is only a directory (and doesn't specify a file).
+    // If so, we should add the default filename.
+    if output_path.is_dir() {
+        output_path.push("raws.json");
+    }
+
+    // It's possible the output file doesn't exist. We should touch an empty file to ensure it does.
+    if !output_path.exists() {
+        if let Err(e) = std::fs::File::create(&output_path) {
+            log::error!("Unable to create output file: {}", e);
+        }
+    }
 
     let mut options = ParserOptions::new(target_path);
-    options.set_output_path(output_path);
+    options.set_output_path(&output_path);
 
     let parse_target = args.parse;
 
@@ -133,24 +146,107 @@ fn main() {
         ParseTarget::All => {
             let mut locations: Vec<RawModuleLocation> = Vec::new();
             if args.parse_vanilla {
+                log::debug!("Parsing options: {:#?}", options);
                 locations.push(RawModuleLocation::Vanilla);
             }
             if args.parse_mods_downloaded {
+                log::debug!("Parsing options: {:#?}", options);
                 locations.push(RawModuleLocation::Mods);
             }
             if args.parse_mods_installed {
+                log::debug!("Parsing options: {:#?}", options);
                 locations.push(RawModuleLocation::InstalledMods);
             }
-            options.set_job(dfraw_json_parser::options::ParsingJob::All);
-            options.set_locations_to_parse(locations);
+            options.set_job(ParsingJob::All);
+            options.set_locations_to_parse(locations.clone());
 
+            // If no locations were specified, parse just vanilla
+            if locations.is_empty() {
+                options.set_locations_to_parse(vec![RawModuleLocation::Vanilla]);
+            }
+
+            // If we have all 3 locations in the list,
+            if locations.len() == 3usize {
+                // Check if the provided output_path ends with a filename (e.g. *.json or similar).
+                if output_path.is_file() {
+                    // Remove the filename from the path for parsing ALL
+                    output_path.pop();
+                    options.set_output_path(&output_path);
+                }
+            }
+
+            // If we have just one location, update the job to be a single location
+            if locations.len() == 1usize {
+                options.set_job(ParsingJob::SingleLocation);
+            }
+
+            log::debug!("Parsing options: {:#?}", options);
             dfraw_json_parser::parse_to_file(&options);
+
+            let mut module_json_fname = String::new();
+            if output_path.is_file() {
+                // Remove the filename portion of the path
+                module_json_fname = format!(
+                    "{}modules.json",
+                    output_path
+                        .clone()
+                        .file_name()
+                        .unwrap_or_default()
+                        .to_str()
+                        .unwrap()
+                        .to_string()
+                        .trim()
+                        .replace(".json", "")
+                );
+                output_path.pop();
+            }
+            // Change the output path to be a modules.json file
+            output_path.push(module_json_fname);
+            options.set_output_path(&output_path);
+            if !output_path.exists() {
+                if let Err(e) = std::fs::File::create(&output_path) {
+                    log::error!("Unable to create output file: {}", e);
+                }
+            }
+            options.set_job(ParsingJob::AllModuleInfoFiles);
             dfraw_json_parser::parse_info_modules_to_file(&options);
         }
     }
 }
 
-fn clean_path(path: &str) -> PathBuf {
-    let path = PathBuf::from(path);
-    path.canonicalize().unwrap_or(path)
+/// The `normalize_path` function takes a path and returns a normalized version of it by removing
+/// redundant components such as "." and "..".
+///
+/// Arguments:
+///
+/// * `path`: The `path` parameter is of type `&Path`, which represents a file or directory path.
+///
+/// Returns:
+///
+/// The function `normalize_path` returns a `PathBuf` object.
+fn normalize_path(path: &Path) -> PathBuf {
+    let mut components = path.components().peekable();
+    let mut ret = if let Some(c @ Component::Prefix(..)) = components.peek().copied() {
+        components.next();
+        PathBuf::from(c.as_os_str())
+    } else {
+        PathBuf::new()
+    };
+
+    for component in components {
+        match component {
+            Component::Prefix(..) => unreachable!(),
+            Component::RootDir => {
+                ret.push(component.as_os_str());
+            }
+            Component::CurDir => {}
+            Component::ParentDir => {
+                ret.pop();
+            }
+            Component::Normal(c) => {
+                ret.push(c);
+            }
+        }
+    }
+    ret
 }
