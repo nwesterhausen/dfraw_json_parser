@@ -189,7 +189,13 @@ impl Material {
                     ..Material::new()
                 }
             }
-            _ => Material::default(),
+            _ => {
+                log::warn!(
+                    "Material::from_value() was provided a value with an invalid material type: {}",
+                    value
+                );
+                Material::new()
+            }
         }
     }
     pub fn parse_tag(&mut self, key: &str, value: &str) {

@@ -1,6 +1,7 @@
 use serde::{Deserialize, Serialize};
 
 use crate::parser::color::DFColor;
+use crate::parser::material::raw::Material;
 use crate::parser::seed_material::raw::SeedMaterial;
 use crate::parser::serializer_helper;
 
@@ -62,14 +63,17 @@ pub struct Shrub {
     /// Names a drink made from the plant, allowing it to be used in entity resources.
     /// Previously also permitted brewing the plant into alcohol made of this material.
     /// Now, a MATERIAL_REACTION_PRODUCT of type DRINK_MAT should be used on the proper plant material.
+    #[serde(skip_serializing_if = "String::is_empty")]
     drink: String,
     /// Permits milling the plant at a quern or millstone into a powder made of this material and allows its use in entity resources.
     /// Said material should have [POWDER_MISC_PLANT] to permit proper stockpiling. This token makes the whole plant harvestable regardless
     /// of which material is designated for milling.
     /// For plants with millable growths, use only MATERIAL_REACTION_PRODUCT or ITEM_REACTION_PRODUCT tokens to define the milling products.
+    #[serde(skip_serializing_if = "String::is_empty")]
     mill: String,
     /// Permits processing the plant at a farmer's workshop to yield threads made of this material and allows its use in entity resources.
     /// Said material should have [THREAD_PLANT] to permit proper stockpiling.
+    #[serde(skip_serializing_if = "String::is_empty")]
     thread: String,
     /// Causes the plant to yield plantable seeds made of this material and having these properties.
     /// Said material should have [SEED_MAT] to permit proper stockpiling.
@@ -77,12 +81,15 @@ pub struct Shrub {
     seed: SeedMaterial,
     /// Permits processing the plant into a vial at a still to yield extract made of this material.
     /// Said material should have [EXTRACT_STORAGE:FLASK].
+    #[serde(skip_serializing_if = "String::is_empty")]
     extract_still_vial: String,
     /// Permits processing the plant into a vial at a farmer's workshop to yield extract made of this material.
     /// Said material should have [EXTRACT_STORAGE:FLASK].
+    #[serde(skip_serializing_if = "String::is_empty")]
     extract_vial: String,
     /// Permits processing the plant into a barrel at a farmer's workshop to yield extract made of this material.
     /// Said material should have [EXTRACT_STORAGE:BARREL].
+    #[serde(skip_serializing_if = "String::is_empty")]
     extract_barrel: String,
 }
 
@@ -204,25 +211,25 @@ impl Shrub {
                 };
             }
             ShrubToken::Drink => {
-                self.drink = value.to_string();
+                self.drink = String::from(value);
             }
             ShrubToken::Mill => {
-                self.mill = value.to_string();
+                self.mill = String::from(value);
             }
             ShrubToken::Thread => {
-                self.thread = value.to_string();
+                self.thread = String::from(value);
             }
             ShrubToken::Seed => {
                 self.seed = SeedMaterial::from_value(value);
             }
             ShrubToken::ExtractStillVial => {
-                self.extract_still_vial = value.to_string();
+                self.extract_still_vial = String::from(value);
             }
             ShrubToken::ExtractVial => {
-                self.extract_vial = value.to_string();
+                self.extract_vial = String::from(value);
             }
             ShrubToken::ExtractBarrel => {
-                self.extract_barrel = value.to_string();
+                self.extract_barrel = String::from(value);
             }
             ShrubToken::Unknown => {
                 log::warn!("Unknown shrub token: {}", key);
