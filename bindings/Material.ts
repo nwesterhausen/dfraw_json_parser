@@ -6,4 +6,22 @@ import type { MaterialUsage } from "./MaterialUsage";
 import type { StateName } from "./StateName";
 import type { Temperatures } from "./Temperatures";
 
-export interface Material { materialType: MaterialType, name: string, fuelType: FuelType, creatureIdentifier: string, plantIdentifier: string, isLocalMaterial: boolean, reagentIdentifier: string, reactionProductIdentifier: string, templateIdentifier: string, usage: Array<MaterialUsage>, value: number, color: DFColor, stateNames: StateName, stateAdjectives: StateName, stateColors: StateName, temperatures: Temperatures, properties: Array<string>, }
+export interface Material {
+  materialType: MaterialType;
+  name: string;
+  fuelType: FuelType;
+  creatureIdentifier: string;
+  plantIdentifier: string;
+  isLocalMaterial: boolean;
+  reagentIdentifier: string;
+  reactionProductIdentifier: string;
+  templateIdentifier: string;
+  usage: Array<MaterialUsage>;
+  value: number;
+  color: DFColor;
+  stateNames: StateName;
+  stateAdjectives: StateName;
+  stateColors: StateName;
+  temperatures: Temperatures;
+  properties: Array<string>;
+}

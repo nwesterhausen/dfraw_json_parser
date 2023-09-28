@@ -2,4 +2,8 @@
 import type { DFColor } from "./DFColor";
 import type { SingPlurName } from "./SingPlurName";
 
-export interface SeedMaterial { name: SingPlurName, color: DFColor, material: string, }
+export interface SeedMaterial {
+  name: SingPlurName;
+  color: DFColor;
+  material: string;
+}

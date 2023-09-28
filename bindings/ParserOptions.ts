@@ -2,4 +2,10 @@
 import type { ObjectType } from "./ObjectType";
 import type { RawModuleLocation } from "./RawModuleLocation";
 
-export interface ParserOptions { hideMetadataInResult: boolean, applyCopyTagsFrom: boolean, applyCreatureVariations: boolean, rawsToParse: Array<ObjectType>, locationsToParse: Array<RawModuleLocation>, }
+export interface ParserOptions {
+  hideMetadataInResult: boolean;
+  applyCopyTagsFrom: boolean;
+  applyCreatureVariations: boolean;
+  rawsToParse: Array<ObjectType>;
+  locationsToParse: Array<RawModuleLocation>;
+}
