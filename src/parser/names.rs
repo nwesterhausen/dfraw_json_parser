@@ -95,9 +95,6 @@ impl StateName {
     pub fn set_gas(&mut self, name: &str) {
         self.gas = String::from(name);
     }
-    pub fn get_solid(&self) -> &str {
-        self.solid.as_str()
-    }
     pub fn add_from_value(&mut self, value: &str) {
         // Split the value into a descriptor and value
         let split = value.split(':').collect::<Vec<&str>>();

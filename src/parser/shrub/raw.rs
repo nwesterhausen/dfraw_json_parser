@@ -1,7 +1,6 @@
 use serde::{Deserialize, Serialize};
 
 use crate::parser::color::DFColor;
-use crate::parser::material::raw::Material;
 use crate::parser::seed_material::raw::SeedMaterial;
 use crate::parser::serializer_helper;
 
