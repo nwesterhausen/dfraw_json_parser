@@ -46,16 +46,20 @@ pub(crate) fn parse_info_file_from_module_directory<P: AsRef<Path>>(
     ModuleInfoFile::parse(&raw_module_directory.as_ref().join("info.txt"))
 }
 
+pub(crate) fn parse_info_file_from_file_path<P: AsRef<Path>>(raw_file_path: &P) -> ModuleInfoFile {
+    ModuleInfoFile::parse(&raw_file_path.as_ref())
+}
+
 pub(crate) fn parse_raws_from_single_file<P: AsRef<Path>>(
     entry_path: &P,
-    options: Option<&ParserOptions>,
+    options: &ParserOptions,
 ) -> Vec<Box<dyn raws::RawObject>> {
     reader::parse_file::parse_raw_file(entry_path, options)
 }
 
 pub(crate) fn parse_raw_module<P: AsRef<Path>>(
     raw_module_directory: &P,
-    options: Option<&ParserOptions>,
+    options: &ParserOptions,
 ) -> Vec<Box<dyn raws::RawObject>> {
     //1. Get information from the info.txt file
     if !raw_module_directory.as_ref().exists() {

@@ -62,10 +62,11 @@ for the steam workshop if it is a mod downloaded from the steam workshop.
 #![warn(clippy::pedantic)]
 #![allow(clippy::must_use_candidate)]
 
-use options::ParserOptions;
-use parser::raws::RawObject;
+use options::{ParserOptions, ParsingJob};
+use parser::{module_info_file::ModuleInfoFile, raws::RawObject};
 use std::path::{Path, PathBuf};
-use walkdir::DirEntry;
+use util::is_valid_path;
+use walkdir::{DirEntry, WalkDir};
 
 use crate::parser::raw_locations::RawModuleLocation;
 
@@ -75,342 +76,187 @@ pub mod parser;
 mod tauri_lib;
 pub mod util;
 
-/// Parse all raws within the module location to JSON.
+/// Given the supplied `ParserOptions`, parse the raws and return a vector of boxed dynamic raw objects.
 ///
-/// Arguments:
+/// Note: This is unable to parse the info.txt file for a module. Use `parse_module_info_file` for that.
 ///
-/// * `raw_module_location_path`: The path to the directory containing the raw modules. This has subdirectories
-/// which contain an 'info.txt' file and raw objects or graphics.
+/// # Arguments
 ///
-/// Returns:
+/// * `options` - A reference to a `ParserOptions` struct that contains the parsing options.
 ///
-/// A vector of raw file information
-pub fn parse_module_location<P: AsRef<Path>>(
-    raw_module_location: &P,
-    options: Option<&ParserOptions>,
-) -> Vec<Box<dyn RawObject>> {
-    let raw_module_location_path = raw_module_location.as_ref();
+/// # Returns
+///
+/// A vector of boxed dynamic raw objects.
+pub fn parse(options: &ParserOptions) -> Vec<Box<dyn RawObject>> {
     // Guard against invalid path
-    if !raw_module_location_path.exists() {
+    if !is_valid_path(&options.target_path, &options.job) {
         log::error!(
-            "Provided module path for parsing doesn't exist!\n{}",
-            raw_module_location_path.display()
+            "Returning early for bad path. Provided options:\n{:#?}",
+            options
         );
         return Vec::new();
     }
-    if !raw_module_location_path.is_dir() {
-        log::error!(
-            "Raw module path needs to be a directory {}",
-            raw_module_location_path.display()
-        );
-        return Vec::new();
-    }
+    let target_path = Path::new(&options.target_path);
+    let mut results: Vec<Box<dyn RawObject>> = Vec::new();
 
-    //2. Get module location from provided path
-    let module_location = RawModuleLocation::from_sourced_directory(
-        raw_module_location_path
-            .file_name()
-            .unwrap_or_default()
-            .to_str()
-            .unwrap_or_default(),
-    );
+    match options.job {
+        ParsingJob::All => {
+            // Set file paths for each location
+            let data_path = target_path.join("data");
+            let vanilla_path = data_path.join("vanilla");
+            let installed_mods_path = data_path.join("installed_mods");
+            let workshop_mods_path = target_path.join("mods");
 
-    //3. Get list of all subdirectories
-    let raw_module_iter: Vec<DirEntry> =
-        util::subdirectories(PathBuf::from(raw_module_location_path)).unwrap_or_default();
-
-    log::info!(
-        "{num} raw modules located in {location:?}",
-        num = raw_module_iter.len(),
-        location = module_location
-    );
-
-    let mut all_raws: Vec<Box<dyn RawObject>> = Vec::new();
-    //4. Loop over all raw modules in the raw module directory
-    for raw_module_directory in raw_module_iter {
-        //2. Parse raws and dump JSON into array
-        let mut module_raws = parse_raw_module(&raw_module_directory.path(), options);
-        all_raws.append(&mut module_raws);
-    }
-
-    all_raws
-}
-
-/// Parse all info.txt files within the module location to JSON.
-///
-/// This would be useful to get information *about* the raw modules in the specified location without reading
-/// and parsing all the raws.
-///
-/// Arguments:
-///
-/// * `raw_module_location_path`: The path to the directory containing the raw modules. This has subdirectories
-/// which contain an 'info.txt' file and raw objects or graphics.
-///
-/// Returns:
-///
-/// A JSON string: `InfoFile[]`
-/// (See [`typings.d.ts`](https://github.com/nwesterhausen/dfraw_json_parser/blob/main/typing.d.ts))
-pub fn parse_info_txt_in_location<P: AsRef<Path>>(raw_module_location: &P) -> String {
-    let raw_module_location_path = raw_module_location.as_ref();
-    // Guard against invalid path
-    if !raw_module_location_path.exists() {
-        log::error!(
-            "Provided module path for parsing doesn't exist!\n{}",
-            raw_module_location_path.display()
-        );
-        return String::new();
-    }
-    if !raw_module_location_path.is_dir() {
-        log::error!(
-            "Raw module path needs to be a directory {}",
-            raw_module_location_path.display()
-        );
-        return String::new();
-    }
-
-    //2. Get module location from provided path
-    let module_location = RawModuleLocation::from_sourced_directory(
-        raw_module_location_path
-            .file_name()
-            .unwrap_or_default()
-            .to_str()
-            .unwrap_or_default(),
-    );
-
-    //3. Get list of all subdirectories
-    let raw_module_iter: Vec<DirEntry> =
-        util::subdirectories(PathBuf::from(raw_module_location_path)).unwrap_or_default();
-
-    log::info!(
-        "{num} raw modules located in {location:?}",
-        num = raw_module_iter.len(),
-        location = module_location
-    );
-
-    let mut all_json: Vec<String> = Vec::new();
-    //4. Loop over all raw modules in the raw module directory
-    for raw_module_directory in raw_module_iter {
-        //2. Parse raws and dump JSON into array
-        all_json.push(parse_info_txt_in_module(&raw_module_directory.path()));
-    }
-
-    format!("[{}]", all_json.join(","))
-}
-
-/// Parse all raw files within the game directory to JSON.
-///
-/// Arguments:
-///
-/// * `df_game_path`: The path to the game directory. This is the directory that contains the data,
-/// mods, and gamelog.txt files.
-///
-/// Returns:
-///
-/// A JSON string: `<T extends Raw>[][][][]`, where T can be `Creature`, `Inorganic`, or `Plant`.
-/// (See [`typings.d.ts`](https://github.com/nwesterhausen/dfraw_json_parser/blob/main/typing.d.ts))
-pub fn parse_game_raws<P: AsRef<Path>>(
-    df_game_path: &P,
-    options: Option<&ParserOptions>,
-) -> Vec<Box<dyn RawObject>> {
-    //1. "validate" folder is as expected
-    let game_path = Path::new(df_game_path.as_ref());
-    // Guard against invalid path
-    if !game_path.exists() {
-        log::error!(
-            "Provided game path for parsing doesn't exist!\n{}",
-            game_path.display()
-        );
-        return Vec::new();
-    }
-    if !game_path.is_dir() {
-        log::error!("Game path needs to be a directory {}", game_path.display());
-        return Vec::new();
-    }
-
-    // warn on no gamelog.txt
-    if !game_path.join("gamelog.txt").exists() {
-        log::warn!("Unable to find gamelog.txt in game directory. Is it valid?");
-    }
-
-    // Set file paths for vanilla raw modules, workshop mods and installed mods
-    let data_path = game_path.join("data");
-    let vanilla_path = data_path.join("vanilla");
-    let installed_mods_path = data_path.join("installed_mods");
-    let workshop_mods_path = game_path.join("mods");
-
-    let all_raws = vec![
-        parse_module_location(&vanilla_path, options),
-        parse_module_location(&installed_mods_path, options),
-        parse_module_location(&workshop_mods_path, options),
-    ];
-
-    let flattened_raws: Vec<Box<dyn RawObject>> = all_raws
-        .into_iter()
-        .flatten()
-        .filter(|s| !s.is_empty())
-        .collect();
-
-    flattened_raws
-}
-
-/// Parse a raw module to JSON.
-///
-/// Arguments:
-///
-/// * `raw_module_path`: The path to the raw module directory.
-///
-/// Returns:
-///
-/// A JSON string: `<T extends Raw>[][]]`, where T can be `Creature`, `Inorganic`, or `Plant`.
-/// (See [`typings.d.ts`](https://github.com/nwesterhausen/dfraw_json_parser/blob/main/typing.d.ts))
-pub fn parse_raw_module<P: AsRef<Path>>(
-    raw_module_path: &P,
-    options: Option<&ParserOptions>,
-) -> Vec<Box<dyn RawObject>> {
-    parser::parse_raw_module(raw_module_path, options)
-}
-
-/// Parse all the game raws and saves the result to a JSON file.
-///
-/// Arguments:
-///
-/// * `df_game_path`: The path to the Dwarf Fortress install directory.
-/// * `out_filepath`: The path to the file to save the parsed raws to. (This should end in `.json`.)
-pub fn parse_game_raws_to_file<P: AsRef<Path>>(
-    df_game_path: &P,
-    out_filepath: &P,
-    options: Option<&ParserOptions>,
-) {
-    let all_game_raws = parse_game_raws(df_game_path, options);
-    let parsed_json_string = serde_json::to_string(&all_game_raws).unwrap_or_default();
-    util::write_json_string_to_file(&parsed_json_string, out_filepath);
-}
-
-/// Parse all info.txt within the modules found in the game directory and saves a JSON file.
-///
-/// Arguments:
-///
-/// * `df_game_path`: The path to the raws folder.
-/// * `out_filepath`: The path to the file to save the parsed raws to. (This should end in `.json`.)
-pub fn parse_info_txt_in_game_dir_to_file<P: AsRef<Path>>(df_game_path: &P, out_filepath: &P) {
-    let parsed_json_string = parse_info_txt_in_game_dir(df_game_path);
-    util::write_json_string_to_file(&parsed_json_string, out_filepath);
-}
-
-/// Parse an info.txt file from a raw module to JSON.
-///
-/// Arguments:
-///
-/// * `raw_module_directory`: The path of the raw module to parse the info.txt for
-///
-/// Returns:
-///
-/// A JSON string: `InfoFile`
-/// (See [`typings.d.ts`](https://github.com/nwesterhausen/dfraw_json_parser/blob/main/typing.d.ts))
-pub fn parse_info_txt_in_module<P: AsRef<Path>>(raw_module_directory: &P) -> String {
-    let result = parser::parse_info_file_from_module_directory(raw_module_directory);
-    serde_json::to_string(&result).unwrap_or_default()
-}
-
-/// Parse a single raw file to JSON.
-///
-/// Arguments:
-///
-/// * `raw_file`: The path to the raw file to parse.
-///
-/// Returns:
-///
-/// A JSON string: `<T extends Raw>[]`, where T can be `Creature`, `Inorganic`, or `Plant`.
-/// (See [`typings.d.ts`](https://github.com/nwesterhausen/dfraw_json_parser/blob/main/typing.d.ts))
-pub fn parse_single_raw_file<P: AsRef<Path>>(
-    raw_file: &P,
-    options: Option<&ParserOptions>,
-) -> String {
-    let result = parser::parse_raws_from_single_file(raw_file, options);
-    serde_json::to_string(&result).unwrap_or_default()
-}
-
-/// Parse all info.txt within the modules found in the game directory to JSON.
-///
-/// Arguments:
-///
-/// * `df_game_path`: The path to the the DF game directory.
-///
-/// Returns:
-///
-/// A JSON string: `InfoFile[][][]`
-/// (See [`typings.d.ts`](https://github.com/nwesterhausen/dfraw_json_parser/blob/main/typing.d.ts))
-pub fn parse_info_txt_in_game_dir<P: AsRef<Path>>(df_game_path: &P) -> String {
-    //1. "validate" folder is as expected
-    let game_path = match util::path_from_game_directory(df_game_path) {
-        Ok(p) => p,
-        Err(e) => {
-            log::error!("Game Path Error: {}", e);
-            return String::new();
+            // Parse each location
+            results.extend(parse_location(&vanilla_path, &options));
+            results.extend(parse_location(&installed_mods_path, &options));
+            results.extend(parse_location(&workshop_mods_path, &options));
         }
-    };
+        ParsingJob::SingleLocation => {
+            // Set the file path for the chosen location
+            let location_path = match options.locations_to_parse.first() {
+                Some(location) => match location {
+                    RawModuleLocation::Vanilla => target_path.join("data").join("vanilla"),
+                    RawModuleLocation::InstalledMods => {
+                        target_path.join("data").join("installed_mods")
+                    }
+                    RawModuleLocation::Mods => target_path.join("mods"),
+                    RawModuleLocation::Unknown => {
+                        log::error!(
+                            "Unknown location provided to parse! Provided options:\n{:#?}",
+                            options
+                        );
+                        return Vec::new();
+                    }
+                },
+                None => {
+                    log::error!(
+                        "No location provided to parse! Provided options:\n{:#?}",
+                        options
+                    );
+                    return Vec::new();
+                }
+            };
 
-    // Set file paths for vanilla raw modules, workshop mods and installed mods
-    let data_path = game_path.join("data");
-    let vanilla_path = data_path.join("vanilla");
-    let installed_mods_path = data_path.join("installed_mods");
-    let workshop_mods_path = game_path.join("mods");
+            // Parse the location
+            results.extend(parse_location(&location_path, &options));
+        }
+        ParsingJob::SingleModule => {
+            // The provided path should be a module directory
 
-    let all_json = vec![
-        parse_info_txt_in_location(&vanilla_path),
-        parse_info_txt_in_location(&installed_mods_path),
-        parse_info_txt_in_location(&workshop_mods_path),
-    ];
+            // Check for info.txt
+            let info_txt_path = target_path.join("info.txt");
+            if !info_txt_path.exists() {
+                let dir_name = target_path.file_name().unwrap_or_default();
+                let dir_name_str = dir_name.to_str().unwrap_or("");
 
-    format!("[{}]", all_json.join(","))
+                if !(dir_name_str.eq("mod_upload")
+                    || dir_name_str.eq("examples and notes")
+                    || dir_name_str.eq("interaction examples"))
+                {
+                    log::error!(
+                        "No info.txt as expected in {:?}. Is this DF 50.xx? Provided options:\n{:#?}",
+                        target_path.file_name().unwrap_or_default(),
+                        options
+                    );
+                }
+
+                return Vec::new();
+            }
+
+            results.extend(parser::parse_raw_module(&target_path, &options));
+        }
+        ParsingJob::SingleRaw => {
+            // The provided path should be a raw file directly
+            results.extend(parser::parse_raws_from_single_file(&target_path, &options));
+        }
+        ParsingJob::SingleModuleInfoFile => {
+            // The provided path should be the info.txt file for a module
+            log::warn!(
+                "Unable to parse info.txt file in this dispatch. Provided options:\n{:#?}",
+                options
+            );
+            return Vec::new();
+        }
+    }
+    results
 }
 
-/// Parse a single raw file and writes the parsed raw array to a JSON file.
+/// Parses the module info file using the provided parser options.
 ///
-/// Arguments:
+/// The only part of the parser options that is used is the `target_path` field and the `job` field.
 ///
-/// * `raw_file`: The path to the raw file to read.
-/// * `out_filepath`: The path to the file you want to write to.
-pub fn parse_single_raw_file_to_file<P: AsRef<Path>>(
-    raw_file: &P,
-    out_filepath: &P,
-    options: Option<&ParserOptions>,
-) {
-    let file_raws = parser::parse_raws_from_single_file(raw_file, options);
-    let parsed_json_string = serde_json::to_string(&file_raws).unwrap_or_default();
-    util::write_json_string_to_file(&parsed_json_string, out_filepath);
+/// Note: This expects the `job` field to be `ParsingJob::SingleModuleInfoFile`. If it is not, it will return an empty `ModuleInfoFile`.
+///
+/// # Arguments
+///
+/// * `options` - A reference to the parser options.
+///
+/// # Returns
+///
+/// Returns a `ModuleInfoFile` struct containing the parsed module information.
+pub fn parse_module_info_file(options: &ParserOptions) -> ModuleInfoFile {
+    // Guard against invalid path
+    if !is_valid_path(&options.target_path, &options.job) {
+        log::error!(
+            "Returning early for bad path. Provided options:\n{:#?}",
+            options
+        );
+        return ModuleInfoFile::default();
+    }
+    let target_path = Path::new(&options.target_path);
+
+    match options.job {
+        ParsingJob::SingleModuleInfoFile => {
+            // The provided path should be the info.txt file for a module
+            parse_module_info_file_direct(&target_path)
+        }
+        _ => {
+            log::error!(
+                "Wrong job provided to parse module info file! Provided options:\n{:#?}",
+                options
+            );
+            ModuleInfoFile::default()
+        }
+    }
 }
 
-/// Parse a single raw module directory, and writes the parsed JSON string to a file.
+/// Parses the input data to JSON format based on the provided options.
 ///
-/// Arguments:
+/// # Arguments
 ///
-/// * `module_path`: The path to the raw file to read.
-/// * `out_filepath`: The path to the file you want to write to.
-pub fn parse_raw_module_to_file<P: AsRef<Path>>(
-    module_path: &P,
-    out_filepath: &P,
-    options: Option<&ParserOptions>,
-) {
-    let file_raws = parse_raw_module(module_path, options);
-    let parsed_json_string = serde_json::to_string(&file_raws).unwrap_or_default();
-    util::write_json_string_to_file(&parsed_json_string, out_filepath);
+/// * `options` - A reference to the parser options.
+///
+/// # Returns
+///
+/// A vector of strings, where each string represents a JSON object.
+pub fn parse_to_json(options: &ParserOptions) -> Vec<String> {
+    let results = parse(options);
+    let mut json_results = Vec::new();
+    for result in results {
+        json_results.push(serde_json::to_string(&result).unwrap_or_default());
+    }
+    json_results
 }
 
-/// Parse all the raw modules within a raw module location, and writes the parsed JSON string to a file.
+/// Parses the input data and writes the output to a JSON file, based on the provided options.
 ///
-/// Arguments:
+/// # Arguments
 ///
-/// * `raw_module_location_path`: The path to the raw module directory.
-/// * `out_filepath`: The path to the file you want to write to.
-pub fn parse_module_location_to_file<P: AsRef<Path>>(
-    raw_module_location_path: &P,
-    out_filepath: &P,
-    options: Option<&ParserOptions>,
-) {
-    let module_raws = parse_module_location(raw_module_location_path, options);
-    let parsed_json_string = serde_json::to_string(&module_raws).unwrap_or_default();
-    util::write_json_string_to_file(&parsed_json_string, out_filepath);
+/// * `options` - A reference to a `ParserOptions` struct that contains the parsing options.
+pub fn parse_to_file(options: &ParserOptions) {
+    // Guard against bad output path
+    if !is_valid_path(&options.output_path, &options.job) {
+        log::error!(
+            "Returning early for bad output path. Provided options:\n{:#?}",
+            options
+        );
+        return;
+    }
+
+    let results = parse_to_json(options);
+
+    util::write_json_string_vec_to_file(&results, &options.output_path);
 }
 
 #[cfg(feature = "tauri")]
@@ -418,42 +264,148 @@ pub fn parse_module_location_to_file<P: AsRef<Path>>(
 /// emit tauri events to the supplied window. The event is titled `PROGRESS` and it uses the `ProgressPayload`
 /// payload for the payload.
 ///
+/// Set the `options` appropriately for the job you want to perform.
+///
 /// The payload supplies the current progress as a float and the name of the current folder being parsed.
 ///
 /// Properties:
 ///
-/// * `df_game_path`: The path to the Dwarf Fortress install directory
+/// * `options`: The `ParserOptions` to use for parsing.
 /// * `window`: A `tauri::Window` to emit `PROGRESS` events to.
 ///
 /// Returns:
 ///
-/// A (large) JSON string with details on all raws in the game path.
-pub fn parse_game_raws_with_tauri_emit<P: AsRef<Path>>(
-    df_game_path: &P,
+/// A JSON string with details on all raws in the game path.
+pub fn parse_with_tauri_emit<P: AsRef<Path>>(
+    options: &ParserOptions,
     window: tauri::Window,
-    options: Option<&ParserOptions>,
 ) -> String {
-    tauri_lib::parse_game_raws_with_tauri_emit(df_game_path, window, options)
+    tauri_lib::parse(options, window)
 }
 
-#[cfg(feature = "tauri")]
-#[allow(clippy::cast_precision_loss)]
-/// It takes a path to a directory containing raw modules, Parse them, and returns a JSON string
-/// containing all the parsed modules. While parsing, emits events to the provided tauri window
-/// to convey parsing status.
+/// Parses the raws in the provided location path, and returns a vector of boxed dynamic raw objects.
 ///
-/// Arguments:
+/// This is meant to be a private function, because the main entry point should be `parse`.
 ///
-/// * `raw_module_location`: The path to the directory containing the raw modules.
-/// * `window`: The active tauri window to receive events.
+/// # Arguments
 ///
-/// Returns:
+/// * `location_path` - A reference to the path to parse.
+/// * `options` - A reference to a `ParserOptions` struct that contains the parsing options.
 ///
-/// A JSON string of all the mods in the location.
-pub fn parse_location_with_tauri_emit<P: AsRef<Path>>(
+/// # Returns
+///
+/// A vector of boxed dynamic raw objects.
+fn parse_location<P: AsRef<Path>>(
     location_path: &P,
-    window: tauri::Window,
-    options: Option<&ParserOptions>,
-) -> String {
-    tauri_lib::parse_location_with_tauri_emit(location_path, window, options)
+    options: &ParserOptions,
+) -> Vec<Box<dyn RawObject>> {
+    let mut results: Vec<Box<dyn RawObject>> = Vec::new();
+    let location_path: PathBuf = location_path.as_ref().to_path_buf();
+    // Get a list of all subdirectories in the location
+    let raw_modules_in_location: Vec<DirEntry> =
+        util::subdirectories(location_path).unwrap_or_default();
+
+    log::info!(
+        "Found {} raw modules in {:?}",
+        raw_modules_in_location.len(),
+        options.locations_to_parse.first().unwrap(),
+    );
+
+    // Loop over each module and parse it
+    for raw_module in raw_modules_in_location {
+        let module = parser::parse_raw_module(&raw_module.path(), &options);
+        results.extend(module);
+    }
+
+    results
+}
+
+fn parse_module_info_file_direct<P: AsRef<Path>>(module_info_file_path: &P) -> ModuleInfoFile {
+    // Get information from the module info file
+    let module_info_file = parser::parse_info_file_from_file_path(module_info_file_path);
+    module_info_file
+}
+
+fn parse_module<P: AsRef<Path>>(
+    module_path: &P,
+    options: &ParserOptions,
+) -> Vec<Box<dyn RawObject>> {
+    // Get information from the module info file
+    let module_info_file_path = module_path.as_ref().join("info.txt");
+    let module_info_file = parse_module_info_file_direct(&module_info_file_path);
+
+    log::info!(
+        "Parsing raws for {} v{}",
+        module_info_file.get_identifier(),
+        module_info_file.get_version(),
+    );
+
+    // Get a list of all raw files in the module
+    let objects_path = module_path.as_ref().join("objects");
+    let graphics_path = module_path.as_ref().join("graphics");
+
+    let mut parse_objects = true;
+    let mut parse_graphics = false;
+
+    if !objects_path.exists() {
+        log::warn!(
+            "No objects directory found in {:?}",
+            module_path.as_ref().file_name().unwrap_or_default(),
+        );
+        parse_objects = false;
+    }
+
+    if parse_objects && !objects_path.is_dir() {
+        log::warn!(
+            "Objects directory in {:?} is not a directory",
+            module_path.as_ref().file_name().unwrap_or_default(),
+        );
+        parse_objects = false;
+    }
+
+    if !graphics_path.exists() {
+        log::warn!(
+            "No graphics directory found in {:?}",
+            module_path.as_ref().file_name().unwrap_or_default(),
+        );
+        parse_graphics = false;
+    }
+
+    if parse_graphics && !graphics_path.is_dir() {
+        log::warn!(
+            "Graphics directory in {:?} is not a directory",
+            module_path.as_ref().file_name().unwrap_or_default(),
+        );
+        parse_graphics = false;
+    }
+
+    // Exit early if nothing to parse
+    if !parse_graphics && !parse_objects {
+        return Vec::new();
+    }
+
+    let mut results = Vec::new();
+
+    // Parse the objects
+    if parse_objects {
+        for entry in WalkDir::new(objects_path)
+            .into_iter()
+            .filter_map(std::result::Result::ok)
+        {
+            if entry.file_type().is_file() {
+                let file_path = entry.path();
+                let file_name = file_path.file_name().unwrap_or_default();
+                let file_name_str = file_name.to_str().unwrap_or_default();
+
+                if file_name_str.ends_with(".txt") {
+                    results.extend(parser::parse_raws_from_single_file(&file_path, &options));
+                }
+            }
+        }
+    }
+
+    // Parse the graphics
+    // NOT IMPLEMENTED YET
+
+    results
 }

@@ -6,7 +6,7 @@ use std::{
 
 use walkdir::WalkDir;
 
-use crate::parser::raws::RawObject;
+use crate::{options::ParsingJob, parser::raws::RawObject};
 
 /// Get a vec of subdirectories for a given directory
 ///
@@ -59,17 +59,6 @@ pub fn get_parent_dir_name<P: AsRef<Path>>(full_path: &P) -> String {
     }
 }
 
-/// It takes a string of json and writes it to a file.
-///
-/// Arguments:
-///
-/// * `parsed_json_string`: String
-/// * `out_filepath`: Path
-pub fn write_json_string_to_file<P: AsRef<Path>>(parsed_json_string: &str, out_filepath: &P) {
-    write_string_vec_to_file(&vec![String::from(parsed_json_string)], out_filepath);
-}
-
-
 /// "Given a path to a game directory, return a `PathBuf` to that directory if it exists and is a
 /// directory, otherwise return an error."
 ///
@@ -110,35 +99,23 @@ pub fn path_from_game_directory<P: AsRef<Path>>(game_path: &P) -> Result<PathBuf
     Ok(game_path.to_path_buf())
 }
 
-/// Save parsed raws to a file as JSON. It converts the `RawObject` vector to JSON
-/// using `serde_json` and then writes it to a file.
-/// 
-/// Arguments:
-/// * `parsed_raws`: Vec<Box<dyn RawObject>>
-/// * `out_filepath`: Path
-pub fn write_parsed_raws_to_json_file<P: AsRef<Path>>(
-    parsed_raws: &[Box<dyn RawObject>],
-    out_filepath: &P,
-) {
-let parsed_json_string_vec: Vec<String> = parsed_raws
-    .iter()
-    .map(|raw| serde_json::to_string(&raw).unwrap_or_default())
-    .collect();
-
-write_string_vec_to_file(&parsed_json_string_vec, out_filepath);
-}
-
 /// Save a vector of strings to a file, one string per line.
 ///
 /// Arguments:
 ///
 /// * `parsed_raws_string_vec`: String
 /// * `out_filepath`: Path
-pub fn write_string_vec_to_file<P: AsRef<Path>>(
-    strings_vec: &Vec<String>,
-    out_filepath: &P,
-) {
-    log::info!("Writing {} strings to file {:?}", strings_vec.len(), out_filepath.as_ref().display());
+pub fn write_json_string_vec_to_file<P: AsRef<Path>>(strings_vec: &Vec<String>, out_filepath: &P) {
+    log::info!(
+        "Writing {} strings to file {:?}",
+        strings_vec.len(),
+        out_filepath.as_ref().display()
+    );
+
+    if strings_vec.is_empty() {
+        log::warn!("Provided string vector is empty!");
+        return;
+    }
 
     let out_file = match File::create(out_filepath) {
         Ok(f) => f,
@@ -158,15 +135,53 @@ pub fn write_string_vec_to_file<P: AsRef<Path>>(
         out_filepath.as_ref().to_string_lossy()
     );
 
-    for parsed_json_string in strings_vec {
-        match writeln!(stream, "{parsed_json_string}") {
+    if strings_vec.len() == 1 {
+        match writeln!(stream, "{}", strings_vec[0]) {
             Ok(_x) => (),
             Err(e) => {
                 log::error!("{}\n{:?}", write_error, e);
                 return;
             }
         };
+        match stream.flush() {
+            Ok(_x) => (),
+            Err(e) => {
+                log::error!("{}\n{:?}", write_error, e);
+            }
+        };
+        return;
     }
+
+    let strings_vec = strings_vec.into_iter();
+    // Write the first value with an open bracket '[' at the beginning
+    // Write all next values with a comma ',' in front
+    // Finish with a closing bracket ']'
+    for (i, string) in strings_vec.enumerate() {
+        match i {
+            0 => match write!(stream, "[{}", string) {
+                Ok(_x) => (),
+                Err(e) => {
+                    log::error!("{}\n{:?}", write_error, e);
+                    return;
+                }
+            },
+            _ => match write!(stream, ",{}", string) {
+                Ok(_x) => (),
+                Err(e) => {
+                    log::error!("{}\n{:?}", write_error, e);
+                    return;
+                }
+            },
+        }
+    }
+
+    match writeln!(stream, "]") {
+        Ok(_x) => (),
+        Err(e) => {
+            log::error!("{}\n{:?}", write_error, e);
+            return;
+        }
+    };
 
     match stream.flush() {
         Ok(_x) => (),
@@ -174,4 +189,38 @@ pub fn write_string_vec_to_file<P: AsRef<Path>>(
             log::error!("{}\n{:?}", write_error, e);
         }
     };
+}
+
+/// Check if the provided path is valid for the given job.
+///
+/// Arguments:
+///
+/// * `path`: The path to check
+/// * `job`: The job to check against
+///
+/// Returns:
+///
+/// A bool. Will log an error if the path is invalid.
+pub fn is_valid_path<P: AsRef<Path>>(path: P, job: &ParsingJob) -> bool {
+    let path = path.as_ref();
+    // Guard against invalid path
+    if !path.exists() {
+        log::error!(
+            "Provided path for parsing doesn't exist!\n{}",
+            path.display()
+        );
+        return false;
+    }
+    if job == &ParsingJob::SingleRaw || job == &ParsingJob::SingleModule {
+        if !path.is_file() {
+            log::error!("Path needs to be a file {}", path.display());
+            return false;
+        }
+        return true;
+    }
+    if !path.is_dir() {
+        log::error!("Path needs to be a directory {}", path.display());
+        return false;
+    }
+    true
 }

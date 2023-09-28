@@ -24,7 +24,7 @@ use super::header::read_raw_file_type;
 
 pub fn parse_raw_file<P: AsRef<Path>>(
     raw_file_path: &P,
-    options: Option<&ParserOptions>,
+    options: &ParserOptions,
 ) -> Vec<Box<dyn RawObject>> {
     let mod_info_file = ModuleInfoFile::from_raw_file_path(raw_file_path);
 
@@ -35,7 +35,7 @@ pub fn parse_raw_file<P: AsRef<Path>>(
 pub fn parse_raw_file_with_info<P: AsRef<Path>>(
     raw_file_path: &P,
     mod_info_file: &ModuleInfoFile,
-    options: Option<&ParserOptions>,
+    options: &ParserOptions,
 ) -> Vec<Box<dyn RawObject>> {
     let caller = "Parse Raw File";
     // log::info!("Parsing raw file: {}", raw_file_path.as_ref().display());
@@ -69,11 +69,7 @@ pub fn parse_raw_file_with_info<P: AsRef<Path>>(
         raw_filename.as_str(),
         &raw_file_path,
     );
-    raw_metadata.set_hidden(
-        options
-            .unwrap_or(&ParserOptions::default())
-            .hide_metadata_in_result,
-    );
+    raw_metadata.set_hidden(!options.attach_metadata_to_raws);
 
     for (index, line) in reader.lines().enumerate() {
         if line.is_err() {
@@ -254,11 +250,7 @@ pub fn parse_raw_file_with_info<P: AsRef<Path>>(
     }
 
     // Apply copy_tags_from
-    if object_type == ObjectType::Creature
-        && options
-            .unwrap_or(&ParserOptions::default())
-            .apply_copy_tags_from
-    {
+    if object_type == ObjectType::Creature && !options.skip_apply_copy_tags_from {
         apply_copy_tags_from(&mut created_raws);
     }
 
