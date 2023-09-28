@@ -33,6 +33,7 @@ mod refs;
 pub(crate) mod seed_material;
 pub(crate) mod serializer_helper;
 pub mod shrub;
+pub mod termperatures;
 pub(crate) mod tile;
 pub(crate) mod tree;
 

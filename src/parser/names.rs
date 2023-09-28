@@ -82,8 +82,10 @@ pub struct StateName {
     gas: String,
 }
 
-#[allow(dead_code)] // Until we add material parsing
 impl StateName {
+    pub fn is_empty(&self) -> bool {
+        self.solid.is_empty() && self.liquid.is_empty() && self.gas.is_empty()
+    }
     pub fn set_solid(&mut self, name: &str) {
         self.solid = String::from(name);
     }

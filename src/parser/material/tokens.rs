@@ -277,9 +277,9 @@ pub enum MaterialProperty {
     /// Determines the name of the material at the specified state, as displayed in-game.[STATE_NAME:ALL_SOLID:stone]
     StateName,
     /// Like STATE_NAME, but used in different situations. Equipment made from the material uses the state adjective and not the state name.
-    StateAdj,
+    StateAdjective,
     /// Sets both STATE_NAME and STATE_ADJ at the same time.
-    StateNameAdj,
+    StateNameAdjective,
     /// The material's tendency to absorb liquids. Containers made of materials with nonzero absorption cannot hold liquids unless they have been glazed.
     /// Defaults to 0.
     Absorption,
@@ -332,14 +332,14 @@ pub enum MaterialProperty {
     MultiplyValue,
     /// Rate at which the material heats up or cools down (in joules/kilogram-kelvin). If set to NONE, the temperature will be fixed at its initial value.
     /// Defaults to NONE.
-    SpecHeat,
+    SpecificHeat,
     /// Temperature above which the material takes damage from heat. Defaults to NONE.
     /// If the material has an ignite point but no heatdam point, it will burn for a very long time (9 months and 16.8 days).
     HeatDamagePoint,
     /// Temperature below which the material takes damage from cold. Defaults to NONE.
     ColdDamagePoint,
     /// Temperature at which the material will catch fire. Defaults to NONE.
-    IgnitePoint,
+    IgnitionPoint,
     /// Temperature at which the material melts. Defaults to NONE.
     MeltingPoint,
     /// Temperature at which the material boils. Defaults to NONE.
@@ -347,7 +347,7 @@ pub enum MaterialProperty {
     /// Items composed of this material will initially have this temperature.
     /// Used in conjunction with [SPEC_HEAT:NONE] to make material's temperature fixed at the specified value.
     /// Defaults to NONE.
-    MatFixedTemp,
+    MaterialFixedTemperature,
     /// Changes a material's HEATDAM_POINT, but only if it was not set to NONE. Not permitted in material template definitions.
     IfExistsSetHeatDamagePoint,
     /// Changes a material's COLDDAM_POINT, but only if it was not set to NONE. Not permitted in material template definitions.

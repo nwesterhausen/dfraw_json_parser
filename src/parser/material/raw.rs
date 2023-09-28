@@ -1,6 +1,9 @@
 use serde::{Deserialize, Serialize};
 
-use crate::parser::{material::phf_table::MATERIAL_PROPERTY_TOKENS, serializer_helper};
+use crate::parser::{
+    color::DFColor, material::phf_table::MATERIAL_PROPERTY_TOKENS, names::StateName,
+    serializer_helper, termperatures::Temperatures,
+};
 
 use super::{
     phf_table::{FUEL_TYPE_TOKENS, MATERIAL_TYPE_TOKENS, MATERIAL_USAGE_TOKENS},
@@ -49,6 +52,21 @@ pub struct Material {
 
     #[serde(skip_serializing_if = "serializer_helper::is_one")]
     value: u32,
+
+    #[serde(skip_serializing_if = "DFColor::is_default")]
+    color: DFColor,
+
+    #[serde(skip_serializing_if = "StateName::is_empty")]
+    state_names: StateName,
+
+    #[serde(skip_serializing_if = "StateName::is_empty")]
+    state_adjectives: StateName,
+
+    #[serde(skip_serializing_if = "StateName::is_empty")]
+    state_colors: StateName,
+
+    #[serde(skip_serializing_if = "Temperatures::is_empty")]
+    temperatures: Temperatures,
 
     /// Catch-all for remaining tags we identify but don't do anything with... yet.
     #[serde(skip_serializing_if = "Vec::is_empty")]
@@ -214,6 +232,38 @@ impl Material {
                 MaterialProperty::MaterialValue => {
                     self.value = value.parse::<u32>().unwrap_or(1);
                 }
+                MaterialProperty::StateNameAdjective => {
+                    self.state_names.add_from_value(value);
+                    self.state_adjectives.add_from_value(value);
+                }
+                // Names and Adjectives
+                MaterialProperty::StateName => self.state_names.add_from_value(value),
+                MaterialProperty::StateAdjective => self.state_adjectives.add_from_value(value),
+                MaterialProperty::StateColor => self.state_colors.add_from_value(value),
+                MaterialProperty::BasicColor => self.color = DFColor::from_value(value),
+                // Temperatures
+                MaterialProperty::SpecificHeat => self
+                    .temperatures
+                    .update_specific_heat(value.parse::<u32>().unwrap_or(0)),
+                MaterialProperty::IgnitionPoint => self
+                    .temperatures
+                    .update_ignition_point(value.parse::<u32>().unwrap_or(0)),
+                MaterialProperty::MeltingPoint => self
+                    .temperatures
+                    .update_melting_point(value.parse::<u32>().unwrap_or(0)),
+                MaterialProperty::BoilingPoint => self
+                    .temperatures
+                    .update_boiling_point(value.parse::<u32>().unwrap_or(0)),
+                MaterialProperty::HeatDamagePoint => self
+                    .temperatures
+                    .update_heat_damage_point(value.parse::<u32>().unwrap_or(0)),
+                MaterialProperty::ColdDamagePoint => self
+                    .temperatures
+                    .update_cold_damage_point(value.parse::<u32>().unwrap_or(0)),
+                MaterialProperty::MaterialFixedTemperature => self
+                    .temperatures
+                    .update_material_fixed_temperature(value.parse::<u32>().unwrap_or(0)),
+                // Catch-all
                 _ => {
                     self.properties.push(format!("{key}:{value}"));
                 }
