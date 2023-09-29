@@ -63,7 +63,10 @@ for the steam workshop if it is a mod downloaded from the steam workshop.
 #![allow(clippy::must_use_candidate)]
 
 use options::{ParserOptions, ParsingJob};
-use parser::{module_info_file::ModuleInfoFile, raws::RawObject};
+use parser::{
+    creature::apply_copy_from::apply_copy_tags_from, module_info_file::ModuleInfoFile,
+    raws::RawObject,
+};
 use std::path::{Path, PathBuf};
 use util::options_has_valid_paths;
 use walkdir::{DirEntry, WalkDir};
@@ -178,6 +181,12 @@ pub fn parse(options: &ParserOptions) -> Vec<Box<dyn RawObject>> {
             return Vec::new();
         }
     }
+
+    // Apply copy_tags_from
+    if !options.skip_apply_copy_tags_from {
+        apply_copy_tags_from(&mut results);
+    }
+
     results
 }
 
@@ -272,11 +281,16 @@ pub fn parse_to_file(options: &ParserOptions) {
 /// Returns:
 ///
 /// A JSON string with details on all raws in the game path.
-pub fn parse_with_tauri_emit<P: AsRef<Path>>(
+pub fn parse_with_tauri_emit(options: &ParserOptions, window: tauri::Window) -> String {
+    tauri_lib::parse(options, window)
+}
+
+#[cfg(feature = "tauri")]
+pub fn parse_with_tauri_emit_to_json_vec(
     options: &ParserOptions,
     window: tauri::Window,
-) -> String {
-    tauri_lib::parse(options, window)
+) -> Vec<String> {
+    tauri_lib::parse_to_json_vec(options, window)
 }
 
 /// Parses the raws in the provided location path, and returns a vector of boxed dynamic raw objects.
@@ -523,6 +537,7 @@ pub fn parse_info_modules(options: &ParserOptions) -> Vec<ModuleInfoFile> {
             results.push(parse_module_info_file_direct(&target_path));
         }
     }
+    log::info!("Parsed {} info.txt files", results.len());
     results
 }
 

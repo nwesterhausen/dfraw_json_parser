@@ -31,14 +31,14 @@ use walkdir::DirEntry;
 pub fn parse(
     options: &crate::options::ParserOptions,
     progress_helper: &mut ProgressHelper,
-) -> String {
+) -> Vec<Box<dyn RawObject>> {
     // Guard against invalid path
     if !crate::util::options_has_valid_paths(options) {
         log::error!(
             "Returning early for bad path. Provided options:\n{:#?}",
             options
         );
-        return String::from("[]");
+        return Vec::new();
     }
     let target_path = Path::new(&options.target_path);
     let mut results: Vec<Box<dyn RawObject>> = Vec::new();
@@ -80,7 +80,7 @@ pub fn parse(
                             "Unknown location provided to parse! Provided options:\n{:#?}",
                             options
                         );
-                        return String::from("[]");
+                        return Vec::new();
                     }
                 }
             } else {
@@ -88,7 +88,7 @@ pub fn parse(
                     "No location provided to parse! Provided options:\n{:#?}",
                     options
                 );
-                return String::from("[]");
+                return Vec::new();
             };
 
             // Parse the location
@@ -114,49 +114,58 @@ pub fn parse(
                     );
                 }
 
-                return String::from("[]");
+                return Vec::new();
             }
 
-            let module = parse_module(&target_path, options, progress_helper);
-            return serde_json::to_string(&module).unwrap_or_default();
+            results.extend(parse_module(&target_path, options, progress_helper));
         }
-        crate::options::ParsingJob::AllModuleInfoFiles => {
-            let modules = crate::parse_info_modules_to_json(options);
-            return format!("[{}]", modules.join(","));
+        crate::options::ParsingJob::AllModuleInfoFiles
+        | crate::options::ParsingJob::SingleModuleInfoFile => {
+            log::warn!(
+                "Unable to parse info.txt files in this dispatch. Provided options:\n{:#?}",
+                options
+            );
+            return Vec::new();
         }
         crate::options::ParsingJob::SingleRaw => {
             // The provided path should be a raw file directly
             results.extend(parser::parse_raws_from_single_file(&target_path, options));
         }
-        crate::options::ParsingJob::SingleModuleInfoFile => {
-            // The provided path should be the info.txt file for a module
-            log::warn!(
-                "Unable to parse info.txt file in this dispatch. Provided options:\n{:#?}",
-                options
-            );
-            return String::from("[]");
-        }
     }
 
-    // Convert the results to a JSON string
-    raws_to_string(results)
+    // Apply copy_tags_from
+    if !options.skip_apply_copy_tags_from {
+        parser::creature::apply_copy_from::apply_copy_tags_from(&mut results);
+    }
+
+    results
 }
 
 #[cfg(feature = "tauri")]
-/// Convert the `Vec<Box<dyn RawObject>>` into a JSON string.
-fn raws_to_string(raws: Vec<Box<dyn RawObject>>) -> String {
-    // It should be an array, so start with '[' character,
-    // then add each raw object, separated by a comma.
-    // Finally add the closing ']' character.
-    // (The last item cannot have a comma before ']')
-    let mut json = String::from('[');
+/// The function `parse_to_json_vec` takes in options and a progress helper, parses the options, and
+/// returns a vector of JSON strings.
+///
+/// Arguments:
+///
+/// * `options`: A reference to an instance of the `ParserOptions` struct from the `options` module in
+/// the crate.
+/// * `progress_helper`: A mutable reference to a `ProgressHelper` struct.
+///
+/// Returns:
+///
+/// a vector of JSON strings
+pub fn parse_to_json_vec(
+    options: &crate::options::ParserOptions,
+    progress_helper: &mut ProgressHelper,
+) -> Vec<String> {
+    let raws = parse(options, progress_helper);
+    let mut results = Vec::new();
+
     for raw in raws {
-        json.push_str(serde_json::to_string(&raw).unwrap().as_str());
-        json.push(',');
+        results.push(serde_json::to_string(&raw).unwrap_or_default());
     }
-    json.pop(); // remove trailing comma
-    json.push(']');
-    json
+
+    results
 }
 
 #[cfg(feature = "tauri")]

@@ -19,6 +19,7 @@ use super::{
 #[serde(rename_all = "camelCase")]
 pub struct Inorganic {
     identifier: String,
+    #[serde(skip_serializing_if = "serializer_helper::is_metadata_hidden")]
     metadata: RawMetadata,
     object_id: String,
     material: Material,

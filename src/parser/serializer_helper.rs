@@ -1,3 +1,5 @@
+use super::raws::RawMetadata;
+
 /// This is only used for serialize
 #[allow(clippy::trivially_copy_pass_by_ref)]
 pub fn min_max_is_ones(min_max: &[u16; 2]) -> bool {
@@ -107,4 +109,9 @@ pub fn is_false(boolean: &bool) -> bool {
 #[allow(clippy::trivially_copy_pass_by_ref)]
 pub fn is_true(boolean: &bool) -> bool {
     *boolean
+}
+/// This is only used for serialize
+#[allow(clippy::trivially_copy_pass_by_ref)]
+pub fn is_metadata_hidden(metadata: &RawMetadata) -> bool {
+    metadata.is_hidden()
 }

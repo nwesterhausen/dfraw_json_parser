@@ -19,7 +19,7 @@ use super::{phf_table::CREATURE_TOKENS, tokens::CreatureTag};
 #[derive(Serialize, Deserialize, Debug, Clone, Default)]
 #[serde(rename_all = "camelCase")]
 pub struct DFCreature {
-    #[serde(skip_serializing_if = "RawMetadata::is_hidden")]
+    #[serde(skip_serializing_if = "serializer_helper::is_metadata_hidden")]
     metadata: RawMetadata,
     identifier: String,
     castes: Vec<DFCaste>,

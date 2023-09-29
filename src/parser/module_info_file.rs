@@ -81,7 +81,6 @@ impl ModuleInfoFile {
             .to_string_lossy()
             .to_string();
         let info_file_path = Path::new(parent_directory.as_str()).join("info.txt");
-        log::info!("ModuleInfoFile - Parsing info.txt for {:?}", info_file_path);
         Self::parse(&info_file_path)
     }
     #[allow(clippy::too_many_lines)]
@@ -153,10 +152,11 @@ impl ModuleInfoFile {
                     "NUMERIC_VERSION" => match captured_value.parse() {
                         Ok(n) => info_file_data.numeric_version = n,
                         Err(_e) => {
-                            log::warn!(
-                                "{} - 'NUMERIC_VERSION' should be integer {}",
+                            log::debug!(
+                                "{} - 'NUMERIC_VERSION' should be integer '{}' from {}",
                                 caller,
-                                parent_dir
+                                captured_value,
+                                info_file_data.get_identifier()
                             );
                             // match on \D to replace any non-digit characters with empty string
                             let digits_only =
@@ -164,10 +164,10 @@ impl ModuleInfoFile {
                             match digits_only.parse() {
                                 Ok(n) => info_file_data.numeric_version = n,
                                 Err(_e) => {
-                                    log::error!(
-                                        "{} - Unable to parse any numbers from {}",
+                                    log::debug!(
+                                        "{} - Unable to parse any numbers from {} for NUMERIC_VERSION",
                                         caller,
-                                        digits_only
+                                        captured_value
                                     );
                                 }
                             }
@@ -176,10 +176,11 @@ impl ModuleInfoFile {
                     "EARLIEST_COMPATIBLE_NUMERIC_VERSION" => match captured_value.parse() {
                         Ok(n) => info_file_data.earliest_compatible_numeric_version = n,
                         Err(_e) => {
-                            log::warn!(
-                                "{} - 'EARLIEST_COMPATIBLE_NUMERIC_VERSION' should be integer {}",
+                            log::debug!(
+                                "{} - 'EARLIEST_COMPATIBLE_NUMERIC_VERSION' should be integer '{}' from {}",
                                 caller,
-                                parent_dir
+                                captured_value,
+                                info_file_data.get_identifier()
                             );
                             // match on \D to replace any non-digit characters with empty string
                             let digits_only =
@@ -187,10 +188,10 @@ impl ModuleInfoFile {
                             match digits_only.parse() {
                                 Ok(n) => info_file_data.earliest_compatible_numeric_version = n,
                                 Err(_e) => {
-                                    log::error!(
-                                        "{} - Unable to parse any numbers from {}",
+                                    log::debug!(
+                                        "{} - Unable to parse any numbers from {} for EARLIEST_COMPATIBLE_NUMERIC_VERSION",
                                         caller,
-                                        digits_only
+                                        captured_value
                                     );
                                 }
                             }
@@ -262,7 +263,7 @@ impl ModuleInfoFile {
                     "STEAM_FILE_ID" => match captured_value.parse() {
                         Ok(n) => info_file_data.steam_file_id = n,
                         Err(_e) => {
-                            log::warn!(
+                            log::debug!(
                                 "{} - 'STEAM_FILE_ID' should be integer {}",
                                 caller,
                                 parent_dir
@@ -273,10 +274,10 @@ impl ModuleInfoFile {
                             match digits_only.parse() {
                                 Ok(n) => info_file_data.steam_file_id = n,
                                 Err(_e) => {
-                                    log::error!(
-                                        "{} - Unable to parse any numbers from {}",
+                                    log::debug!(
+                                        "{} - Unable to parse any numbers from {} for STEAM_FILE_ID",
                                         caller,
-                                        digits_only
+                                        captured_value
                                     );
                                 }
                             }

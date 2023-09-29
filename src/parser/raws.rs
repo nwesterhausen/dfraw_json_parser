@@ -58,6 +58,7 @@ impl RawMetadata {
         object_type: &ObjectType,
         raw_identifier: &str,
         raw_file_path: &P,
+        attach_metadata_to_raws: bool,
     ) -> Self {
         Self {
             module_name: module_info.get_name(),
@@ -66,18 +67,14 @@ impl RawMetadata {
             raw_identifier: String::from(raw_identifier),
             object_type: object_type.clone(),
             raw_module_location: module_info.get_location(),
-            hidden: true,
+            hidden: !attach_metadata_to_raws,
         }
     }
     /// Used only for serialization
-    pub(crate) fn is_hidden(&self) -> bool {
+    pub fn is_hidden(&self) -> bool {
         self.hidden
     }
     pub fn get_raw_identifier(&self) -> &str {
         &self.raw_identifier
-    }
-
-    pub(crate) fn set_hidden(&mut self, hide_metadata_in_result: bool) {
-        self.hidden = hide_metadata_in_result;
     }
 }

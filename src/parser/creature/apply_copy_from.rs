@@ -12,7 +12,12 @@ fn get_only_creatures_from_raws(all_raws: &[Box<dyn RawObject>]) -> Vec<DFCreatu
 }
 
 pub fn apply_copy_tags_from(all_raws: &mut Vec<Box<dyn RawObject>>) {
-    let all_creatures = {get_only_creatures_from_raws(all_raws)};
+    let all_creatures = { get_only_creatures_from_raws(all_raws) };
+    log::info!(
+        "apply_copy_tags_from looking at {} of {} raws",
+        all_creatures.len(),
+        all_raws.len()
+    );
 
     let mut creatures_to_replace: Vec<DFCreature> = Vec::new();
 
@@ -22,11 +27,11 @@ pub fn apply_copy_tags_from(all_raws: &mut Vec<Box<dyn RawObject>>) {
         }
 
         let Some(creature) = raw.as_any().downcast_ref::<DFCreature>() else {
-                log::error!(
-                    "Unable to downcast raw object to creature raw:{}",
-                    raw.get_identifier()
-                );
-                continue;            
+            log::error!(
+                "Unable to downcast raw object to creature raw:{}",
+                raw.get_identifier()
+            );
+            continue;
         };
 
         if !creature.get_copy_tags_from().is_empty() {
@@ -53,7 +58,12 @@ pub fn apply_copy_tags_from(all_raws: &mut Vec<Box<dyn RawObject>>) {
             }
         }
     }
-
+    log::info!(
+        "Before replacement, all_raws has {} records, {}/{} creatures flagged for replacement",
+        all_raws.len(),
+        creatures_to_replace.len(),
+        all_creatures.len()
+    );
     for creature in creatures_to_replace {
         // Remove the old creature from all_raws by matching creature identifier
         let old_creature_index = all_raws
@@ -66,4 +76,5 @@ pub fn apply_copy_tags_from(all_raws: &mut Vec<Box<dyn RawObject>>) {
         // Add replacement creature to all_raws
         all_raws.push(Box::new(creature));
     }
+    log::info!("After replacement, all_raws has {} records", all_raws.len());
 }

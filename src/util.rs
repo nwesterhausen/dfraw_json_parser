@@ -6,7 +6,10 @@ use std::{
 
 use walkdir::WalkDir;
 
-use crate::options::{ParserOptions, ParsingJob};
+use crate::{
+    options::{ParserOptions, ParsingJob},
+    parser::raws::RawObject,
+};
 
 /// Get a vec of subdirectories for a given directory
 ///
@@ -215,6 +218,11 @@ pub fn options_has_valid_paths(options: &ParserOptions) -> bool {
         return false;
     }
 
+    // Exit early if we aren't writing to a file.
+    if !options.output_to_file {
+        return true;
+    }
+
     let output_path = &options.output_path;
     // Guard against invalid path
     if !target_path.exists() {
@@ -230,4 +238,29 @@ pub fn options_has_valid_paths(options: &ParserOptions) -> bool {
         return false;
     }
     true
+}
+
+/// The function `raws_to_string` converts a vector of raw objects into a JSON string representation.
+///
+/// Arguments:
+///
+/// * `raws`: The `raws` parameter is a vector of `Box<dyn RawObject>`.
+///
+/// Returns:
+///
+/// The function `raws_to_string` returns a `String` that represents the input `Vec<Box<dyn RawObject>>`
+/// as a JSON array.
+pub fn raws_to_string(raws: Vec<Box<dyn RawObject>>) -> String {
+    // It should be an array, so start with '[' character,
+    // then add each raw object, separated by a comma.
+    // Finally add the closing ']' character.
+    // (The last item cannot have a comma before ']')
+    let mut json = String::from('[');
+    for raw in raws {
+        json.push_str(serde_json::to_string(&raw).unwrap_or_default().as_str());
+        json.push(',');
+    }
+    json.pop(); // remove trailing comma
+    json.push(']');
+    json
 }

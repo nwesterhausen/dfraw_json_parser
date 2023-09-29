@@ -37,6 +37,7 @@ influence exactly which locations are parsed. All also includes a modules.json w
 modules and their info.
 ";
 
+#[allow(clippy::struct_excessive_bools)]
 #[derive(Parser, Debug)]
 #[command(author, version, about, long_about = None)] // Read from `Cargo.toml`
 struct Args {
@@ -69,6 +70,14 @@ struct Args {
     /// Parse installed mods location
     #[clap(long, default_value_t = false, long_help = "Parse installed mods")]
     parse_mods_installed: bool,
+
+    /// Include Metadata in output
+    #[clap(
+        long,
+        default_value_t = false,
+        long_help = "Include metadata in output"
+    )]
+    include_metadata: bool,
 }
 
 #[derive(Debug, Copy, Clone, PartialEq, Eq, PartialOrd, Ord, ValueEnum)]
@@ -83,6 +92,7 @@ enum ParseTarget {
     All,
 }
 
+#[allow(clippy::too_many_lines)]
 fn main() {
     // Specify color configuration
     let colors = ColoredLevelConfig::new()
@@ -128,19 +138,26 @@ fn main() {
     let mut options = ParserOptions::new(target_path);
     options.set_output_path(&output_path);
 
+    if args.include_metadata {
+        options.attach_metadata_to_raws();
+    }
+
     let parse_target = args.parse;
 
     match parse_target {
         ParseTarget::RawFile => {
             options.set_job(ParsingJob::SingleRaw);
+            log::info!("Parsing options: {:#?}", options);
             dfraw_json_parser::parse_to_file(&options);
         }
         ParseTarget::RawModuleInfoFile => {
             options.set_job(ParsingJob::SingleModuleInfoFile);
+            log::info!("Parsing options: {:#?}", options);
             dfraw_json_parser::parse_module_info_file(&options);
         }
         ParseTarget::RawModule => {
             options.set_job(ParsingJob::SingleModule);
+            log::info!("Parsing options: {:#?}", options);
             dfraw_json_parser::parse_to_file(&options);
         }
         ParseTarget::All => {
@@ -180,7 +197,7 @@ fn main() {
                 options.set_job(ParsingJob::SingleLocation);
             }
 
-            log::debug!("Parsing options: {:#?}", options);
+            log::info!("Parsing options: {:#?}", options);
             dfraw_json_parser::parse_to_file(&options);
 
             let mut module_json_fname = String::new();

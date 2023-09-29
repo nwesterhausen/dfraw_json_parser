@@ -68,8 +68,8 @@ pub fn parse_raw_file_with_info<P: AsRef<Path>>(
         &object_type,
         raw_filename.as_str(),
         &raw_file_path,
+        options.attach_metadata_to_raws,
     );
-    raw_metadata.set_hidden(!options.attach_metadata_to_raws);
 
     for (index, line) in reader.lines().enumerate() {
         if line.is_err() {
@@ -96,6 +96,7 @@ pub fn parse_raw_file_with_info<P: AsRef<Path>>(
                 &object_type,
                 raw_filename.as_str(),
                 &raw_file_path,
+                options.attach_metadata_to_raws,
             );
             continue;
         }
@@ -145,7 +146,7 @@ pub fn parse_raw_file_with_info<P: AsRef<Path>>(
                         return created_raws;
                     }
                 }
-                "CREATURE" | "SELECT_CREATURE" => {
+                "CREATURE" => {
                     if started {
                         // We need to add the creature to the list.
                         created_raws.push(Box::new(temp_creature.clone()));
@@ -153,6 +154,12 @@ pub fn parse_raw_file_with_info<P: AsRef<Path>>(
                     // We haven't started a creature yet, so we need to start one.
                     started = true;
                     temp_creature = DFCreature::new(captured_value, &raw_metadata.clone());
+                }
+                "SELECT_CREATURE" => {
+                    log::info!(
+                        "Skipping SELECT_CREATURE:{} (currently unsupported)",
+                        captured_value
+                    );
                 }
                 "CASTE" => {
                     // Starting a new caste (in creature), so we can just add a caste to the last creature we started.
@@ -247,11 +254,6 @@ pub fn parse_raw_file_with_info<P: AsRef<Path>>(
             }
             _ => {}
         }
-    }
-
-    // Apply copy_tags_from
-    if object_type == ObjectType::Creature && !options.skip_apply_copy_tags_from {
-        apply_copy_tags_from(&mut created_raws);
     }
 
     // Return the created raws.

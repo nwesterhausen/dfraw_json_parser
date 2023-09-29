@@ -58,6 +58,9 @@ pub struct ParserOptions {
     ///
     /// If left empty, ./output.json will be used.
     pub output_path: PathBuf,
+    /// Whether output to a file or not
+    /// Default: false
+    pub output_to_file: bool,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize, PartialEq, Eq, ts_rs::TS)]
@@ -78,6 +81,7 @@ impl Default for ParserOptions {
             skip_apply_copy_tags_from: false,
             skip_apply_creature_variations: false,
             serialize_result_to_json: false,
+            output_to_file: false,
             raws_to_parse: vec![
                 ObjectType::Creature,
                 ObjectType::Plant,
@@ -87,7 +91,7 @@ impl Default for ParserOptions {
             locations_to_parse: vec![RawModuleLocation::Vanilla],
             target_path: PathBuf::from(""),
             job: ParsingJob::All,
-            output_path: PathBuf::from("output.json"),
+            output_path: PathBuf::from(""),
         }
     }
 }
@@ -176,5 +180,11 @@ impl ParserOptions {
     /// If left empty, ./output.json will be used.
     pub fn set_output_path<P: AsRef<Path>>(&mut self, output_path: P) {
         self.output_path = output_path.as_ref().to_path_buf();
+    }
+
+    /// Whether output to a file or not
+    /// Default: false
+    pub fn output_to_file(&mut self) {
+        self.output_to_file = true;
     }
 }
