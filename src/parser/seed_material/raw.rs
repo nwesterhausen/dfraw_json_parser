@@ -1,6 +1,6 @@
 use serde::{Deserialize, Serialize};
 
-use crate::parser::{color::DFColor, names::SingPlurName};
+use crate::parser::{color::Color, names::SingPlurName};
 
 #[derive(ts_rs::TS)]
 #[ts(export)]
@@ -9,7 +9,7 @@ use crate::parser::{color::DFColor, names::SingPlurName};
 #[serde(rename_all = "camelCase")]
 pub struct SeedMaterial {
     name: SingPlurName,
-    color: DFColor,
+    color: Color,
     material: String,
 }
 
@@ -40,7 +40,7 @@ impl SeedMaterial {
             parts.next().unwrap_or_default()
         ));
         // The color uses the next three parts
-        let color = DFColor::from_value(&format!(
+        let color = Color::from_value(&format!(
             "{}:{}:{}",
             parts.next().unwrap_or_default(),
             parts.next().unwrap_or_default(),

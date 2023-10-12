@@ -135,8 +135,10 @@ pub fn parse(
 
     // Apply copy_tags_from
     if !options.skip_apply_copy_tags_from {
-        parser::creature::apply_copy_from::apply_copy_tags_from(&mut results);
+        parser::helpers::apply_copy_from::apply_copy_tags_from(&mut results);
     }
+    // Absorb select_creature
+    parser::helpers::absorb_select_creature::absorb_select_creature(&mut results);
 
     results
 }
@@ -187,15 +189,14 @@ fn parse_location<P: AsRef<Path>>(
     options: &crate::options::ParserOptions,
     progress_helper: &mut ProgressHelper,
 ) -> Vec<Box<dyn RawObject>> {
+    use crate::parser::raw_locations::RawModuleLocation;
+
     let mut results: Vec<Box<dyn RawObject>> = Vec::new();
+    let module_location = RawModuleLocation::from_path(&location_path);
     let location_path: std::path::PathBuf = location_path.as_ref().to_path_buf();
     // Get a list of all subdirectories in the location
     let raw_modules_in_location: Vec<DirEntry> =
         util::subdirectories(location_path).unwrap_or_default();
-    let module_location = options
-        .locations_to_parse
-        .first()
-        .unwrap_or(&crate::parser::raw_locations::RawModuleLocation::Unknown);
     log::info!(
         "Found {} raw modules in {:?}",
         raw_modules_in_location.len(),
@@ -265,7 +266,7 @@ fn parse_module<P: AsRef<Path>>(
     }
 
     if !graphics_path.exists() {
-        log::warn!(
+        log::debug!(
             "No graphics directory found in {:?}",
             module_path.as_ref().file_name().unwrap_or_default(),
         );
@@ -305,6 +306,7 @@ fn parse_module<P: AsRef<Path>>(
                     progress_helper.add_steps(1);
                     progress_helper.send_update(file_name_str);
                     results.extend(parser::parse_raws_from_single_file(&file_path, options));
+                    progress_helper.add_to_running_total(results.len());
                 }
             }
         }

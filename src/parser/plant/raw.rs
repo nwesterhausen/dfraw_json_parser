@@ -27,7 +27,7 @@ use super::{phf_table::PLANT_TOKENS, tokens::PlantTag};
 #[allow(clippy::module_name_repetitions)]
 #[derive(Serialize, Deserialize, Debug, Clone, Default)]
 #[serde(rename_all = "camelCase")]
-pub struct DFPlant {
+pub struct Plant {
     /// Common Raw file Things
     #[serde(skip_serializing_if = "RawMetadata::is_hidden")]
     metadata: RawMetadata,
@@ -66,15 +66,15 @@ pub struct DFPlant {
     materials: Vec<Material>,
 }
 
-impl DFPlant {
-    pub fn empty() -> DFPlant {
-        DFPlant {
+impl Plant {
+    pub fn empty() -> Plant {
+        Plant {
             frequency: 50,
-            ..DFPlant::default()
+            ..Plant::default()
         }
     }
-    pub fn new(identifier: &str, metadata: &RawMetadata) -> DFPlant {
-        DFPlant {
+    pub fn new(identifier: &str, metadata: &RawMetadata) -> Plant {
+        Plant {
             identifier: String::from(identifier),
             metadata: metadata.clone(),
             frequency: 50,
@@ -84,13 +84,13 @@ impl DFPlant {
                 "PLANT",
                 slugify(identifier)
             ),
-            ..DFPlant::default()
+            ..Plant::default()
         }
     }
 }
 
 #[typetag::serde]
-impl RawObject for DFPlant {
+impl RawObject for Plant {
     fn get_metadata(&self) -> &RawMetadata {
         &self.metadata
     }
@@ -156,6 +156,7 @@ impl RawObject for DFPlant {
                 .as_mut()
                 .unwrap_or(&mut Shrub::default())
                 .parse_tag(key, value);
+            return;
         }
 
         if !PLANT_TOKENS.contains_key(key) {

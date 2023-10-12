@@ -15,6 +15,7 @@ pub struct ProgressPayload {
     current_module: String,
     current_file: String,
     current_location: String,
+    running_total: usize,
 }
 
 #[cfg(feature = "tauri")]
@@ -38,6 +39,7 @@ impl ProgressHelper {
                 current_module: String::new(),
                 current_file: String::new(),
                 current_location: String::new(),
+                running_total: 0,
             },
         }
     }
@@ -52,6 +54,9 @@ impl ProgressHelper {
     }
     pub fn update_current_task(&mut self, task: &str) {
         self.progress_cache.current_task = String::from(task);
+    }
+    pub fn add_to_running_total(&mut self, amount: usize) {
+        self.progress_cache.running_total += amount;
     }
     #[allow(clippy::cast_precision_loss)]
     fn step_advance(&mut self) {

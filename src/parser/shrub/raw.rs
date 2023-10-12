@@ -1,6 +1,6 @@
 use serde::{Deserialize, Serialize};
 
-use crate::parser::color::DFColor;
+use crate::parser::color::Color;
 use crate::parser::seed_material::raw::SeedMaterial;
 use crate::parser::serializer_helper;
 
@@ -43,17 +43,17 @@ pub struct Shrub {
     #[serde(skip_serializing_if = "serializer_helper::is_default_cluster_size")]
     cluster_size: u32,
     /// The color of the plant when it has been picked whole, or when it is ready for harvest in a farm plot. Defaults to 2:0:0 (dark green).
-    #[serde(skip_serializing_if = "DFColor::is_default")]
-    picked_color: DFColor,
+    #[serde(skip_serializing_if = "Color::is_default")]
+    picked_color: Color,
     /// The color of the plant when it has been picked whole, but has wilted. Defaults to 0:0:1 (dark gray).
-    #[serde(skip_serializing_if = "DFColor::is_default")]
-    dead_picked_color: DFColor,
+    #[serde(skip_serializing_if = "Color::is_default")]
+    dead_picked_color: Color,
     /// The color of the plant when it is alive, wild, and has no growths. Defaults to 2:0:0 (dark green).
-    #[serde(skip_serializing_if = "DFColor::is_default")]
-    shrub_color: DFColor,
+    #[serde(skip_serializing_if = "Color::is_default")]
+    shrub_color: Color,
     /// The color of the plant when it is dead in the wild. Defaults to 6:0:0 (brown).
-    #[serde(skip_serializing_if = "DFColor::is_default")]
-    dead_shrub_color: DFColor,
+    #[serde(skip_serializing_if = "Color::is_default")]
+    dead_shrub_color: Color,
     /// The shrub will drown once the water on its tile reaches this level. Defaults to 4.
     #[serde(skip_serializing_if = "serializer_helper::is_default_shrub_drown_level")]
     shrub_drown_level: u8,
@@ -189,16 +189,16 @@ impl Shrub {
                 };
             }
             ShrubToken::PickedColor => {
-                self.picked_color = DFColor::from_value(value);
+                self.picked_color = Color::from_value(value);
             }
             ShrubToken::DeadPickedColor => {
-                self.dead_picked_color = DFColor::from_value(value);
+                self.dead_picked_color = Color::from_value(value);
             }
             ShrubToken::ShrubColor => {
-                self.shrub_color = DFColor::from_value(value);
+                self.shrub_color = Color::from_value(value);
             }
             ShrubToken::DeadShrubColor => {
-                self.dead_shrub_color = DFColor::from_value(value);
+                self.dead_shrub_color = Color::from_value(value);
             }
             ShrubToken::ShrubDrownLevel => {
                 self.shrub_drown_level = match value.parse() {

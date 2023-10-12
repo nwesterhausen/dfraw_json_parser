@@ -1,12 +1,12 @@
 use serde::{Deserialize, Serialize};
 
 use crate::parser::{
-    body_size::DFBodySize,
-    milkable::DFMilkable,
+    body_size::BodySize,
+    milkable::Milkable,
     names::{Name, SingPlurName},
     ranges::parse_min_max_range,
     serializer_helper,
-    tile::DFTile,
+    tile::Tile,
 };
 
 use super::{phf_table::CASTE_TOKENS, tokens::CasteTag};
@@ -16,7 +16,7 @@ use super::{phf_table::CASTE_TOKENS, tokens::CasteTag};
 #[allow(clippy::module_name_repetitions)]
 #[derive(Serialize, Deserialize, Debug, Clone, Default)]
 #[serde(rename_all = "camelCase")]
-pub struct DFCaste {
+pub struct Caste {
     identifier: String,
     #[serde(skip_serializing_if = "Vec::is_empty")]
     tags: Vec<CasteTag>,
@@ -65,18 +65,18 @@ pub struct DFCaste {
     creature_class: Vec<String>,
     // Special Tokens
     #[serde(skip_serializing_if = "Vec::is_empty")]
-    body_size: Vec<DFBodySize>,
-    #[serde(skip_serializing_if = "DFMilkable::is_default")]
-    milkable: DFMilkable,
-    #[serde(skip_serializing_if = "DFTile::is_default")]
-    tile: DFTile,
+    body_size: Vec<BodySize>,
+    #[serde(skip_serializing_if = "Milkable::is_default")]
+    milkable: Milkable,
+    #[serde(skip_serializing_if = "Tile::is_default")]
+    tile: Tile,
 }
 
-impl DFCaste {
-    pub fn new(name: &str) -> DFCaste {
-        DFCaste {
+impl Caste {
+    pub fn new(name: &str) -> Caste {
+        Caste {
             identifier: String::from(name),
-            ..DFCaste::default()
+            ..Caste::default()
         }
     }
     pub fn parse_tag(&mut self, key: &str, value: &str) {
@@ -116,9 +116,9 @@ impl DFCaste {
             CasteTag::MaxAge => self.max_age = parse_min_max_range(value).unwrap_or_default(),
             CasteTag::CreatureClass => self.creature_class.push(String::from(value)),
             CasteTag::BodySize => {
-                self.body_size.push(DFBodySize::from_value(value));
+                self.body_size.push(BodySize::from_value(value));
             }
-            CasteTag::Milkable => self.milkable = DFMilkable::from_value(value),
+            CasteTag::Milkable => self.milkable = Milkable::from_value(value),
             CasteTag::BabyName => self.baby_name = SingPlurName::from_value(value),
             CasteTag::CasteName => self.caste_name = Name::from_value(value),
             CasteTag::ChildName => self.child_name = SingPlurName::from_value(value),
@@ -169,10 +169,10 @@ impl DFCaste {
             CasteTag::MaxAge => self.max_age = [0, 0],
             CasteTag::CreatureClass => self.creature_class.retain(|c| c != value),
             CasteTag::BodySize => {
-                let body_size_to_remove = DFBodySize::from_value(value);
+                let body_size_to_remove = BodySize::from_value(value);
                 self.body_size.retain(|bs| bs != &body_size_to_remove);
             }
-            CasteTag::Milkable => self.milkable = DFMilkable::default(),
+            CasteTag::Milkable => self.milkable = Milkable::default(),
             CasteTag::BabyName => self.baby_name = SingPlurName::default(),
             CasteTag::CasteName => self.caste_name = Name::default(),
             CasteTag::ChildName => self.child_name = SingPlurName::default(),
@@ -186,7 +186,7 @@ impl DFCaste {
         }
     }
 
-    pub fn overwrite_caste(&mut self, other: &DFCaste) {
+    pub fn overwrite_caste(&mut self, other: &Caste) {
         // Include any tags from other that aren't in self
         for tag in &other.tags {
             if !self.tags.contains(tag) {

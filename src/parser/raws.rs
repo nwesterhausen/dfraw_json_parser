@@ -1,6 +1,7 @@
 use std::{any::Any, path::Path};
 
 use serde::{Deserialize, Serialize};
+use slug::slugify;
 
 use super::{
     module_info_file::ModuleInfoFile, object_types::ObjectType, raw_locations::RawModuleLocation,
@@ -77,4 +78,30 @@ impl RawMetadata {
     pub fn get_raw_identifier(&self) -> &str {
         &self.raw_identifier
     }
+    pub fn get_module_name(&self) -> &str {
+        &self.module_name
+    }
+    pub fn get_module_numerical_version(&self) -> &str {
+        &self.module_version
+    }
+    pub fn get_module_version(&self) -> &str {
+        &self.module_version
+    }
+    pub fn get_raw_file_path(&self) -> &str {
+        &self.raw_file_path
+    }
+}
+
+pub fn build_object_id_from_pieces(
+    metadata: &RawMetadata,
+    identifier: &str,
+    raw_type: &ObjectType,
+) -> String {
+    format!(
+        "{raw_parent_id}-{raw_type}-{raw_id}-{module_name}{module_version}",
+        raw_id = slugify(identifier),
+        raw_parent_id = slugify(metadata.get_raw_identifier()),
+        module_version = metadata.get_module_numerical_version(),
+        module_name = slugify(metadata.get_module_name()),
+    )
 }

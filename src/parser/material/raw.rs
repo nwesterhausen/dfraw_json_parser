@@ -1,8 +1,8 @@
 use serde::{Deserialize, Serialize};
 
 use crate::parser::{
-    color::DFColor, material::phf_table::MATERIAL_PROPERTY_TOKENS, names::StateName,
-    serializer_helper, termperatures::Temperatures,
+    color::Color, material::phf_table::MATERIAL_PROPERTY_TOKENS, names::StateName,
+    serializer_helper, temperature::Temperatures,
 };
 
 use super::{
@@ -53,8 +53,8 @@ pub struct Material {
     #[serde(skip_serializing_if = "serializer_helper::is_one")]
     value: u32,
 
-    #[serde(skip_serializing_if = "DFColor::is_default")]
-    color: DFColor,
+    #[serde(skip_serializing_if = "Color::is_default")]
+    color: Color,
 
     #[serde(skip_serializing_if = "StateName::is_empty")]
     state_names: StateName,
@@ -234,7 +234,7 @@ impl Material {
                 MaterialProperty::StateName => self.state_names.add_from_value(value),
                 MaterialProperty::StateAdjective => self.state_adjectives.add_from_value(value),
                 MaterialProperty::StateColor => self.state_colors.add_from_value(value),
-                MaterialProperty::BasicColor => self.color = DFColor::from_value(value),
+                MaterialProperty::BasicColor => self.color = Color::from_value(value),
                 // Temperatures
                 MaterialProperty::SpecificHeat => self
                     .temperatures

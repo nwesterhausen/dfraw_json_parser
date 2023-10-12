@@ -407,6 +407,16 @@ pub enum MaterialProperty {
     Syndrome,
     /// This is since .50 in the raws of several antler-wielding animals. It is used to show an antler as bodypart.
     Antler,
+
+    // Additional tokens from 50.x
+    Hair,
+    Feather,
+    Scale,
+    Hoof,
+    Chitin,
+    Cartilage,
+    NervousTissue,
+    MeatCategory,
     /// For default value, use unknown.
     #[default]
     Unknown,

@@ -1,11 +1,11 @@
-use crate::parser::creature::raw::DFCreature;
+use crate::parser::creature::raw::Creature;
 
 use super::tokens::CVTag;
 
 #[typetag::serde(tag = "type")]
 pub trait CreatureVariation {
     fn get_type(&self) -> CVTag;
-    fn apply_tag(&self, creature: &mut DFCreature);
+    fn apply_tag(&self, creature: &mut Creature);
 }
 
 #[typetag::serde]

@@ -1,6 +1,8 @@
 use serde::{Deserialize, Serialize};
 
-#[derive(Serialize, Deserialize, Copy, Clone, Debug)]
+#[derive(ts_rs::TS)]
+#[ts(export)]
+#[derive(Serialize, Deserialize, Copy, Clone, Debug, Default)]
 pub struct Dimensions {
     x: i32,
     y: i32,

@@ -87,6 +87,7 @@ impl Default for ParserOptions {
                 ObjectType::Plant,
                 ObjectType::Inorganic,
                 ObjectType::MaterialTemplate,
+                ObjectType::Graphics,
             ],
             locations_to_parse: vec![RawModuleLocation::Vanilla],
             target_path: PathBuf::from(""),

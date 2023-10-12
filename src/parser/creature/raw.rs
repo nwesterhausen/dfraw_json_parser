@@ -1,15 +1,15 @@
 use serde::{Deserialize, Serialize};
-use slug::slugify;
 
 use crate::parser::{
-    creature_caste::{phf_table::CASTE_TOKENS, raw::DFCaste},
+    creature_caste::{phf_table::CASTE_TOKENS, raw::Caste},
     creature_variation::raw::CreatureVariationRequirements,
     names::{Name, SingPlurName},
     object_types::ObjectType,
     ranges::parse_min_max_range,
-    raws::{RawMetadata, RawObject},
+    raws::{build_object_id_from_pieces, RawMetadata, RawObject},
+    select_creature::raw::SelectCreature,
     serializer_helper,
-    tile::DFTile,
+    tile::Tile,
 };
 
 use super::{phf_table::CREATURE_TOKENS, tokens::CreatureTag};
@@ -18,19 +18,19 @@ use super::{phf_table::CREATURE_TOKENS, tokens::CreatureTag};
 #[ts(export)]
 #[derive(Serialize, Deserialize, Debug, Clone, Default)]
 #[serde(rename_all = "camelCase")]
-pub struct DFCreature {
+pub struct Creature {
     #[serde(skip_serializing_if = "serializer_helper::is_metadata_hidden")]
     metadata: RawMetadata,
     identifier: String,
-    castes: Vec<DFCaste>,
+    castes: Vec<Caste>,
     #[serde(skip_serializing_if = "Vec::is_empty")]
     tags: Vec<CreatureTag>,
     #[serde(skip_serializing_if = "Vec::is_empty")]
     biomes: Vec<String>,
     #[serde(skip_serializing_if = "Vec::is_empty")]
     pref_strings: Vec<String>,
-    #[serde(skip_serializing_if = "DFTile::is_default")]
-    tile: DFTile,
+    #[serde(skip_serializing_if = "Tile::is_default")]
+    tile: Tile,
     // integers
     #[serde(skip_serializing_if = "serializer_helper::is_default_frequency")]
     frequency: u16, //Defaults to 50 if not specified
@@ -56,41 +56,44 @@ pub struct DFCreature {
     #[serde(skip_serializing_if = "Vec::is_empty")]
     apply_creature_variation: Vec<String>,
     object_id: String,
+    #[serde(skip_serializing_if = "Vec::is_empty")]
+    select_creature_variation: Vec<SelectCreature>,
 }
 
-impl DFCreature {
-    pub fn empty() -> DFCreature {
-        DFCreature {
-            castes: vec![DFCaste::new("ALL")],
+impl Creature {
+    pub fn empty() -> Creature {
+        Creature {
+            castes: vec![Caste::new("ALL")],
             population_number: [1, 1],
             cluster_number: [1, 1],
             frequency: 50,
-            ..DFCreature::default()
+            ..Creature::default()
         }
     }
-    pub fn new(identifier: &str, metadata: &RawMetadata) -> DFCreature {
-        DFCreature {
+    pub fn new(identifier: &str, metadata: &RawMetadata) -> Creature {
+        Creature {
             identifier: String::from(identifier),
             metadata: metadata.clone(),
             frequency: 50,
-            castes: vec![DFCaste::new("ALL")],
+            castes: vec![Caste::new("ALL")],
             population_number: [1, 1],
             cluster_number: [1, 1],
-            object_id: format!(
-                "{}-{}-{}",
-                metadata.get_raw_identifier(),
-                "CREATURE",
-                slugify(identifier)
-            ),
-            ..DFCreature::default()
+            object_id: build_object_id_from_pieces(metadata, identifier, &ObjectType::Creature),
+            ..Creature::default()
         }
     }
     pub fn get_copy_tags_from(&self) -> &str {
         &self.copy_tags_from
     }
+    pub fn push_select_creature_variation(&mut self, select_creature: SelectCreature) {
+        self.select_creature_variation.push(select_creature);
+    }
+    pub fn extend_select_creature_variation(&mut self, select_creature_vec: Vec<SelectCreature>) {
+        self.select_creature_variation.extend(select_creature_vec);
+    }
     // Add a new caste
     pub fn add_caste(&mut self, name: &str) {
-        self.castes.push(DFCaste::new(name));
+        self.castes.push(Caste::new(name));
     }
     // Move specified caste (by name) to end of case list
     pub fn select_caste(&mut self, name: &str) {
@@ -120,8 +123,16 @@ impl DFCreature {
         false
     }
 
+    pub fn get_child_object_ids(&self) -> Vec<&str> {
+        let mut object_ids = Vec::new();
+        for select_creature in &self.select_creature_variation {
+            object_ids.push(select_creature.get_object_id());
+        }
+        object_ids
+    }
+
     /// Copy tags from another creature
-    pub fn copy_tags_from(creature: &DFCreature, creature_to_copy_from: &DFCreature) -> Self {
+    pub fn copy_tags_from(creature: &Creature, creature_to_copy_from: &Creature) -> Self {
         // Because anything specified in our self will override the copied tags, first we need to clone the creature
         let mut combined_creature = creature_to_copy_from.clone();
         // Now apply any tags that exist for us but not for the one we copy.
@@ -131,6 +142,8 @@ impl DFCreature {
         combined_creature.metadata = creature.metadata.clone();
         // our identifier is preserved
         combined_creature.identifier = creature.identifier.clone();
+        // our object_id is preserved
+        combined_creature.object_id = creature.object_id.clone();
 
         // We need to loop over our castes and apply any differences.
         for caste in &creature.castes {
@@ -168,16 +181,16 @@ impl DFCreature {
         }
 
         // If any of our other properties are not default, we need to apply them to the combined creature.
-        if creature.frequency != 50 {
+        if !serializer_helper::is_default_frequency(&creature.frequency) {
             combined_creature.frequency = creature.frequency;
         }
-        if creature.population_number != [1, 1] {
+        if !serializer_helper::min_max_is_ones(&creature.cluster_number) {
             combined_creature.population_number = creature.population_number;
         }
-        if creature.cluster_number != [1, 1] {
+        if !serializer_helper::min_max_is_ones(&creature.cluster_number) {
             combined_creature.cluster_number = creature.cluster_number;
         }
-        if creature.underground_depth != [0, 0] {
+        if !serializer_helper::min_max_is_zeroes(&creature.underground_depth) {
             combined_creature.underground_depth = creature.underground_depth;
         }
         if !creature.general_baby_name.is_empty() {
@@ -198,7 +211,7 @@ impl DFCreature {
 }
 
 #[typetag::serde]
-impl RawObject for DFCreature {
+impl RawObject for Creature {
     fn get_metadata(&self) -> &RawMetadata {
         &self.metadata
     }
@@ -217,7 +230,7 @@ impl RawObject for DFCreature {
             return;
         }
         if !CREATURE_TOKENS.contains_key(key) {
-            log::debug!("CreatureParsing: Unknown tag {} with value {}", key, value);
+            log::trace!("CreatureParsing: Unknown tag {} with value {}", key, value);
             return;
         }
 
@@ -284,12 +297,12 @@ impl RawObject for DFCreature {
         }
     }
     fn get_object_id(&self) -> &str {
-        &self.object_id
+        self.object_id.as_str()
     }
 }
 
 #[typetag::serde]
-impl CreatureVariationRequirements for DFCreature {
+impl CreatureVariationRequirements for Creature {
     fn remove_tag(&mut self, key: &str) {
         self.remove_tag_and_value(key, "");
     }

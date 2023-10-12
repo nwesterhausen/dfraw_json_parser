@@ -27,6 +27,23 @@ impl RawModuleLocation {
             RawModuleLocation::Unknown => PathBuf::from("unknown"),
         }
     }
+    pub fn from_path<P: AsRef<Path>>(path: &P) -> Self {
+        match path.as_ref().file_name() {
+            Some(file_name) => match file_name.to_string_lossy().as_ref() {
+                "mods" => RawModuleLocation::Mods,
+                "installed_mods" => RawModuleLocation::InstalledMods,
+                "vanilla" => RawModuleLocation::Vanilla,
+                _ => {
+                    log::warn!(
+                        "RawModuleLocation - Unable to match source directory \"{dir}\"",
+                        dir = file_name.to_string_lossy()
+                    );
+                    RawModuleLocation::Unknown
+                }
+            },
+            None => RawModuleLocation::Unknown,
+        }
+    }
     pub fn from_sourced_directory(sourced_directory: &str) -> Self {
         match sourced_directory {
             "mods" => RawModuleLocation::Mods,

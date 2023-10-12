@@ -1,7 +1,5 @@
-use phf::phf_map;
-
 use super::tokens::CreatureTag;
-pub static CREATURE_TOKENS: phf::Map<&'static str, CreatureTag> = phf_map! {
+pub static CREATURE_TOKENS: phf::Map<&'static str, CreatureTag> = phf::phf_map! {
     "ARTIFICIAL_HIVEABLE" => CreatureTag::ArtificialHiveable,
     "DOES_NOT_EXIST" => CreatureTag::DoesNotExist,
     "EVIL" => CreatureTag::Evil,

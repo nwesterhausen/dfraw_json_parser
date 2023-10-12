@@ -1,25 +1,25 @@
 use serde::{Deserialize, Serialize};
 
-use super::color::DFColor;
+use super::color::Color;
 
 #[derive(ts_rs::TS)]
 #[ts(export)]
 #[allow(clippy::module_name_repetitions)]
 #[derive(Serialize, Deserialize, Debug, Clone, Default)]
 #[serde(rename_all = "camelCase")]
-pub struct DFTile {
+pub struct Tile {
     character: String,
     #[serde(skip_serializing_if = "String::is_empty")]
     alt_character: String,
-    #[serde(skip_serializing_if = "DFColor::is_default")]
-    color: DFColor,
+    #[serde(skip_serializing_if = "Color::is_default")]
+    color: Color,
     #[serde(skip_serializing_if = "String::is_empty")]
     glow_character: String,
-    #[serde(skip_serializing_if = "DFColor::is_default")]
-    glow_color: DFColor,
+    #[serde(skip_serializing_if = "Color::is_default")]
+    glow_color: Color,
 }
 
-impl DFTile {
+impl Tile {
     pub fn set_character(&mut self, character: &str) {
         self.character = String::from(character);
     }
@@ -27,10 +27,10 @@ impl DFTile {
         self.alt_character = String::from(character);
     }
     pub fn set_color(&mut self, color: &str) {
-        self.color = DFColor::from_value(color);
+        self.color = Color::from_value(color);
     }
     pub fn set_glow_color(&mut self, color: &str) {
-        self.glow_color = DFColor::from_value(color);
+        self.glow_color = Color::from_value(color);
     }
     pub fn set_glow_character(&mut self, character: &str) {
         self.glow_character = String::from(character);

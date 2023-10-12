@@ -1,7 +1,7 @@
 use serde::{Deserialize, Serialize};
 
 use crate::parser::{
-    creature::raw::DFCreature, creature_variation::raw::CreatureVariation, raws::RawObject,
+    creature::raw::Creature, creature_variation::raw::CreatureVariation, raws::RawObject,
 };
 
 use super::tokens::CVTag;
@@ -18,7 +18,7 @@ impl CreatureVariation for CVNewTag {
         CVTag::NewTag
     }
 
-    fn apply_tag(&self, creature: &mut DFCreature) {
+    fn apply_tag(&self, creature: &mut Creature) {
         log::debug!(
             "Applying new tag {}:{} to creature {}",
             self.new_token_key,
@@ -41,7 +41,7 @@ impl CreatureVariation for CVAddTag {
         CVTag::AddTag
     }
 
-    fn apply_tag(&self, creature: &mut DFCreature) {
+    fn apply_tag(&self, creature: &mut Creature) {
         log::debug!(
             "Applying add tag {}:{} to creature {}",
             self.add_token_key,

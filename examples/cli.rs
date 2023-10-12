@@ -41,6 +41,10 @@ modules and their info.
 #[derive(Parser, Debug)]
 #[command(author, version, about, long_about = None)] // Read from `Cargo.toml`
 struct Args {
+    // Verbose (debug) logging
+    #[clap(short, long, long_help = "Enable verbose (debug) logging")]
+    verbose: bool,
+
     // Target path to parse
     #[clap(short, long, long_help = HELP_TARGET_PATH)]
     #[arg(required = true)]
@@ -94,6 +98,13 @@ enum ParseTarget {
 
 #[allow(clippy::too_many_lines)]
 fn main() {
+    let args = Args::parse();
+    let log_level = if args.verbose {
+        log::LevelFilter::Debug
+    } else {
+        log::LevelFilter::Info
+    };
+
     // Specify color configuration
     let colors = ColoredLevelConfig::new()
         // Specify info as cyan
@@ -110,14 +121,12 @@ fn main() {
             ));
         })
         // Add blanket level filter -
-        .level(log::LevelFilter::Info)
+        .level(log_level)
         // Output to stdout, files, and other Dispatch configurations
         .chain(std::io::stdout())
         // Apply globally
         .apply()
         .expect("Failed to start logger");
-
-    let args = Args::parse();
 
     let target_path = normalize_path(Path::new(args.target_path.as_str()));
     let mut output_path = normalize_path(Path::new(args.out_dir.as_str()));
@@ -204,7 +213,7 @@ fn main() {
             if output_path.is_file() {
                 // Remove the filename portion of the path
                 module_json_fname = format!(
-                    "{}modules.json",
+                    "{}_modules.json",
                     output_path
                         .clone()
                         .file_name()

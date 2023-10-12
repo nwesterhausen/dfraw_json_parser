@@ -1,6 +1,6 @@
 use serde::{Deserialize, Serialize};
 
-use crate::parser::{color::DFColor, names::Name, serializer_helper};
+use crate::parser::{color::Color, names::Name, serializer_helper};
 
 use super::{
     phf_table::TREE_TOKENS,
@@ -92,17 +92,17 @@ pub struct Tree {
     #[serde(skip_serializing_if = "String::is_empty")]
     dead_sapling_tile: String,
     /// The color of the tree on the map. Defaults to 2:0:0 (dark green).
-    #[serde(skip_serializing_if = "DFColor::is_default")]
-    tree_color: DFColor,
+    #[serde(skip_serializing_if = "Color::is_default")]
+    tree_color: Color,
     /// The color of the tree on the map when (un)dead. Defaults to 0:0:1 (dark gray).
-    #[serde(skip_serializing_if = "DFColor::is_default")]
-    dead_tree_color: DFColor,
+    #[serde(skip_serializing_if = "Color::is_default")]
+    dead_tree_color: Color,
     /// The color of saplings of this tree. Defaults to 2:0:0 (dark green).
-    #[serde(skip_serializing_if = "DFColor::is_default")]
-    sapling_color: DFColor,
+    #[serde(skip_serializing_if = "Color::is_default")]
+    sapling_color: Color,
     /// The color of dead saplings of this tree. Defaults to 0:0:1 (dark gray).
-    #[serde(skip_serializing_if = "DFColor::is_default")]
-    dead_sapling_color: DFColor,
+    #[serde(skip_serializing_if = "Color::is_default")]
+    dead_sapling_color: Color,
     /// The sapling of this tree will drown once the water on its tile reaches this level. Defaults to 4.
     #[serde(skip_serializing_if = "serializer_helper::is_default_sapling_drown_level")]
     sapling_drown_level: u8,
@@ -362,16 +362,16 @@ impl Tree {
                 self.dead_sapling_tile = String::from(value);
             }
             TreeToken::TreeColor => {
-                self.tree_color = DFColor::from_value(value);
+                self.tree_color = Color::from_value(value);
             }
             TreeToken::DeadTreeColor => {
-                self.dead_tree_color = DFColor::from_value(value);
+                self.dead_tree_color = Color::from_value(value);
             }
             TreeToken::SaplingColor => {
-                self.sapling_color = DFColor::from_value(value);
+                self.sapling_color = Color::from_value(value);
             }
             TreeToken::DeadSaplingColor => {
-                self.dead_sapling_color = DFColor::from_value(value);
+                self.dead_sapling_color = Color::from_value(value);
             }
             TreeToken::SaplingDrownLevel => {
                 self.sapling_drown_level = match value.parse() {

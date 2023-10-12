@@ -189,4 +189,11 @@ pub static MATERIAL_PROPERTY_TOKENS: phf::Map<&'static str, MaterialProperty> = 
     "SOAP_LEVEL" => MaterialProperty::SoapLevel,
     "SYNDROME" => MaterialProperty::Syndrome,
     "ANTLER" => MaterialProperty::Antler,
+    "CARTILAGE" => MaterialProperty::Cartilage,
+    "FEATHER" => MaterialProperty::Feather,
+    "HOOF" => MaterialProperty::Hoof,
+    "CHITIN" => MaterialProperty::Chitin,
+    "SCALE" => MaterialProperty::Scale,
+    "NERVOUS_TISSUE" => MaterialProperty::NervousTissue,
+    "MEAT_CATEGORY" => MaterialProperty::MeatCategory,
 };

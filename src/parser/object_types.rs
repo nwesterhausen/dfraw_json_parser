@@ -91,6 +91,8 @@ pub enum ObjectType {
     Interaction,
     #[default]
     Unknown,
+    SelectCreature,
+    CreatureCaste,
 }
 
 impl Display for ObjectType {

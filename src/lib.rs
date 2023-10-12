@@ -64,7 +64,10 @@ for the steam workshop if it is a mod downloaded from the steam workshop.
 
 use options::{ParserOptions, ParsingJob};
 use parser::{
-    creature::apply_copy_from::apply_copy_tags_from, module_info_file::ModuleInfoFile,
+    helpers::{
+        absorb_select_creature::absorb_select_creature, apply_copy_from::apply_copy_tags_from,
+    },
+    module_info_file::ModuleInfoFile,
     raws::RawObject,
 };
 use std::path::{Path, PathBuf};
@@ -182,6 +185,8 @@ pub fn parse(options: &ParserOptions) -> Vec<Box<dyn RawObject>> {
         }
     }
 
+    // Absorb select_creature
+    absorb_select_creature(&mut results);
     // Apply copy_tags_from
     if !options.skip_apply_copy_tags_from {
         apply_copy_tags_from(&mut results);
@@ -396,7 +401,7 @@ fn parse_module<P: AsRef<Path>>(
     }
 
     if !graphics_path.exists() {
-        log::warn!(
+        log::debug!(
             "No graphics directory found in {:?}",
             module_path.as_ref().file_name().unwrap_or_default(),
         );
@@ -440,7 +445,25 @@ fn parse_module<P: AsRef<Path>>(
     }
 
     // Parse the graphics
-    // NOT IMPLEMENTED YET
+    if parse_graphics {
+        for entry in WalkDir::new(graphics_path)
+            .into_iter()
+            .filter_map(std::result::Result::ok)
+        {
+            if entry.file_type().is_file() {
+                let file_path = entry.path();
+                let file_name = file_path.file_name().unwrap_or_default();
+                let file_name_str = file_name.to_str().unwrap_or_default();
+
+                if Path::new(file_name_str)
+                    .extension()
+                    .map_or(false, |ext| ext.eq_ignore_ascii_case("txt"))
+                {
+                    results.extend(parser::parse_raws_from_single_file(&file_path, options));
+                }
+            }
+        }
+    }
 
     results
 }

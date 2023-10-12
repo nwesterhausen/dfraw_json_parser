@@ -1,22 +1,23 @@
+use encoding_rs_io::DecodeReaderBytesBuilder;
 use std::{
     fs::File,
     io::{BufRead, BufReader},
     path::Path,
 };
 
-use encoding_rs_io::DecodeReaderBytesBuilder;
-
 use crate::{
     options::ParserOptions,
     parser::{
-        creature::{apply_copy_from::apply_copy_tags_from, raw::DFCreature},
+        creature::raw::Creature,
+        graphics::raw::Graphic,
         inorganic::raw::Inorganic,
         material_template::raw::MaterialTemplate,
         module_info_file::ModuleInfoFile,
         object_types::{ObjectType, OBJECT_TOKENS},
-        plant::raw::DFPlant,
+        plant::raw::Plant,
         raws::{RawMetadata, RawObject},
         refs::{DF_ENCODING, RAW_TOKEN_RE},
+        select_creature::raw::SelectCreature,
     },
 };
 
@@ -56,10 +57,14 @@ pub fn parse_raw_file_with_info<P: AsRef<Path>>(
     let mut started = false;
     let mut raw_filename = String::new();
 
-    let mut temp_creature = DFCreature::empty();
-    let mut temp_plant = DFPlant::empty();
+    let mut temp_creature = Creature::empty();
+    let mut temp_select_creature = SelectCreature::empty();
+    let mut temp_plant = Plant::empty();
     let mut temp_inorganic = Inorganic::empty();
+    let mut temp_graphic = Graphic::empty();
     let mut temp_material_template = MaterialTemplate::empty();
+
+    let mut last_parsed_type = ObjectType::Unknown;
 
     // Metadata
     let object_type = read_raw_file_type(raw_file_path);
@@ -147,27 +152,34 @@ pub fn parse_raw_file_with_info<P: AsRef<Path>>(
                     }
                 }
                 "CREATURE" => {
-                    if started {
+                    if started && last_parsed_type == ObjectType::Creature {
                         // We need to add the creature to the list.
                         created_raws.push(Box::new(temp_creature.clone()));
                     }
                     // We haven't started a creature yet, so we need to start one.
                     started = true;
-                    temp_creature = DFCreature::new(captured_value, &raw_metadata.clone());
+                    temp_creature = Creature::new(captured_value, &raw_metadata.clone());
+                    last_parsed_type = ObjectType::Creature;
                 }
                 "SELECT_CREATURE" => {
-                    log::info!(
-                        "Skipping SELECT_CREATURE:{} (currently unsupported)",
-                        captured_value
-                    );
+                    if started && last_parsed_type == ObjectType::SelectCreature {
+                        // We need to add the creature to the list.
+                        created_raws.push(Box::new(temp_select_creature.clone()));
+                    }
+                    // We haven't started a creature yet, so we need to start one.
+                    started = true;
+                    temp_select_creature =
+                        SelectCreature::new(captured_value, &raw_metadata.clone());
+                    last_parsed_type = ObjectType::SelectCreature;
                 }
                 "CASTE" => {
                     // Starting a new caste (in creature), so we can just add a caste to the last creature we started.
-                    if started {
+                    if started && last_parsed_type == ObjectType::CreatureCaste {
                         // We have a creature, so we can add a caste to it.
                         // First we have to cast the dyn RawObject to a DFCreature.
                         temp_creature.add_caste(captured_value);
                     }
+                    last_parsed_type = ObjectType::CreatureCaste;
                 }
                 "SELECT_CASTE" => {
                     // Starting a new caste (in creature), so we can just add a caste to the last creature we started.
@@ -185,7 +197,8 @@ pub fn parse_raw_file_with_info<P: AsRef<Path>>(
                     }
                     // We haven't started a plant yet, so we need to start one.
                     started = true;
-                    temp_plant = DFPlant::new(captured_value, &raw_metadata.clone());
+                    temp_plant = Plant::new(captured_value, &raw_metadata.clone());
+                    last_parsed_type = ObjectType::Plant;
                 }
                 "INORGANIC" | "SELECT_INORGANIC" => {
                     if started {
@@ -196,6 +209,7 @@ pub fn parse_raw_file_with_info<P: AsRef<Path>>(
                         started = true;
                     }
                     temp_inorganic = Inorganic::new(captured_value, &raw_metadata.clone());
+                    last_parsed_type = ObjectType::Inorganic;
                 }
                 "MATERIAL_TEMPLATE" => {
                     // Starting a new material template, so we can just add a material template to the list.
@@ -207,17 +221,37 @@ pub fn parse_raw_file_with_info<P: AsRef<Path>>(
                     started = true;
                     temp_material_template =
                         MaterialTemplate::new(captured_value, &raw_metadata.clone());
+                    last_parsed_type = ObjectType::MaterialTemplate;
+                }
+                "CREATURE_GRAPHICS"
+                | "CREATURE_CASTE_GRAPHICS"
+                | "TILE_GRAPHICS"
+                | "PLANT_GRAPHICS" => {
+                    // Starting a new graphic, so we can just add a graphic to the list.
+                    if started {
+                        // We need to add the graphic to the list.
+                        created_raws.push(Box::new(temp_graphic.clone()));
+                    }
+                    // We haven't started a graphic yet, so we need to start one.
+                    started = true;
+                    temp_graphic = Graphic::new(captured_value, &raw_metadata.clone());
+                    last_parsed_type = ObjectType::Graphics;
                 }
                 _ => {
                     // This should be a tag for the current object.
                     // We should check if we have a current object, and if we do, we should add the tag to it.
                     // If we haven't started yet, we should do nothing.
                     if started {
-                        match object_type {
+                        match last_parsed_type {
                             ObjectType::Creature => {
                                 // We have a creature, so we can add a tag to it.
                                 // First we have to cast the dyn RawObject to a DFCreature.
                                 temp_creature.parse_tag(captured_key, captured_value);
+                            }
+                            ObjectType::SelectCreature => {
+                                // We have a creature, so we can add a tag to it.
+                                // First we have to cast the dyn RawObject to a DFCreature.
+                                temp_select_creature.parse_tag(captured_key, captured_value);
                             }
                             ObjectType::Plant => {
                                 // We have a plant, so we can add a tag to it.
@@ -234,6 +268,11 @@ pub fn parse_raw_file_with_info<P: AsRef<Path>>(
                                 // First we have to cast the dyn RawObject to a DFPlant.
                                 temp_material_template.parse_tag(captured_key, captured_value);
                             }
+                            ObjectType::Graphics => {
+                                // We have a graphic, so we can add a tag to it.
+                                // First we have to cast the dyn RawObject to a DFPlant.
+                                temp_graphic.parse_tag(captured_key, captured_value);
+                            }
                             _ => {
                                 // We don't have a known raw yet. So do nothing.
                             }
@@ -245,17 +284,22 @@ pub fn parse_raw_file_with_info<P: AsRef<Path>>(
     }
     if started {
         // If we did indeed start capture, we need to complete the final raw by adding it to the list
-        match object_type {
+        match last_parsed_type {
             ObjectType::Creature => created_raws.push(Box::new(temp_creature.clone())),
             ObjectType::Plant => created_raws.push(Box::new(temp_plant.clone())),
             ObjectType::Inorganic => created_raws.push(Box::new(temp_inorganic.clone())),
             ObjectType::MaterialTemplate => {
                 created_raws.push(Box::new(temp_material_template.clone()));
             }
+            ObjectType::SelectCreature => {
+                created_raws.push(Box::new(temp_select_creature.clone()));
+            }
+            ObjectType::Graphics => {
+                created_raws.push(Box::new(temp_graphic.clone()));
+            }
             _ => {}
         }
     }
 
-    // Return the created raws.
     created_raws
 }

@@ -8,7 +8,10 @@ use walkdir::WalkDir;
 
 use crate::{
     options::{ParserOptions, ParsingJob},
-    parser::raws::RawObject,
+    parser::{
+        creature::raw::Creature, object_types::ObjectType, raws::RawObject,
+        select_creature::raw::SelectCreature,
+    },
 };
 
 /// Get a vec of subdirectories for a given directory
@@ -263,4 +266,42 @@ pub fn raws_to_string(raws: Vec<Box<dyn RawObject>>) -> String {
     json.pop(); // remove trailing comma
     json.push(']');
     json
+}
+
+/// The function `get_only_creatures_from_raws` takes a slice of `RawObject` trait objects and returns a
+/// vector containing only the objects that are of type `DFCreature`.
+///
+/// Arguments:
+///
+/// * `all_raws`: A slice of boxed objects that implement the `RawObject` trait.
+///
+/// Returns:
+///
+/// a vector of `DFCreature` objects.
+pub fn get_only_creatures_from_raws(all_raws: &[Box<dyn RawObject>]) -> Vec<Creature> {
+    all_raws
+        .iter()
+        .filter(|r| r.get_type() == &ObjectType::Creature)
+        .map(|r| r.as_any().downcast_ref::<Creature>())
+        .map(|r| r.unwrap_or(&Creature::default()).clone())
+        .collect::<Vec<Creature>>()
+}
+
+/// The function `get_only_select_creatures_from_raws` filters a slice of raw objects and returns a
+/// vector containing only the objects of type `SelectCreature`.
+///
+/// Arguments:
+///
+/// * `all_raws`: A slice of boxed objects that implement the `RawObject` trait.
+///
+/// Returns:
+///
+/// a vector of `SelectCreature` objects.
+pub fn get_only_select_creatures_from_raws(all_raws: &[Box<dyn RawObject>]) -> Vec<SelectCreature> {
+    all_raws
+        .iter()
+        .filter(|r| r.get_type() == &ObjectType::SelectCreature)
+        .map(|r| r.as_any().downcast_ref::<SelectCreature>())
+        .map(|r| r.unwrap_or(&SelectCreature::default()).clone())
+        .collect::<Vec<SelectCreature>>()
 }
