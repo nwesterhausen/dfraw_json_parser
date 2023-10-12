@@ -9,7 +9,7 @@ use crate::{
     options::ParserOptions,
     parser::{
         creature::raw::Creature,
-        graphics::raw::Graphic,
+        graphics::{phf_table::GRAPHIC_TYPE_TAGS, raw::Graphic, tokens::GraphicType},
         inorganic::raw::Inorganic,
         material_template::raw::MaterialTemplate,
         module_info_file::ModuleInfoFile,
@@ -65,6 +65,7 @@ pub fn parse_raw_file_with_info<P: AsRef<Path>>(
     let mut temp_material_template = MaterialTemplate::empty();
 
     let mut last_parsed_type = ObjectType::Unknown;
+    let mut last_graphic_type = GraphicType::Unknown;
 
     // Metadata
     let object_type = read_raw_file_type(raw_file_path);
@@ -234,8 +235,14 @@ pub fn parse_raw_file_with_info<P: AsRef<Path>>(
                     }
                     // We haven't started a graphic yet, so we need to start one.
                     started = true;
-                    temp_graphic = Graphic::new(captured_value, &raw_metadata.clone());
+
                     last_parsed_type = ObjectType::Graphics;
+                    last_graphic_type = *GRAPHIC_TYPE_TAGS
+                        .get(captured_key)
+                        .unwrap_or(&GraphicType::Unknown);
+
+                    temp_graphic =
+                        Graphic::new(captured_value, &raw_metadata.clone(), last_graphic_type);
                 }
                 _ => {
                     // This should be a tag for the current object.
@@ -271,7 +278,11 @@ pub fn parse_raw_file_with_info<P: AsRef<Path>>(
                             ObjectType::Graphics => {
                                 // We have a graphic, so we can add a tag to it.
                                 // First we have to cast the dyn RawObject to a DFPlant.
-                                temp_graphic.parse_tag(captured_key, captured_value);
+                                temp_graphic.parse_sprite_from_tag(
+                                    captured_key,
+                                    captured_value,
+                                    last_graphic_type,
+                                );
                             }
                             _ => {
                                 // We don't have a known raw yet. So do nothing.

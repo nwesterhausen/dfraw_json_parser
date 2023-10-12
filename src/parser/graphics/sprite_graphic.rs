@@ -2,7 +2,7 @@ use serde::{Deserialize, Serialize};
 
 use super::{
     dimensions::Dimensions,
-    phf_table::GRAPHIC_TYPE_TAGS,
+    sprite_layer::SpriteLayer,
     tokens::{ColorModification, Condition, GraphicType},
 };
 
@@ -22,21 +22,11 @@ pub struct SpriteGraphic {
 }
 
 impl SpriteGraphic {
-    pub fn from_token(key: &str, value: &str) -> Option<Self> {
-        todo!("fix parsing---no obj type");
+    pub fn from_token(key: &str, value: &str, graphic_type: GraphicType) -> Option<Self> {
         // Recombine token for parsing
         let token = format!("{key}:{value}");
-        // The key should match our GRAPHIC_TYPE_TOKENS
-        if !GRAPHIC_TYPE_TAGS.contains_key(key) {
-            log::warn!(
-                "Failed to parse {} as SpriteGraphic, unknown key {}",
-                value,
-                key
-            );
-            return None;
-        }
 
-        match GRAPHIC_TYPE_TAGS.get(key).unwrap_or(&GraphicType::Unknown) {
+        match graphic_type {
             GraphicType::Creature | GraphicType::CreatureCaste => {
                 // parse creature
                 SpriteGraphic::parse_creature_from_token(&token)
@@ -135,10 +125,14 @@ impl SpriteGraphic {
             }
         };
 
-        let large_image = match split.next() {
-            Some(v) => v == "LARGE_IMAGE",
-            _ => false,
+        let fourth_position_token = match split.next() {
+            Some(v) => String::from(v),
+            _ => {
+                return None;
+            }
         };
+
+        let large_image = matches!(fourth_position_token.as_str(), "LARGE_IMAGE");
 
         if large_image {
             return SpriteGraphic::parse_large_creature_with_split(
@@ -148,15 +142,11 @@ impl SpriteGraphic {
             );
         }
 
-        let x1: i32 = match split.next() {
-            Some(v) => match v.parse() {
-                Ok(n) => n,
-                Err(e) => {
-                    log::warn!("Failed to parse {} as x1, {:?}", v, e);
-                    return None;
-                }
-            },
-            _ => {
+        // x1 actually is parsed from fourth_position_token
+        let x1: i32 = match fourth_position_token.parse() {
+            Ok(n) => n,
+            Err(e) => {
+                log::warn!("Failed to parse {} as x1, {:?}", fourth_position_token, e);
                 return None;
             }
         };
@@ -201,7 +191,12 @@ impl SpriteGraphic {
     ) -> Option<Self> {
         // [<condition>:<tile page identifier>:LARGE_IMAGE:<x1>:<y1>:<x2>:<y2>:<color type>:<secondary condition>]
         //   0           1                      2          3    4     5    6    7            8
-
+        log::info!(
+            "parse_large_creature_with_split: {:?} {:?} {:?}",
+            condition,
+            tile_page_id,
+            split
+        );
         // We know it's a large image, and the split should contain 6 elements (x1, y1, x2, y2, color type, secondary condition)
         if split.len() != 6 {
             log::warn!(

@@ -1,4 +1,4 @@
-use super::tokens::{Condition, GraphicType};
+use super::tokens::{Condition, GraphicType, LayerCondition};
 
 pub static GRAPHIC_CONDITION_TAGS: phf::Map<&'static str, Condition> = phf::phf_map! {
     "DEFAULT" => Condition::Default,
@@ -37,4 +37,11 @@ pub static GRAPHIC_TYPE_TAGS: phf::Map<&'static str, GraphicType> = phf::phf_map
     "SEED" => GraphicType::Plant,
     "CROP" => GraphicType::Plant,
     "SAPLING" => GraphicType::Plant,
+};
+
+pub static LAYER_CONDITION_TAGS: phf::Map<&'static str, LayerCondition> = phf::phf_map! {
+    "CONDITION_NOT_CHILD" => LayerCondition::ConditionNotChild,
+    "CONDITION_CHILD" => LayerCondition::ConditionChild,
+    "CONDITION_HAUL_COUNT_MIN" => LayerCondition::ConditionHaulCountMin,
+    "CONDITION_HAUL_COUNT_MAX" => LayerCondition::ConditionHaulCountMax,
 };

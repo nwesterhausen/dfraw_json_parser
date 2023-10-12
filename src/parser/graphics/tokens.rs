@@ -43,6 +43,18 @@ pub enum Condition {
 #[derive(ts_rs::TS)]
 #[ts(export)]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, Default)]
+pub enum LayerCondition {
+    ConditionNotChild,
+    ConditionChild,
+    ConditionHaulCountMin,
+    ConditionHaulCountMax,
+    #[default]
+    Unknown,
+}
+
+#[derive(ts_rs::TS)]
+#[ts(export)]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, Default)]
 pub enum ColorModification {
     #[default]
     AsIs,
