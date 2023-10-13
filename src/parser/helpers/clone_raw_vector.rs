@@ -1,7 +1,12 @@
 use crate::parser::{
-    creature::raw::Creature, graphics::raw::Graphic, inorganic::raw::Inorganic,
-    material_template::raw::MaterialTemplate, object_types::ObjectType, plant::raw::Plant,
-    raws::RawObject, select_creature::raw::SelectCreature,
+    creature::raw::Creature,
+    graphics::{raw::Graphic, tile_page::TilePage},
+    inorganic::raw::Inorganic,
+    material_template::raw::MaterialTemplate,
+    object_types::ObjectType,
+    plant::raw::Plant,
+    raws::RawObject,
+    select_creature::raw::SelectCreature,
 };
 
 #[allow(clippy::borrowed_box)]
@@ -63,6 +68,14 @@ pub fn clone_raw_object_box(box_ref: &Box<dyn RawObject>) -> Box<dyn RawObject> 
                 .unwrap_or(&Graphic::empty())
                 .clone();
             Box::new(temp_graphic)
+        }
+        ObjectType::TilePage => {
+            let temp_tile_page = box_ref
+                .as_any()
+                .downcast_ref::<TilePage>()
+                .unwrap_or(&TilePage::empty())
+                .clone();
+            Box::new(temp_tile_page)
         }
         _ => {
             log::warn!(

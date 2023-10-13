@@ -9,7 +9,9 @@ use crate::{
     options::ParserOptions,
     parser::{
         creature::raw::Creature,
-        graphics::{phf_table::GRAPHIC_TYPE_TAGS, raw::Graphic, tokens::GraphicType},
+        graphics::{
+            phf_table::GRAPHIC_TYPE_TAGS, raw::Graphic, tile_page::TilePage, tokens::GraphicType,
+        },
         inorganic::raw::Inorganic,
         material_template::raw::MaterialTemplate,
         module_info_file::ModuleInfoFile,
@@ -66,6 +68,7 @@ pub fn parse_raw_file_with_info<P: AsRef<Path>>(
 
     let mut last_parsed_type = ObjectType::Unknown;
     let mut last_graphic_type = GraphicType::Unknown;
+    let mut temp_tile_page = TilePage::empty();
 
     // Metadata
     let object_type = read_raw_file_type(raw_file_path);
@@ -244,6 +247,17 @@ pub fn parse_raw_file_with_info<P: AsRef<Path>>(
                     temp_graphic =
                         Graphic::new(captured_value, &raw_metadata.clone(), last_graphic_type);
                 }
+                "TILE_PAGE" => {
+                    if started {
+                        // We need to add the tile page to the list.
+                        created_raws.push(Box::new(temp_tile_page.clone()));
+                    } else {
+                        started = true;
+                    }
+                    // We haven't started a tile page yet, so we need to start one.
+                    temp_tile_page = TilePage::new(captured_value, &raw_metadata.clone());
+                    last_parsed_type = ObjectType::TilePage;
+                }
                 _ => {
                     // This should be a tag for the current object.
                     // We should check if we have a current object, and if we do, we should add the tag to it.
@@ -284,6 +298,11 @@ pub fn parse_raw_file_with_info<P: AsRef<Path>>(
                                     last_graphic_type,
                                 );
                             }
+                            ObjectType::TilePage => {
+                                // We have a tile page, so we can add a tag to it.
+                                // First we have to cast the dyn RawObject to a DFPlant.
+                                temp_tile_page.parse_tag(captured_key, captured_value);
+                            }
                             _ => {
                                 // We don't have a known raw yet. So do nothing.
                             }
@@ -307,6 +326,9 @@ pub fn parse_raw_file_with_info<P: AsRef<Path>>(
             }
             ObjectType::Graphics => {
                 created_raws.push(Box::new(temp_graphic.clone()));
+            }
+            ObjectType::TilePage => {
+                created_raws.push(Box::new(temp_tile_page.clone()));
             }
             _ => {}
         }

@@ -1,4 +1,4 @@
-use super::tokens::{Condition, GraphicType, LayerCondition};
+use super::tokens::{Condition, GraphicType, LayerCondition, TilePageTag};
 
 pub static GRAPHIC_CONDITION_TAGS: phf::Map<&'static str, Condition> = phf::phf_map! {
     "DEFAULT" => Condition::Default,
@@ -44,4 +44,10 @@ pub static LAYER_CONDITION_TAGS: phf::Map<&'static str, LayerCondition> = phf::p
     "CONDITION_CHILD" => LayerCondition::ConditionChild,
     "CONDITION_HAUL_COUNT_MIN" => LayerCondition::ConditionHaulCountMin,
     "CONDITION_HAUL_COUNT_MAX" => LayerCondition::ConditionHaulCountMax,
+};
+
+pub static TILE_PAGE_TAGS: phf::Map<&'static str, TilePageTag> = phf::phf_map! {
+    "TILE_DIM" => TilePageTag::TileDim,
+    "PAGE_DIM" => TilePageTag::PageDim,
+    "FILE" => TilePageTag::File,
 };

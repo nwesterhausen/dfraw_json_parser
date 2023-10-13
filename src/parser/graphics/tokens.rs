@@ -73,6 +73,17 @@ pub enum GraphicType {
     Unknown,
 }
 
+#[derive(ts_rs::TS)]
+#[ts(export)]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, Default)]
+pub enum TilePageTag {
+    TileDim,
+    PageDim,
+    File,
+    #[default]
+    Unknown,
+}
+
 impl ColorModification {
     pub fn from_token(token: &str) -> Self {
         if let "AS_IS" = token {
