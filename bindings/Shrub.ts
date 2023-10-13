@@ -3,4 +3,25 @@ import type { Color } from "./Color";
 import type { SeasonToken } from "./SeasonToken";
 import type { SeedMaterial } from "./SeedMaterial";
 
-export interface Shrub { growingSeason: Array<SeasonToken>, growDuration: number, value: number, pickedTile: number, deadPickedTile: number, shrubTile: number, deadShrubTile: number, clusterSize: number, pickedColor: Color, deadPickedColor: Color, shrubColor: Color, deadShrubColor: Color, shrubDrownLevel: number, drink: string, mill: string, thread: string, seed: SeedMaterial, extractStillVial: string, extractVial: string, extractBarrel: string, }
+export interface Shrub {
+  growingSeason: Array<SeasonToken>;
+  growDuration: number;
+  value: number;
+  pickedTile: number;
+  deadPickedTile: number;
+  shrubTile: number;
+  deadShrubTile: number;
+  clusterSize: number;
+  pickedColor: Color;
+  deadPickedColor: Color;
+  shrubColor: Color;
+  deadShrubColor: Color;
+  shrubDrownLevel: number;
+  drink: string;
+  mill: string;
+  thread: string;
+  seed: SeedMaterial;
+  extractStillVial: string;
+  extractVial: string;
+  extractBarrel: string;
+}

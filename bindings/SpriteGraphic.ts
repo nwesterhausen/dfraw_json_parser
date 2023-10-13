@@ -3,4 +3,12 @@ import type { ColorModification } from "./ColorModification";
 import type { Condition } from "./Condition";
 import type { Dimensions } from "./Dimensions";
 
-export interface SpriteGraphic { primaryCondition: Condition, tilePageId: string, offset: Dimensions, color: ColorModification, largeImage: boolean, offset2: Dimensions, secondaryCondition: Condition, }
+export interface SpriteGraphic {
+  primaryCondition: Condition;
+  tilePageId: string;
+  offset: Dimensions;
+  color: ColorModification;
+  largeImage: boolean;
+  offset2: Dimensions;
+  secondaryCondition: Condition;
+}

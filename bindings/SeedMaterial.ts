@@ -2,4 +2,8 @@
 import type { Color } from "./Color";
 import type { SingPlurName } from "./SingPlurName";
 
-export interface SeedMaterial { name: SingPlurName, color: Color, material: string, }
+export interface SeedMaterial {
+  name: SingPlurName;
+  color: Color;
+  material: string;
+}

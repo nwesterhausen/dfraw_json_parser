@@ -7,4 +7,23 @@ import type { SelectCreature } from "./SelectCreature";
 import type { SingPlurName } from "./SingPlurName";
 import type { Tile } from "./Tile";
 
-export interface Creature { metadata: RawMetadata, identifier: string, castes: Array<Caste>, tags: Array<CreatureTag>, biomes: Array<string>, prefStrings: Array<string>, tile: Tile, frequency: number, clusterNumber: Array<number>, populationNumber: Array<number>, undergroundDepth: Array<number>, generalBabyName: SingPlurName, generalChildName: SingPlurName, name: Name, copyTagsFrom: string, applyCreatureVariation: Array<string>, objectId: string, selectCreatureVariation: Array<SelectCreature>, }
+export interface Creature {
+  metadata: RawMetadata;
+  identifier: string;
+  castes: Array<Caste>;
+  tags: Array<CreatureTag>;
+  biomes: Array<string>;
+  prefStrings: Array<string>;
+  tile: Tile;
+  frequency: number;
+  clusterNumber: Array<number>;
+  populationNumber: Array<number>;
+  undergroundDepth: Array<number>;
+  generalBabyName: SingPlurName;
+  generalChildName: SingPlurName;
+  name: Name;
+  copyTagsFrom: string;
+  applyCreatureVariation: Array<string>;
+  objectId: string;
+  selectCreatureVariation: Array<SelectCreature>;
+}

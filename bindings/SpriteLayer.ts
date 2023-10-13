@@ -2,4 +2,9 @@
 import type { Dimensions } from "./Dimensions";
 import type { LayerCondition } from "./LayerCondition";
 
-export interface SpriteLayer { layerName: string, tilePageId: string, offset: Dimensions, conditions: Array<[LayerCondition, number]>, }
+export interface SpriteLayer {
+  layerName: string;
+  tilePageId: string;
+  offset: Dimensions;
+  conditions: Array<[LayerCondition, number]>;
+}

@@ -6,4 +6,28 @@ import type { Name } from "./Name";
 import type { SingPlurName } from "./SingPlurName";
 import type { Tile } from "./Tile";
 
-export interface Caste { identifier: string, tags: Array<CasteTag>, description: string, babyName: SingPlurName, casteName: Name, childName: SingPlurName, clutchSize: Array<number>, litterSize: Array<number>, maxAge: Array<number>, baby: number, child: number, difficulty: number, eggSize: number, grassTrample: number, grazer: number, lowLightVision: number, petValue: number, popRatio: number, changeBodySizePercentage: number, creatureClass: Array<string>, bodySize: Array<BodySize>, milkable: Milkable, tile: Tile, }
+export interface Caste {
+  identifier: string;
+  tags: Array<CasteTag>;
+  description: string;
+  babyName: SingPlurName;
+  casteName: Name;
+  childName: SingPlurName;
+  clutchSize: Array<number>;
+  litterSize: Array<number>;
+  maxAge: Array<number>;
+  baby: number;
+  child: number;
+  difficulty: number;
+  eggSize: number;
+  grassTrample: number;
+  grazer: number;
+  lowLightVision: number;
+  petValue: number;
+  popRatio: number;
+  changeBodySizePercentage: number;
+  creatureClass: Array<string>;
+  bodySize: Array<BodySize>;
+  milkable: Milkable;
+  tile: Tile;
+}

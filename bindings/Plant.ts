@@ -7,4 +7,18 @@ import type { RawMetadata } from "./RawMetadata";
 import type { Shrub } from "./Shrub";
 import type { Tree } from "./Tree";
 
-export interface Plant { metadata: RawMetadata, identifier: string, objectId: string, name: Name, prefStrings: Array<string>, tags: Array<PlantTag>, undergroundDepth: Array<number>, frequency: number, biomes: Array<string>, growths: Array<PlantGrowth>, treeDetails?: Tree, shrubDetails?: Shrub, materials: Array<Material>, }
+export interface Plant {
+  metadata: RawMetadata;
+  identifier: string;
+  objectId: string;
+  name: Name;
+  prefStrings: Array<string>;
+  tags: Array<PlantTag>;
+  undergroundDepth: Array<number>;
+  frequency: number;
+  biomes: Array<string>;
+  growths: Array<PlantGrowth>;
+  treeDetails?: Tree;
+  shrubDetails?: Shrub;
+  materials: Array<Material>;
+}

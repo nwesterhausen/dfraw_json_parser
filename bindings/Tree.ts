@@ -4,4 +4,37 @@ import type { Name } from "./Name";
 import type { TreeToken } from "./TreeToken";
 import type { TwigPlacement } from "./TwigPlacement";
 
-export interface Tree { material: string, trunkName: Name, maxTrunkHeight: number, maxTrunkDiameter: number, trunkPeriod: number, trunkWidthPeriod: number, branchName: Name, branchDensity: number, branchRadius: number, heavyBranchesName: Name, heavyBranchDensity: number, heavyBranchRadius: number, trunkBranching: number, rootName: Name, rootDensity: number, rootRadius: number, twigsName: Name, twigsPlacement: Array<TwigPlacement>, capName: Name, capPeriod: number, capRadius: number, treeTile: string, deadTreeTile: string, saplingTile: string, deadSaplingTile: string, treeColor: Color, deadTreeColor: Color, saplingColor: Color, deadSaplingColor: Color, saplingDrownLevel: number, treeDrownLevel: number, tags: Array<TreeToken>, }
+export interface Tree {
+  material: string;
+  trunkName: Name;
+  maxTrunkHeight: number;
+  maxTrunkDiameter: number;
+  trunkPeriod: number;
+  trunkWidthPeriod: number;
+  branchName: Name;
+  branchDensity: number;
+  branchRadius: number;
+  heavyBranchesName: Name;
+  heavyBranchDensity: number;
+  heavyBranchRadius: number;
+  trunkBranching: number;
+  rootName: Name;
+  rootDensity: number;
+  rootRadius: number;
+  twigsName: Name;
+  twigsPlacement: Array<TwigPlacement>;
+  capName: Name;
+  capPeriod: number;
+  capRadius: number;
+  treeTile: string;
+  deadTreeTile: string;
+  saplingTile: string;
+  deadSaplingTile: string;
+  treeColor: Color;
+  deadTreeColor: Color;
+  saplingColor: Color;
+  deadSaplingColor: Color;
+  saplingDrownLevel: number;
+  treeDrownLevel: number;
+  tags: Array<TreeToken>;
+}

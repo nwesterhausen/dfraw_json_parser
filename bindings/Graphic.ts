@@ -4,4 +4,12 @@ import type { RawMetadata } from "./RawMetadata";
 import type { SpriteGraphic } from "./SpriteGraphic";
 import type { SpriteLayer } from "./SpriteLayer";
 
-export interface Graphic { metadata: RawMetadata, identifier: string, objectId: string, casteIdentifier: string, kind: GraphicType, graphics: Array<SpriteGraphic>, layers: Array<[string, Array<SpriteLayer>]>, }
+export interface Graphic {
+  metadata: RawMetadata;
+  identifier: string;
+  objectId: string;
+  casteIdentifier: string;
+  kind: GraphicType;
+  graphics: Array<SpriteGraphic>;
+  layers: Array<[string, Array<SpriteLayer>]>;
+}
