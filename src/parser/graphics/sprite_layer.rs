@@ -1,6 +1,6 @@
 use serde::{Deserialize, Serialize};
 
-use super::{dimensions::Dimensions, phf_table::LAYER_CONDITION_TAGS, tokens::LayerCondition};
+use super::{dimensions::Dimensions, phf_table::CONDITION_TAGS, tokens::Condition};
 
 #[derive(ts_rs::TS)]
 #[ts(export)]
@@ -11,41 +11,18 @@ pub struct SpriteLayer {
     layer_name: String,
     tile_page_id: String,
     offset: Dimensions,
-    conditions: Vec<(LayerCondition, i32)>,
+    offset_2: Dimensions,
+    large_image: bool,
+    conditions: Vec<(Condition, String)>,
 }
 
 impl SpriteLayer {
-    pub fn from_token(key: &str, value: &str) -> Option<Self> {
-        // First check if key === "LAYER" which means a new layer is starting..
-        if let "LAYER" = key {
-            // Parse the value into a SpriteLayer
-            Self::parse_layer_from_value(value)
-        } else {
-            // Not a layer, return None
-            None
-        }
-    }
     pub fn parse_condition_token(&mut self, key: &str, value: &str) {
         // Condition is the key, and it should match a value in LAYER_CONDITION_TAGS
-        if let Some(condition) = LAYER_CONDITION_TAGS.get(key) {
-            // Some conditions do not have an i32 value, so we need to check if the condition
-            // is one of those. (e.g. CONDITION_NOT_CHILD, CONDITION_CHILD)
-            if let LayerCondition::ConditionNotChild | LayerCondition::ConditionChild = condition {
-                // These conditions do not have an i32 value, so we can just add them to the list
-                self.conditions.push((condition.clone(), 0));
-                return;
-            }
-            // Parse the value into an i32
-            let value: i32 = match value.parse() {
-                Ok(n) => n,
-                Err(e) => {
-                    log::warn!("Failed to parse {} as i32, {:?}", value, e);
-                    return;
-                }
-            };
-
-            // Add the condition to the list of conditions
-            self.conditions.push((condition.clone(), value));
+        if let Some(condition) = CONDITION_TAGS.get(key) {
+            // It's true that some conditions have a value, some have a tag, and some are standalone.
+            // At the moment we only care about saving the tag, so we'll just save the value as a string.
+            self.conditions.push((*condition, String::from(value)));
         } else {
             log::warn!(
                 "Failed to parse {} as LayerCondition, unknown key {}",
@@ -70,12 +47,24 @@ impl SpriteLayer {
                 return None;
             }
         };
-        let tile_offset_x = match split.next() {
+
+        let fourth_position_token = match split.next() {
             Some(v) => String::from(v),
             _ => {
                 return None;
             }
         };
+
+        let large_image = matches!(fourth_position_token.as_str(), "LARGE_IMAGE");
+
+        if large_image {
+            return Self::parse_large_layer_with_split(
+                layer_name.as_str(),
+                tile_page_id.as_str(),
+                split.collect::<Vec<&str>>().as_slice(),
+            );
+        }
+
         let tile_offset_y = match split.next() {
             Some(v) => String::from(v),
             _ => {
@@ -83,18 +72,26 @@ impl SpriteLayer {
             }
         };
 
-        let offset_x: i32 = match tile_offset_x.parse() {
+        let offset_x: i32 = match fourth_position_token.parse() {
             Ok(n) => n,
-            Err(e) => {
-                log::warn!("Failed to parse {} as offset_x, {:?}", tile_offset_x, e);
+            Err(_e) => {
+                log::warn!(
+                    "parse_layer_from_value: Failed to parse {} as offset_x, {}",
+                    fourth_position_token,
+                    value
+                );
                 return None;
             }
         };
 
         let offset_y: i32 = match tile_offset_y.parse() {
             Ok(n) => n,
-            Err(e) => {
-                log::warn!("Failed to parse {} as offset_y, {:?}", tile_offset_y, e);
+            Err(_e) => {
+                log::warn!(
+                    "parse_layer_from_value: Failed to parse {} as offset_y, {}",
+                    tile_offset_y,
+                    value
+                );
                 return None;
             }
         };
@@ -103,7 +100,90 @@ impl SpriteLayer {
             layer_name,
             tile_page_id,
             offset: Dimensions::from_xy(offset_x, offset_y),
-            conditions: Vec::new(),
+            ..Self::default()
+        })
+    }
+
+    fn parse_large_layer_with_split(
+        layer_name: &str,
+        tile_page_id: &str,
+        split: &[&str],
+    ) -> Option<SpriteLayer> {
+        let x1: i32 = match split.first() {
+            Some(v) => match v.parse() {
+                Ok(n) => n,
+                Err(_e) => {
+                    log::warn!(
+                        "parse_large_creature_with_split: Failed to parse {} as offset_x1 {:?}",
+                        v,
+                        split
+                    );
+                    return None;
+                }
+            },
+            _ => {
+                return None;
+            }
+        };
+
+        let y1: i32 = match split.get(1) {
+            Some(v) => match v.parse() {
+                Ok(n) => n,
+                Err(_e) => {
+                    log::warn!(
+                        "parse_large_creature_with_split: Failed to parse {} as offset_y1 {:?}",
+                        v,
+                        split
+                    );
+                    return None;
+                }
+            },
+            _ => {
+                return None;
+            }
+        };
+
+        let x2: i32 = match split.get(2) {
+            Some(v) => match v.parse() {
+                Ok(n) => n,
+                Err(_e) => {
+                    log::warn!(
+                        "parse_large_creature_with_split: Failed to parse {} as offset_x2 {:?}",
+                        v,
+                        split
+                    );
+                    return None;
+                }
+            },
+            _ => {
+                return None;
+            }
+        };
+
+        let y2: i32 = match split.get(3) {
+            Some(v) => match v.parse() {
+                Ok(n) => n,
+                Err(_e) => {
+                    log::warn!(
+                        "parse_large_creature_with_split: Failed to parse {} as offset_y2 {:?}",
+                        v,
+                        split
+                    );
+                    return None;
+                }
+            },
+            _ => {
+                return None;
+            }
+        };
+
+        Some(Self {
+            layer_name: String::from(layer_name),
+            tile_page_id: String::from(tile_page_id),
+            large_image: true,
+            offset: Dimensions::from_xy(x1, y1),
+            offset_2: Dimensions::from_xy(x2, y2),
+            ..Self::default()
         })
     }
 }

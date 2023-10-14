@@ -50,6 +50,7 @@ pub struct RawMetadata {
     raw_module_location: RawModuleLocation,
     // Optionally hide or unhide from exporting
     // By default will be hidden
+    #[serde(skip)]
     hidden: bool,
 }
 

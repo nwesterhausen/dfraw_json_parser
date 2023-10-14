@@ -382,7 +382,7 @@ fn parse_module<P: AsRef<Path>>(
     let graphics_path = module_path.as_ref().join("graphics");
 
     let mut parse_objects = true;
-    let mut parse_graphics = false;
+    let mut parse_graphics = true;
 
     if !objects_path.exists() {
         log::warn!(

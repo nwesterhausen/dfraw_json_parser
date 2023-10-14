@@ -247,7 +247,7 @@ fn parse_module<P: AsRef<Path>>(
     let graphics_path = module_path.as_ref().join("graphics");
 
     let mut parse_objects = true;
-    let mut parse_graphics = false;
+    let mut parse_graphics = true;
 
     if !objects_path.exists() {
         log::warn!(
@@ -313,7 +313,28 @@ fn parse_module<P: AsRef<Path>>(
     }
 
     // Parse the graphics
-    // NOT IMPLEMENTED YET
+    if parse_objects {
+        for entry in walkdir::WalkDir::new(graphics_path)
+            .into_iter()
+            .filter_map(std::result::Result::ok)
+        {
+            if entry.file_type().is_file() {
+                let file_path = entry.path();
+                let file_name = file_path.file_name().unwrap_or_default();
+                let file_name_str = file_name.to_str().unwrap_or_default();
+
+                if std::path::Path::new(file_name_str)
+                    .extension()
+                    .map_or(false, |ext| ext.eq_ignore_ascii_case("txt"))
+                {
+                    progress_helper.add_steps(1);
+                    progress_helper.send_update(file_name_str);
+                    results.extend(parser::parse_raws_from_single_file(&file_path, options));
+                    progress_helper.add_to_running_total(results.len());
+                }
+            }
+        }
+    }
 
     results
 }

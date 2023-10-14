@@ -2,7 +2,7 @@ use serde::{Deserialize, Serialize};
 
 use super::{
     dimensions::Dimensions,
-    sprite_layer::SpriteLayer,
+    phf_table::CONDITION_TAGS,
     tokens::{ColorModification, Condition, GraphicType},
 };
 
@@ -33,9 +33,17 @@ impl SpriteGraphic {
             }
             GraphicType::Plant => {
                 // parse plant
-                None
+                SpriteGraphic::parse_plant_from_token(&token)
             }
             GraphicType::Tile => SpriteGraphic::parse_tile_from_value(value),
+            GraphicType::Template => {
+                // parse template ""
+                Some(Self {
+                    primary_condition: Condition::CopyOfTemplate,
+                    tile_page_id: format!("{key}:{value}"),
+                    ..Self::default()
+                })
+            }
             _ => {
                 log::warn!(
                     "Failed to parse {} as SpriteGraphic, unknown key {}",
@@ -46,9 +54,81 @@ impl SpriteGraphic {
             }
         }
     }
+    fn parse_plant_from_token(token: &str) -> Option<Self> {
+        // [SHRUB:PLANT_STANDARD:0:0]
+        // [PICKED:PLANT_STANDARD:1:0]
+        // [Condition, TilePageId, OffsetX, OffsetY]
+        let mut split = token.split(':');
+
+        let sprite_condition = match split.next() {
+            Some(v) => *CONDITION_TAGS.get(v).unwrap_or(&Condition::None),
+            _ => {
+                return None;
+            }
+        };
+        let tile_page_id = match split.next() {
+            Some(v) => String::from(v),
+            _ => {
+                return None;
+            }
+        };
+        let tile_offset_x = match split.next() {
+            Some(v) => String::from(v),
+            _ => {
+                return None;
+            }
+        };
+        let tile_offset_y = match split.next() {
+            Some(v) => String::from(v),
+            _ => {
+                return None;
+            }
+        };
+
+        let offset_x: i32 = match tile_offset_x.parse() {
+            Ok(n) => n,
+            Err(_e) => {
+                log::warn!(
+                    "parse_plant_from_token: Failed to parse {} as offset_x, {}",
+                    tile_offset_x,
+                    token
+                );
+                return None;
+            }
+        };
+
+        let offset_y: i32 = match tile_offset_y.parse() {
+            Ok(n) => n,
+            Err(_e) => {
+                log::warn!(
+                    "parse_plant_from_token: Failed to parse {} as offset_y, {}",
+                    tile_offset_y,
+                    token
+                );
+                return None;
+            }
+        };
+
+        Some(Self {
+            primary_condition: sprite_condition,
+            tile_page_id,
+            offset: Dimensions::from_xy(offset_x, offset_y),
+            color: ColorModification::AsIs,
+            large_image: false,
+            offset2: Dimensions::zero(),
+            secondary_condition: Condition::None,
+        })
+    }
     fn parse_tile_from_value(value: &str) -> Option<Self> {
-        // ...ITEMS4:0:1:ITEM_BRANCH]
-        // ...ITEM_COFFIN:1:0:ITEM_COFFIN_WOOD_UNUSED]
+        // .[TOY_GRAPHICS:              ITEM_TOY:           1:     4:          ITEM_TOY_MINIFORGE:GLASS]
+        // .[ARMOR_GRAPHICS:            ITEMS4:             1:     4:          ITEM_ARMOR_CAPE]
+        // .[TOOL_GRAPHICS:             TOOLS:              0:     14:         ITEM_TOOL_HONEYCOMB]
+        // .[WEAPON_GRAPHICS_DEFAULT:   WEAPONS:            2:     20]               (none)
+        // .[WEAPON_GRAPHICS_UPRIGHT_1T:UPRIGHT_WEAPONS:    0:     5]                (none)
+        // (     key                    tile_page_id    offset_x   offset_y    Option<tile_target_identifier>)
+
+        // .[TOOL_GRAPHICS_WOOD:        1:      ITEM_BOOKCASE:      0:      0]
+        // (     key                color_id    tile_page_id    offset_x   offset_y)
 
         let mut split = value.split(':');
         let tile_sheet = match split.next() {
@@ -71,23 +151,31 @@ impl SpriteGraphic {
         };
 
         // Target identifier is optional
-        // let tile_target_identifier = match split.next() {
-        //     Some(v) => String::from(v),
-        //     _ => String::new(),
-        // };
+        let tile_target_identifier = match split.next() {
+            Some(v) => String::from(v),
+            _ => String::new(),
+        };
 
         let offset_x: i32 = match tile_offset_x.parse() {
             Ok(n) => n,
-            Err(e) => {
-                log::warn!("Failed to parse {} as offset_x, {:?}", tile_offset_x, e);
+            Err(_e) => {
+                log::warn!(
+                    "parse_tile_from_value: Failed to parse {} as offset_x {}",
+                    tile_offset_x,
+                    value
+                );
                 return None;
             }
         };
 
         let offset_y: i32 = match tile_offset_y.parse() {
             Ok(n) => n,
-            Err(e) => {
-                log::warn!("Failed to parse {} as offset_y, {:?}", tile_offset_y, e);
+            Err(_e) => {
+                log::warn!(
+                    "parse_tile_from_value: Failed to parse {} as offset_y {}",
+                    tile_offset_y,
+                    value
+                );
                 return None;
             }
         };
@@ -145,8 +233,12 @@ impl SpriteGraphic {
         // x1 actually is parsed from fourth_position_token
         let x1: i32 = match fourth_position_token.parse() {
             Ok(n) => n,
-            Err(e) => {
-                log::warn!("Failed to parse {} as x1, {:?}", fourth_position_token, e);
+            Err(_e) => {
+                log::warn!(
+                    "parse_creature_from_token: Failed to parse {} as x1 {}",
+                    fourth_position_token,
+                    token
+                );
                 return None;
             }
         };
@@ -154,8 +246,12 @@ impl SpriteGraphic {
         let y1: i32 = match split.next() {
             Some(v) => match v.parse() {
                 Ok(n) => n,
-                Err(e) => {
-                    log::warn!("Failed to parse {} as y1, {:?}", v, e);
+                Err(_e) => {
+                    log::warn!(
+                        "parse_creature_from_token: Failed to parse {} as y1 {}",
+                        v,
+                        token
+                    );
                     return None;
                 }
             },
@@ -169,13 +265,24 @@ impl SpriteGraphic {
             _ => ColorModification::AsIs,
         };
 
+        let primary_condition = Condition::from_token(condition.as_str());
+
         let secondary_condition = match split.next() {
             Some(v) => Condition::from_token(v),
             _ => Condition::None,
         };
 
+        if primary_condition == Condition::None {
+            log::warn!(
+                "Failed to parse {} as primary_condition large_animal_sprite {}",
+                condition,
+                tile_page_id
+            );
+            return None;
+        }
+
         Some(Self {
-            primary_condition: Condition::from_token(condition.as_str()),
+            primary_condition,
             tile_page_id,
             offset: Dimensions::from_xy(x1, y1),
             color,
@@ -191,26 +298,16 @@ impl SpriteGraphic {
     ) -> Option<Self> {
         // [<condition>:<tile page identifier>:LARGE_IMAGE:<x1>:<y1>:<x2>:<y2>:<color type>:<secondary condition>]
         //   0           1                      2          3    4     5    6    7            8
-        log::info!(
-            "parse_large_creature_with_split: {:?} {:?} {:?}",
-            condition,
-            tile_page_id,
-            split
-        );
-        // We know it's a large image, and the split should contain 6 elements (x1, y1, x2, y2, color type, secondary condition)
-        if split.len() != 6 {
-            log::warn!(
-                "Failed to parse {} as SpriteGraphic, invalid number of tokens",
-                split.join(":")
-            );
-            return None;
-        }
 
         let x1: i32 = match split.first() {
             Some(v) => match v.parse() {
                 Ok(n) => n,
-                Err(e) => {
-                    log::warn!("Failed to parse {} as offset_x1, {:?}", v, e);
+                Err(_e) => {
+                    log::warn!(
+                        "parse_large_creature_with_split: Failed to parse {} as offset_x1 {:?}",
+                        v,
+                        split
+                    );
                     return None;
                 }
             },
@@ -222,8 +319,12 @@ impl SpriteGraphic {
         let y1: i32 = match split.get(1) {
             Some(v) => match v.parse() {
                 Ok(n) => n,
-                Err(e) => {
-                    log::warn!("Failed to parse {} as offset_y1, {:?}", v, e);
+                Err(_e) => {
+                    log::warn!(
+                        "parse_large_creature_with_split: Failed to parse {} as offset_y1 {:?}",
+                        v,
+                        split
+                    );
                     return None;
                 }
             },
@@ -235,8 +336,12 @@ impl SpriteGraphic {
         let x2: i32 = match split.get(2) {
             Some(v) => match v.parse() {
                 Ok(n) => n,
-                Err(e) => {
-                    log::warn!("Failed to parse {} as offset_x2, {:?}", v, e);
+                Err(_e) => {
+                    log::warn!(
+                        "parse_large_creature_with_split: Failed to parse {} as offset_x2 {:?}",
+                        v,
+                        split
+                    );
                     return None;
                 }
             },
@@ -248,8 +353,12 @@ impl SpriteGraphic {
         let y2: i32 = match split.get(3) {
             Some(v) => match v.parse() {
                 Ok(n) => n,
-                Err(e) => {
-                    log::warn!("Failed to parse {} as offset_y2, {:?}", v, e);
+                Err(_e) => {
+                    log::warn!(
+                        "parse_large_creature_with_split: Failed to parse {} as offset_y2 {:?}",
+                        v,
+                        split
+                    );
                     return None;
                 }
             },
@@ -263,13 +372,24 @@ impl SpriteGraphic {
             _ => ColorModification::AsIs,
         };
 
+        let primary_condition = Condition::from_token(condition);
+
         let secondary_condition = match split.get(5) {
             Some(v) => Condition::from_token(v),
             _ => Condition::None,
         };
 
+        if primary_condition == Condition::None {
+            log::warn!(
+                "Failed to parse {} as primary_condition large_animal_sprite {}",
+                condition,
+                tile_page_id
+            );
+            return None;
+        }
+
         Some(Self {
-            primary_condition: Condition::from_token(condition),
+            primary_condition,
             tile_page_id: String::from(tile_page_id),
             offset: Dimensions::from_xy(x1, y1),
             color,

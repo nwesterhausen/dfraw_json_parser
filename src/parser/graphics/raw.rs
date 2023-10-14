@@ -7,7 +7,9 @@ use crate::parser::{
 };
 
 use super::{
-    phf_table::LAYER_CONDITION_TAGS, sprite_graphic::SpriteGraphic, sprite_layer::SpriteLayer,
+    phf_table::{GROWTH_TAGS, PLANT_GRAPHIC_TEMPLATES},
+    sprite_graphic::SpriteGraphic,
+    sprite_layer::SpriteLayer,
     tokens::GraphicType,
 };
 
@@ -22,10 +24,16 @@ pub struct Graphic {
     identifier: String,
     object_id: String,
 
+    #[serde(skip_serializing_if = "String::is_empty")]
     caste_identifier: String,
     kind: GraphicType,
-    graphics: Vec<SpriteGraphic>,
+
+    sprites: Vec<SpriteGraphic>,
     layers: Vec<(String, Vec<SpriteLayer>)>,
+    growths: Vec<(String, Vec<SpriteGraphic>)>,
+
+    #[serde(skip)]
+    layer_mode: bool,
 }
 
 impl Graphic {
@@ -49,7 +57,7 @@ impl Graphic {
             self.layers.last_mut().unwrap().1.push(layer);
         }
     }
-    fn parse_condition_token(&mut self, key: &str, value: &str) {
+    fn parse_layer_condition_token(&mut self, key: &str, value: &str) {
         // Conditions get attached to the last layer in the last layer group
         if let Some(layer) = self.layers.last_mut().unwrap().1.last_mut() {
             layer.parse_condition_token(key, value);
@@ -67,6 +75,7 @@ impl Graphic {
         if let "LAYER_SET" = key {
             // Parse the value into a SpriteLayer
             self.parse_layer_set_from_value(value);
+            self.layer_mode = true;
             return;
         }
 
@@ -74,22 +83,74 @@ impl Graphic {
         if let "LAYER" = key {
             // Parse the value into a SpriteLayer
             self.parse_layer_from_value(value);
+            self.layer_mode = true;
             return;
         }
 
-        // Check if the key is in the LAYER_CONDITION_TAGS table, meaning it is a condition
-        if let Some(_condition) = LAYER_CONDITION_TAGS.get(key) {
-            // Parse the value into a SpriteLayer
-            self.parse_condition_token(key, value);
+        // Layers can be defined in groups.. for now we just ignore it
+        if let "LAYER_GROUP" = key {
+            self.layer_mode = true;
+            return;
+        }
+        if let "END_LAYER_GROUP" = key {
+            self.layer_mode = false;
+            return;
+        }
+
+        // Right now we don't handle TREE_TILE
+        if let "TREE_TILE" = key {
+            return;
+        }
+
+        // Check if the key indicates a new growth.
+        if let "GROWTH" = key {
+            self.growths.push((String::from(value), Vec::new()));
+            return;
+        }
+
+        // If the key is a growth token, parse it into a SpriteGraphic and add it to the current growth
+        if let Some(_growth_type) = GROWTH_TAGS.get(key) {
+            if let Some(sprite_graphic) = SpriteGraphic::from_token(key, value, graphic_type) {
+                self.growths.last_mut().unwrap().1.push(sprite_graphic);
+            } else {
+                log::warn!(
+                    "Graphic::parse_sprite_from_tag:_growth_type [{}] Failed to parse {},{} as SpriteGraphic",
+                    self.identifier,
+                    key,
+                    value
+                );
+            }
+            return;
+        }
+        // Check if the key is plant graphic template, which for now we accept only on growths
+        if let Some(_plant_graphic_template) = PLANT_GRAPHIC_TEMPLATES.get(key) {
+            if let Some(sprite_graphic) =
+                SpriteGraphic::from_token(key, value, GraphicType::Template)
+            {
+                self.growths.last_mut().unwrap().1.push(sprite_graphic);
+            } else {
+                log::warn!(
+                    "Graphic::parse_sprite_from_tag:_plant_graphic_template [{}] Failed to parse {},{} as SpriteGraphic",
+                    self.identifier,
+                    key,
+                    value
+                );
+            }
+            return;
+        }
+
+        // Check if we are in layer mode, and if so, parse the token as a layer condition
+        if self.layer_mode {
+            self.parse_layer_condition_token(key, value);
             return;
         }
 
         // Otherwise we can parse it for a sprite and report an error if that fails.
         if let Some(sprite_graphic) = SpriteGraphic::from_token(key, value, graphic_type) {
-            self.graphics.push(sprite_graphic);
+            self.sprites.push(sprite_graphic);
         } else {
             log::warn!(
-                "Graphic::parse_sprite_from_tag: [{}] Failed to parse {},{} as SpriteGraphic",
+                "Graphic::parse_sprite_from_tag:_from_token [{}] Failed to parse {},{} as SpriteGraphic",
                 self.identifier,
                 key,
                 value

@@ -5,6 +5,7 @@ use serde::{Deserialize, Serialize};
 use crate::parser::{
     object_types::ObjectType,
     raws::{build_object_id_from_pieces, RawMetadata, RawObject},
+    serializer_helper,
 };
 
 use super::{dimensions::Dimensions, phf_table::TILE_PAGE_TAGS, tokens::TilePageTag};
@@ -15,7 +16,7 @@ use super::{dimensions::Dimensions, phf_table::TILE_PAGE_TAGS, tokens::TilePageT
 #[derive(Serialize, Deserialize, Debug, Clone, Default)]
 #[serde(rename_all = "camelCase")]
 pub struct TilePage {
-    // Common Raw file Things
+    #[serde(skip_serializing_if = "serializer_helper::is_metadata_hidden")]
     metadata: RawMetadata,
     identifier: String,
     object_id: String,
@@ -59,11 +60,7 @@ impl RawObject for TilePage {
             TilePageTag::File => {
                 let relative_path: PathBuf = value.split('/').collect();
                 let raw_path = PathBuf::from(self.metadata.get_raw_file_path());
-                self.file = raw_path
-                    .parent()
-                    .unwrap_or(&raw_path)
-                    .join("graphics")
-                    .join(relative_path);
+                self.file = raw_path.parent().unwrap_or(&raw_path).join(relative_path);
             }
             TilePageTag::TileDim => {
                 self.tile_dim = Dimensions::from_token(value);

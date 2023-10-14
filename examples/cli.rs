@@ -192,7 +192,7 @@ fn main() {
             }
 
             // If we have all 3 locations in the list,
-            if locations.len() == 3usize {
+            if locations.len() == 3_usize {
                 // Check if the provided output_path ends with a filename (e.g. *.json or similar).
                 if output_path.is_file() {
                     // Remove the filename from the path for parsing ALL
@@ -202,7 +202,7 @@ fn main() {
             }
 
             // If we have just one location, update the job to be a single location
-            if locations.len() == 1usize {
+            if locations.len() == 1_usize {
                 options.set_job(ParsingJob::SingleLocation);
             }
 

@@ -1,6 +1,6 @@
 use serde::{Deserialize, Serialize};
 
-use super::phf_table::GRAPHIC_CONDITION_TAGS;
+use super::phf_table::CONDITION_TAGS;
 
 #[derive(ts_rs::TS)]
 #[ts(export)]
@@ -12,6 +12,7 @@ pub enum Condition {
     Animated,
     Corpse,
     Child,
+    Baby,
     TrainedHunter,
     TrainedWar,
     ListIcon,
@@ -24,38 +25,86 @@ pub enum Condition {
     VampireCursed,
     Ghoul,
     DisturbedDead,
+    Remains,
+    Vermin,
+    LightVermin,
+    Hive,
+    SwarmSmall,
+    SwarmMedium,
+    SwarmLarge,
+
     NotArtifact,
     CraftedArtifact,
     Dye,
     NotDyed,
+
     Crop,
     Seed,
     Picked,
     Shrub,
+    Sapling,
+    CropSprout,
+    CropL,
+    CropM,
+    CropR,
+    ShrubDead,
+
+    NotChild,
+    HaulCountMin,
+    HaulCountMax,
+    ItemWorn,
+    ProfessionCategory,
+    SyndromeClass,
+    Caste,
+    TissueLayer,
+    MaterialFlag,
+    MaterialType,
+    ShutOffIfItemPresent,
+    RandomPartIndex,
+    Ghost,
+    TissueMayHaveColor,
+    TissueMinLength,
+    TissueMaxLength,
+    TissueMayHaveShaping,
+    TissueNotShaped,
+    TissueSwap,
     // Additional Conditions
     Layer,
     LayerSet,
     LayerGroup,
     EndLayerGroup,
     BodyUpper,
-}
-
-#[derive(ts_rs::TS)]
-#[ts(export)]
-#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, Default)]
-pub enum LayerCondition {
-    ConditionNotChild,
-    ConditionChild,
-    ConditionHaulCountMin,
-    ConditionHaulCountMax,
-    #[default]
-    Unknown,
+    CopyOfTemplate,
 }
 
 #[derive(ts_rs::TS)]
 #[ts(export)]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, Default)]
 pub enum ColorModification {
+    #[default]
+    AsIs,
+}
+
+#[derive(ts_rs::TS)]
+#[ts(export)]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq)]
+pub enum PlantGraphicTemplate {
+    StandardLeaves,
+    StandardFruit1,
+    StandardFruit2,
+    StandardFruit3,
+    StandardFruit4,
+    StandardFlowers1,
+    StandardFlowers2,
+    StandardFlowers3,
+    StandardFlowers4,
+}
+
+#[derive(ts_rs::TS)]
+#[ts(export)]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, Default)]
+pub enum GrowthTag {
+    Fruit,
     #[default]
     AsIs,
 }
@@ -71,6 +120,7 @@ pub enum GraphicType {
     Plant,
     #[default]
     Unknown,
+    Template,
 }
 
 #[derive(ts_rs::TS)]
@@ -97,7 +147,7 @@ impl ColorModification {
 
 impl Condition {
     pub fn from_token(token: &str) -> Self {
-        if let Some(condition) = GRAPHIC_CONDITION_TAGS.get(token) {
+        if let Some(condition) = CONDITION_TAGS.get(token) {
             *condition
         } else {
             log::warn!("Failed to parse {} as Condition", token);

@@ -159,9 +159,10 @@ pub fn parse_raw_file_with_info<P: AsRef<Path>>(
                     if started && last_parsed_type == ObjectType::Creature {
                         // We need to add the creature to the list.
                         created_raws.push(Box::new(temp_creature.clone()));
+                    } else {
+                        started = true;
                     }
                     // We haven't started a creature yet, so we need to start one.
-                    started = true;
                     temp_creature = Creature::new(captured_value, &raw_metadata.clone());
                     last_parsed_type = ObjectType::Creature;
                 }
@@ -169,9 +170,10 @@ pub fn parse_raw_file_with_info<P: AsRef<Path>>(
                     if started && last_parsed_type == ObjectType::SelectCreature {
                         // We need to add the creature to the list.
                         created_raws.push(Box::new(temp_select_creature.clone()));
+                    } else {
+                        started = true;
                     }
                     // We haven't started a creature yet, so we need to start one.
-                    started = true;
                     temp_select_creature =
                         SelectCreature::new(captured_value, &raw_metadata.clone());
                     last_parsed_type = ObjectType::SelectCreature;
@@ -198,9 +200,10 @@ pub fn parse_raw_file_with_info<P: AsRef<Path>>(
                     if started {
                         // We need to add the plant to the list.
                         created_raws.push(Box::new(temp_plant.clone()));
+                    } else {
+                        started = true;
                     }
                     // We haven't started a plant yet, so we need to start one.
-                    started = true;
                     temp_plant = Plant::new(captured_value, &raw_metadata.clone());
                     last_parsed_type = ObjectType::Plant;
                 }
@@ -220,9 +223,10 @@ pub fn parse_raw_file_with_info<P: AsRef<Path>>(
                     if started {
                         // We need to add the material template to the list.
                         created_raws.push(Box::new(temp_material_template.clone()));
+                    } else {
+                        started = true;
                     }
                     // We haven't started a material template yet, so we need to start one.
-                    started = true;
                     temp_material_template =
                         MaterialTemplate::new(captured_value, &raw_metadata.clone());
                     last_parsed_type = ObjectType::MaterialTemplate;
@@ -235,9 +239,10 @@ pub fn parse_raw_file_with_info<P: AsRef<Path>>(
                     if started {
                         // We need to add the graphic to the list.
                         created_raws.push(Box::new(temp_graphic.clone()));
+                    } else {
+                        started = true;
                     }
                     // We haven't started a graphic yet, so we need to start one.
-                    started = true;
 
                     last_parsed_type = ObjectType::Graphics;
                     last_graphic_type = *GRAPHIC_TYPE_TAGS
@@ -314,23 +319,26 @@ pub fn parse_raw_file_with_info<P: AsRef<Path>>(
     }
     if started {
         // If we did indeed start capture, we need to complete the final raw by adding it to the list
-        match last_parsed_type {
-            ObjectType::Creature => created_raws.push(Box::new(temp_creature.clone())),
-            ObjectType::Plant => created_raws.push(Box::new(temp_plant.clone())),
-            ObjectType::Inorganic => created_raws.push(Box::new(temp_inorganic.clone())),
-            ObjectType::MaterialTemplate => {
-                created_raws.push(Box::new(temp_material_template.clone()));
-            }
-            ObjectType::SelectCreature => {
-                created_raws.push(Box::new(temp_select_creature.clone()));
-            }
-            ObjectType::Graphics => {
-                created_raws.push(Box::new(temp_graphic.clone()));
-            }
-            ObjectType::TilePage => {
-                created_raws.push(Box::new(temp_tile_page.clone()));
-            }
-            _ => {}
+        if !temp_creature.is_empty() {
+            created_raws.push(Box::new(temp_creature.clone()));
+        }
+        if !temp_select_creature.is_empty() {
+            created_raws.push(Box::new(temp_select_creature.clone()));
+        }
+        if !temp_plant.is_empty() {
+            created_raws.push(Box::new(temp_plant.clone()));
+        }
+        if !temp_inorganic.is_empty() {
+            created_raws.push(Box::new(temp_inorganic.clone()));
+        }
+        if !temp_material_template.is_empty() {
+            created_raws.push(Box::new(temp_material_template.clone()));
+        }
+        if !temp_graphic.is_empty() {
+            created_raws.push(Box::new(temp_graphic.clone()));
+        }
+        if !temp_tile_page.is_empty() {
+            created_raws.push(Box::new(temp_tile_page.clone()));
         }
     }
 
