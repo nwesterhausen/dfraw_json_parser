@@ -1,3 +1,4 @@
+pub mod custom_extension;
 pub mod dimensions;
 pub mod phf_table;
 pub mod raw;

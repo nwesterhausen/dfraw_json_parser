@@ -7,7 +7,8 @@ use crate::parser::{
 };
 
 use super::{
-    phf_table::{GROWTH_TAGS, PLANT_GRAPHIC_TEMPLATES},
+    custom_extension::CustomGraphicExtension,
+    phf_table::{CUSTOM_GRAPHIC_TAGS, GROWTH_TAGS, PLANT_GRAPHIC_TEMPLATES},
     sprite_graphic::SpriteGraphic,
     sprite_layer::SpriteLayer,
     tokens::GraphicType,
@@ -28,9 +29,17 @@ pub struct Graphic {
     caste_identifier: String,
     kind: GraphicType,
 
+    #[serde(skip_serializing_if = "Vec::is_empty")]
     sprites: Vec<SpriteGraphic>,
+    #[serde(skip_serializing_if = "Vec::is_empty")]
     layers: Vec<(String, Vec<SpriteLayer>)>,
+    #[serde(skip_serializing_if = "Vec::is_empty")]
     growths: Vec<(String, Vec<SpriteGraphic>)>,
+
+    #[serde(skip_serializing_if = "Vec::is_empty")]
+    custom_extensions: Vec<CustomGraphicExtension>,
+    #[serde(skip_serializing_if = "Vec::is_empty")]
+    tags: Vec<String>,
 
     #[serde(skip)]
     layer_mode: bool,
@@ -54,6 +63,9 @@ impl Graphic {
     }
     fn parse_layer_from_value(&mut self, value: &str) {
         if let Some(layer) = SpriteLayer::parse_layer_from_value(value) {
+            if self.layers.is_empty() {
+                self.layers.push((String::from("default"), Vec::new()));
+            }
             self.layers.last_mut().unwrap().1.push(layer);
         }
     }
@@ -108,6 +120,29 @@ impl Graphic {
             return;
         }
 
+        // Check if the value is empty, which means we have a tag
+        if value.is_empty() {
+            self.tags.push(String::from(key));
+            return;
+        }
+
+        // If the key is a custom extension, parse it into a CustomGraphicExtension and add it to the current sprite
+        if let Some(extension_type) = CUSTOM_GRAPHIC_TAGS.get(key) {
+            if let Some(custom_extension) =
+                CustomGraphicExtension::from_value(*extension_type, value)
+            {
+                self.custom_extensions.push(custom_extension);
+            } else {
+                log::warn!(
+                    "Graphic::parse_sprite_from_tag:_extension_type [{}] Failed to parse {},{} as CustomGraphicExtension",
+                    self.identifier,
+                    key,
+                    value
+                );
+            }
+            return;
+        }
+
         // If the key is a growth token, parse it into a SpriteGraphic and add it to the current growth
         if let Some(_growth_type) = GROWTH_TAGS.get(key) {
             if let Some(sprite_graphic) = SpriteGraphic::from_token(key, value, graphic_type) {
@@ -150,12 +185,17 @@ impl Graphic {
             self.sprites.push(sprite_graphic);
         } else {
             log::warn!(
-                "Graphic::parse_sprite_from_tag:_from_token [{}] Failed to parse {},{} as SpriteGraphic",
+                "Graphic::parse_sprite_from_tag:_from_token [{}] Failed to parse [{}:{}] as SpriteGraphic::{:?}",
                 self.identifier,
                 key,
-                value
+                value,
+                graphic_type
             );
         }
+    }
+
+    pub(crate) fn get_graphic_type(&self) -> GraphicType {
+        self.kind
     }
 }
 

@@ -58,4 +58,12 @@ impl Dimensions {
     pub fn new() -> Self {
         Dimensions::zero()
     }
+    pub fn is_default(self) -> bool {
+        self.x == 0 && self.y == 0
+    }
+    /// Used in serialization
+    #[allow(clippy::trivially_copy_pass_by_ref)]
+    pub fn is_empty(&self) -> bool {
+        self.is_default()
+    }
 }

@@ -271,32 +271,33 @@ pub fn parse_raw_file_with_info<P: AsRef<Path>>(
                         match last_parsed_type {
                             ObjectType::Creature => {
                                 // We have a creature, so we can add a tag to it.
-                                // First we have to cast the dyn RawObject to a DFCreature.
                                 temp_creature.parse_tag(captured_key, captured_value);
                             }
                             ObjectType::SelectCreature => {
                                 // We have a creature, so we can add a tag to it.
-                                // First we have to cast the dyn RawObject to a DFCreature.
                                 temp_select_creature.parse_tag(captured_key, captured_value);
                             }
                             ObjectType::Plant => {
                                 // We have a plant, so we can add a tag to it.
-                                // First we have to cast the dyn RawObject to a DFPlant.
                                 temp_plant.parse_tag(captured_key, captured_value);
                             }
                             ObjectType::Inorganic => {
                                 // We have an inorganic, so we can add a tag to it.
-                                // First we have to cast the dyn RawObject to a DFPlant.
                                 temp_inorganic.parse_tag(captured_key, captured_value);
                             }
                             ObjectType::MaterialTemplate => {
                                 // We have a material template, so we can add a tag to it.
-                                // First we have to cast the dyn RawObject to a DFPlant.
                                 temp_material_template.parse_tag(captured_key, captured_value);
                             }
                             ObjectType::Graphics => {
                                 // We have a graphic, so we can add a tag to it.
-                                // First we have to cast the dyn RawObject to a DFPlant.
+                                if temp_graphic.get_graphic_type() == GraphicType::Tile {
+                                    // Update graphic type (every line should have a graphic type tag)
+                                    last_graphic_type = *GRAPHIC_TYPE_TAGS
+                                        .get(captured_key)
+                                        .unwrap_or(&GraphicType::Unknown);
+                                }
+
                                 temp_graphic.parse_sprite_from_tag(
                                     captured_key,
                                     captured_value,
@@ -305,7 +306,6 @@ pub fn parse_raw_file_with_info<P: AsRef<Path>>(
                             }
                             ObjectType::TilePage => {
                                 // We have a tile page, so we can add a tag to it.
-                                // First we have to cast the dyn RawObject to a DFPlant.
                                 temp_tile_page.parse_tag(captured_key, captured_value);
                             }
                             _ => {
