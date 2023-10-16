@@ -21,7 +21,10 @@ mod with_progress;
 /// Returns:
 ///
 /// A (large) JSON string with details on all raws in the game path.
-pub fn parse(options: &crate::options::ParserOptions, window: tauri::Window) -> String {
+pub fn parse(
+    options: &crate::options::ParserOptions,
+    window: tauri::Window,
+) -> Vec<Box<dyn crate::parser::raws::RawObject>> {
     // setup progress helper
     let mut progress_helper = structs::ProgressHelper::with_tauri_window(window);
     progress_helper.update_current_task("Parsing all raws in dwarf fortress directory.");
@@ -29,7 +32,7 @@ pub fn parse(options: &crate::options::ParserOptions, window: tauri::Window) -> 
     let result = with_progress::parse(options, &mut progress_helper);
     progress_helper.send_final("Parsing completed.");
 
-    crate::util::raws_to_string(result)
+    result
 }
 
 #[cfg(feature = "tauri")]

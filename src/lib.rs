@@ -286,7 +286,10 @@ pub fn parse_to_file(options: &ParserOptions) {
 /// Returns:
 ///
 /// A JSON string with details on all raws in the game path.
-pub fn parse_with_tauri_emit(options: &ParserOptions, window: tauri::Window) -> String {
+pub fn parse_with_tauri_emit(
+    options: &ParserOptions,
+    window: tauri::Window,
+) -> Vec<Box<dyn RawObject>> {
     tauri_lib::parse(options, window)
 }
 
