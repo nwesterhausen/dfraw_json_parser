@@ -10,7 +10,7 @@ pub struct Milkable {
     frequency: u32,
 }
 impl Milkable {
-    pub(crate) fn from_value(value: &str) -> Self {
+    pub fn from_value(value: &str) -> Self {
         let split = value.split(':').collect::<Vec<&str>>();
         if split.len() == 2 {
             let material_str = *split.first().unwrap_or(&"");

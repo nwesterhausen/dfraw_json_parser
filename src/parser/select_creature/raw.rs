@@ -1,8 +1,9 @@
 use serde::{Deserialize, Serialize};
 
 use crate::parser::{
+    helpers::object_id::build_object_id_from_pieces,
     object_types::ObjectType,
-    raws::{build_object_id_from_pieces, RawMetadata, RawObject},
+    raws::{RawMetadata, RawObject},
     serializer_helper,
 };
 
@@ -32,7 +33,7 @@ impl SelectCreature {
         }
     }
 
-    pub(crate) fn empty() -> Self {
+    pub fn empty() -> Self {
         Self::default()
     }
 }

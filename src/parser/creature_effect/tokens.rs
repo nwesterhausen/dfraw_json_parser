@@ -93,11 +93,11 @@ pub enum CreatureEffectProperty {
     /// This is one of the most powerful and useful aspects of the syndrome system, as it allows you to selectively target body parts relevant to the contagion,
     /// like lungs for coal dust inhalation, or the eyes for exposure to an acid gas.
     BodyPart,
-    /// BY_CATEGORY:X to target body parts with a matching [CATEGORY:X] body token (or ALL to affect everything)
+    /// BY_CATEGORY:X to target body parts with a matching \[CATEGORY:X\] body token (or ALL to affect everything)
     ByCategory,
     /// BY_TYPE:X to target body parts having a particular type (UPPERBODY, LOWERBODY, HEAD, GRASP, or STANCE)
     ByType,
-    /// BY_TOKEN:X to target individual body parts by their ID as specified by the [BP] token of the body plan definition.
+    /// BY_TOKEN:X to target individual body parts by their ID as specified by the \[BP\] token of the body plan definition.
     ByToken,
     /// Determines the time after exposure, in ticks, when the effect starts. Required for all effects.
     Start,

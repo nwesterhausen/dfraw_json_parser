@@ -1,3 +1,3 @@
-pub(crate) mod phf_table;
-pub(crate) mod raw;
+pub mod phf_table;
+pub mod raw;
 pub mod tokens;

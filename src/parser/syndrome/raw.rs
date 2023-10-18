@@ -9,7 +9,7 @@ use super::{phf_table::SYNDROME_TOKEN, tokens::SyndromeToken};
 #[derive(Serialize, Deserialize, Debug, Clone, Default)]
 #[serde(rename_all = "camelCase")]
 pub struct Syndrome {
-    /// Seen the [SYN_IDENTIFIER:INEBRIATION] tag in material_templates.txt
+    /// Seen the \[SYN_IDENTIFIER:INEBRIATION\] tag in material_templates.txt
     #[serde(skip_serializing_if = "String::is_empty")]
     identifier: String,
     #[serde(skip_serializing_if = "String::is_empty")]
@@ -24,7 +24,7 @@ pub struct Syndrome {
     #[serde(skip_serializing_if = "Vec::is_empty")]
     immune_creatures: Vec<(String, String)>,
 
-    /// Seen the [SYN_CONCENTRATION_ADDED:100:1000] tag in material_templates.txt
+    /// Seen the \[SYN_CONCENTRATION_ADDED:100:1000\] tag in material_templates.txt
     #[serde(skip_serializing_if = "serializer_helper::min_max_is_zeroes")]
     concentration_added: [u16; 2],
 

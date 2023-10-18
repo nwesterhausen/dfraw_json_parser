@@ -30,13 +30,13 @@ pub struct Caste {
     #[serde(skip_serializing_if = "SingPlurName::is_empty")]
     child_name: SingPlurName,
     // [min, max] ranges
-    /// Default [0,0]
+    /// Default \[0,0\]
     #[serde(skip_serializing_if = "serializer_helper::min_max_is_zeroes")]
     clutch_size: [u16; 2],
-    /// Default [0,0]
+    /// Default \[0,0\]
     #[serde(skip_serializing_if = "serializer_helper::min_max_is_zeroes")]
     litter_size: [u16; 2],
-    /// Default [0,0]
+    /// Default \[0,0\]
     #[serde(skip_serializing_if = "serializer_helper::min_max_is_zeroes")]
     max_age: [u16; 2],
     // Integer tokens
@@ -134,7 +134,7 @@ impl Caste {
         }
     }
 
-    pub(crate) fn get_identifier(&self) -> &str {
+    pub fn get_identifier(&self) -> &str {
         &self.identifier
     }
 

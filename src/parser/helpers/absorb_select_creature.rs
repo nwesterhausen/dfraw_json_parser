@@ -1,7 +1,7 @@
 use crate::{
     parser::{
-        creature::raw::Creature, helpers::clone_raw_vector::clone_raw_vector_with_purge,
-        object_types::ObjectType, raws::RawObject, select_creature::raw::SelectCreature,
+        creature::raw::Creature, helpers::clone_raw_vector::with_purge, object_types::ObjectType,
+        raws::RawObject, select_creature::raw::SelectCreature,
     },
     util::get_only_select_creatures_from_raws,
 };
@@ -70,7 +70,7 @@ pub fn absorb_select_creature(all_raws: &mut Vec<Box<dyn RawObject>>) {
     );
 
     let mut new_raws: Vec<Box<dyn RawObject>> =
-        clone_raw_vector_with_purge(all_raws.as_slice(), object_ids_to_purge.as_slice());
+        with_purge(all_raws.as_slice(), object_ids_to_purge.as_slice());
 
     for creature in new_creatures {
         new_raws.push(Box::new(creature));

@@ -14,19 +14,19 @@ pub enum SyndromeToken {
     Inhaled,
     /// Syndrome can be contracted by ingestion (when the material is eaten in solid or liquid form)
     Ingested,
-    /// Adds a class of creatures to those affected, such as `GENERAL_POISON` from `[CREATURE_CLASS:GENERAL_POISON]` tag.
+    /// Adds a class of creatures to those affected, such as `GENERAL_POISON` from \[CREATURE_CLASS:GENERAL_POISON\] tag.
     AffectedClass,
     /// Makes the class of creatures immune to the syndrome.
     ImmuneClass,
-    /// Adds a specific creature to those affected. `[creature name:caste name || ALL]`
+    /// Adds a specific creature to those affected. \[creature name:caste name || ALL\]
     AffectedCreature,
-    /// Makes the creature immune to the syndrome. `[creature name:caste name || ALL]`
+    /// Makes the creature immune to the syndrome. \[creature name:caste name || ALL\]
     ImmuneCreature,
     /// Unknown as default.
     #[default]
     Unknown,
-    /// Seen the [SYN_CONCENTRATION_ADDED:100:1000] tag in material_templates.txt
+    /// Seen the \[SYN_CONCENTRATION_ADDED:100:1000\] tag in material_templates.txt
     ConcentrationAdded,
-    /// Seen the [SYN_IDENTIFIER:INEBRIATION] tag in material_templates.txt
+    /// Seen the \[SYN_IDENTIFIER:INEBRIATION\] tag in material_templates.txt
     Identifier,
 }

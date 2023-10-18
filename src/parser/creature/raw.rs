@@ -3,10 +3,11 @@ use serde::{Deserialize, Serialize};
 use crate::parser::{
     creature_caste::{phf_table::CASTE_TOKENS, raw::Caste},
     creature_variation::raw::CreatureVariationRequirements,
+    helpers::object_id::build_object_id_from_pieces,
     names::{Name, SingPlurName},
     object_types::ObjectType,
     ranges::parse_min_max_range,
-    raws::{build_object_id_from_pieces, RawMetadata, RawObject},
+    raws::{RawMetadata, RawObject},
     select_creature::raw::SelectCreature,
     serializer_helper,
     tile::Tile,
@@ -14,6 +15,16 @@ use crate::parser::{
 
 use super::{phf_table::CREATURE_TOKENS, tokens::CreatureTag};
 
+/// The `Creature` struct represents a creature in a Dwarf Fortress, with the properties
+/// that can be set in the raws. Not all the raws are represented here, only the ones that
+/// are currently supported by the library.
+///
+/// Some items like `CREATURE_VARIATION` and `CREATURE_VARIATION_CASTE` are saved in their raw
+/// format. `SELECT_CREATURE` is saved here as a sub-creature object with all the properties
+/// from that raw. This is because the `SELECT_CREATURE` raws are used to create new creatures
+/// based on the properties of the creature they are applied to. But right now the application
+/// of those changes is not applied, in order to preserve the original creature. So instead,
+/// they are saved and can be applied later (at the consumer's discretion).
 #[derive(ts_rs::TS)]
 #[ts(export)]
 #[derive(Serialize, Deserialize, Debug, Clone, Default)]
@@ -61,6 +72,11 @@ pub struct Creature {
 }
 
 impl Creature {
+    /// Returns a `Creature` object with default values.
+    ///
+    /// Returns:
+    ///
+    /// An empty instance of `Creature`.
     pub fn empty() -> Creature {
         Creature {
             castes: vec![Caste::new("ALL")],
@@ -70,6 +86,19 @@ impl Creature {
             ..Creature::default()
         }
     }
+
+    /// Create a new instance of a `Creature` with the given identifier and metadata.
+    ///
+    /// Arguments:
+    ///
+    /// * `identifier`: A string that represents the identifier of the creature. It is used to uniquely
+    /// identify the creature.
+    /// * `metadata`: The `metadata` parameter is of type `RawMetadata` and is used to provide
+    /// additional information about the raws the `Creature` is found in.
+    ///
+    /// Returns:
+    ///
+    /// a `Creature` object.
     pub fn new(identifier: &str, metadata: &RawMetadata) -> Creature {
         Creature {
             identifier: String::from(identifier),
@@ -82,20 +111,52 @@ impl Creature {
             ..Creature::default()
         }
     }
+
+    /// The function `get_copy_tags_from` returns a reference to the `copy_tags_from` field.
+    ///
+    /// Returns:
+    ///
+    /// The private field `copy_tags_from`.
     pub fn get_copy_tags_from(&self) -> &str {
         &self.copy_tags_from
     }
+
+    /// Adds a `SelectCreature` object to the internal `SelectCreature` vector.
+    ///
+    /// Arguments:
+    ///
+    /// * `select_creature`: The parameter `select_creature` is of type `SelectCreature`.
     pub fn push_select_creature_variation(&mut self, select_creature: SelectCreature) {
         self.select_creature_variation.push(select_creature);
     }
+
+    /// Extends the internal `SelectCreature` vector with the elements from the `select_creature_vec`
+    /// vector. This is a convenience function to enable bulk addition of `SelectCreature` objects.
+    ///
+    /// Arguments:
+    ///
+    /// * `select_creature_vec`: A vector of `SelectCreature` objects.
     pub fn extend_select_creature_variation(&mut self, select_creature_vec: Vec<SelectCreature>) {
         self.select_creature_variation.extend(select_creature_vec);
     }
-    // Add a new caste
+
+    /// The function `add_caste` adds a new `Caste` object with the given name to a vector called
+    /// `castes`.
+    ///
+    /// Arguments:
+    ///
+    /// * `name`: The `name` parameter is a string that represents the name of the caste to add.
     pub fn add_caste(&mut self, name: &str) {
         self.castes.push(Caste::new(name));
     }
-    // Move specified caste (by name) to end of case list
+
+    /// The function `select_caste` moves a caste to the end of a list if it matches the given name,
+    /// otherwise it adds a new caste with the given name. This essentially allows the other functions
+    /// to assume that the caste they are working with is the last one in the list.
+    ///
+    /// Arguments:
+    ///
+    /// * `name`: The `name` parameter is a string that represents the identifier of the caste to select.
     pub fn select_caste(&mut self, name: &str) {
         // Find the caste
         let mut index = 0;
@@ -105,15 +166,35 @@ impl Creature {
                 break;
             }
         }
-        // If the caste is not found, add a new one
-        if index == 0 && !self.castes.get(0).unwrap().get_identifier().eq(name) {
-            return self.add_caste(name);
+
+        if index == 0 {
+            // If we have no castes, add a new one
+            if self.castes.is_empty() {
+                return self.add_caste(name);
+            } else if let Some(caste) = self.castes.get(index) {
+                // (If we're here, we're at index 0 and the caste list is not empty)
+                // If the caste doesn't match the one we need, add a new one
+                if !caste.get_identifier().eq(name) {
+                    return self.add_caste(name);
+                }
+            }
         }
+
         // Move the caste to the end of the list
         let caste = self.castes.remove(index);
         self.castes.push(caste);
     }
 
+    /// Checks if a given name exists in the list of castes.
+    ///
+    /// Arguments:
+    ///
+    /// * `name`: A string representing the `identifier` of the caste to check for.
+    ///
+    /// Returns:
+    ///
+    /// Returns true if there is a caste with the given name in this creature's caste list,
+    /// and false otherwise.
     pub fn has_caste(&self, name: &str) -> bool {
         for caste in &self.castes {
             if caste.get_identifier().eq(name) {
@@ -123,6 +204,13 @@ impl Creature {
         false
     }
 
+    /// Returns a vector of object IDs from the creature's `SelectCreature` vector. Essentially,
+    /// it's the list of object IDs that have been added to this creature and then can be removed
+    /// from the master raw list.
+    ///
+    /// Returns:
+    ///
+    /// Returns a vector of `object_id`s.
     pub fn get_child_object_ids(&self) -> Vec<&str> {
         let mut object_ids = Vec::new();
         for select_creature in &self.select_creature_variation {
@@ -131,7 +219,19 @@ impl Creature {
         object_ids
     }
 
-    /// Copy tags from another creature
+    /// Takes two `Creature` objects and creates a new `Creature` object
+    /// by combining their tags and properties.
+    ///
+    /// Arguments:
+    ///
+    /// * `creature`: A reference to the creature that will receive the copied tags.
+    /// * `creature_to_copy_from`: A reference to the Creature object from which we want to copy the
+    /// tags.
+    ///
+    /// Returns:
+    ///
+    /// A combined `Creature`, which is a combination of the original creature and the
+    /// creature to copy from.
     pub fn copy_tags_from(creature: &Creature, creature_to_copy_from: &Creature) -> Self {
         // Because anything specified in our self will override the copied tags, first we need to clone the creature
         let mut combined_creature = creature_to_copy_from.clone();
@@ -151,8 +251,9 @@ impl Creature {
             // If the caste exists in the combined creature, we need to apply the differences
             if combined_creature.has_caste(caste_identifier) {
                 combined_creature.select_caste(caste_identifier);
-                let combined_caste = combined_creature.castes.last_mut().unwrap();
-                combined_caste.overwrite_caste(caste);
+                if let Some(combined_caste) = combined_creature.castes.last_mut() {
+                    combined_caste.overwrite_caste(caste);
+                }
             } else {
                 // If the caste does not exist in the combined creature, we need to add it
                 combined_creature.castes.push(caste.clone());

@@ -11,7 +11,7 @@ pub struct BodySize {
     size_cm3: u32,
 }
 impl BodySize {
-    pub(crate) fn from_value(value: &str) -> BodySize {
+    pub fn from_value(value: &str) -> BodySize {
         let split = value.split(':').collect::<Vec<&str>>();
         if split.len() == 3 {
             return BodySize {

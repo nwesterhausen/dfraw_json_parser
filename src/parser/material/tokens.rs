@@ -102,7 +102,7 @@ pub enum MaterialUsage {
     /// Exact behavior unknown, possibly vestigial.
     PowderMisc,
     /// Permits globs of the material in solid form to be stored in food stockpiles under "Fat" - without it,
-    /// dwarves will come by and "clean" the items, destroying them (unless [DO_NOT_CLEAN_GLOB] is also included).
+    /// dwarves will come by and "clean" the items, destroying them (unless \[DO_NOT_CLEAN_GLOB\] is also included).
     StockpileGlobOrStockpileGlobSolid,
     /// Classifies the material as milled paste, allowing its storage in food stockpiles under "Paste".
     StockpileGlobPaste,
@@ -124,7 +124,8 @@ pub enum MaterialUsage {
     SeedMat,
     /// Classifies the material as bone, allowing its use for bone carvers and restriction from stockpiles by material.
     Bone,
-    /// Classifies the material as wood, allowing its use for carpenters and storage in wood stockpiles. Entities opposed to killing plants (i.e. Elves) will refuse to accept these items in trade.
+    /// Classifies the material as wood, allowing its use for carpenters and storage in wood stockpiles.
+    /// Entities opposed to killing plants (i.e. Elves) will refuse to accept these items in trade.
     Wood,
     /// Classifies the material as plant fiber, allowing its use for clothiers and storage in cloth stockpiles under "Thread (Plant)" and "Cloth (Plant)".
     ThreadPlant,
@@ -142,11 +143,11 @@ pub enum MaterialUsage {
     Leather,
     /// Classifies the material as silk, allowing its use for clothiers and storage in cloth stockpiles under "Thread (Silk)" and "Cloth (Silk)".
     Silk,
-    /// Classifies the material as soap, allowing it to be used as a bath detergent and stored in bar/block stockpiles under "Bars: Other Materials".[Verify]
+    /// Classifies the material as soap, allowing it to be used as a bath detergent and stored in bar/block stockpiles under "Bars: Other Materials".
     Soap,
     /// Material generates miasma when it rots.
     GeneratesMiasma,
-    /// Classifies the material as edible meat.[Verify]
+    /// Classifies the material as edible meat.
     Meat,
     /// Material will rot if not stockpiled appropriately. Currently only affects food and refuse, other items made of this material will not rot.
     Rots,
@@ -211,7 +212,7 @@ pub enum MaterialUsage {
     StockpileThreadMetal,
     /// Defines the material as being metal, allowing it to be used at forges.
     IsMetal,
-    /// Used internally by green glass, clear glass, and crystal glass. Appears to only affect the [GLASS_MATERIAL] reaction token. Does not cause the game
+    /// Used internally by green glass, clear glass, and crystal glass. Appears to only affect the \[GLASS_MATERIAL\] reaction token. Does not cause the game
     /// to treat the material like glass, i.e being referred to as "raw" instead of "rough" in its raw form or being displayed in the "glass" trade/embark category.
     IsGlass,
     /// Can be used in the production of crystal glass.
@@ -262,19 +263,22 @@ pub enum MaterialProperty {
     Tile,
     /// Specifies the tile that will be used to represent BOULDER items made of this material. Generally only used with stones. Defaults to 7 ('•').
     ItemSymbol,
-    /// The on-screen color of the material. Uses a standard 3-digit color token. Equivalent to [TILE_COLOR:a:b:c], [BUILD_COLOR:b:a:X] (X = 1 if 'a' equals 'b', 0 otherwise), and [BASIC_COLOR:a:c]
+    /// The on-screen color of the material. Uses a standard 3-digit color token. Equivalent to \[TILE_COLOR:a:b:c\],
+    /// \[BUILD_COLOR:b:a:X\] (X = 1 if 'a' equals 'b', 0 otherwise), and \[BASIC_COLOR:a:c\]
     DisplayColor,
-    /// The color of objects made of this material which use both the foreground and background color: doors, floodgates, hatch covers, bins, barrels, and cages. Defaults to 7:7:1 (white).
+    /// The color of objects made of this material which use both the foreground and background color: doors, floodgates, hatch covers, bins, barrels, and cages.
+    /// Defaults to 7:7:1 (white).
     BuildColor,
     /// The color of unmined tiles containing this material (for stone and soil), as well as engravings in this material. Defaults to 7:7:1 (white).
     TileColor,
     /// The color of objects made of this material which use only the foreground color, including workshops, floors and boulders, and smoothed walls. Defaults to 7:1 (white).
     BasicColor,
     /// Determines the color of the material at the specified state. See below for a list of valid material states. Color comes from descriptor_color_standard.txt.
-    /// The nearest color value is used to display contaminants and body parts made of this material in ASCII and to color items and constructions made from this material with graphics.
-    /// Example:[STATE_COLOR:ALL_SOLID:GRAY]
+    /// The nearest color value is used to display contaminants and body parts made of this material in ASCII and to color items and constructions made from this
+    /// material with graphics.
+    /// Example:\[STATE_COLOR:ALL_SOLID:GRAY\]
     StateColor,
-    /// Determines the name of the material at the specified state, as displayed in-game.[STATE_NAME:ALL_SOLID:stone]
+    /// Determines the name of the material at the specified state, as displayed in-game. \[STATE_NAME:ALL_SOLID:stone\]
     StateName,
     /// Like STATE_NAME, but used in different situations. Equipment made from the material uses the state adjective and not the state name.
     StateAdjective,
@@ -291,17 +295,22 @@ pub enum MaterialProperty {
     /// Specifies how much the material will have given (in parts-per-100000) when the yield point is reached. Used for blunt-force combat. Defaults to 0.
     /// Apparently affects in combat whether the corresponding tissue is bruised (value >= 50000), torn (value between 25000 and 49999), or fractured (value <= 24999)
     ImpactElasticity,
-    /// Specifies how hard the material can be compressed before it will start deforming permanently. Determines a tissue's resistance to pinching and response to strangulation. Defaults to 10000.
+    /// Specifies how hard the material can be compressed before it will start deforming permanently. Determines a tissue's resistance to pinching and response to strangulation.
+    /// Defaults to 10000.
     CompressiveYield,
-    /// Specifies how hard the material can be compressed before it will fail entirely. Determines a tissue's resistance to pinching and response to strangulation. Defaults to 10000.
+    /// Specifies how hard the material can be compressed before it will fail entirely. Determines a tissue's resistance to pinching and response to strangulation.
+    /// Defaults to 10000.
     CompressiveFracture,
-    /// Specifies how much the material will have given when it has been compressed to its yield point. Determines a tissue's resistance to pinching and response to strangulation. Defaults to 0.
+    /// Specifies how much the material will have given when it has been compressed to its yield point. Determines a tissue's resistance to pinching and
+    /// response to strangulation. Defaults to 0.
     CompressiveElasticity,
-    /// Specifies how hard the material can be stretched before it will start deforming permanently. Determines a tissue's resistance to a latching and tearing bite. Defaults to 10000.
+    /// Specifies how hard the material can be stretched before it will start deforming permanently. Determines a tissue's resistance to a latching and tearing bite.
+    /// Defaults to 10000.
     TensileYield,
     /// Specifies how hard the material can be stretched before it will fail entirely. Determines a tissue's resistance to a latching and tearing bite. Defaults to 10000.
     TensileFracture,
-    /// Specifies how much the material will have given when it is stretched to its yield point. Determines a tissue's resistance to a latching and tearing bite. Defaults to 0.
+    /// Specifies how much the material will have given when it is stretched to its yield point. Determines a tissue's resistance to a latching and tearing bite.
+    /// Defaults to 0.
     TensileElasticity,
     /// Specifies how hard the material can be twisted before it will start deforming permanently. Used for latching and shaking with a blunt attack
     /// (no default creature has such an attack, but they can be modded in). Defaults to 10000.
@@ -318,7 +327,8 @@ pub enum MaterialProperty {
     ShearFracture,
     /// Specifies how much the material will have given when sheared to its yield point. Used for cutting calculations. Defaults to 0.
     ShearElasticity,
-    /// Specifies how hard the material can be bent before it will start deforming permanently. Determines a tissue's resistance to being mangled with a joint lock. Defaults to 10000.
+    /// Specifies how hard the material can be bent before it will start deforming permanently. Determines a tissue's resistance to being mangled with a joint lock.
+    /// Defaults to 10000.
     BendingYield,
     /// Specifies how hard the material can be bent before it will fail entirely. Determines a tissue's resistance to being mangled with a joint lock. Defaults to 10000.
     BendingFracture,
@@ -326,7 +336,8 @@ pub enum MaterialProperty {
     BendingElasticity,
     /// How sharp the material is. Used in cutting calculations. Applying a value of at least 10000 to a stone will allow weapons to be made from that stone. Defaults to 10000.
     MaxEdge,
-    /// Value modifier for the material. Defaults to 1. This number can be made negative by placing a "-" in front, resulting in things that you are paid to buy and must pay to sell.
+    /// Value modifier for the material. Defaults to 1. This number can be made negative by placing a "-" in front, resulting in things that you are paid to buy and
+    /// must pay to sell.
     MaterialValue,
     /// Multiplies the value of the material. Not permitted in material template definitions.
     MultiplyValue,
@@ -345,7 +356,7 @@ pub enum MaterialProperty {
     /// Temperature at which the material boils. Defaults to NONE.
     BoilingPoint,
     /// Items composed of this material will initially have this temperature.
-    /// Used in conjunction with [SPEC_HEAT:NONE] to make material's temperature fixed at the specified value.
+    /// Used in conjunction with \[SPEC_HEAT:NONE\] to make material's temperature fixed at the specified value.
     /// Defaults to NONE.
     MaterialFixedTemperature,
     /// Changes a material's HEATDAM_POINT, but only if it was not set to NONE. Not permitted in material template definitions.
@@ -369,7 +380,8 @@ pub enum MaterialProperty {
     /// Specifies (in kg/mol) the molar mass of the material in gaseous form. Also affects combat calculations like the densities,
     /// but only for attacks made by gases (e.g. forgotten beasts made of steam).
     MolarMass,
-    /// Specifies the type of container used to store the material. Used in conjunction with the [EXTRACT_BARREL], [EXTRACT_VIAL], or [EXTRACT_STILL_VIAL] plant tokens.
+    /// Specifies the type of container used to store the material. Used in conjunction with the \[EXTRACT_BARREL\], \[EXTRACT_VIAL\],
+    /// or \[EXTRACT_STILL_VIAL\] plant tokens.
     /// Defaults to BARREL.
     ExtractStorage,
     /// Specifies the item type used for butchering results made of this material. Stock raws use GLOB:NONE for fat and MEAT:NONE for other meat materials.
@@ -381,10 +393,12 @@ pub enum MaterialProperty {
     /// The material forms "wafers" instead of "bars".
     Wafers,
     /// Used with reaction raws to associate a reagent material with a product material. The first argument is used by HAS_MATERIAL_REACTION_PRODUCT and GET_MATERIAL_FROM_REAGENT in reaction raws.
-    /// The remainder is a material reference, generally LOCAL_CREATURE_MAT:SUBTYPE or LOCAL_PLANT_MAT:SUBTYPE or INORGANIC:STONETYPE.[MATERIAL_REACTION_PRODUCT:TAN_MAT:LOCAL_CREATURE_MAT:LEATHER]
+    /// The remainder is a material reference, generally LOCAL_CREATURE_MAT:SUBTYPE or LOCAL_PLANT_MAT:SUBTYPE or INORGANIC:STONETYPE.
+    /// \[MATERIAL_REACTION_PRODUCT:TAN_MAT:LOCAL_CREATURE_MAT:LEATHER\]
     MaterialReactionProduct,
     /// Used with reaction raws to associate a reagent material with a complete item. The first argument is used by HAS_ITEM_REACTION_PRODUCT and GET_ITEM_DATA_FROM_REAGENT in reaction raws.
-    /// The rest refers to the type of item, then its material.[ITEM_REACTION_PRODUCT:BAG_ITEM:PLANT_GROWTH:LEAVES:LOCAL_PLANT_MAT:LEAF]
+    /// The rest refers to the type of item, then its material.
+    /// \[ITEM_REACTION_PRODUCT:BAG_ITEM:PLANT_GROWTH:LEAVES:LOCAL_PLANT_MAT:LEAF\]
     ItemReactionProduct,
     /// "Used to classify all items made of the material, so that reactions can use them as generic reagents.In default raws, the following are used:
     /// `FAT`, `TALLOW`, `SOAP`, `PARCHMENT`, `PAPER_PLANT`, `PAPER_SLURRY`, `MILK`, `CHEESE`, `WAX`.
@@ -397,11 +411,12 @@ pub enum MaterialProperty {
     /// Places the material under ""Metal Ores"" in Stone stockpiles." The specified value determines the probability for this product (see Tetrahedrite or Galena for details).
     MetalOre,
     /// Makes BOULDER items made of the material acceptable for strand extraction into threads; see also STOCKPILE_THREAD_METAL.
-    /// Value presumably determines the probability of this product extracted.[Verify]
+    /// Value presumably determines the probability of this product extracted.
     ThreadMetal,
     /// Allows the material to be used to make casts.
     HardensWithWater,
-    /// Determines effectiveness of soap - if the amount of grime on a body part is more than 3-SOAP_LEVEL, it sets it to 3-SOAP_LEVEL; as such setting it above 3 is bad. Soap has [SOAP_LEVEL:2]. Defaults to 0.
+    /// Determines effectiveness of soap - if the amount of grime on a body part is more than 3-SOAP_LEVEL, it sets it to 3-SOAP_LEVEL; as such setting it above 3 is bad.
+    /// Soap has \[SOAP_LEVEL:2\]. Defaults to 0.
     SoapLevel,
     /// Begins defining a syndrome applied by the material. Multiple syndromes can be specified. See Syndrome token.
     Syndrome,

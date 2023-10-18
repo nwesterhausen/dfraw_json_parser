@@ -8,7 +8,7 @@ use crate::parser::object_types::{ObjectType, OBJECT_TOKENS};
 use crate::parser::refs::{DF_ENCODING, RAW_TOKEN_RE};
 
 /// It reads a file, line by line, and checks the first line for the filename, reads lines until it encounters the
-/// [OBJECT:<type>] tag in the file.
+/// \[OBJECT:(type)] tag in the file.
 ///
 /// Arguments:
 ///
@@ -17,7 +17,7 @@ use crate::parser::refs::{DF_ENCODING, RAW_TOKEN_RE};
 ///
 /// Returns:
 ///
-/// `RawObjectKind` for the type of [OBJECT] tag encountered, and `RawObjectKind::None` if it is unsupported.
+/// `RawObjectKind` for the type of \[OBJECT\] tag encountered, and `RawObjectKind::None` if it is unsupported.
 #[allow(clippy::too_many_lines)]
 pub fn read_raw_file_type<P: AsRef<Path>>(input_path: &P) -> ObjectType {
     let caller = "Raw File Type Checker";
@@ -58,7 +58,7 @@ pub fn read_raw_file_type<P: AsRef<Path>>(input_path: &P) -> ObjectType {
     // String to store the parsed filename in
     let mut raw_filename = String::new();
 
-    // Read in lines until we encounter the [OBJECT tag] or complete the file.
+    // Read in lines until we encounter the \[OBJECT tag\] or complete the file.
     for (index, line) in reader.lines().enumerate() {
         if line.is_err() {
             log::error!(
@@ -107,7 +107,7 @@ pub fn read_raw_file_type<P: AsRef<Path>>(input_path: &P) -> ObjectType {
 
             // Match the front part of the tag
             match captured_key {
-                // We are only concerned with the [OBJECT] key
+                // We are only concerned with the \[OBJECT\] key
                 "OBJECT" => {
                     log::trace!(
                         "{} - {} is a {} raw file",
@@ -125,7 +125,7 @@ pub fn read_raw_file_type<P: AsRef<Path>>(input_path: &P) -> ObjectType {
         }
     }
 
-    // Reading through the entire file and not finding an [OBJECT] tag means the raw file is invalid
+    // Reading through the entire file and not finding an \[OBJECT\] tag means the raw file is invalid
     log::warn!(
         "{} - no [OBJECT] tag in {}",
         caller,

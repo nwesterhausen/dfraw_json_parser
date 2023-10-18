@@ -1,8 +1,8 @@
 use itertools::Itertools;
 
 use crate::parser::{
-    creature::raw::Creature, helpers::clone_raw_vector::clone_raw_vector_with_purge,
-    object_types::ObjectType, raws::RawObject,
+    creature::raw::Creature, helpers::clone_raw_vector::with_purge, object_types::ObjectType,
+    raws::RawObject,
 };
 
 #[allow(clippy::too_many_lines)]
@@ -101,7 +101,7 @@ pub fn apply_copy_tags_from(all_raws: &mut Vec<Box<dyn RawObject>>) {
     );
 
     let mut new_raws: Vec<Box<dyn RawObject>> =
-        clone_raw_vector_with_purge(all_raws, object_ids_to_purge.as_slice());
+        with_purge(all_raws, object_ids_to_purge.as_slice());
 
     for creature in new_creatures {
         new_raws.push(Box::new(creature));

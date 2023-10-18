@@ -7,7 +7,7 @@ pub enum InorganicToken {
     /// Used on metals, causes the metal to be made into wafers instead of bars.
     Wafers,
     /// Causes the stone to form hollow tubes leading to the Underworld. Used for raw adamantine. When mined, stone has a 100% yield.
-    /// If no material with this token exists, hollow veins will instead be made of the first available inorganic, usually iron. Implies [SPECIAL].
+    /// If no material with this token exists, hollow veins will instead be made of the first available inorganic, usually iron. Implies \[SPECIAL\].
     DeepSpecial,
     /// Allows the ore to be smelted into metal in the smelter. Each token with a non-zero chance causes the game to roll d100 four times,
     /// each time creating one bar of the type requested on success.
@@ -27,23 +27,28 @@ pub enum InorganicToken {
     Soil,
     /// Causes the material to form pelagic sediment layers beneath deep oceans. Mining is faster and produces no stones.
     SoilOcean,
-    /// Causes the material to form sand layers, allowing it to appear in sand deserts and shallow oceans. Mining is faster and produces no stones. Sand layers can also be used for making glass. Can be combined with [SOIL].
+    /// Causes the material to form sand layers, allowing it to appear in sand deserts and shallow oceans. Mining is faster and produces no stones.
+    /// Sand layers can also be used for making glass. Can be combined with \[SOIL\].
     SoilSand,
-    /// Permits an already [SEDIMENTARY] stone layer to appear underneath shallow ocean regions.
+    /// Permits an already \[SEDIMENTARY\] stone layer to appear underneath shallow ocean regions.
     SedimentaryOceanShallow,
-    /// Permits an already [SEDIMENTARY] stone layer to appear underneath deep ocean regions.
+    /// Permits an already \[SEDIMENTARY\] stone layer to appear underneath deep ocean regions.
     SedimentaryOceanDeep,
     /// Causes the material to form igneous intrusive layers.
     IgneousExtrusive,
     /// Causes the material to form igneous extrusive layers.
     IgneousIntrusive,
-    /// Specifies what types of layers will contain this mineral. Multiple instances of the same token segment will cause the rock type to occur more frequently, but won't increase its abundance in the specified environment. See below.
+    /// Specifies what types of layers will contain this mineral. Multiple instances of the same token segment will cause the rock type to occur more frequently,
+    /// but won't increase its abundance in the specified environment. See below.
     Environment,
     /// Specifies which specific minerals will contain this mineral. See below.
     EnvironmentSpecific,
-    /// Specifies that the stone is created when combining water and magma, also causing it to line the edges of magma pools and volcanoes. If multiple minerals are marked as lava stones, a different one will be used in each biome or geological region.
+    /// Specifies that the stone is created when combining water and magma, also causing it to line the edges of magma pools and volcanoes.
+    /// If multiple minerals are marked as lava stones, a different one will be used in each biome or geological region.
     Lava,
-    /// Prevents the material from showing up in certain places. AI-controlled entities won't use the material to make items and don't bring it in caravans, though the player can use it as normal. Also, inorganic generated creatures (forgotten beasts, titans, demons) will never be composed of this material. Explicitly set by all evil weather materials and implied by [DEEP_SURFACE] and [DEEP_SPECIAL].
+    /// Prevents the material from showing up in certain places. AI-controlled entities won't use the material to make items and don't bring it in caravans,
+    /// though the player can use it as normal. Also, inorganic generated creatures (forgotten beasts, titans, demons) will never be composed of this material.
+    /// Explicitly set by all evil weather materials and implied by \[DEEP_SURFACE\] and \[DEEP_SPECIAL\].
     Special,
     /// Indicates that this is a generated material. Cannot be specified in user-defined raws.
     Generated,

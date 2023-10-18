@@ -65,29 +65,29 @@ pub struct Shrub {
     #[serde(skip_serializing_if = "String::is_empty")]
     drink: String,
     /// Permits milling the plant at a quern or millstone into a powder made of this material and allows its use in entity resources.
-    /// Said material should have [POWDER_MISC_PLANT] to permit proper stockpiling. This token makes the whole plant harvestable regardless
+    /// Said material should have \[POWDER_MISC_PLANT\] to permit proper stockpiling. This token makes the whole plant harvestable regardless
     /// of which material is designated for milling.
     /// For plants with millable growths, use only MATERIAL_REACTION_PRODUCT or ITEM_REACTION_PRODUCT tokens to define the milling products.
     #[serde(skip_serializing_if = "String::is_empty")]
     mill: String,
     /// Permits processing the plant at a farmer's workshop to yield threads made of this material and allows its use in entity resources.
-    /// Said material should have [THREAD_PLANT] to permit proper stockpiling.
+    /// Said material should have \[THREAD_PLANT\] to permit proper stockpiling.
     #[serde(skip_serializing_if = "String::is_empty")]
     thread: String,
     /// Causes the plant to yield plantable seeds made of this material and having these properties.
-    /// Said material should have [SEED_MAT] to permit proper stockpiling.
+    /// Said material should have \[SEED_MAT\] to permit proper stockpiling.
     #[serde(skip_serializing_if = "SeedMaterial::is_empty")]
     seed: SeedMaterial,
     /// Permits processing the plant into a vial at a still to yield extract made of this material.
-    /// Said material should have [EXTRACT_STORAGE:FLASK].
+    /// Said material should have \[EXTRACT_STORAGE:FLASK\].
     #[serde(skip_serializing_if = "String::is_empty")]
     extract_still_vial: String,
     /// Permits processing the plant into a vial at a farmer's workshop to yield extract made of this material.
-    /// Said material should have [EXTRACT_STORAGE:FLASK].
+    /// Said material should have \[EXTRACT_STORAGE:VIAL\].
     #[serde(skip_serializing_if = "String::is_empty")]
     extract_vial: String,
     /// Permits processing the plant into a barrel at a farmer's workshop to yield extract made of this material.
-    /// Said material should have [EXTRACT_STORAGE:BARREL].
+    /// Said material should have \[EXTRACT_STORAGE:BARREL\].
     #[serde(skip_serializing_if = "String::is_empty")]
     extract_barrel: String,
 }

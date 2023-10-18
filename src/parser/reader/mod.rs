@@ -1,2 +1,2 @@
 mod header;
-pub(crate) mod parse_file;
+pub mod parse_file;
