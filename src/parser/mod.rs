@@ -2,7 +2,7 @@ use std::path::Path;
 
 use crate::{options::ParserOptions, parser::module_info_file::ModuleInfoFile};
 
-mod biomes;
+pub mod biomes;
 pub mod body_size;
 pub mod color;
 pub mod creature;
@@ -16,7 +16,7 @@ pub mod material;
 pub mod material_template;
 pub mod milkable;
 pub mod module_info_file;
-mod names;
+pub mod names;
 pub mod object_types;
 pub mod plant;
 pub mod plant_growth;
