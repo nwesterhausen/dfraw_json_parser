@@ -130,9 +130,6 @@ impl MaterialMechanics {
             MaterialProperty::SolidDensity => {
                 self.solid_density = value.parse::<i32>().unwrap_or(0);
             }
-            MaterialProperty::LiquidDensity => {
-                self.liquid_density = value.parse::<i32>().unwrap_or(0);
-            }
 
             _ => {
                 log::warn!("Unhandled material mechanics token: '{:?}'", key);
