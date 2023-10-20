@@ -5,7 +5,10 @@ currently useful for getting some basic information from from a limited set of r
 - creatures
 - plants
 - inorganics (rocks, ores, etc)
-
+- materials
+- syndromes
+- graphics (sprites and tile pages, some layer support)
+- limited template support, creature variations support, and select XX support
 
 ## How It Works
 
@@ -69,6 +72,7 @@ use parser::{
     },
     module_info_file::ModuleInfoFile,
     raws::RawObject,
+    searchable::Searchable,
 };
 use std::path::{Path, PathBuf};
 use util::options_has_valid_paths;
@@ -294,6 +298,18 @@ pub fn parse_with_tauri_emit(
 }
 
 #[cfg(feature = "tauri")]
+/// The function `parse_with_tauri_emit_to_json_vec` takes in `options` and `window` as parameters and
+/// returns a vector of strings.
+///
+/// Arguments:
+///
+/// * `options`: A reference to a `ParserOptions` struct, which contains options for parsing.
+/// * `window`: The `window` parameter is of type `tauri::Window`. It represents the window object of
+/// the Tauri application.
+///
+/// Returns:
+///
+/// A vector of strings is being returned.
 pub fn parse_with_tauri_emit_to_json_vec(
     options: &ParserOptions,
     window: tauri::Window,
@@ -338,6 +354,19 @@ fn parse_location<P: AsRef<Path>>(
     results
 }
 
+/// The function `parse_module_info_files_at_location` takes a location path as input, retrieves a list
+/// of subdirectories at that location, and parses each subdirectory's "info.txt" file into a
+/// `ModuleInfoFile` struct, returning a vector of these structs.
+///
+/// Arguments:
+///
+/// * `location_path`: The `location_path` parameter is the path to the directory where the module info
+/// files are located. It can be any type that can be converted to a `Path`, such as a `String` or
+/// `&str`.
+///
+/// Returns:
+///
+/// The function `parse_module_info_files_at_location` returns a vector of `ModuleInfoFile` objects.
 fn parse_module_info_files_at_location<P: AsRef<Path>>(location_path: &P) -> Vec<ModuleInfoFile> {
     let mut results: Vec<ModuleInfoFile> = Vec::new();
     let location_path: PathBuf = location_path.as_ref().to_path_buf();
@@ -361,11 +390,35 @@ fn parse_module_info_files_at_location<P: AsRef<Path>>(location_path: &P) -> Vec
     results
 }
 
+/// The function `parse_module_info_file_direct` parses a module info file and returns a
+/// `ModuleInfoFile` object.
+///
+/// Arguments:
+///
+/// * `module_info_file_path`: A reference to a path that points to the module info file.
+///
+/// Returns:
+///
+/// The function `parse_module_info_file_direct` returns a `ModuleInfoFile` object.
 fn parse_module_info_file_direct<P: AsRef<Path>>(module_info_file_path: &P) -> ModuleInfoFile {
     // Get information from the module info file
     parser::parse_info_file_from_file_path(module_info_file_path)
 }
 
+/// The `parse_module` function parses raw files from a module directory and returns a vector of parsed
+/// objects.
+///
+/// Arguments:
+///
+/// * `module_path`: The `module_path` parameter is the path to the module directory that contains the
+/// raw files to be parsed.
+/// * `options`: The `options` parameter is of type `ParserOptions`, which is a struct that contains
+/// various options for the parser. It is passed to the `parse_raws_from_single_file` function to
+/// control the parsing behavior.
+///
+/// Returns:
+///
+/// The function `parse_module` returns a vector of boxed dynamic objects (`Vec<Box<dyn RawObject>>`).
 fn parse_module<P: AsRef<Path>>(
     module_path: &P,
     options: &ParserOptions,
@@ -471,6 +524,16 @@ fn parse_module<P: AsRef<Path>>(
     results
 }
 
+/// The function `parse_info_modules` parses module information files based on the provided options.
+///
+/// Arguments:
+///
+/// * `options`: A reference to a `ParserOptions` struct, which contains various options for parsing
+/// module information.
+///
+/// Returns:
+///
+/// The function `parse_info_modules` returns a `Vec<ModuleInfoFile>`.
 pub fn parse_info_modules(options: &ParserOptions) -> Vec<ModuleInfoFile> {
     // Guard against invalid path
     if !options_has_valid_paths(options) {
@@ -567,6 +630,17 @@ pub fn parse_info_modules(options: &ParserOptions) -> Vec<ModuleInfoFile> {
     results
 }
 
+/// The function `parse_info_modules_to_json` takes a `ParserOptions` object as input, parses the
+/// information modules using the options, and returns a vector of JSON strings representing the parsed
+/// results.
+///
+/// Arguments:
+///
+/// * `options`: A reference to a `ParserOptions` struct.
+///
+/// Returns:
+///
+/// The function `parse_info_modules_to_json` returns a vector of strings.
 pub fn parse_info_modules_to_json(options: &ParserOptions) -> Vec<String> {
     let results = parse_info_modules(options);
     let mut json_results = Vec::new();
@@ -576,6 +650,12 @@ pub fn parse_info_modules_to_json(options: &ParserOptions) -> Vec<String> {
     json_results
 }
 
+/// The function `parse_info_modules_to_file` parses information modules to JSON and writes the results
+/// to a file.
+///
+/// Arguments:
+///
+/// * `options`: A reference to a `ParserOptions` struct.
 pub fn parse_info_modules_to_file(options: &ParserOptions) {
     // Guard against bad output path
     if !options_has_valid_paths(options) {
@@ -588,4 +668,19 @@ pub fn parse_info_modules_to_file(options: &ParserOptions) {
 
     let results = parse_info_modules_to_json(options);
     util::write_json_string_vec_to_file(&results, &options.output_path);
+}
+
+/// The function `build_search_string` takes a `raw_object` that implements the `Searchable` trait and
+/// returns a string representation of the object for searching purposes.
+///
+/// Arguments:
+///
+/// * `raw_object`: The `raw_object` parameter is a reference to an object that implements the
+/// `Searchable` trait.
+///
+/// Returns:
+///
+/// The function `build_search_string` returns a `String` value.
+pub fn build_search_string(raw_object: &dyn Searchable) -> String {
+    crate::parser::searchable::get_search_string(raw_object)
 }
