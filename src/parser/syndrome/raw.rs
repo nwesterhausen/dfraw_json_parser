@@ -23,6 +23,8 @@ pub struct Syndrome {
     affected_creatures: Vec<(String, String)>,
     #[serde(skip_serializing_if = "Vec::is_empty")]
     immune_creatures: Vec<(String, String)>,
+    #[serde(skip_serializing_if = "Vec::is_empty")]
+    classes: Vec<String>,
 
     /// Seen the \[SYN_CONCENTRATION_ADDED:100:1000\] tag in material_templates.txt
     #[serde(skip_serializing_if = "serializer_helper::min_max_is_zeroes")]
@@ -36,6 +38,15 @@ pub struct Syndrome {
 }
 
 impl Syndrome {
+    pub fn new() -> Self {
+        Self::default()
+    }
+    pub fn from_name(name: &str) -> Self {
+        Self {
+            name: String::from(name),
+            ..Self::default()
+        }
+    }
     pub fn parse_tag(&mut self, key: &str, value: &str) {
         if CREATURE_EFFECT_TOKENS.contains_key(key) {
             self.conditions.push(String::from(value));
@@ -79,6 +90,8 @@ impl Syndrome {
             SyndromeToken::Unknown => {
                 log::warn!("Unknown syndrome token: {}", key);
             }
+            SyndromeToken::Class => self.classes.push(String::from(value)),
+            SyndromeToken::NoHospital => self.tags.push(SyndromeToken::NoHospital),
         }
     }
 }

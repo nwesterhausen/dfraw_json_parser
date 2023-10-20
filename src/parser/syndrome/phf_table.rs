@@ -12,4 +12,5 @@ pub static SYNDROME_TOKEN: phf::Map<&'static str, SyndromeToken> = phf::phf_map!
     "SYN_AFFECTED_CREATURE" => SyndromeToken::AffectedCreature,
     "SYN_IMMUNE_CREATURE" => SyndromeToken::ImmuneCreature,
     "SYN_CONCENTRATION_ADDED" => SyndromeToken::ConcentrationAdded,
+    "SYN_NO_HOSPITAL" => SyndromeToken::NoHospital,
 };

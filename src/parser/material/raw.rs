@@ -1,8 +1,14 @@
 use serde::{Deserialize, Serialize};
 
 use crate::parser::{
-    color::Color, material::phf_table::MATERIAL_PROPERTY_TOKENS, names::StateName,
-    serializer_helper, temperature::Temperatures,
+    color::Color,
+    creature_effect::phf_table::CREATURE_EFFECT_TOKENS,
+    material::phf_table::MATERIAL_PROPERTY_TOKENS,
+    material_mechanics::MaterialMechanics,
+    names::StateName,
+    serializer_helper,
+    syndrome::{phf_table::SYNDROME_TOKEN, raw::Syndrome},
+    temperature::Temperatures,
 };
 
 use super::{
@@ -71,6 +77,24 @@ pub struct Material {
     /// Catch-all for remaining tags we identify but don't do anything with... yet.
     #[serde(skip_serializing_if = "Vec::is_empty")]
     properties: Vec<String>,
+
+    // Syndromes attached to materials..
+    #[serde(skip_serializing_if = "Vec::is_empty")]
+    syndromes: Vec<Syndrome>,
+    // Material Mechanical Properties
+    #[serde(skip_serializing_if = "MaterialMechanics::is_empty")]
+    mechanical_properties: MaterialMechanics,
+    // Technically, the material mechanics wouldn't apply to liquid or gaseous forms
+    #[serde(skip_serializing_if = "serializer_helper::is_zero_i32")]
+    liquid_density: i32,
+    #[serde(skip_serializing_if = "serializer_helper::is_zero_i32")]
+    molar_mass: i32,
+
+    // Colors
+    #[serde(skip_serializing_if = "Color::is_default")]
+    build_color: Color,
+    #[serde(skip_serializing_if = "Color::is_default")]
+    display_color: Color,
 }
 
 impl Material {
@@ -119,7 +143,8 @@ impl Material {
         let split_len = split.clone().count();
 
         // The first part is always the material type, so we can get that first.
-        let Some(material_type) = MATERIAL_TYPE_TOKENS.get(split.next().unwrap()) else {
+        let material_type = split.next().unwrap_or_default();
+        let Some(material_type) = MATERIAL_TYPE_TOKENS.get(material_type) else {
             log::warn!(
                 "Material::from_value() was provided a value with an invalid material type: {}",
                 value
@@ -257,6 +282,48 @@ impl Material {
                 MaterialProperty::MaterialFixedTemperature => self
                     .temperatures
                     .update_material_fixed_temperature(value.parse::<u32>().unwrap_or(0)),
+                // Syndrome
+                MaterialProperty::Syndrome => {
+                    let syndrome = Syndrome::new();
+                    self.syndromes.push(syndrome);
+                }
+                // Material Mechanics..
+                MaterialProperty::ImpactYield
+                | MaterialProperty::ImpactFracture
+                | MaterialProperty::ImpactElasticity
+                | MaterialProperty::CompressiveYield
+                | MaterialProperty::CompressiveFracture
+                | MaterialProperty::CompressiveElasticity
+                | MaterialProperty::TensileYield
+                | MaterialProperty::TensileFracture
+                | MaterialProperty::TensileElasticity
+                | MaterialProperty::TorsionYield
+                | MaterialProperty::TorsionFracture
+                | MaterialProperty::TorsionElasticity
+                | MaterialProperty::ShearYield
+                | MaterialProperty::ShearFracture
+                | MaterialProperty::ShearElasticity
+                | MaterialProperty::BendingYield
+                | MaterialProperty::BendingFracture
+                | MaterialProperty::BendingElasticity
+                | MaterialProperty::MaxEdge
+                | MaterialProperty::SolidDensity => {
+                    self.mechanical_properties.parse_tag(tag.clone(), value);
+                }
+                // Liquid and Gas
+                MaterialProperty::LiquidDensity => {
+                    self.liquid_density = value.parse::<i32>().unwrap_or(0);
+                }
+                MaterialProperty::MolarMass => {
+                    self.molar_mass = value.parse::<i32>().unwrap_or(0);
+                }
+                // Template
+                MaterialProperty::UseMaterialTemplate => {
+                    self.template_identifier = String::from(value);
+                }
+                // Colors
+                MaterialProperty::BuildColor => self.build_color = Color::from_value(value),
+                MaterialProperty::DisplayColor => self.display_color = Color::from_value(value),
                 // Catch-all
                 _ => {
                     self.properties.push(format!("{key}:{value}"));
@@ -276,6 +343,15 @@ impl Material {
             };
             self.usage.push(usage.clone());
             return;
+        }
+
+        // Materials can have syndromes attached and syndromes have creature effects attached.
+        if SYNDROME_TOKEN.contains_key(key) || CREATURE_EFFECT_TOKENS.contains_key(key) {
+            // We need to add the tag to the last syndrome added (all syndromes start with SYNDROME key)
+            if let Some(syndrome) = self.syndromes.last_mut() {
+                syndrome.parse_tag(key, value);
+                return;
+            }
         }
 
         log::warn!(

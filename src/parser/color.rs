@@ -12,6 +12,16 @@ pub struct Color {
 }
 
 impl Color {
+    /// The function `from_value` takes a string value and splits it into three parts to create a
+    /// `Color` struct, or returns a default `Color` if the string does not have three parts.
+    ///
+    /// Arguments:
+    ///
+    /// * `value`: A string representing a color in the format "foreground:background:brightness".
+    ///
+    /// Returns:
+    ///
+    /// a `Color` struct.
     pub fn from_value(value: &str) -> Color {
         let split = value.split(':').collect::<Vec<&str>>();
         if split.len() == 3 {

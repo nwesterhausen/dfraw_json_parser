@@ -13,6 +13,7 @@ pub mod graphics;
 pub mod helpers;
 pub mod inorganic;
 pub mod material;
+pub mod material_mechanics;
 pub mod material_template;
 pub mod milkable;
 pub mod module_info_file;
