@@ -5,7 +5,7 @@ use crate::parser::serializer_helper;
 
 use super::{
     dimensions::Dimensions,
-    phf_table::CONDITION_TAGS,
+    phf_table::{CONDITION_TAGS, GRAPHIC_TYPE_TAGS},
     tokens::{ColorModification, Condition, GraphicType},
 };
 
@@ -38,8 +38,9 @@ impl SpriteGraphic {
     pub fn from_token(key: &str, value: &str, graphic_type: GraphicType) -> Option<Self> {
         // Recombine token for parsing
         let token = format!("{key}:{value}");
+        let specific_graphic_type = GRAPHIC_TYPE_TAGS.get(key).copied().unwrap_or(graphic_type);
 
-        match graphic_type {
+        match specific_graphic_type {
             GraphicType::Creature | GraphicType::CreatureCaste => {
                 // parse creature
                 SpriteGraphic::parse_creature_from_token(&token)
@@ -62,7 +63,9 @@ impl SpriteGraphic {
             GraphicType::ToolShape | GraphicType::ShapeLargeGem | GraphicType::ShapeSmallGem => {
                 SpriteGraphic::parse_tile_with_extra_descriptor_from_value(value)
             }
-            GraphicType::StatueCreature | GraphicType::StatueCreatureCaste => {
+            GraphicType::StatueCreature
+            | GraphicType::StatueCreatureCaste
+            | GraphicType::StatuesSurfaceGiant => {
                 SpriteGraphic::parse_creature_statue_from_token(&token)
             }
             GraphicType::Template
@@ -379,7 +382,7 @@ impl SpriteGraphic {
                 Ok(n) => n,
                 Err(_e) => {
                     log::warn!(
-                        "parse_creature_from_token: Failed to parse {} as x1 {}",
+                        "parse_creature_statue_from_token: Failed to parse {} as x1 {}",
                         v,
                         token
                     );
@@ -395,7 +398,7 @@ impl SpriteGraphic {
                 Ok(n) => n,
                 Err(_e) => {
                     log::warn!(
-                        "parse_creature_from_token: Failed to parse {} as y1 {}",
+                        "parse_creature_statue_from_token: Failed to parse {} as y1 {}",
                         v,
                         token
                     );
@@ -411,7 +414,7 @@ impl SpriteGraphic {
                 Ok(n) => n,
                 Err(_e) => {
                     log::warn!(
-                        "parse_creature_from_token: Failed to parse {} as x2 {}",
+                        "parse_creature_statue_from_token: Failed to parse {} as x2 {}",
                         v,
                         token
                     );
@@ -427,7 +430,7 @@ impl SpriteGraphic {
                 Ok(n) => n,
                 Err(_e) => {
                     log::warn!(
-                        "parse_creature_from_token: Failed to parse {} as y2 {}",
+                        "parse_creature_statue_from_token: Failed to parse {} as y2 {}",
                         v,
                         token
                     );
@@ -444,10 +447,10 @@ impl SpriteGraphic {
                 parsed_condition
             } else {
                 log::warn!(
-                    "Failed to parse {} as primary_condition in {}",
-                    condition,
-                    token
-                );
+                "parse_creature_statue_from_token: Failed to parse {} as primary_condition in {}",
+                condition,
+                token
+            );
                 Condition::None
             };
 

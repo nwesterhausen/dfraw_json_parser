@@ -42,6 +42,7 @@ pub static CONDITION_TAGS: phf::Map<&'static str, Condition> = phf::phf_map! {
     "SAPLING" => Condition::Sapling,
 
     "CONDITION_NOT_CHILD" => Condition::NotChild,
+    "CONDITION_CLASS" => Condition::Class,
     "CONDITION_CHILD" => Condition::Child,
     "CONDITION_BABY" => Condition::Baby,
     "CONDITION_HAUL_COUNT_MIN" => Condition::HaulCountMin,
@@ -54,6 +55,7 @@ pub static CONDITION_TAGS: phf::Map<&'static str, Condition> = phf::phf_map! {
     "CONDITION_MATERIAL_FLAG" => Condition::MaterialFlag,
     "CONDITION_MATERIAL_TYPE" => Condition::MaterialType,
     "CONDITION_DYE" => Condition::Dye,
+    "CONDITION_DYED" => Condition::Dye,
     "CONDITION_NOT_DYED" => Condition::NotDyed,
     "SHUT_OFF_IF_ITEM_PRESENT" => Condition::ShutOffIfItemPresent,
     "CONDITION_RANDOM_PART_INDEX" => Condition::RandomPartIndex,
@@ -367,6 +369,8 @@ pub static GRAPHIC_TYPE_TAGS: phf::Map<&'static str, GraphicType> = phf::phf_map
     // Creature Graphics
     "STATUE_CREATURE_GRAPHICS" => GraphicType::StatueCreature,
     "STATUE_CREATURE_CASTE_GRAPHICS" => GraphicType::StatueCreatureCaste,
+    "STATUES_SURFACE_GIANT" => GraphicType::StatuesSurfaceGiant,
+
 };
 
 pub static GROWTH_TAGS: phf::Map<&'static str, GrowthTag> = phf::phf_map! {

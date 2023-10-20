@@ -235,6 +235,7 @@ impl Material {
             }
         }
     }
+    #[allow(clippy::too_many_lines)]
     pub fn parse_tag(&mut self, key: &str, value: &str) {
         // Determine if the key is a Property or Usage tag
         if MATERIAL_PROPERTY_TOKENS.contains_key(key) {
@@ -346,7 +347,10 @@ impl Material {
         }
 
         // Materials can have syndromes attached and syndromes have creature effects attached.
-        if SYNDROME_TOKEN.contains_key(key) || CREATURE_EFFECT_TOKENS.contains_key(key) {
+        if SYNDROME_TOKEN.contains_key(key)
+            || CREATURE_EFFECT_TOKENS.contains_key(key)
+            || key == "CE"
+        {
             // We need to add the tag to the last syndrome added (all syndromes start with SYNDROME key)
             if let Some(syndrome) = self.syndromes.last_mut() {
                 syndrome.parse_tag(key, value);
