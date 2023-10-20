@@ -2,6 +2,7 @@
 
 export type SyndromeToken =
   | "Name"
+  | "Class"
   | "Injected"
   | "Contact"
   | "Inhaled"
@@ -10,6 +11,7 @@ export type SyndromeToken =
   | "ImmuneClass"
   | "AffectedCreature"
   | "ImmuneCreature"
-  | "Unknown"
   | "ConcentrationAdded"
-  | "Identifier";
+  | "NoHospital"
+  | "Identifier"
+  | "Unknown";

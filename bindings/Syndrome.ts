@@ -8,6 +8,7 @@ export interface Syndrome {
   immuneClasses: Array<string>;
   affectedCreatures: Array<[string, string]>;
   immuneCreatures: Array<[string, string]>;
+  classes: Array<string>;
   concentrationAdded: Array<number>;
   tags: Array<SyndromeToken>;
   conditions: Array<string>;

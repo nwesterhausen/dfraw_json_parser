@@ -2,6 +2,7 @@
 
 export type Condition =
   | "None"
+  | "Condition"
   | "Default"
   | "Animated"
   | "Corpse"
@@ -45,6 +46,7 @@ export type Condition =
   | "HaulCountMax"
   | "ItemWorn"
   | "ProfessionCategory"
+  | "Class"
   | "SyndromeClass"
   | "Caste"
   | "TissueLayer"

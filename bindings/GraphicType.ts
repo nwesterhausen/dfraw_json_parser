@@ -5,6 +5,7 @@ export type GraphicType =
   | "CreatureCaste"
   | "StatueCreature"
   | "StatueCreatureCaste"
+  | "StatuesSurfaceGiant"
   | "Tile"
   | "Empty"
   | "Plant"
