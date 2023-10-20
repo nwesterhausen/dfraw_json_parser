@@ -69,8 +69,10 @@ jobs:
         with:
           shared-key: clippy
           cache-on-failure: true
-      - name: Verify Type Bindings
-        run: cargo test --all-features
+      - name: Generate Type Bindings
+        run: |
+          cargo test --all-features
+          npx prettier --write bindings/*.ts
       - name: Check for changes
         run: |
           git diff --exit-code
