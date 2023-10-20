@@ -24,4 +24,14 @@ impl Milkable {
     pub fn is_default(&self) -> bool {
         self.material.is_empty() && self.frequency == 0
     }
+    pub fn as_vec(&self) -> Vec<String> {
+        let mut vec = Vec::new();
+        if !self.material.is_empty() {
+            vec.push(self.material.clone());
+        }
+        if self.frequency > 0 {
+            vec.push(self.frequency.to_string());
+        }
+        vec
+    }
 }

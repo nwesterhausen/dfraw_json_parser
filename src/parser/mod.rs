@@ -26,6 +26,7 @@ pub mod raw_locations;
 pub mod raws;
 mod reader;
 mod refs;
+pub mod searchable;
 pub mod seed_material;
 pub mod select_creature;
 pub mod serializer_helper;

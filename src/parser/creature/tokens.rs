@@ -43,3 +43,47 @@ pub enum CreatureTag {
     #[default]
     Unknown,
 }
+
+impl std::fmt::Display for CreatureTag {
+    fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
+        match self {
+            CreatureTag::ArtificialHiveable => write!(f, "ArtificialHiveable"),
+            CreatureTag::DoesNotExist => write!(f, "DoesNotExist"),
+            CreatureTag::Evil => write!(f, "Evil"),
+            CreatureTag::Fanciful => write!(f, "Fanciful"),
+            CreatureTag::Good => write!(f, "Good"),
+            CreatureTag::Savage => write!(f, "Savage"),
+            CreatureTag::Generated => write!(f, "Generated"),
+            CreatureTag::Ubiquitous => write!(f, "Ubiquitous"),
+            CreatureTag::VerminSoil => write!(f, "VerminSoil"),
+            CreatureTag::VerminSoilColony => write!(f, "VerminSoilColony"),
+            CreatureTag::VerminRotter => write!(f, "VerminRotter"),
+            CreatureTag::VerminGrounder => write!(f, "VerminGrounder"),
+            CreatureTag::VerminFish => write!(f, "VerminFish"),
+            CreatureTag::VerminEater => write!(f, "VerminEater"),
+            CreatureTag::LargeRoaming => write!(f, "LargeRoaming"),
+            CreatureTag::LocalPopsControllable => write!(f, "LocalPopsControllable"),
+            CreatureTag::LocalPopsProduceHeroes => write!(f, "LocalPopsProduceHeroes"),
+            CreatureTag::LooseClusters => write!(f, "LooseClusters"),
+            CreatureTag::Mundane => write!(f, "Mundane"),
+            CreatureTag::Biome => write!(f, "Biome"),
+            CreatureTag::PrefString => write!(f, "PrefString"),
+            CreatureTag::Name => write!(f, "Name"),
+            CreatureTag::GeneralBabyName => write!(f, "GeneralBabyName"),
+            CreatureTag::GeneralChildName => write!(f, "GeneralChildName"),
+            CreatureTag::Frequency => write!(f, "Frequency"),
+            CreatureTag::UndergroundDepth => write!(f, "UndergroundDepth"),
+            CreatureTag::PopulationNumber => write!(f, "PopulationNumber"),
+            CreatureTag::CopyTagsFrom => write!(f, "CopyTagsFrom"),
+            CreatureTag::ApplyCreatureVariation => write!(f, "ApplyCreatureVariation"),
+            CreatureTag::CreatureTile => write!(f, "CreatureTile"),
+            CreatureTag::AltTile => write!(f, "AltTile"),
+            CreatureTag::Color => write!(f, "Color"),
+            CreatureTag::GlowColor => write!(f, "GlowColor"),
+            CreatureTag::GlowTile => write!(f, "GlowTile"),
+            CreatureTag::ChangeFrequencyPercent => write!(f, "ChangeFrequencyPercent"),
+            CreatureTag::ClusterNumber => write!(f, "ClusterNumber"),
+            CreatureTag::Unknown => write!(f, "Unknown"),
+        }
+    }
+}

@@ -147,7 +147,9 @@ impl Graphic {
         // If the key is a growth token, parse it into a SpriteGraphic and add it to the current growth
         if let Some(_growth_type) = GROWTH_TAGS.get(key) {
             if let Some(sprite_graphic) = SpriteGraphic::from_token(key, value, graphic_type) {
-                self.growths.last_mut().unwrap().1.push(sprite_graphic);
+                if let Some(growth) = self.growths.last_mut() {
+                    growth.1.push(sprite_graphic);
+                };
             } else {
                 log::warn!(
                     "Graphic::parse_sprite_from_tag:_growth_type [{}] Failed to parse {},{} as SpriteGraphic",
@@ -163,7 +165,9 @@ impl Graphic {
             if let Some(sprite_graphic) =
                 SpriteGraphic::from_token(key, value, GraphicType::Template)
             {
-                self.growths.last_mut().unwrap().1.push(sprite_graphic);
+                if let Some(growth) = self.growths.last_mut() {
+                    growth.1.push(sprite_graphic);
+                };
             } else {
                 log::warn!(
                     "Graphic::parse_sprite_from_tag:_plant_graphic_template [{}] Failed to parse {},{} as SpriteGraphic",

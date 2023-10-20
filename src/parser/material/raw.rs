@@ -6,9 +6,11 @@ use crate::parser::{
     material::phf_table::MATERIAL_PROPERTY_TOKENS,
     material_mechanics::MaterialMechanics,
     names::StateName,
+    searchable::{clean_search_vec, Searchable},
     serializer_helper,
     syndrome::{phf_table::SYNDROME_TOKEN, raw::Syndrome},
     temperature::Temperatures,
+    tile::Tile,
 };
 
 use super::{
@@ -95,6 +97,12 @@ pub struct Material {
     build_color: Color,
     #[serde(skip_serializing_if = "Color::is_default")]
     display_color: Color,
+
+    // Display
+    #[serde(skip_serializing_if = "Tile::is_default")]
+    tile: Tile,
+    #[serde(skip_serializing_if = "String::is_empty")]
+    item_symbol: String,
 }
 
 impl Material {
@@ -171,7 +179,8 @@ impl Material {
                 }
             }
             MaterialType::Coal => {
-                let Some(fuel_type) = FUEL_TYPE_TOKENS.get(split.next().unwrap()) else {
+                let material_key = split.next().unwrap_or_default();
+                let Some(fuel_type) = FUEL_TYPE_TOKENS.get(material_key) else {
                     log::warn!(
                         "Material::from_value() was provided a value with an invalid fuel type: {}",
                         value
@@ -309,7 +318,7 @@ impl Material {
                 | MaterialProperty::BendingElasticity
                 | MaterialProperty::MaxEdge
                 | MaterialProperty::SolidDensity => {
-                    self.mechanical_properties.parse_tag(tag.clone(), value);
+                    self.mechanical_properties.parse_tag(tag, value);
                 }
                 // Liquid and Gas
                 MaterialProperty::LiquidDensity => {
@@ -325,6 +334,22 @@ impl Material {
                 // Colors
                 MaterialProperty::BuildColor => self.build_color = Color::from_value(value),
                 MaterialProperty::DisplayColor => self.display_color = Color::from_value(value),
+
+                MaterialProperty::Tile => {
+                    self.tile.set_character(value);
+                }
+                MaterialProperty::TileColor => {
+                    self.tile.set_color(value);
+                }
+
+                MaterialProperty::MaterialReactionProduct => {
+                    self.reaction_product_identifier = String::from(value);
+                }
+
+                MaterialProperty::ItemSymbol => {
+                    self.item_symbol = String::from(value);
+                }
+
                 // Catch-all
                 _ => {
                     self.properties.push(format!("{key}:{value}"));
@@ -362,5 +387,50 @@ impl Material {
             "Material::parse_tag() was provided a key that was not recognized: {}",
             key
         );
+    }
+}
+
+impl Searchable for Material {
+    fn get_search_vec(&self) -> Vec<String> {
+        let mut vec = Vec::new();
+
+        // Name
+        vec.push(self.name.clone());
+        // Material Type
+        vec.push(self.material_type.to_string());
+        // State descriptions
+        vec.extend(self.state_names.as_vec());
+        vec.extend(self.state_adjectives.as_vec());
+        vec.extend(self.state_colors.as_vec());
+
+        // Tags
+        vec.extend(
+            self.usage
+                .iter()
+                .map(std::string::ToString::to_string)
+                .collect::<Vec<String>>(),
+        );
+
+        // Syndromes
+        vec.extend(
+            self.syndromes
+                .iter()
+                .flat_map(Searchable::get_search_vec)
+                .collect::<Vec<String>>(),
+        );
+
+        // Reaction Classes (products)
+        vec.push(self.reaction_product_identifier.clone());
+        // Properties
+        vec.extend(self.properties.clone());
+        // Usage
+        vec.extend(
+            self.usage
+                .iter()
+                .map(std::string::ToString::to_string)
+                .collect::<Vec<String>>(),
+        );
+
+        clean_search_vec(vec.as_slice())
     }
 }

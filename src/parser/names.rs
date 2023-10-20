@@ -38,6 +38,19 @@ impl Name {
     pub fn update_adjective(&mut self, name: &str) {
         self.adjective = String::from(name);
     }
+    pub fn as_vec(&self) -> Vec<String> {
+        let mut vec = Vec::new();
+        if !self.singular.is_empty() {
+            vec.push(self.singular.clone());
+        }
+        if !self.plural.is_empty() {
+            vec.push(self.plural.clone());
+        }
+        if !self.adjective.is_empty() {
+            vec.push(self.adjective.clone());
+        }
+        vec
+    }
 }
 
 #[derive(ts_rs::TS)]
@@ -69,6 +82,16 @@ impl SingPlurName {
     }
     pub fn is_empty(&self) -> bool {
         self.singular.is_empty() && self.plural.is_empty()
+    }
+    pub fn as_vec(&self) -> Vec<String> {
+        let mut vec = Vec::new();
+        if !self.singular.is_empty() {
+            vec.push(self.singular.clone());
+        }
+        if !self.plural.is_empty() {
+            vec.push(self.plural.clone());
+        }
+        vec
     }
 }
 
@@ -128,5 +151,18 @@ impl StateName {
             }
             _ => (),
         }
+    }
+    pub fn as_vec(&self) -> Vec<String> {
+        let mut vec = Vec::new();
+        if !self.solid.is_empty() {
+            vec.push(self.solid.clone());
+        }
+        if !self.liquid.is_empty() {
+            vec.push(self.liquid.clone());
+        }
+        if !self.gas.is_empty() {
+            vec.push(self.gas.clone());
+        }
+        vec
     }
 }

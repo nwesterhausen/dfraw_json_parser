@@ -19,6 +19,7 @@ use crate::{
         plant::raw::Plant,
         raws::{RawMetadata, RawObject},
         refs::{DF_ENCODING, RAW_TOKEN_RE},
+        searchable::get_search_string,
         select_creature::raw::SelectCreature,
     },
 };
@@ -159,6 +160,9 @@ pub fn parse_raw_file_with_info<P: AsRef<Path>>(
                     if started && last_parsed_type == ObjectType::Creature {
                         // We need to add the creature to the list.
                         created_raws.push(Box::new(temp_creature.clone()));
+
+                        // TEMP TEST TODO: REMOVE
+                        println!("{}", get_search_string(&temp_creature));
                     } else {
                         started = true;
                     }
@@ -212,6 +216,9 @@ pub fn parse_raw_file_with_info<P: AsRef<Path>>(
                         // We've already started a raw, so we need to finish it.
                         // This is a new creature, so we need to finish the old one.
                         created_raws.push(Box::new(temp_inorganic.clone()));
+
+                        // TEMP TEST TODO: REMOVE
+                        println!("{}", get_search_string(&temp_inorganic));
                     } else {
                         started = true;
                     }

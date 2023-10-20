@@ -10,6 +10,10 @@ use std::num::ParseIntError;
 /// Returns:
 ///
 /// A Result<[u16; 2], `ParseIntError`>
+///
+/// # Errors
+///
+/// Will return a `ParseIntError` if the string cannot be parsed into two unsigned 16-bit integers.
 pub fn parse_min_max_range_from_vec(split: &[&str]) -> Result<[u16; 2], ParseIntError> {
     let min: u16 = match split.first().unwrap_or(&"").parse() {
         Ok(n) => n,
@@ -28,6 +32,20 @@ pub fn parse_min_max_range_from_vec(split: &[&str]) -> Result<[u16; 2], ParseInt
     Ok([min, max])
 }
 
+/// The function `parse_min_max_range` takes a string input and splits it by a colon, then calls another
+/// function to parse the resulting vector into an array of two unsigned 16-bit integers.
+///
+/// Arguments:
+///
+/// * `value`: A string representing a range of values in the format "min:max".
+///
+/// Returns:
+///
+/// The function `parse_min_max_range` returns a `Result<[u16; 2], ParseIntError>`.
+///
+/// # Errors
+///
+/// Will return a `ParseIntError` if the string cannot be parsed into two unsigned 16-bit integers.
 pub fn parse_min_max_range(value: &str) -> Result<[u16; 2], ParseIntError> {
     let split: Vec<&str> = value.split(':').collect::<Vec<&str>>();
     parse_min_max_range_from_vec(&split)

@@ -1,6 +1,10 @@
 use serde::{Deserialize, Serialize};
 
-use crate::parser::{creature_effect::phf_table::CREATURE_EFFECT_TOKENS, serializer_helper};
+use crate::parser::{
+    creature_effect::phf_table::CREATURE_EFFECT_TOKENS,
+    searchable::{clean_search_vec, Searchable},
+    serializer_helper,
+};
 
 use super::{phf_table::SYNDROME_TOKEN, tokens::SyndromeToken};
 
@@ -98,5 +102,51 @@ impl Syndrome {
             SyndromeToken::Class => self.classes.push(String::from(value)),
             SyndromeToken::NoHospital => self.tags.push(SyndromeToken::NoHospital),
         }
+    }
+}
+
+impl Searchable for Syndrome {
+    fn get_search_vec(&self) -> Vec<String> {
+        let mut vec = Vec::new();
+
+        // Identifier
+        vec.push(self.identifier.clone());
+
+        // Name
+        vec.push(self.name.clone());
+
+        // Affected classes
+        for affected_class in &self.affected_classes {
+            vec.push(affected_class.clone());
+        }
+
+        // Immune classes
+        for immune_class in &self.immune_classes {
+            vec.push(immune_class.clone());
+        }
+
+        // Affected creatures
+        for (creature, caste) in &self.affected_creatures {
+            vec.push(creature.clone());
+            vec.push(caste.clone());
+        }
+
+        // Immune creatures
+        for (creature, caste) in &self.immune_creatures {
+            vec.push(creature.clone());
+            vec.push(caste.clone());
+        }
+
+        // Classes
+        for class in &self.classes {
+            vec.push(class.clone());
+        }
+
+        // Conditions
+        for condition in &self.conditions {
+            vec.push(condition.clone());
+        }
+
+        clean_search_vec(vec.as_slice())
     }
 }

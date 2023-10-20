@@ -5,6 +5,7 @@ use crate::parser::{
     material::raw::Material,
     object_types::ObjectType,
     raws::{RawMetadata, RawObject},
+    searchable::{clean_search_vec, Searchable},
     serializer_helper,
 };
 
@@ -135,5 +136,30 @@ impl RawObject for Inorganic {
 
     fn get_object_id(&self) -> &str {
         &self.object_id
+    }
+}
+
+impl Searchable for Inorganic {
+    fn get_search_vec(&self) -> Vec<String> {
+        let mut vec = Vec::new();
+
+        // Identifier
+        vec.push(self.identifier.clone());
+        // Material (if any)
+        vec.extend(self.material.get_search_vec());
+        // Tags
+        vec.extend(
+            self.tags
+                .iter()
+                .map(std::string::ToString::to_string)
+                .collect::<Vec<String>>(),
+        );
+        // Environment information
+        vec.push(self.environment_class.to_string());
+        vec.push(self.environment_inclusion_type.to_string());
+        vec.push(self.environment_inclusion_frequency.to_string());
+        vec.extend(self.environment_class_specific.clone());
+
+        clean_search_vec(vec.as_slice())
     }
 }

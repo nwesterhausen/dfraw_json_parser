@@ -5,6 +5,7 @@ use crate::parser::{
     milkable::Milkable,
     names::{Name, SingPlurName},
     ranges::parse_min_max_range,
+    searchable::Searchable,
     serializer_helper,
     tile::Tile,
 };
@@ -257,5 +258,76 @@ impl Caste {
         if !other.tile.is_default() {
             self.tile = other.tile.clone();
         }
+    }
+
+    pub fn is_egg_layer(&self) -> bool {
+        self.tags.contains(&CasteTag::LaysEggs)
+    }
+    pub fn is_milkable(&self) -> bool {
+        self.tags.contains(&CasteTag::Milkable)
+    }
+}
+
+impl Searchable for Caste {
+    // Used to help extend things that own this caste
+    fn get_search_vec(&self) -> Vec<String> {
+        let mut vec = Vec::new();
+
+        // Identifier
+        vec.push(self.identifier.clone());
+        // Name (and child/baby names)
+        vec.extend(self.caste_name.as_vec());
+        vec.extend(self.child_name.as_vec());
+        vec.extend(self.baby_name.as_vec());
+        // Creature Class
+        vec.extend(self.creature_class.clone());
+        // Description
+        vec.push(self.description.clone());
+        // If egg layer, include egg information
+        if self.is_egg_layer() {
+            vec.push(String::from("eggs"));
+            vec.push(format!("{}", self.egg_size));
+        }
+        // If milkable, include milk information
+        if self.is_milkable() {
+            vec.push(String::from("milk"));
+            vec.extend(self.milkable.as_vec());
+        }
+        // If flier, include flyer information
+        if self.tags.contains(&CasteTag::Flier) {
+            vec.push(String::from("flying flies flier"));
+        }
+        // If gnawer, include gnawer information
+        if self.tags.contains(&CasteTag::Gnawer) {
+            vec.push(String::from("gnawer"));
+        }
+        // If playable/civilized, include playable information
+        if self.tags.contains(&CasteTag::OutsiderControllable) {
+            vec.push(String::from("playable civilized"));
+        }
+        // Include difficulty if not 0
+        if self.difficulty > 0 {
+            vec.push(format!("{}", self.difficulty));
+        }
+        // Include pet value if not 0
+        if self.pet_value > 0 {
+            vec.push(format!("{}", self.pet_value));
+        }
+        // If speaks, include language information
+        // If learns, include learn
+        // If both, include "intelligent"
+        if self.tags.contains(&CasteTag::Intelligent) || self.tags.contains(&CasteTag::CanSpeak) {
+            vec.push(String::from("speaks language"));
+        }
+        if self.tags.contains(&CasteTag::Intelligent) || self.tags.contains(&CasteTag::CanLearn) {
+            vec.push(String::from("learns"));
+        }
+        if self.tags.contains(&CasteTag::Intelligent)
+            || (self.tags.contains(&CasteTag::CanSpeak) && self.tags.contains(&CasteTag::CanLearn))
+        {
+            vec.push(String::from("intelligent"));
+        }
+
+        vec
     }
 }

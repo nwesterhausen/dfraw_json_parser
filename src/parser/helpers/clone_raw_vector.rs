@@ -118,7 +118,7 @@ pub fn with_purge(
 }
 
 pub fn with_limit_and_page(
-    all_raws: &Vec<Box<dyn RawObject>>,
+    all_raws: &[Box<dyn RawObject>],
     limit: usize,
     page: usize,
 ) -> Vec<Box<dyn RawObject>> {

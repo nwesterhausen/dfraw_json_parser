@@ -1,6 +1,7 @@
 use serde::{Deserialize, Serialize};
 
 use crate::parser::{
+    biomes::BIOMES,
     creature_caste::{phf_table::CASTE_TOKENS, raw::Caste},
     creature_variation::raw::CreatureVariationRequirements,
     helpers::object_id::build_object_id_from_pieces,
@@ -8,6 +9,7 @@ use crate::parser::{
     object_types::ObjectType,
     ranges::parse_min_max_range,
     raws::{RawMetadata, RawObject},
+    searchable::{clean_search_vec, Searchable},
     select_creature::raw::SelectCreature,
     serializer_helper,
     tile::Tile,
@@ -510,5 +512,37 @@ impl CreatureVariationRequirements for Creature {
     fn add_tag_and_value_for_caste(&mut self, key: &str, value: &str, caste: &str) {
         self.select_caste(caste);
         self.parse_tag(key, value);
+    }
+}
+
+impl Searchable for Creature {
+    fn get_search_vec(&self) -> Vec<String> {
+        let mut vec = Vec::new();
+        // Add caste search strings
+        for caste in &self.castes {
+            vec.extend(caste.get_search_vec());
+        }
+        // Add tags
+        for tag in &self.tags {
+            vec.push(tag.to_string());
+        }
+        // Add biomes
+        for biome in &self.biomes {
+            if let Some(biome_str) = BIOMES.get(biome) {
+                vec.push((*biome_str).to_string());
+            }
+        }
+        // Add pref strings
+        vec.extend(self.pref_strings.clone());
+        // Add name
+        vec.extend(self.name.as_vec());
+        // Add general baby name
+        vec.extend(self.general_baby_name.as_vec());
+        // Add general child name
+        vec.extend(self.general_child_name.as_vec());
+        // Add identifier
+        vec.push(self.identifier.clone());
+
+        clean_search_vec(vec.as_slice())
     }
 }

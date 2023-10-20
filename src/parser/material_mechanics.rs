@@ -69,7 +69,7 @@ impl MaterialMechanics {
             && self.shear.is_empty()
             && self.bending.is_empty()
     }
-    pub fn parse_tag(&mut self, key: MaterialProperty, value: &str) {
+    pub fn parse_tag(&mut self, key: &MaterialProperty, value: &str) {
         match key {
             MaterialProperty::ImpactYield => {
                 self.impact.set_yield(value.parse::<i32>().unwrap_or(0));

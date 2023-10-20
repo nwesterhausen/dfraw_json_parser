@@ -117,3 +117,62 @@ impl InclusionType {
         *self == InclusionType::None
     }
 }
+impl std::fmt::Display for InclusionType {
+    fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
+        match self {
+            InclusionType::Cluster => write!(f, "Cluster"),
+            InclusionType::ClusterSmall => write!(f, "ClusterSmall"),
+            InclusionType::ClusterOne => write!(f, "ClusterOne"),
+            InclusionType::Vein => write!(f, "Vein"),
+            InclusionType::None => write!(f, "None"),
+        }
+    }
+}
+
+impl std::fmt::Display for EnvironmentClass {
+    fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
+        match self {
+            EnvironmentClass::AllStone => write!(f, "AllStone"),
+            EnvironmentClass::IgneousAll => write!(f, "IgneousAll"),
+            EnvironmentClass::IgneousExtrusive => write!(f, "IgneousExtrusive"),
+            EnvironmentClass::IgneousIntrusive => write!(f, "IgneousIntrusive"),
+            EnvironmentClass::Soil => write!(f, "Soil"),
+            EnvironmentClass::SoilSand => write!(f, "SoilSand"),
+            EnvironmentClass::SoilOcean => write!(f, "SoilOcean"),
+            EnvironmentClass::Sedimentary => write!(f, "Sedimentary"),
+            EnvironmentClass::Metamorphic => write!(f, "Metamorphic"),
+            EnvironmentClass::Alluvial => write!(f, "Alluvial"),
+            EnvironmentClass::None => write!(f, "None"),
+        }
+    }
+}
+
+impl std::fmt::Display for InorganicToken {
+    fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
+        match self {
+            InorganicToken::Wafers => write!(f, "Wafers"),
+            InorganicToken::DeepSpecial => write!(f, "DeepSpecial"),
+            InorganicToken::MetalOre => write!(f, "MetalOre"),
+            InorganicToken::ThreadMetal => write!(f, "ThreadMetal"),
+            InorganicToken::DeepSurface => write!(f, "DeepSurface"),
+            InorganicToken::Aquifer => write!(f, "Aquifer"),
+            InorganicToken::Metamorphic => write!(f, "Metamorphic"),
+            InorganicToken::Sedimentary => write!(f, "Sedimentary"),
+            InorganicToken::Soil => write!(f, "Soil"),
+            InorganicToken::SoilOcean => write!(f, "SoilOcean"),
+            InorganicToken::SoilSand => write!(f, "SoilSand"),
+            InorganicToken::SedimentaryOceanShallow => write!(f, "SedimentaryOceanShallow"),
+            InorganicToken::SedimentaryOceanDeep => write!(f, "SedimentaryOceanDeep"),
+            InorganicToken::IgneousExtrusive => write!(f, "IgneousExtrusive"),
+            InorganicToken::IgneousIntrusive => write!(f, "IgneousIntrusive"),
+            InorganicToken::Environment => write!(f, "Environment"),
+            InorganicToken::EnvironmentSpecific => write!(f, "EnvironmentSpecific"),
+            InorganicToken::Lava => write!(f, "Lava"),
+            InorganicToken::Special => write!(f, "Special"),
+            InorganicToken::Generated => write!(f, "Generated"),
+            InorganicToken::Divine => write!(f, "Divine"),
+            InorganicToken::Sphere => write!(f, "Sphere"),
+            InorganicToken::Unknown => write!(f, "Unknown"),
+        }
+    }
+}
