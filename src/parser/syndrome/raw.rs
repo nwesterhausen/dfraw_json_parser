@@ -52,6 +52,11 @@ impl Syndrome {
             self.conditions.push(String::from(value));
             return;
         }
+        if key == "CE" {
+            log::debug!("Manual handling of CE tag: {}:{}", key, value);
+            self.conditions.push(String::from(value));
+            return;
+        }
 
         let token = SYNDROME_TOKEN.get(key).unwrap_or(&SyndromeToken::Unknown);
         match token {

@@ -66,6 +66,8 @@ pub static CONDITION_TAGS: phf::Map<&'static str, Condition> = phf::phf_map! {
     "TISSUE_SWAP" => Condition::TissueSwap,
     "TISSUE_MIN_CURLY" => Condition::TissueMinCurly,
     "TISSUE_MAX_CURLY" => Condition::TissueMaxCurly,
+    // Generic condition (or something)
+    "CONDITION" => Condition::Condition,
 
     // Professions...
     "HAMMERMAN" => Condition::Hammerman,

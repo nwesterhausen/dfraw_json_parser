@@ -24,6 +24,10 @@ impl SpriteLayer {
             // At the moment we only care about saving the tag, so we'll just save the value as a string.
             self.conditions.push((*condition, String::from(value)));
         } else {
+            // Manually avoid ISSUE_MIN_LENGTH which is a typo in one of the mods.. This hack should be removed once the mod is fixed.
+            if key == "ISSUE_MIN_LENGTH" {
+                return;
+            }
             log::warn!(
                 "Failed to parse {} as LayerCondition, unknown key {}",
                 value,

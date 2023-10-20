@@ -7,6 +7,7 @@ use super::phf_table::CONDITION_TAGS;
 #[derive(Serialize, Deserialize, Debug, PartialEq, Eq, Clone, Copy, Default)]
 pub enum Condition {
     None,
+    Condition,
     #[default]
     Default,
     Animated,

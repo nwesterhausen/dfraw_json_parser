@@ -12,6 +12,7 @@ pub static CREATURE_EFFECT_TOKENS: phf::Map<&'static str, CreatureEffectToken> =
     "CE_BLEEDING" => CreatureEffectToken::Bleeding,
     "CE_COUGHING_BLOOD" => CreatureEffectToken::CoughingBlood,
     "CE_VOMITING_BLOOD" => CreatureEffectToken::VomitingBlood,
+    "CE_VOMIT_BLOOD" => CreatureEffectToken::VomitingBlood,
     "CE_NAUSEA" => CreatureEffectToken::Nausea,
     "CE_UNCONSCIOUSNESS" => CreatureEffectToken::Unconsciousness,
     "CE_NECROSIS" => CreatureEffectToken::Necrosis,
