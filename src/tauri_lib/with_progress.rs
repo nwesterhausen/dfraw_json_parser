@@ -93,7 +93,7 @@ pub fn parse(
                     parser::raw_locations::RawModuleLocation::Mods => target_path.join("mods"),
                     parser::raw_locations::RawModuleLocation::Unknown => {
                         log::error!(
-                            "Unknown location provided to parse! Provided options:\n{:#?}",
+                            "parse: Unknown location provided to parse! Provided options:\n{:#?}",
                             options
                         );
                         return Vec::new();
@@ -101,7 +101,7 @@ pub fn parse(
                 }
             } else {
                 log::error!(
-                    "No location provided to parse! Provided options:\n{:#?}",
+                    "parse: No location provided to parse! Provided options:\n{:#?}",
                     options
                 );
                 return Vec::new();
@@ -124,7 +124,7 @@ pub fn parse(
                     || dir_name_str.eq("interaction examples"))
                 {
                     log::error!(
-                        "No info.txt as expected in {:?}. Is this DF 50.xx? Provided options:\n{:#?}",
+                        "parse: No info.txt as expected in {:?}. Is this DF 50.xx? Provided options:\n{:#?}",
                         target_path.file_name().unwrap_or_default(),
                         options
                     );
@@ -138,7 +138,7 @@ pub fn parse(
         crate::options::ParsingJob::AllModuleInfoFiles
         | crate::options::ParsingJob::SingleModuleInfoFile => {
             log::warn!(
-                "Unable to parse info.txt files in this dispatch. Provided options:\n{:#?}",
+                "parse: Unable to parse info.txt files in this dispatch. Provided options:\n{:#?}",
                 options
             );
             return Vec::new();
@@ -214,7 +214,7 @@ fn parse_location<P: AsRef<Path>>(
     let raw_modules_in_location: Vec<DirEntry> =
         util::subdirectories(location_path).unwrap_or_default();
     log::info!(
-        "Found {} raw modules in {:?}",
+        "parse_location: Found {} raw modules in {:?}",
         raw_modules_in_location.len(),
         module_location,
     );
@@ -245,7 +245,7 @@ fn parse_module<P: AsRef<Path>>(
     let module_info_file = crate::parse_module_info_file_direct(&module_info_file_path);
 
     log::info!(
-        "Parsing raws for {} v{}",
+        "parse_module: Parsing raws for {} v{}",
         module_info_file.get_identifier(),
         module_info_file.get_version(),
     );
@@ -267,7 +267,7 @@ fn parse_module<P: AsRef<Path>>(
 
     if !objects_path.exists() {
         log::warn!(
-            "No objects directory found in {:?}",
+            "parse_module: No objects directory found in {:?}",
             module_path.as_ref().file_name().unwrap_or_default(),
         );
         parse_objects = false;
@@ -275,7 +275,7 @@ fn parse_module<P: AsRef<Path>>(
 
     if parse_objects && !objects_path.is_dir() {
         log::warn!(
-            "Objects directory in {:?} is not a directory",
+            "parse_module: Objects directory in {:?} is not a directory",
             module_path.as_ref().file_name().unwrap_or_default(),
         );
         parse_objects = false;
@@ -283,7 +283,7 @@ fn parse_module<P: AsRef<Path>>(
 
     if !graphics_path.exists() {
         log::debug!(
-            "No graphics directory found in {:?}",
+            "parse_module: No graphics directory found in {:?}",
             module_path.as_ref().file_name().unwrap_or_default(),
         );
         parse_graphics = false;
@@ -291,7 +291,7 @@ fn parse_module<P: AsRef<Path>>(
 
     if parse_graphics && !graphics_path.is_dir() {
         log::warn!(
-            "Graphics directory in {:?} is not a directory",
+            "parse_module: Graphics directory in {:?} is not a directory",
             module_path.as_ref().file_name().unwrap_or_default(),
         );
         parse_graphics = false;

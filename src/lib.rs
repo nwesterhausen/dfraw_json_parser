@@ -443,7 +443,7 @@ fn parse_module<P: AsRef<Path>>(
     let module_info_file = parse_module_info_file_direct(&module_info_file_path);
 
     log::info!(
-        "Parsing raws for {} v{}",
+        "draw_json_parser: Parsing raws for {} v{}",
         module_info_file.get_identifier(),
         module_info_file.get_version(),
     );
@@ -553,7 +553,7 @@ pub fn parse_info_modules(options: &ParserOptions) -> Vec<ModuleInfoFile> {
     // Guard against invalid path
     if !options_has_valid_paths(options) {
         log::error!(
-            "Returning early for bad path. Provided options:\n{:#?}",
+            "draw_json_parser: returning early for bad path. Provided options:\n{:#?}",
             options
         );
         return Vec::new();
@@ -600,7 +600,7 @@ pub fn parse_info_modules(options: &ParserOptions) -> Vec<ModuleInfoFile> {
                     RawModuleLocation::Mods => target_path.join("mods"),
                     RawModuleLocation::Unknown => {
                         log::error!(
-                            "Unknown location provided to parse! Provided options:\n{:#?}",
+                            "draw_json_parser: Unknown location provided to parse! Provided options:\n{:#?}",
                             options
                         );
                         return Vec::new();
@@ -608,7 +608,7 @@ pub fn parse_info_modules(options: &ParserOptions) -> Vec<ModuleInfoFile> {
                 }
             } else {
                 log::error!(
-                    "No location provided to parse! Provided options:\n{:#?}",
+                    "draw_json_parser: No location provided to parse! Provided options:\n{:#?}",
                     options
                 );
                 return Vec::new();
@@ -631,7 +631,7 @@ pub fn parse_info_modules(options: &ParserOptions) -> Vec<ModuleInfoFile> {
                     || dir_name_str.eq("interaction examples"))
                 {
                     log::error!(
-                        "No info.txt as expected in {:?}. Is this DF 50.xx? Provided options:\n{:#?}",
+                        "draw_json_parser: No info.txt as expected in {:?}. Is this DF 50.xx? Provided options:\n{:#?}",
                         target_path.file_name().unwrap_or_default(),
                         options
                     );
@@ -646,7 +646,7 @@ pub fn parse_info_modules(options: &ParserOptions) -> Vec<ModuleInfoFile> {
         ParsingJob::SingleRaw => {
             // The provided path should be a raw file directly
             log::warn!(
-                "Unable to parse info.txt file in this dispatch. Provided options:\n{:#?}",
+                "draw_json_parser: Unable to parse info.txt file in this dispatch. Provided options:\n{:#?}",
                 options
             );
             return Vec::new();
@@ -656,7 +656,7 @@ pub fn parse_info_modules(options: &ParserOptions) -> Vec<ModuleInfoFile> {
             results.push(parse_module_info_file_direct(&target_path));
         }
     }
-    log::info!("Parsed {} info.txt files", results.len());
+    log::info!("draw_json_parser: Parsed {} info.txt files", results.len());
     results
 }
 
@@ -690,7 +690,7 @@ pub fn parse_info_modules_to_file(options: &ParserOptions) {
     // Guard against bad output path
     if !options_has_valid_paths(options) {
         log::error!(
-            "Returning early for bad output path. Provided options:\n{:#?}",
+            "draw_json_parser: Returning early for bad output path. Provided options:\n{:#?}",
             options
         );
         return;

@@ -113,13 +113,13 @@ pub fn path_from_game_directory<P: AsRef<Path>>(game_path: &P) -> Result<PathBuf
 /// * `out_filepath`: Path
 pub fn write_json_string_vec_to_file<P: AsRef<Path>>(strings_vec: &Vec<String>, out_filepath: &P) {
     log::info!(
-        "Writing {} strings to file {:?}",
+        "write_json_string_vec_to_file: Writing {} strings to file {:?}",
         strings_vec.len(),
         out_filepath.as_ref().display()
     );
 
     if strings_vec.is_empty() {
-        log::warn!("Provided string vector is empty!");
+        log::warn!("write_json_string_vec_to_file: Provided string vector is empty!");
         return;
     }
 
@@ -127,7 +127,7 @@ pub fn write_json_string_vec_to_file<P: AsRef<Path>>(strings_vec: &Vec<String>, 
         Ok(f) => f,
         Err(e) => {
             log::error!(
-                "Unable to open {} for writing \n{:?}",
+                "write_json_string_vec_to_file: Unable to open {} for writing \n{:?}",
                 out_filepath.as_ref().display(),
                 e
             );
@@ -137,7 +137,7 @@ pub fn write_json_string_vec_to_file<P: AsRef<Path>>(strings_vec: &Vec<String>, 
 
     let mut stream = BufWriter::new(out_file);
     let write_error = &format!(
-        "Unable to write to {}",
+        "write_json_string_vec_to_file: Unable to write to {}",
         out_filepath.as_ref().to_string_lossy()
     );
 
@@ -145,14 +145,14 @@ pub fn write_json_string_vec_to_file<P: AsRef<Path>>(strings_vec: &Vec<String>, 
         match writeln!(stream, "{}", strings_vec.first().unwrap_or(&String::new())) {
             Ok(_x) => (),
             Err(e) => {
-                log::error!("{}\n{:?}", write_error, e);
+                log::error!("write_json_string_vec_to_file: {}\n{:?}", write_error, e);
                 return;
             }
         };
         match stream.flush() {
             Ok(_x) => (),
             Err(e) => {
-                log::error!("{}\n{:?}", write_error, e);
+                log::error!("write_json_string_vec_to_file: {}\n{:?}", write_error, e);
             }
         };
         return;
@@ -167,14 +167,14 @@ pub fn write_json_string_vec_to_file<P: AsRef<Path>>(strings_vec: &Vec<String>, 
             0 => match write!(stream, "[{string}") {
                 Ok(_x) => (),
                 Err(e) => {
-                    log::error!("{}\n{:?}", write_error, e);
+                    log::error!("write_json_string_vec_to_file: {}\n{:?}", write_error, e);
                     return;
                 }
             },
             _ => match write!(stream, ",{string}") {
                 Ok(_x) => (),
                 Err(e) => {
-                    log::error!("{}\n{:?}", write_error, e);
+                    log::error!("write_json_string_vec_to_file: {}\n{:?}", write_error, e);
                     return;
                 }
             },
@@ -184,7 +184,7 @@ pub fn write_json_string_vec_to_file<P: AsRef<Path>>(strings_vec: &Vec<String>, 
     match writeln!(stream, "]") {
         Ok(_x) => (),
         Err(e) => {
-            log::error!("{}\n{:?}", write_error, e);
+            log::error!("write_json_string_vec_to_file: {}\n{:?}", write_error, e);
             return;
         }
     };
@@ -192,7 +192,7 @@ pub fn write_json_string_vec_to_file<P: AsRef<Path>>(strings_vec: &Vec<String>, 
     match stream.flush() {
         Ok(_x) => (),
         Err(e) => {
-            log::error!("{}\n{:?}", write_error, e);
+            log::error!("write_json_string_vec_to_file: {}\n{:?}", write_error, e);
         }
     };
 }
@@ -202,7 +202,7 @@ pub fn options_has_valid_paths(options: &ParserOptions) -> bool {
     // Guard against invalid path
     if !target_path.exists() {
         log::error!(
-            "Provided path for parsing doesn't exist!\n{}",
+            "write_json_string_vec_to_file: Provided path for parsing doesn't exist!\n{}",
             target_path.display()
         );
         return false;
@@ -214,7 +214,7 @@ pub fn options_has_valid_paths(options: &ParserOptions) -> bool {
         && target_path.is_file()
     {
         log::error!(
-            "Target path needs to be a directory for parsing {:?}\n{}",
+            "write_json_string_vec_to_file: Target path needs to be a directory for parsing {:?}\n{}",
             options.job,
             target_path.display()
         );
@@ -230,14 +230,17 @@ pub fn options_has_valid_paths(options: &ParserOptions) -> bool {
     // Guard against invalid path
     if !target_path.exists() {
         log::error!(
-            "Provided path for parsing doesn't exist!\n{}",
+            "write_json_string_vec_to_file: Provided path for parsing doesn't exist!\n{}",
             output_path.display()
         );
         return false;
     }
     // Output path needs to be a file (always)
     if !output_path.is_file() {
-        log::error!("Output path needs to be a file\n{}", output_path.display());
+        log::error!(
+            "write_json_string_vec_to_file: Output path needs to be a file\n{}",
+            output_path.display()
+        );
         return false;
     }
     true
