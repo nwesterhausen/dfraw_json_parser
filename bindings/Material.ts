@@ -7,6 +7,7 @@ import type { MaterialUsage } from "./MaterialUsage";
 import type { StateName } from "./StateName";
 import type { Syndrome } from "./Syndrome";
 import type { Temperatures } from "./Temperatures";
+import type { Tile } from "./Tile";
 
 export interface Material {
   materialType: MaterialType;
@@ -32,4 +33,6 @@ export interface Material {
   molarMass: number;
   buildColor: Color;
   displayColor: Color;
+  tile: Tile;
+  itemSymbol: string;
 }
