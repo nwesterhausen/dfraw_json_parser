@@ -260,7 +260,7 @@ pub enum EntityToken {
     LandHolderTrigger,
     /// Arguments: position responsibility or 'ALL'
     ///
-    /// Allows a site responsibility to be taken up by a dynamically generated position (lords, hearthpersons, etc.).
+    /// Allows a site responsibility to be taken up by a dynamically generated position (lords, hearth-persons, etc.).
     /// Any defined positions holding a given responsibility will take precedence over generated positions for that responsibility.
     /// Also appears to cause site disputes.
     SiteVariablePositions,

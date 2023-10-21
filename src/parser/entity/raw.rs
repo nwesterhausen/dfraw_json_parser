@@ -1,6 +1,7 @@
 use serde::{Deserialize, Serialize};
 
 use crate::parser::{
+    color::Color,
     object_types::ObjectType,
     raws::{RawMetadata, RawObject},
     searchable::{clean_search_vec, Searchable},
@@ -20,6 +21,80 @@ pub struct Entity {
     object_id: String,
 
     tags: Vec<EntityToken>,
+
+    #[serde(skip_serializing_if = "String::is_empty")]
+    creature: String,
+    #[serde(skip_serializing_if = "String::is_empty")]
+    translation: String,
+    #[serde(skip_serializing_if = "String::is_empty")]
+    exclusive_start_biome: String,
+
+    #[serde(skip_serializing_if = "Vec::is_empty")]
+    biome_support: Vec<(String, u32)>,
+    #[serde(skip_serializing_if = "Vec::is_empty")]
+    settlement_biome: Vec<String>,
+    #[serde(skip_serializing_if = "Vec::is_empty")]
+    start_biome: Vec<String>,
+    #[serde(skip_serializing_if = "Vec::is_empty")]
+    likes_sites: Vec<String>,
+    #[serde(skip_serializing_if = "Vec::is_empty")]
+    tolerates_sites: Vec<String>,
+    #[serde(skip_serializing_if = "Vec::is_empty")]
+    world_constructions: Vec<String>,
+
+    #[serde(skip_serializing_if = "serializer_helper::is_500_u32")]
+    max_pop_number: u32,
+    #[serde(skip_serializing_if = "serializer_helper::is_50_u32")]
+    max_site_pop_number: u32,
+    #[serde(skip_serializing_if = "serializer_helper::is_3_u32")]
+    max_starting_civ_number: u32,
+
+    #[serde(skip_serializing_if = "Vec::is_empty")]
+    permitted_buildings: Vec<String>,
+    #[serde(skip_serializing_if = "Vec::is_empty")]
+    permitted_jobs: Vec<String>,
+    #[serde(skip_serializing_if = "Vec::is_empty")]
+    permitted_reactions: Vec<String>,
+
+    #[serde(skip_serializing_if = "Vec::is_empty")]
+    currency: Vec<(String, u32)>,
+    #[serde(skip_serializing_if = "Vec::is_empty")]
+    art_facet_modifier: Vec<(String, u32)>,
+    #[serde(skip_serializing_if = "Vec::is_empty")]
+    art_image_element_modifier: Vec<(String, u32)>,
+    #[serde(skip_serializing_if = "Vec::is_empty")]
+    item_improvement_modifier: Vec<(String, u32)>,
+    #[serde(skip_serializing_if = "Vec::is_empty")]
+    select_symbols: Vec<(String, String)>,
+    #[serde(skip_serializing_if = "Vec::is_empty")]
+    subselect_symbols: Vec<(String, String)>,
+    #[serde(skip_serializing_if = "Vec::is_empty")]
+    cull_symbols: Vec<(String, String)>,
+    #[serde(skip_serializing_if = "Color::is_default")]
+    friendly_color: Color,
+
+    #[serde(skip_serializing_if = "String::is_empty")]
+    religion: String,
+    #[serde(skip_serializing_if = "Vec::is_empty")]
+    religion_spheres: Vec<String>,
+    #[serde(skip_serializing_if = "Vec::is_empty")]
+    sphere_alignments: Vec<String>,
+
+    #[serde(skip_serializing_if = "Vec::is_empty")]
+    position: Vec<String>,
+    #[serde(skip_serializing_if = "String::is_empty")]
+    land_holder_trigger: String,
+    #[serde(skip_serializing_if = "Vec::is_empty")]
+    site_variable_positions: Vec<String>,
+    #[serde(skip_serializing_if = "Vec::is_empty")]
+    variable_positions: Vec<String>,
+
+    #[serde(skip_serializing_if = "Vec::is_empty")]
+    ethics: Vec<(String, String)>,
+    #[serde(skip_serializing_if = "Vec::is_empty")]
+    values: Vec<(String, u32)>,
+    #[serde(skip_serializing_if = "Vec::is_empty")]
+    variable_values: Vec<(String, u32, u32)>,
 
     #[serde(skip_serializing_if = "String::is_empty")]
     active_season: String,
@@ -76,6 +151,9 @@ pub struct Entity {
     gem_shape: Vec<String>,
     #[serde(skip_serializing_if = "Vec::is_empty")]
     stone_shape: Vec<String>,
+
+    #[serde(skip_serializing_if = "serializer_helper::is_zero_u32")]
+    source_hfid: u32,
 }
 
 #[typetag::serde]
@@ -114,6 +192,9 @@ impl RawObject for Entity {
             }
             EntityToken::Banditry => {
                 self.banditry = value.parse().unwrap_or_default();
+            }
+            EntityToken::Creature => {
+                self.creature = value.to_string();
             }
             EntityToken::ProgressTriggerPopulation => {
                 self.progress_trigger_population = value.parse().unwrap_or_default();
@@ -199,6 +280,140 @@ impl RawObject for Entity {
             EntityToken::StoneShape => {
                 self.stone_shape.push(value.to_string());
             }
+            EntityToken::BiomeSupport => {
+                let mut split = value.split(':');
+                let biome = split.next().unwrap_or_default().to_string();
+                let chance = split.next().unwrap_or_default().parse().unwrap_or_default();
+                self.biome_support.push((biome, chance));
+            }
+            EntityToken::SettlementBiome => {
+                self.settlement_biome.push(value.to_string());
+            }
+            EntityToken::StartBiome => {
+                self.start_biome.push(value.to_string());
+            }
+            EntityToken::LikesSite => {
+                self.likes_sites.push(value.to_string());
+            }
+            EntityToken::ToleratesSite => {
+                self.tolerates_sites.push(value.to_string());
+            }
+            EntityToken::WorldConstruction => {
+                self.world_constructions.push(value.to_string());
+            }
+            EntityToken::PermittedBuilding => {
+                self.permitted_buildings.push(value.to_string());
+            }
+            EntityToken::PermittedJob => {
+                self.permitted_jobs.push(value.to_string());
+            }
+            EntityToken::PermittedReaction => {
+                self.permitted_reactions.push(value.to_string());
+            }
+            EntityToken::Currency => {
+                let mut split = value.split(':');
+                let currency = split.next().unwrap_or_default().to_string();
+                let chance = split.next().unwrap_or_default().parse().unwrap_or_default();
+                self.currency.push((currency, chance));
+            }
+            EntityToken::ArtFacetModifier => {
+                let mut split = value.split(':');
+                let facet = split.next().unwrap_or_default().to_string();
+                let chance = split.next().unwrap_or_default().parse().unwrap_or_default();
+                self.art_facet_modifier.push((facet, chance));
+            }
+            EntityToken::ArtImageElementModifier => {
+                let mut split = value.split(':');
+                let element = split.next().unwrap_or_default().to_string();
+                let chance = split.next().unwrap_or_default().parse().unwrap_or_default();
+                self.art_image_element_modifier.push((element, chance));
+            }
+            EntityToken::ItemImprovementModifier => {
+                let mut split = value.split(':');
+                let improvement = split.next().unwrap_or_default().to_string();
+                let chance = split.next().unwrap_or_default().parse().unwrap_or_default();
+                self.item_improvement_modifier.push((improvement, chance));
+            }
+            EntityToken::SelectSymbol => {
+                let mut split = value.split(':');
+                let symbol = split.next().unwrap_or_default().to_string();
+                let chance = split.next().unwrap_or_default().to_string();
+                self.select_symbols.push((symbol, chance));
+            }
+            EntityToken::SubselectSymbol => {
+                let mut split = value.split(':');
+                let symbol = split.next().unwrap_or_default().to_string();
+                let chance = split.next().unwrap_or_default().to_string();
+                self.subselect_symbols.push((symbol, chance));
+            }
+            EntityToken::CullSymbol => {
+                let mut split = value.split(':');
+                let symbol = split.next().unwrap_or_default().to_string();
+                let chance = split.next().unwrap_or_default().to_string();
+                self.cull_symbols.push((symbol, chance));
+            }
+            EntityToken::FriendlyColor => {
+                self.friendly_color = Color::from_value(value);
+            }
+            EntityToken::Religion => {
+                self.religion = value.to_string();
+            }
+            EntityToken::ReligionSphere => {
+                self.religion_spheres.push(value.to_string());
+            }
+            EntityToken::SphereAlignment => {
+                self.sphere_alignments.push(value.to_string());
+            }
+            EntityToken::Position => {
+                self.position.push(value.to_string());
+            }
+            EntityToken::LandHolderTrigger => {
+                self.land_holder_trigger = value.to_string();
+            }
+            EntityToken::SiteVariablePositions => {
+                self.site_variable_positions.push(value.to_string());
+            }
+            EntityToken::VariablePositions => {
+                self.variable_positions.push(value.to_string());
+            }
+            EntityToken::Ethic => {
+                let mut split = value.split(':');
+                let ethic = split.next().unwrap_or_default().to_string();
+                let chance = split.next().unwrap_or_default().to_string();
+                self.ethics.push((ethic, chance));
+            }
+            EntityToken::Value => {
+                let mut split = value.split(':');
+                let value = split.next().unwrap_or_default().to_string();
+                let chance = split.next().unwrap_or_default().parse().unwrap_or_default();
+                self.values.push((value, chance));
+            }
+            EntityToken::VariableValue => {
+                let mut split = value.split(':');
+                let value = split.next().unwrap_or_default().to_string();
+                let chance = split.next().unwrap_or_default().parse().unwrap_or_default();
+                let max = split.next().unwrap_or_default().parse().unwrap_or_default();
+                self.variable_values.push((value, chance, max));
+            }
+            EntityToken::ExclusiveStartBiome => {
+                self.exclusive_start_biome = value.to_string();
+            }
+            EntityToken::MaxPopNumber => {
+                self.max_pop_number = value.parse().unwrap_or_default();
+            }
+            EntityToken::MaxSitePopNumber => {
+                self.max_site_pop_number = value.parse().unwrap_or_default();
+            }
+            EntityToken::MaxStartingCivNumber => {
+                self.max_starting_civ_number = value.parse().unwrap_or_default();
+            }
+            EntityToken::SourceHfid => {
+                self.source_hfid = value.parse().unwrap_or_default();
+            }
+            EntityToken::Translation => {
+                self.translation = value.to_string();
+            }
+
             _ => {
                 self.tags.push(tag.clone());
             }

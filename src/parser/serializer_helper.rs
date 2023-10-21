@@ -126,3 +126,24 @@ pub fn is_zero_i32(value: &i32) -> bool {
 pub fn is_zero_f32(value: &f32) -> bool {
     *value == 0.0
 }
+
+/// This is only used for serialize
+#[allow(clippy::trivially_copy_pass_by_ref)]
+pub fn is_500_u32(value: &u32) -> bool {
+    *value == 500
+}
+/// This is only used for serialize
+#[allow(clippy::trivially_copy_pass_by_ref)]
+pub fn is_50_u32(value: &u32) -> bool {
+    *value == 50
+}
+/// This is only used for serialize
+#[allow(clippy::trivially_copy_pass_by_ref)]
+pub fn is_3_u32(value: &u32) -> bool {
+    *value == 3
+}
+/// This is only used for serialize
+#[allow(clippy::trivially_copy_pass_by_ref)]
+pub fn is_zero_u32(value: &u32) -> bool {
+    *value == 0
+}
