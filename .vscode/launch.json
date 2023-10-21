@@ -1,0 +1,25 @@
+{
+  // Use IntelliSense to learn about possible attributes.
+  // Hover to view descriptions of existing attributes.
+  // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "Creature_Domestic",
+      "type": "lldb",
+      "request": "launch",
+      "cargo": {
+        "args": ["build", "--example=cli", "--package=dfraw_json_parser"]
+      },
+      "args": [
+        "--parse",
+        "raw-file",
+        "-o",
+        "examples/out/single-creature-domestic.json",
+        "-t",
+        "E:/SteamLibrary/steamapps/common/Dwarf Fortress/data/vanilla/vanilla_creatures/objects/creature_domestic.txt"
+      ],
+      "cwd": "${workspaceFolder}"
+    }
+  ]
+}
