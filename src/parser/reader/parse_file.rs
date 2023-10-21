@@ -272,7 +272,7 @@ pub fn parse_raw_file_with_info<P: AsRef<Path>>(
                     // If we haven't started yet, we should do nothing.
                     if started {
                         match last_parsed_type {
-                            ObjectType::Creature => {
+                            ObjectType::Creature | ObjectType::CreatureCaste => {
                                 // We have a creature, so we can add a tag to it.
                                 temp_creature.parse_tag(captured_key, captured_value);
                             }
