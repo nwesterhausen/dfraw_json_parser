@@ -46,6 +46,9 @@ impl RawObject for MaterialTemplate {
     fn get_identifier(&self) -> &str {
         &self.identifier
     }
+    fn get_name(&self) -> &str {
+        &self.identifier
+    }
 
     fn get_metadata(&self) -> &RawMetadata {
         &self.metadata

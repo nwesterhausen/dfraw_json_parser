@@ -51,6 +51,15 @@ impl Name {
         }
         vec
     }
+    pub fn get_singular(&self) -> &str {
+        &self.singular
+    }
+    pub fn get_plural(&self) -> &str {
+        &self.plural
+    }
+    pub fn get_adjective(&self) -> &str {
+        &self.adjective
+    }
 }
 
 #[derive(ts_rs::TS)]

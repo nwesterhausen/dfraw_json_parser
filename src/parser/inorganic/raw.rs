@@ -67,15 +67,15 @@ impl RawObject for Inorganic {
     fn get_identifier(&self) -> &str {
         &self.identifier
     }
-
+    fn get_name(&self) -> &str {
+        &self.identifier
+    }
     fn get_metadata(&self) -> &RawMetadata {
         &self.metadata
     }
-
     fn is_empty(&self) -> bool {
         self.identifier.is_empty()
     }
-
     fn get_type(&self) -> &ObjectType {
         &ObjectType::Inorganic
     }

@@ -95,11 +95,12 @@ impl RawObject for Plant {
     fn get_metadata(&self) -> &RawMetadata {
         &self.metadata
     }
-
     fn get_identifier(&self) -> &str {
         &self.identifier
     }
-
+    fn get_name(&self) -> &str {
+        self.name.get_singular()
+    }
     fn is_empty(&self) -> bool {
         self.identifier.is_empty()
     }

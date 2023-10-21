@@ -30,6 +30,10 @@ pub trait RawObject: RawObjectToAny + Send + Sync + Searchable {
     fn parse_tag(&mut self, key: &str, value: &str);
     /// Get the object ID of the raw.
     fn get_object_id(&self) -> &str;
+    /// Get the name of the raw (if it has one).
+    /// If no name is found, the identifier is returned instead.
+    /// This is used for searching.
+    fn get_name(&self) -> &str;
 }
 
 /// The `RawObjectToAny` trait is implemented by all raw objects. This trait is

@@ -44,15 +44,15 @@ impl RawObject for SelectCreature {
     fn get_metadata(&self) -> &RawMetadata {
         &self.metadata
     }
-
     fn get_identifier(&self) -> &str {
         &self.identifier
     }
-
+    fn get_name(&self) -> &str {
+        &self.identifier
+    }
     fn is_empty(&self) -> bool {
         false
     }
-
     fn get_type(&self) -> &ObjectType {
         &ObjectType::SelectCreature
     }
