@@ -40,14 +40,15 @@ pub fn parse_raw_file_with_info<P: AsRef<Path>>(
     mod_info_file: &ModuleInfoFile,
     options: &ParserOptions,
 ) -> Vec<Box<dyn RawObject>> {
-    let caller = "Parse Raw File";
-    // log::info!("Parsing raw file: {}", raw_file_path.as_ref().display());
     let mut created_raws: Vec<Box<dyn RawObject>> = Vec::new();
 
     let file = match File::open(raw_file_path) {
         Ok(f) => f,
         Err(e) => {
-            log::error!("{} - Error opening raw file for parsing!\n{:?}", caller, e);
+            log::error!(
+                "parse_raw_file_with_info: Error opening raw file for parsing!\n{:?}",
+                e
+            );
             return created_raws;
         }
     };
@@ -83,8 +84,7 @@ pub fn parse_raw_file_with_info<P: AsRef<Path>>(
     for (index, line) in reader.lines().enumerate() {
         if line.is_err() {
             log::error!(
-                "{} - Error processing {}:{}",
-                caller,
+                "parse_raw_file_with_info: Error processing {}:{}",
                 raw_file_path.as_ref().display(),
                 index
             );
@@ -93,7 +93,7 @@ pub fn parse_raw_file_with_info<P: AsRef<Path>>(
         let line = match line {
             Ok(l) => l,
             Err(e) => {
-                log::error!("{} - Line-reading error\n{:?}", caller, e);
+                log::error!("parse_raw_file_with_info: Line-reading error\n{:?}", e);
                 continue;
             }
         };
@@ -124,8 +124,7 @@ pub fn parse_raw_file_with_info<P: AsRef<Path>>(
             };
 
             log::trace!(
-                "{} - Key: {} Value: {}",
-                caller,
+                "parse_raw_file_with_info: Key: {} Value: {}",
                 captured_key,
                 captured_value
             );
@@ -136,8 +135,7 @@ pub fn parse_raw_file_with_info<P: AsRef<Path>>(
                         // We don't know what this object is, so we can't parse it.
                         // We should log this as an error.
                         log::error!(
-                            "{} - Unknown object type: {} Raw: {}",
-                            caller,
+                            "parse_raw_file_with_info: Unknown object type: {} Raw: {}",
                             captured_value.to_uppercase(),
                             raw_filename
                         );
@@ -147,8 +145,7 @@ pub fn parse_raw_file_with_info<P: AsRef<Path>>(
                     // If it doesn't, we should log this as an error.
                     if &object_type != OBJECT_TOKENS.get(captured_value).unwrap() {
                         log::error!(
-                            "{} - Object type mismatch: {} != {}",
-                            caller,
+                            "parse_raw_file_with_info: Object type mismatch: {} != {}",
                             object_type,
                             captured_value.to_uppercase()
                         );
@@ -156,7 +153,10 @@ pub fn parse_raw_file_with_info<P: AsRef<Path>>(
                     }
                 }
                 "CREATURE" => {
-                    if started && last_parsed_type == ObjectType::Creature {
+                    if started
+                        && (last_parsed_type == ObjectType::Creature
+                            || last_parsed_type == ObjectType::CreatureCaste)
+                    {
                         // We need to add the creature to the list.
                         created_raws.push(Box::new(temp_creature.clone()));
                     } else {
@@ -341,6 +341,12 @@ pub fn parse_raw_file_with_info<P: AsRef<Path>>(
             created_raws.push(Box::new(temp_tile_page.clone()));
         }
     }
+
+    log::info!(
+        "parse_raw_file_with_info: Parsed {} raws from {}",
+        created_raws.len(),
+        raw_filename
+    );
 
     created_raws
 }

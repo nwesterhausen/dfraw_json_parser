@@ -118,9 +118,24 @@ pub fn parse(options: &ParserOptions) -> Vec<Box<dyn RawObject>> {
             let workshop_mods_path = target_path.join("mods");
 
             // Parse each location
-            results.extend(parse_location(&vanilla_path, options));
-            results.extend(parse_location(&installed_mods_path, options));
-            results.extend(parse_location(&workshop_mods_path, options));
+            if options
+                .locations_to_parse
+                .contains(&RawModuleLocation::Vanilla)
+            {
+                results.extend(parse_location(&vanilla_path, options));
+            }
+            if options
+                .locations_to_parse
+                .contains(&RawModuleLocation::InstalledMods)
+            {
+                results.extend(parse_location(&installed_mods_path, options));
+            }
+            if options
+                .locations_to_parse
+                .contains(&RawModuleLocation::Mods)
+            {
+                results.extend(parse_location(&workshop_mods_path, options));
+            }
         }
         ParsingJob::SingleLocation => {
             // Set the file path for the chosen location
@@ -441,7 +456,7 @@ fn parse_module<P: AsRef<Path>>(
     let mut parse_graphics = true;
 
     if !objects_path.exists() {
-        log::warn!(
+        log::debug!(
             "No objects directory found in {:?}",
             module_path.as_ref().file_name().unwrap_or_default(),
         );
@@ -555,9 +570,24 @@ pub fn parse_info_modules(options: &ParserOptions) -> Vec<ModuleInfoFile> {
             let workshop_mods_path = target_path.join("mods");
 
             // Parse each location
-            results.extend(parse_module_info_files_at_location(&vanilla_path));
-            results.extend(parse_module_info_files_at_location(&installed_mods_path));
-            results.extend(parse_module_info_files_at_location(&workshop_mods_path));
+            if options
+                .locations_to_parse
+                .contains(&RawModuleLocation::Vanilla)
+            {
+                results.extend(parse_module_info_files_at_location(&vanilla_path));
+            }
+            if options
+                .locations_to_parse
+                .contains(&RawModuleLocation::InstalledMods)
+            {
+                results.extend(parse_module_info_files_at_location(&installed_mods_path));
+            }
+            if options
+                .locations_to_parse
+                .contains(&RawModuleLocation::Mods)
+            {
+                results.extend(parse_module_info_files_at_location(&workshop_mods_path));
+            }
         }
         ParsingJob::SingleLocation => {
             // Set the file path for the chosen location

@@ -28,6 +28,7 @@ use walkdir::DirEntry;
 /// Returns:
 ///
 /// A (large) JSON string with details on all raws in the game path.
+#[allow(clippy::too_many_lines)]
 pub fn parse(
     options: &crate::options::ParserOptions,
     progress_helper: &mut ProgressHelper,
@@ -52,17 +53,32 @@ pub fn parse(
             let workshop_mods_path = target_path.join("mods");
 
             // Parse each location
-            results.extend(parse_location(&vanilla_path, options, progress_helper));
-            results.extend(parse_location(
-                &installed_mods_path,
-                options,
-                progress_helper,
-            ));
-            results.extend(parse_location(
-                &workshop_mods_path,
-                options,
-                progress_helper,
-            ));
+            if options
+                .locations_to_parse
+                .contains(&parser::raw_locations::RawModuleLocation::Vanilla)
+            {
+                results.extend(parse_location(&vanilla_path, options, progress_helper));
+            }
+            if options
+                .locations_to_parse
+                .contains(&parser::raw_locations::RawModuleLocation::InstalledMods)
+            {
+                results.extend(parse_location(
+                    &installed_mods_path,
+                    options,
+                    progress_helper,
+                ));
+            }
+            if options
+                .locations_to_parse
+                .contains(&parser::raw_locations::RawModuleLocation::Mods)
+            {
+                results.extend(parse_location(
+                    &workshop_mods_path,
+                    options,
+                    progress_helper,
+                ));
+            }
         }
         crate::options::ParsingJob::SingleLocation => {
             // Set the file path for the chosen location
@@ -133,12 +149,12 @@ pub fn parse(
         }
     }
 
+    // Absorb select_creature
+    parser::helpers::absorb_select_creature::absorb_select_creature(&mut results);
     // Apply copy_tags_from
     if !options.skip_apply_copy_tags_from {
         parser::helpers::apply_copy_from::apply_copy_tags_from(&mut results);
     }
-    // Absorb select_creature
-    parser::helpers::absorb_select_creature::absorb_select_creature(&mut results);
 
     results
 }

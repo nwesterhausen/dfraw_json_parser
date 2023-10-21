@@ -1,87 +1,93 @@
 use itertools::Itertools;
 
 use crate::parser::{
-    creature::raw::Creature, helpers::clone_raw_vector::with_purge, object_types::ObjectType,
+    creature::raw::Creature,
+    helpers::clone_raw_vector::{self, with_purge},
+    object_types::ObjectType,
     raws::RawObject,
 };
 
 #[allow(clippy::too_many_lines)]
 pub fn apply_copy_tags_from(all_raws: &mut Vec<Box<dyn RawObject>>) {
+    let untouched_raws: Vec<_> = all_raws
+        .iter()
+        .map(clone_raw_vector::clone_raw_object_box)
+        .collect();
+
     let creatures_with_copy_tags_from: Vec<Creature> = {
-        all_raws
+        untouched_raws
             .iter()
             .filter(|r| r.get_type() == &ObjectType::Creature)
-            .unique_by(|r| r.get_object_id())
-            .map(|r| {
-                r.as_any()
+            .filter_map(|r| {
+                let creature = r
+                    .as_any()
                     .downcast_ref::<Creature>()
                     .unwrap_or(&Creature::empty())
-                    .clone()
+                    .clone();
+
+                if creature.get_copy_tags_from() == "" {
+                    None
+                } else {
+                    Some(creature)
+                }
             })
-            .filter(|c| c.get_copy_tags_from() != "")
             .collect()
     };
+    let source_creature_identifier_list: Vec<String> = creatures_with_copy_tags_from
+        .iter()
+        .map(|c| c.get_copy_tags_from().to_lowercase())
+        .unique()
+        .collect();
     log::info!(
-        "apply_copy_tags_from looking at {} of {} raws",
+        "apply_copy_tags_from: updating {} of {} raws from {} creatures",
         creatures_with_copy_tags_from.len(),
-        all_raws.len()
+        all_raws.len(),
+        source_creature_identifier_list.len()
     );
 
-    let mut target_creature_identifiers: Vec<&str> = Vec::new();
-    let mut new_creatures: Vec<Creature> = Vec::new();
-
-    for creature in creatures_with_copy_tags_from.as_slice() {
-        if target_creature_identifiers.contains(&creature.get_copy_tags_from()) {
-            continue;
-        }
-        target_creature_identifiers.push(creature.get_copy_tags_from());
-    }
-
-    for raw in &*all_raws {
-        if raw.get_type() == &ObjectType::Creature
-            && target_creature_identifiers.contains(&raw.get_identifier())
-        {
-            for creature in creatures_with_copy_tags_from.as_slice() {
-                if creature.get_copy_tags_from() == raw.get_identifier() {
-                    if new_creatures
-                        .iter()
-                        .map(RawObject::get_identifier)
-                        .contains(&creature.get_identifier())
-                    {
-                        // Update the creature in new_creatures instead of adding a new one
-                        let temp_creature = raw
-                            .as_any()
-                            .downcast_ref::<Creature>()
-                            .unwrap_or(&Creature::empty())
-                            .clone();
-                        // Grab the creature from new_creatures
-                        let mut new_creature = new_creatures
-                            .iter()
-                            .find(|c| c.get_identifier() == creature.get_identifier())
-                            .unwrap_or(&Creature::empty())
-                            .clone();
-                        // Remove the creature from new_creatures
-                        new_creatures.retain(|c| c.get_identifier() != creature.get_identifier());
-                        // Apply copy tags from to new_creature
-                        new_creature = Creature::copy_tags_from(&new_creature, &temp_creature);
-                        // Add the updated creature back to new_creatures
-                        new_creatures.push(new_creature);
-                        continue;
-                    }
-                    let temp_creature = raw
-                        .as_any()
+    // Build a list of unique creature identifiers to target, based on the apply_copy_tags_from list.
+    let source_creatures: Vec<Creature> = untouched_raws
+        .iter()
+        .filter_map(|raw| {
+            if raw.get_type() == &ObjectType::Creature
+                && source_creature_identifier_list.contains(&raw.get_identifier().to_lowercase())
+            {
+                Some(
+                    raw.as_any()
                         .downcast_ref::<Creature>()
                         .unwrap_or(&Creature::empty())
-                        .clone();
-
-                    new_creatures.push(Creature::copy_tags_from(creature, &temp_creature));
-                }
+                        .clone(),
+                )
+            } else {
+                None
             }
+        })
+        .collect::<Vec<Creature>>();
+
+    // The outside loop iterates over the source creatures, which we will use to copy tags from
+    // Inside the loop, we find which creatures have the source creature's identifier in their
+    // copy_tags_from field, and then apply the source creature's tags to those creatures.
+    // Then we put the updated creatures into the new_creatures vector, which will be used to
+    // replace the old creatures in the all_raws vector.
+
+    let mut new_creatures: Vec<Creature> = Vec::new();
+    for source_creature in source_creatures {
+        let target_creatures: Vec<Creature> = creatures_with_copy_tags_from
+            .iter()
+            .filter(|c| {
+                c.get_copy_tags_from().to_lowercase()
+                    == source_creature.get_identifier().to_lowercase()
+            })
+            .cloned()
+            .collect::<Vec<Creature>>();
+
+        for target_creature in target_creatures {
+            new_creatures.push(Creature::copy_tags_from(&target_creature, &source_creature));
         }
     }
 
     log::info!(
-        "apply_copy_tags_from updated {} creatures",
+        "apply_copy_tags_from: copied tags to {} creatures",
         new_creatures.len()
     );
 
@@ -94,14 +100,21 @@ pub fn apply_copy_tags_from(all_raws: &mut Vec<Box<dyn RawObject>>) {
             .collect::<Vec<&str>>(),
     );
 
-    log::info!(
-        "apply_copy_tags_from purging {} objects\n{:#?}",
-        object_ids_to_purge.len(),
-        object_ids_to_purge
-    );
-
     let mut new_raws: Vec<Box<dyn RawObject>> =
         with_purge(all_raws, object_ids_to_purge.as_slice());
+
+    if all_raws.len() < new_raws.len() {
+        log::warn!(
+            "apply_copy_tags_from: post purge has {} raws, but started with {}",
+            new_raws.len(),
+            all_raws.len()
+        );
+    } else {
+        log::info!(
+            "apply_copy_tags_from: purged {} raws",
+            all_raws.len() - new_raws.len()
+        );
+    }
 
     for creature in new_creatures {
         new_raws.push(Box::new(creature));
@@ -109,13 +122,13 @@ pub fn apply_copy_tags_from(all_raws: &mut Vec<Box<dyn RawObject>>) {
 
     if all_raws.len() < new_raws.len() {
         log::warn!(
-            "apply_copy_tags_from finished with {} raws, but started with {}",
+            "apply_copy_tags_from: finished with {} raws, but started with {}",
             new_raws.len(),
             all_raws.len()
         );
     } else {
         log::info!(
-            "apply_copy_tags_from finished with {} raws (some {} purged)",
+            "apply_copy_tags_from: finished with {} raws (net {} lost)",
             new_raws.len(),
             all_raws.len() - new_raws.len()
         );
