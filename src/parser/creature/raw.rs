@@ -342,7 +342,7 @@ impl RawObject for Creature {
 
         let Some(tag) = CREATURE_TOKENS.get(key) else {
             log::warn!(
-                "CreatureParsing: called `Option::unwrap()` on a `None` value for presumed creature tag: {}",
+                "Creature::parse_tag: called `Option::unwrap()` on a `None` value for presumed creature tag: {}",
                 key
             );
             return;

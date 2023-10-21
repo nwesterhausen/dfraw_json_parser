@@ -9,6 +9,7 @@ pub mod creature;
 pub mod creature_caste;
 pub mod creature_effect;
 pub mod creature_variation;
+pub mod entity;
 pub mod graphics;
 pub mod helpers;
 pub mod inorganic;

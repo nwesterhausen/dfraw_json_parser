@@ -121,3 +121,8 @@ pub fn is_metadata_hidden(metadata: &RawMetadata) -> bool {
 pub fn is_zero_i32(value: &i32) -> bool {
     *value == 0
 }
+/// This is only used for serialize
+#[allow(clippy::trivially_copy_pass_by_ref)]
+pub fn is_zero_f32(value: &f32) -> bool {
+    *value == 0.0
+}
