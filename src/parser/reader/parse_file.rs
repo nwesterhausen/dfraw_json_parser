@@ -155,6 +155,14 @@ pub fn parse_raw_file_with_info<P: AsRef<Path>>(
                     }
                 }
                 "CREATURE" => {
+                    // The entity object has a CREATURE tag
+                    if started && last_parsed_type == ObjectType::Entity {
+                        // We need to let the entity parse this tag.
+                        temp_creature.parse_tag(captured_key, captured_value);
+                        // leave before adding a fake new creature
+                        continue;
+                    }
+
                     if started
                         && (last_parsed_type == ObjectType::Creature
                             || last_parsed_type == ObjectType::CreatureCaste)
