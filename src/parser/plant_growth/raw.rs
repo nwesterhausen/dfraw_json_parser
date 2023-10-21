@@ -1,7 +1,8 @@
 use serde::{Deserialize, Serialize};
 
-use crate::parser::names::SingPlurName;
+use crate::parser::searchable::clean_search_vec;
 use crate::parser::serializer_helper;
+use crate::parser::{names::SingPlurName, searchable::Searchable};
 
 use super::{
     phf_table::{GROWTH_TOKENS, PLANT_PART_TOKENS},
@@ -151,5 +152,18 @@ impl PlantGrowth {
                 self.tags.push(tag.clone());
             }
         }
+    }
+}
+
+impl Searchable for PlantGrowth {
+    fn get_search_vec(&self) -> Vec<String> {
+        let mut vec = Vec::new();
+
+        vec.extend(self.name.as_vec());
+        vec.push(format!("{:?}", self.growth_type));
+        vec.push(self.item.clone());
+        vec.extend(self.tags.iter().map(|tag| format!("{tag:?}")));
+
+        clean_search_vec(vec.as_slice())
     }
 }

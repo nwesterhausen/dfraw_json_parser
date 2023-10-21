@@ -15,6 +15,7 @@ use crate::parser::{
     },
     ranges::parse_min_max_range,
     raws::{RawMetadata, RawObject},
+    searchable::{clean_search_vec, Searchable},
     serializer_helper,
     shrub::{phf_table::SHRUB_TOKENS, raw::Shrub},
     tree::{phf_table::TREE_TOKENS, raw::Tree},
@@ -220,5 +221,31 @@ impl RawObject for Plant {
 
     fn get_object_id(&self) -> &str {
         &self.object_id
+    }
+}
+
+impl Searchable for Plant {
+    fn get_search_vec(&self) -> Vec<String> {
+        let mut vec = Vec::new();
+
+        vec.push(self.get_identifier().to_string());
+        vec.extend(self.name.as_vec());
+        vec.extend(self.pref_strings.clone());
+        vec.extend(self.biomes.clone());
+        vec.extend(self.tags.iter().map(|tag| format!("{tag:?}")));
+        vec.extend(
+            self.growths
+                .iter()
+                .flat_map(Searchable::get_search_vec)
+                .collect::<Vec<String>>(),
+        );
+        vec.extend(
+            self.materials
+                .iter()
+                .flat_map(Searchable::get_search_vec)
+                .collect::<Vec<String>>(),
+        );
+
+        clean_search_vec(vec.as_slice())
     }
 }

@@ -5,6 +5,7 @@ use crate::parser::{
     material::raw::Material,
     object_types::ObjectType,
     raws::{RawMetadata, RawObject},
+    searchable::{clean_search_vec, Searchable},
 };
 
 #[derive(ts_rs::TS)]
@@ -59,5 +60,18 @@ impl RawObject for MaterialTemplate {
     }
     fn get_type(&self) -> &ObjectType {
         &ObjectType::MaterialTemplate
+    }
+}
+
+impl Searchable for MaterialTemplate {
+    fn get_search_vec(&self) -> Vec<String> {
+        let mut vec = Vec::new();
+
+        vec.push(self.get_identifier().to_string());
+        vec.push(format!("{:?}", self.get_type()));
+        vec.extend(self.material.get_search_vec());
+        vec.push("template".to_string());
+
+        clean_search_vec(vec.as_slice())
     }
 }

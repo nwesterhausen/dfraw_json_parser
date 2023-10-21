@@ -4,6 +4,7 @@ use crate::parser::{
     helpers::object_id::build_object_id_from_pieces,
     object_types::ObjectType,
     raws::{RawMetadata, RawObject},
+    searchable::{clean_search_vec, Searchable},
     serializer_helper,
 };
 
@@ -231,5 +232,17 @@ impl RawObject for Graphic {
 
     fn get_object_id(&self) -> &str {
         &self.object_id
+    }
+}
+
+impl Searchable for Graphic {
+    fn get_search_vec(&self) -> Vec<String> {
+        let mut vec = Vec::new();
+
+        vec.push(self.get_identifier().to_string());
+        vec.push(format!("{:?}", self.kind));
+        vec.push("graphic".to_string());
+
+        clean_search_vec(vec.as_slice())
     }
 }
