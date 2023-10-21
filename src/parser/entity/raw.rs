@@ -2,6 +2,7 @@ use serde::{Deserialize, Serialize};
 
 use crate::parser::{
     color::Color,
+    helpers::object_id::build_object_id_from_pieces,
     object_types::ObjectType,
     raws::{RawMetadata, RawObject},
     searchable::{clean_search_vec, Searchable},
@@ -154,6 +155,31 @@ pub struct Entity {
 
     #[serde(skip_serializing_if = "serializer_helper::is_zero_u32")]
     source_hfid: u32,
+}
+
+impl Entity {
+    pub fn empty() -> Self {
+        Entity {
+            // Default values which aren't rust defaults
+            max_pop_number: 500,
+            max_site_pop_number: 50,
+            max_starting_civ_number: 3,
+
+            ..Default::default()
+        }
+    }
+    pub fn new(identifier: &str, metadata: &RawMetadata) -> Self {
+        Entity {
+            identifier: String::from(identifier),
+            metadata: metadata.clone(),
+            object_id: build_object_id_from_pieces(metadata, identifier, &ObjectType::Entity),
+            // Default values which aren't rust defaults
+            max_pop_number: 500,
+            max_site_pop_number: 50,
+            max_starting_civ_number: 3,
+            ..Default::default()
+        }
+    }
 }
 
 #[typetag::serde]

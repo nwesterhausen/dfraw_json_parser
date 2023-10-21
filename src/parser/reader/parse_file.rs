@@ -9,6 +9,7 @@ use crate::{
     options::ParserOptions,
     parser::{
         creature::raw::Creature,
+        entity::raw::Entity,
         graphics::{
             phf_table::GRAPHIC_TYPE_TAGS, raw::Graphic, tile_page::TilePage, tokens::GraphicType,
         },
@@ -66,6 +67,7 @@ pub fn parse_raw_file_with_info<P: AsRef<Path>>(
     let mut temp_inorganic = Inorganic::empty();
     let mut temp_graphic = Graphic::empty();
     let mut temp_material_template = MaterialTemplate::empty();
+    let mut temp_entity = Entity::empty();
 
     let mut last_parsed_type = ObjectType::Unknown;
     let mut last_graphic_type = GraphicType::Unknown;
@@ -266,6 +268,18 @@ pub fn parse_raw_file_with_info<P: AsRef<Path>>(
                     temp_tile_page = TilePage::new(captured_value, &raw_metadata.clone());
                     last_parsed_type = ObjectType::TilePage;
                 }
+                "ENTITY" => {
+                    // Starting a new entity, so we can just add an entity to the list.
+                    if started {
+                        // We need to add the entity to the list.
+                        created_raws.push(Box::new(temp_entity.clone()));
+                    } else {
+                        started = true;
+                    }
+                    // We haven't started an entity yet, so we need to start one.
+                    temp_entity = Entity::new(captured_value, &raw_metadata.clone());
+                    last_parsed_type = ObjectType::Entity;
+                }
                 _ => {
                     // This should be a tag for the current object.
                     // We should check if we have a current object, and if we do, we should add the tag to it.
@@ -311,6 +325,10 @@ pub fn parse_raw_file_with_info<P: AsRef<Path>>(
                                 // We have a tile page, so we can add a tag to it.
                                 temp_tile_page.parse_tag(captured_key, captured_value);
                             }
+                            ObjectType::Entity => {
+                                // We have an entity, so we can add a tag to it.
+                                temp_entity.parse_tag(captured_key, captured_value);
+                            }
                             _ => {
                                 // We don't have a known raw yet. So do nothing.
                             }
@@ -342,6 +360,9 @@ pub fn parse_raw_file_with_info<P: AsRef<Path>>(
         }
         if !temp_tile_page.is_empty() {
             created_raws.push(Box::new(temp_tile_page.clone()));
+        }
+        if !temp_entity.is_empty() {
+            created_raws.push(Box::new(temp_entity.clone()));
         }
     }
 

@@ -101,7 +101,7 @@ impl Creature {
     /// Returns:
     ///
     /// a `Creature` object.
-    pub fn new(identifier: &str, metadata: &RawMetadata) -> Creature {
+    pub fn new(identifier: &str, metadata: &RawMetadata) -> Self {
         Creature {
             identifier: String::from(identifier),
             metadata: metadata.clone(),
