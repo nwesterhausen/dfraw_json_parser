@@ -2,7 +2,7 @@ use itertools::Itertools;
 
 use crate::parser::{
     creature::raw::Creature,
-    helpers::clone_raw_vector::{self, with_purge},
+    helpers::{clone_raw_object_box, clone_raw_vector::with_purge},
     object_types::ObjectType,
     raws::RawObject,
 };
@@ -11,7 +11,7 @@ use crate::parser::{
 pub fn apply_copy_tags_from(all_raws: &mut Vec<Box<dyn RawObject>>) {
     let untouched_raws: Vec<_> = all_raws
         .iter()
-        .map(clone_raw_vector::clone_raw_object_box)
+        .map(clone_raw_object_box::clone_raw_object_box)
         .collect();
 
     let creatures_with_copy_tags_from: Vec<Creature> = {
