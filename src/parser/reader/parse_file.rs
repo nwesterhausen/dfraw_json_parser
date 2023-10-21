@@ -180,7 +180,10 @@ pub fn parse_raw_file_with_info<P: AsRef<Path>>(
                 }
                 "CASTE" => {
                     // Starting a new caste (in creature), so we can just add a caste to the last creature we started.
-                    if started && last_parsed_type == ObjectType::CreatureCaste {
+                    if started
+                        && (last_parsed_type == ObjectType::CreatureCaste
+                            || last_parsed_type == ObjectType::Creature)
+                    {
                         // We have a creature, so we can add a caste to it.
                         // First we have to cast the dyn RawObject to a DFCreature.
                         temp_creature.add_caste(captured_value);
