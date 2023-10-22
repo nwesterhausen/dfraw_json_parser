@@ -4,6 +4,7 @@ use crate::parser::{
     color::Color,
     helpers::object_id::build_object_id_from_pieces,
     object_types::ObjectType,
+    position::{phf_table::POSITION_TOKENS, raw::Position},
     raws::{RawMetadata, RawObject},
     searchable::{clean_search_vec, Searchable},
     serializer_helper,
@@ -82,7 +83,7 @@ pub struct Entity {
     sphere_alignments: Vec<String>,
 
     #[serde(skip_serializing_if = "Vec::is_empty")]
-    position: Vec<String>,
+    positions: Vec<Position>,
     #[serde(skip_serializing_if = "String::is_empty")]
     land_holder_trigger: String,
     #[serde(skip_serializing_if = "Vec::is_empty")]
@@ -204,9 +205,22 @@ impl RawObject for Entity {
     }
     #[allow(clippy::too_many_lines)]
     fn parse_tag(&mut self, key: &str, value: &str) {
+        if let Some(position_token) = POSITION_TOKENS.get(key) {
+            // Tags should be attached to the last Position in the list
+            if let Some(position) = self.positions.last_mut() {
+                position.parse_tag(position_token, value);
+                return;
+            }
+            // If there is no position, create one with unknown name..
+            let mut position = Position::new("unknown".into());
+            position.parse_tag(position_token, value);
+            self.positions.push(position);
+            return;
+        }
+
         let Some(tag) = ENTITY_TOKENS.get(key) else {
             log::warn!(
-                "Entity::parse_tag: called `Option::unwrap()` on a `None` value for presumed creature tag: {}",
+                "Entity::parse_tag: called `Option::unwrap()` on a `None` value for presumed Entity tag: {}",
                 key
             );
             return;
@@ -391,7 +405,7 @@ impl RawObject for Entity {
                 self.sphere_alignments.push(value.to_string());
             }
             EntityToken::Position => {
-                self.position.push(value.to_string());
+                self.positions.push(Position::new(value.into()));
             }
             EntityToken::LandHolderTrigger => {
                 self.land_holder_trigger = value.to_string();

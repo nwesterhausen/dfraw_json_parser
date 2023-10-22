@@ -22,6 +22,7 @@ pub mod names;
 pub mod object_types;
 pub mod plant;
 pub mod plant_growth;
+pub mod position;
 pub mod ranges;
 pub mod raw_locations;
 pub mod raws;
