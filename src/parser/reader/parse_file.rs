@@ -19,6 +19,7 @@ use crate::{
         object_types::{ObjectType, OBJECT_TOKENS},
         plant::raw::Plant,
         raws::{RawMetadata, RawObject},
+        reader::parsable_types::PARSABLE_OBJECT_TYPES,
         refs::{DF_ENCODING, RAW_TOKEN_RE},
         select_creature::raw::SelectCreature,
     },
@@ -82,6 +83,15 @@ pub fn parse_raw_file_with_info<P: AsRef<Path>>(
         &raw_file_path,
         options.attach_metadata_to_raws,
     );
+
+    // If the type of object is not in our known_list, we should quit here
+    if !PARSABLE_OBJECT_TYPES.contains(&&object_type) {
+        log::debug!(
+            "parse_raw_file_with_info: Quitting early because object type {:?} is not parsable!",
+            object_type
+        );
+        return created_raws;
+    }
 
     for (index, line) in reader.lines().enumerate() {
         if line.is_err() {
@@ -189,6 +199,13 @@ pub fn parse_raw_file_with_info<P: AsRef<Path>>(
                     last_parsed_type = ObjectType::SelectCreature;
                 }
                 "CASTE" => {
+                    if object_type != ObjectType::Creature
+                        && object_type != ObjectType::Entity
+                        && object_type != ObjectType::Graphics
+                    {
+                        // Currently unhandled outside of these configurations.
+                        continue;
+                    }
                     // Starting a new caste (in creature), so we can just add a caste to the last creature we started.
                     if started
                         && (last_parsed_type == ObjectType::CreatureCaste
@@ -374,7 +391,7 @@ pub fn parse_raw_file_with_info<P: AsRef<Path>>(
         }
     }
 
-    log::info!(
+    log::debug!(
         "parse_raw_file_with_info: Parsed {} raws from {}",
         created_raws.len(),
         raw_filename

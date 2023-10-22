@@ -770,4 +770,12 @@ pub enum EntityToken {
     TissueStylePreferredShaping,
     #[default]
     Unknown,
+
+    // not yet tags, but they are used in some mods
+    WoodPref,
+    UndeadCandidate,
+
+    // this needs separate handling.. later !Todo
+    CutEntity,
+    SelectEntity,
 }
