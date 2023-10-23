@@ -312,15 +312,6 @@ impl Creature {
         combined_creature
     }
 
-    /// The function `get_tags` returns a slice of `CreatureTag` values.
-    ///
-    /// Returns:
-    ///
-    /// The tags that belong to this creature.
-    pub fn get_tags(&self) -> &[CreatureTag] {
-        self.tags.as_slice()
-    }
-
     /// The function `get_castes` returns a slice of `Caste` objects.
     ///
     /// Returns:
@@ -328,6 +319,10 @@ impl Creature {
     /// The castes that belong to this creature.
     pub fn get_castes(&self) -> &[Caste] {
         self.castes.as_slice()
+    }
+
+    pub fn does_not_exist(&self) -> bool {
+        self.tags.contains(&CreatureTag::DoesNotExist)
     }
 }
 
