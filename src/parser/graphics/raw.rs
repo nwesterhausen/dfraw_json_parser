@@ -203,6 +203,19 @@ impl Graphic {
     pub fn get_graphic_type(&self) -> GraphicType {
         self.kind
     }
+
+    pub fn get_tile_pages(&self) -> Vec<String> {
+        let mut vec = Vec::new();
+        for sprite in &self.sprites {
+            vec.push(sprite.get_tile_page_id().to_string());
+        }
+        for layer in &self.layers {
+            for sprite in &layer.1 {
+                vec.push(sprite.get_tile_page_id().to_string());
+            }
+        }
+        vec
+    }
 }
 
 #[typetag::serde]

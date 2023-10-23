@@ -17,6 +17,9 @@ pub struct SpriteLayer {
 }
 
 impl SpriteLayer {
+    pub fn get_tile_page_id(&self) -> &str {
+        self.tile_page_id.as_str()
+    }
     pub fn parse_condition_token(&mut self, key: &str, value: &str) {
         // Condition is the key, and it should match a value in LAYER_CONDITION_TAGS
         if let Some(condition) = CONDITION_TAGS.get(key) {

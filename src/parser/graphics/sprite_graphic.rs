@@ -35,6 +35,9 @@ pub struct SpriteGraphic {
 }
 
 impl SpriteGraphic {
+    pub fn get_tile_page_id(&self) -> &str {
+        self.tile_page_id.as_str()
+    }
     pub fn from_token(key: &str, value: &str, graphic_type: GraphicType) -> Option<Self> {
         // Recombine token for parsing
         let token = format!("{key}:{value}");
