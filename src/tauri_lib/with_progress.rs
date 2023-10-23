@@ -329,7 +329,7 @@ fn parse_module<P: AsRef<Path>>(
     }
 
     // Parse the graphics
-    if parse_objects {
+    if parse_graphics {
         for entry in walkdir::WalkDir::new(graphics_path)
             .into_iter()
             .filter_map(std::result::Result::ok)
