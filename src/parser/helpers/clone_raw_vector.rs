@@ -55,7 +55,8 @@ pub fn with_limit_and_page(
 ) -> Vec<Box<dyn RawObject>> {
     let mut new_raws: Vec<Box<dyn RawObject>> = Vec::new();
     // Page 0 is the first page, so we need to subtract 1 from the page number
-    let page = page - 1;
+    // But this guards against someone sending an invalid page number of 0
+    let page = if page > 0 { page - 1 } else { page };
     let start = limit * page;
     let end = start + limit;
 
