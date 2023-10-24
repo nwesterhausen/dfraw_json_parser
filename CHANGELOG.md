@@ -5,7 +5,235 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## v0.13.0 (2023-10-24)
+## v0.14.0 (2023-10-24)
+
+### Chore
+
+ - <csr-id-b80a528d92b4e6764b21036878b37433c879aaf2/> force version bump
+
+### Bug Fixes
+
+ - <csr-id-692f5c6069b6ce4b3bf0088b513dae384770d159/> update rust crate regex to 1.10
+ - <csr-id-b44b1dcc83a5cdf200acb88f555041f02eb0b436/> update rust crate tauri to 1.5
+ - <csr-id-45f13d9e74b177f5211b8e9eb259c92458f1ef0a/> include sapling in helper function
+
+### Other
+
+ - <csr-id-04e94f04e8e3831bade62a15059a3ed7077b54ec/> Logic Rewrite
+   * refactor: wipe and rewrite all for new engine
+   
+   * refactor: example cli runs. metadata is good but need to rework raw parsing
+   
+   * refactor: continue rewrite
+   
+   * refactor: finish creature parsing rewrite
+   
+   * chore: clear clippy warnings
+   
+   * fix: remove unused dependencies
+   
+   * fix: add missing tags
+   
+   * feat; handle copy_tags_from
+   
+   * fix: with progress response
+   
+   * feat: add rs-ts
+   
+   * refactor: continue rewrite
+   
+   * refactor: continue rewrite
+   
+   * change: use formatting for rs-ts
+   
+   * docs: update readme and remove old type file
+   
+   * feat: add plant_growths
+   
+   * fix: use default pattern for module info file
+   
+   * feat: add options struct for passing options to parser
+   
+   * chore: disable clippy::must_use_candidate
+   
+   * chore: allow clippy::must_use_candidate
+   
+   * feat: plant parsing
+   
+   * fix: remove formatting from rs-ts
+   
+   * feat: add shrub details for plant
+   
+   * feat: add plant seed
+   
+   * feat: handle plant materials
+   
+   * feat: add inorganic parsing
+   
+   * fix: plant raws serializing empties
+   
+   * feat: add temperature and state names
+   
+   * feat: parse material templates
+   
+   * fix: respect parser options
+   
+   * feat: add syndromes
+   
+   * chore: update bindings
+   
+   * chore: add helper script to update bindings
+   
+   * feat: update tauri_lib with new logic
+   
+   * feat: update cli and tauri_lib for new logic
+   
+   * fix: make sure cli works and update examples
+   
+   * chore: update bindings
+   
+   * fix: improve library methods
+   
+   * feat: add first-pass graphics and other utility
+   
+   * fix: graphic parsing includes layers
+   
+   * chore: update bindings
+   
+   * feat: add TilePage parsing
+   
+   * fix: improve graphic parsing
+   
+   * fix: improve graphic parsing
+   
+   * chore: update bindings
+   
+   * ci: update tauri dependencies
+   
+   * ci: update clippy check
+   
+   * ci: fix clippy check
+   
+   * ci: fix formatting
+   
+   * ci: add libsoup-3.0 dependency for tauri dependency soup3
+   
+   * ci: add additional `soup3` dependency
+   
+   * ci: add tauri v2 requirements
+   
+   based on comment https://github.com/tauri-apps/tauri/issues/3701#issuecomment-1499791223
+   
+   * feat(tauri): return objects instead of json string
+   
+   Tauri handles serde serialization automatically.
+   
+   * feat: some changes to help enable + Send + Sync
+   
+   * fix: expose names
+   
+   * fix: expose graphics
+   
+   * ci: add a step to verify type bindings
+   
+   * ci: prettier bindings
+   
+   * feat: parse syndromes and other material properties
+   
+   * fix: remove liquid density
+   
+   * feat: handle more tokens
+   
+   * feat: more tokens
+   
+   * chore: update bindings
+   
+   * feat: implement search string generation
+   
+   * chore: remove boilerplate
+   
+   * feat: expose build_search_string
+   
+   * chore: update bindings
+   
+   * feat: impl Searchable as part of RawObject
+   
+   * feat: expose name on raw object for sorting
+   
+   * fix: page number - 1
+   
+   * fix: less verbose logs
+   
+   * dev: add launch config for debug
+   
+   * fix: correct the parsing logic
+   
+   * chore: update logging messages
+   
+   * fix: caste and creature are together
+   
+   * fix: hopefully final change for creature caste
+   
+   * feat: add entity object
+   
+   * feat: add remaining entity fields and parsing
+   
+   * feat: actually add entity parsing
+   
+   * fix: handle creature tags on entity
+   
+   * fix: add entity to clone raw object box
+   
+   * fix: entity wasn't getting updated
+   
+   * feat: add Position raw under Entity
+   
+   * feat: improved turnaround on non-supported raw files
+   
+   * chore: update bindings
+   
+   * feat: add convenience functions to creature
+   
+   * fix: expose DoesNotExist
+   
+   * feat: expose all tile pages used
+   
+   * fix: check parse_graphics for graphics go-ahead
+   
+   * fix: guard against page number 0
+   
+   * feat: expose location on metadata
+   
+   * chore: set tauri back to stable before merge
+   
+   ---------
+
+### Commit Statistics
+
+<csr-read-only-do-not-edit/>
+
+ - 6 commits contributed to the release over the course of 35 calendar days.
+ - 35 days passed between releases.
+ - 5 commits were understood as [conventional](https://www.conventionalcommits.org).
+ - 1 unique issue was worked on: [#35](https://github.com/nwesterhausen/dfraw_json_parser/issues/35)
+
+### Commit Details
+
+<csr-read-only-do-not-edit/>
+
+<details><summary>view details</summary>
+
+ * **[#35](https://github.com/nwesterhausen/dfraw_json_parser/issues/35)**
+    - Logic Rewrite ([`04e94f0`](https://github.com/nwesterhausen/dfraw_json_parser/commit/04e94f04e8e3831bade62a15059a3ed7077b54ec))
+ * **Uncategorized**
+    - Force version bump ([`b80a528`](https://github.com/nwesterhausen/dfraw_json_parser/commit/b80a528d92b4e6764b21036878b37433c879aaf2))
+    - Release dfraw_json_parser v0.13.0 ([`5868e0c`](https://github.com/nwesterhausen/dfraw_json_parser/commit/5868e0c9aefe9a01b8b1476af90343c84da80f12))
+    - Update rust crate regex to 1.10 ([`692f5c6`](https://github.com/nwesterhausen/dfraw_json_parser/commit/692f5c6069b6ce4b3bf0088b513dae384770d159))
+    - Update rust crate tauri to 1.5 ([`b44b1dc`](https://github.com/nwesterhausen/dfraw_json_parser/commit/b44b1dcc83a5cdf200acb88f555041f02eb0b436))
+    - Include sapling in helper function ([`45f13d9`](https://github.com/nwesterhausen/dfraw_json_parser/commit/45f13d9e74b177f5211b8e9eb259c92458f1ef0a))
+</details>
+
+## v0.13.0 (2023-09-18)
 
 <csr-id-1a1950a5b43bb0474355ce2f7e29a78bdffd081e/>
 <csr-id-c1ff0a07d29ae8213e3070ffc3d78c674f766832/>
@@ -16,6 +244,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 <csr-id-891a33a87ab43f793aafc6477e83ce976f9e0a6e/>
 <csr-id-de14e788e06faa5d35092219aabb8b5a4370dd44/>
 <csr-id-7bb7703c8f4ac0c60b6d6f696ac6fe1ea32b1eab/>
+<csr-id-04e94f04e8e3831bade62a15059a3ed7077b54ec/>
 
 ### Changed
 
@@ -252,10 +481,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 <csr-read-only-do-not-edit/>
 
- - 4 commits contributed to the release over the course of 35 calendar days.
- - 35 days passed between releases.
- - 4 commits were understood as [conventional](https://www.conventionalcommits.org).
- - 1 unique issue was worked on: [#35](https://github.com/nwesterhausen/dfraw_json_parser/issues/35)
+ - 20 commits contributed to the release over the course of 222 calendar days.
+ - 237 days passed between releases.
+ - 19 commits were understood as [conventional](https://www.conventionalcommits.org).
+ - 0 issues like '(#ID)' were seen in commit messages
 
 ### Commit Details
 
@@ -263,12 +492,27 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 <details><summary>view details</summary>
 
- * **[#35](https://github.com/nwesterhausen/dfraw_json_parser/issues/35)**
-    - Logic Rewrite ([`04e94f0`](https://github.com/nwesterhausen/dfraw_json_parser/commit/04e94f04e8e3831bade62a15059a3ed7077b54ec))
  * **Uncategorized**
-    - Update rust crate regex to 1.10 ([`692f5c6`](https://github.com/nwesterhausen/dfraw_json_parser/commit/692f5c6069b6ce4b3bf0088b513dae384770d159))
-    - Update rust crate tauri to 1.5 ([`b44b1dc`](https://github.com/nwesterhausen/dfraw_json_parser/commit/b44b1dcc83a5cdf200acb88f555041f02eb0b436))
-    - Include sapling in helper function ([`45f13d9`](https://github.com/nwesterhausen/dfraw_json_parser/commit/45f13d9e74b177f5211b8e9eb259c92458f1ef0a))
+    - Release dfraw_json_parser v0.13.0 ([`2c747ad`](https://github.com/nwesterhausen/dfraw_json_parser/commit/2c747ad3d24d4154937b9e915a62dcb8a3ac183e))
+    - Include sapling sprites ([`fd3d92f`](https://github.com/nwesterhausen/dfraw_json_parser/commit/fd3d92fae81b4a5f855fa9bfd8bcea80cb3cb41d))
+    - Include library methods for dynamic return ([`c95096e`](https://github.com/nwesterhausen/dfraw_json_parser/commit/c95096e0e85d7e19fd9bdfa56176729d2eb0b97e))
+    - Replace with let .. else ([`891a33a`](https://github.com/nwesterhausen/dfraw_json_parser/commit/891a33a87ab43f793aafc6477e83ce976f9e0a6e))
+    - Update actions/checkout action to v4 ([`1a1950a`](https://github.com/nwesterhausen/dfraw_json_parser/commit/1a1950a5b43bb0474355ce2f7e29a78bdffd081e))
+    - 🔥 use serde rename_all camelCase ([`de14e78`](https://github.com/nwesterhausen/dfraw_json_parser/commit/de14e788e06faa5d35092219aabb8b5a4370dd44))
+    - 🔥 removed manual vector slicing ([`7bb7703`](https://github.com/nwesterhausen/dfraw_json_parser/commit/7bb7703c8f4ac0c60b6d6f696ac6fe1ea32b1eab))
+    - Update rust crate clap to 4.4 ([`c1ff0a0`](https://github.com/nwesterhausen/dfraw_json_parser/commit/c1ff0a07d29ae8213e3070ffc3d78c674f766832))
+    - Update rust crate log to 0.4.20 ([`0bcac7e`](https://github.com/nwesterhausen/dfraw_json_parser/commit/0bcac7e447473577396fa317959b55e3663d3628))
+    - Update rust crate regex to 1.9 ([`6c8ab81`](https://github.com/nwesterhausen/dfraw_json_parser/commit/6c8ab8132385f83e447c557dd09626c10b54d976))
+    - Update rust crate phf to 0.11.2 ([`080fade`](https://github.com/nwesterhausen/dfraw_json_parser/commit/080fade8efc95aa9b3bb95b7a26fbc046f9d5829))
+    - Update rust crate tauri to 1.4 ([`561c955`](https://github.com/nwesterhausen/dfraw_json_parser/commit/561c95598d64e444f4d2803d31533cdc714f2103))
+    - Update rust crate log to 0.4.19 ([`f0f9772`](https://github.com/nwesterhausen/dfraw_json_parser/commit/f0f97723d32725d63611fea545bd71b01a7d201a))
+    - Update rust crate log to 0.4.18 ([`7b516ea`](https://github.com/nwesterhausen/dfraw_json_parser/commit/7b516eabb1630e3e4f51b6c6c3e3151727a010be))
+    - Update rust crate clap to 4.3 ([`946b03d`](https://github.com/nwesterhausen/dfraw_json_parser/commit/946b03da912a6028cdec964373b0a34f0af55317))
+    - Update rust crate tauri to 1.3 ([`ff9da26`](https://github.com/nwesterhausen/dfraw_json_parser/commit/ff9da26d227f3f792479c5b0d38c60427496531c))
+    - Update rust crate regex to 1.8 ([`cf8952a`](https://github.com/nwesterhausen/dfraw_json_parser/commit/cf8952ac17ccbe4ab01d0729b01d59327ab56ff6))
+    - Update rust crate clap to 4.2 ([`5c07ce1`](https://github.com/nwesterhausen/dfraw_json_parser/commit/5c07ce1c3df8ba57c87d2e4dcae6f808ff49e319))
+    - Update rust crate fern to 0.6.2 ([`238e76e`](https://github.com/nwesterhausen/dfraw_json_parser/commit/238e76e7008f7a90b2fe10cb2f7122d5b06b2ef4))
+    - Proper version tag for clippy-check ([`03501d4`](https://github.com/nwesterhausen/dfraw_json_parser/commit/03501d4430066100dfeac48740851eba34be0f01))
 </details>
 
 ## v0.12.0 (2023-01-24)
@@ -303,7 +547,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 <csr-id-edf44ef452e9952e7ebd7e49a09af69e9ffebf4b/>
 
 
-<csr-id-edf44ef452e9952e7ebd7e49a09af69e9ffebf4b/>
 
 ### New Features
 
@@ -397,7 +640,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 <csr-id-a4ff82d5790c6b3b07676eae32b2fbeadb587643/>
 
 
-<csr-id-9aaabf7317998f58325feccfddb49c0c9d4a531e/>
 <csr-id-3e363ff91a2f87f4be26593c6cfc6e9e37882494/>
 <csr-id-bac89e814c58315b6629755d25f06ec8d24e4ce2/>
 <csr-id-d1a86054f8995bdb12350ab84f8bf1cdfc9e88f5/>
@@ -598,8 +840,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 <csr-id-b5ac4440b1189f0c7ef8fdaeca97d36d334a3100/>
 
-
-
 ### Refactor
 
  - <csr-id-b5ac4440b1189f0c7ef8fdaeca97d36d334a3100/> 🔥 refactor typings for consistency
@@ -627,8 +867,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## v0.8.1 (2023-01-09)
 
 <csr-id-e87e4363aea2a138d7e1deb7c7a47f8c262ef9ff/>
-
-
 
 ### Chore
 
@@ -665,7 +903,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 <csr-id-9669a1cd9d2be7518d989a26fbd4dc656edd4c9b/>
 
 
-<csr-id-48d50ad26512c5a35b8c3d136a49da3b4f1cc95b/>
 <csr-id-9669a1cd9d2be7518d989a26fbd4dc656edd4c9b/>
 
 ### New Features
@@ -880,7 +1117,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 <csr-id-59e2dff2d583cd8c5c55411688a6c8f4ddcf361a/>
 
 
-<csr-id-5e6dde45b3489ad93660372f654fa637a4379d98/>
 <csr-id-a6f00156cddc9b0c42b5f0a19883d5382c19d160/>
 <csr-id-5a9740e01528680c3f6543673fbd722913ac57c2/>
 <csr-id-7932e59c509f1da93e8f431fbbef9a164de144d1/>
@@ -978,8 +1214,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 <csr-id-373da1570664724774cddd13d34ae50c05a47dd8/>
 
-
-
 ### Chore
 
  - <csr-id-373da1570664724774cddd13d34ae50c05a47dd8/> 🔖 bump version
@@ -1022,8 +1256,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## v0.3.0 (2022-12-13)
 
 <csr-id-0c7aebb62c9b8cae212207bddcae6edbece83995/>
-
-
 
 ### Chore
 
