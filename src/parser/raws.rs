@@ -145,4 +145,8 @@ impl RawMetadata {
     pub fn get_raw_file_path(&self) -> &str {
         &self.raw_file_path
     }
+    /// Get the location of the owning raw module.
+    pub fn get_location(&self) -> &RawModuleLocation {
+        &self.raw_module_location
+    }
 }
