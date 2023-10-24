@@ -86,6 +86,9 @@ pub mod parser;
 mod tauri_lib;
 pub mod util;
 
+#[cfg(feature = "tauri")]
+pub use tauri_lib::ProgressPayload;
+
 /// Given the supplied `ParserOptions`, parse the raws and return a vector of boxed dynamic raw objects.
 ///
 /// Note: This is unable to parse the info.txt file for a module. Use `parse_module_info_file` for that.
