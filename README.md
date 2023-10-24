@@ -21,72 +21,11 @@ include a lot of items that were not important to me when looking up creatures. 
 the description of the animal, if they laid eggs, if they were milkable, and how big they were.
 
 - Parses raw files for creatures
+- Parses raw files for plants
 
 ### Outputs
 
-There is a [Typescript definition file](./typing.d.ts) for the format of the generated JSON. Here are detailed
-descriptions of Rust structs used when performing the serde_json serialization.
-
-#### DF Info File
-
-It parses the info.txt file in each raw module directory it goes through.
-
-| Property                              | Description                                                           | Type     |
-| ------------------------------------- | --------------------------------------------------------------------- | -------- |
-| identifier                            | id of the raw module                                                  | `String` |
-| sourced_directory                     | directory found in, `vanilla`, `mods` or `installed_mods`             | `String` |
-| numeric_version                       | version of raw module represented as a number                         | `u32`    |
-| displayed_version                     | human-readable display for `numeric_version`                          | `String` |
-| earliest_compatible_numeric_version   | earliest "upgrade-compatible" version of this raw module, as a number | `u32`    |
-| earliest_compatible_displayed_version | human readable display for `earliest_compatible_numeric_version`      | `String` |
-| author                                | author of the raw module                                              | `String` |
-| name                                  | human readable name of the module                                     | `String` |
-| description                           | description of the module                                             | `String` |
-| display_title                         | built-in formatting for `{name} v{displayed_version}`                 | `String` |
-
-#### Creature Token
-
-Creature data and its castes are included. However, currently doesn't apply COPY_TAG_FROM.
-
-| Property           | Description                                        | Type                               |
-| ------------------ | -------------------------------------------------- | ---------------------------------- |
-| identifier         | defined in CREATURE token                          | `String`                           |
-| parent_raw         | name of the raw file its located                   | `String`                           |
-| raw_module         | id of the raws module raw is from                  | `String`                           |
-| raw_module_version | version of the raws module raw is from             | `String`                           |
-| dfraw_display      | human readable "Name Version" of the parent module | `String`                           |
-| objectId           | unique id for creature                             | `String`                           |
-| name               | species name                                       | `String`                           |
-| names_map          | names by castes                                    | `HashMap<String, Vec<String>>`     |
-| descriptions       | descriptions by castes                             | `HashMap<String, String>`          |
-| max_age            | max age by castes                                  | `HashMap<String, [u16; 2]>`        |
-| clutch_size        | clutch size by castes                              | `HashMap<String, [u16; 2]>`        |
-| based_on           | defined by copy_tags_from token                    | `String`                           |
-| biomes             | biomes creature found in                           | `Vec<String>`                      |
-| cluster_range      | cluster range (how many appear at once)            | `[u16; 2]`                         |
-| underground_depth  | depth found                                        | `[u16; 2]`                         |
-| body_size          | body size by castes                                | `HashMap<String, Vec<DFBodySize>>` |
-| grown_at           | age when adult by castes                           | `HashMap<String, u32>`             |
-| child_at           | age when adolescent by castes                      | `HashMap<String, u32>`             |
-| egg_sizes          | egg size by castes                                 | `HashMap<String, u32>`             |
-| pet_value          | pet value by castes                                | `HashMap<String, u16>`             |
-| intelligence       | intelligence by castes                             | `HashMap<String, [bool; 2]>`       |
-| flier              | flier by castes                                    | `HashMap<String, bool>`            |
-| gnawer             | gnawer by castes                                   | `HashMap<String, bool>`            |
-| trainable          | trainability by castes                             | `HashMap<String, u8>`              |
-| active_time        | active time by castes                              | `HashMap<String, u8>`              |
-| inactive_season    | NO_SEASON by castes                                | `HashMap<String, u8>`              |
-| creature_class     | creature class by castes                           | `HashMap<String, Vec<String>>`     |
-| tags               | tags on the creature                               | `Vec<CreatureTag>`                 |
-| caste_tags         | tags on each caste                                 | `HashMap<String, Vec<CasteTag>>`   |
-| difficulty         | difficulty by castes                               | `HashMap<String, u32>`             |
-| grass_trample      | grass trample by castes                            | `HashMap<String, u8>`              |
-| grazer             | grazer by castes                                   | `HashMap<String, u32>`             |
-| low_light_vision   | low light vision by castes                         | `HashMap<String, u32>`             |
-| pop_ratio          | population ratio by castes                         | `HashMap<String, u16>`             |
-| milkable           | milk production by castes                          | `HashMap<String, DFMilkable>`      |
-| pref_string        | preference string for creature                     | `Vec<String>`                      |
-| population_number  | pop num (how many exist per valid world tile)      | `[u16; 2]`                         |
+There are generated typescript type definitions in the [bindings](/bindings/) directory.
 
 ## Rust Program
 
@@ -105,15 +44,18 @@ cargo run --example cli -- --help
 ```sh
 Library which parses Dwarf Fortress raw files into JSON
 
-Usage: cli.exe [OPTIONS]
+Usage: cli.exe [OPTIONS] --target-path <TARGET_PATH>
 
 Options:
-  -g, --game-dir <GAME_DIR>
-          Specify the directory where Dwarf Fortress is installed.
+  -t, --target-path <TARGET_PATH>
+          Specify the path to parse raws from.
 
-          This directory will likely include the 'gamelog.txt' file, and it should have a 'data' subdirectory.
+          If you choose `-p RawFile`, or `-p RawModuleInfoFile`, this must be a file path.
 
-          [default: ]
+          If you choose `-p RawModule` this must be the path to the module folder.
+
+          If you choose `-p All` (or leave it unset), this must be the path to the Dwarf Fortress
+          game directory (e.g. `C:/Program Files/Dwarf Fortress`).
 
   -o, --out-dir <OUT_DIR>
           Specify the directory that the JSON database should be saved into.
@@ -122,16 +64,46 @@ Options:
           saved to disk in a location specified by this argument. This will
           create an 'raws.json' file in the directory specified by this argument.
 
-          Alongside raws.json will be a modules.json which is a JSON database for the
-          raw modules that were found and parsed.
+          If not specified, the current working directory will be used.
 
-          [default: ./www/]
+          [default: ]
+
+      --parse <PARSE>
+          What level of parsing to perform.
+
+          Choose from:
+              - RawFile: Parse a single raw file
+              - RawModuleInfoFile: Parse a single raw module info file
+              - RawModule: Parse a single raw module
+              - All: Parse all, limited to locations if specified
+
+          If All is chosen, the flags for parse_vanilla, parse_mods_downloaded, and parse_mods_installed will all
+          influence exactly which locations are parsed. All also includes a modules.json which is a database of all
+          modules and their info.
+
+
+          [default: all]
+
+          Possible values:
+          - raw-file:             Parse a single raw file
+          - raw-module-info-file: Parse a single raw module info file
+          - raw-module:           Parse a single raw module
+          - all:                  Parse all, limited to locations if specified
+
+      --parse-vanilla
+          Parse vanilla raws
+
+      --parse-mods-downloaded
+          Parse downloaded workshop mods
+
+      --parse-mods-installed
+          Parse installed mods
 
   -h, --help
-          Print help information (use `-h` for a summary)
+          Print help (see a summary with '-h')
 
   -V, --version
-          Print version information
+          Print version
 ```
 
 ### How to use
@@ -139,7 +111,7 @@ Options:
 The [example](examples/cli.rs) is a usable tool to write the parsed raws into JSON, this could then be uploaded
 to Algolia search for searching through, or can be easily ingested by a website with javascript.
 
-There is a [Typescript definition file](./typing.d.ts) for the format of the generated JSON.
+Use the generated typescript types to help you utilize the generated JSON.
 
 #### Existing Projects
 

@@ -6,8 +6,6 @@ mod structs;
 #[cfg(feature = "tauri")]
 mod with_progress;
 
-use std::path::Path;
-
 #[cfg(feature = "tauri")]
 /// Parse a directory of raws, and return a JSON string of the parsed raws. While parsing, this will
 /// emit tauri events to the supplied window. The event is titled `PROGRESS` and it uses the `ProgressPayload`
@@ -23,42 +21,43 @@ use std::path::Path;
 /// Returns:
 ///
 /// A (large) JSON string with details on all raws in the game path.
-pub fn parse_game_raws_with_tauri_emit<P: AsRef<Path>>(
-    df_game_path: &P,
+pub fn parse(
+    options: &crate::options::ParserOptions,
     window: tauri::Window,
-) -> String {
+) -> Vec<Box<dyn crate::parser::raws::RawObject>> {
     // setup progress helper
     let mut progress_helper = structs::ProgressHelper::with_tauri_window(window);
     progress_helper.update_current_task("Parsing all raws in dwarf fortress directory.");
 
-    let result = with_progress::parse_game_raws(df_game_path, &mut progress_helper);
+    let result = with_progress::parse(options, &mut progress_helper);
     progress_helper.send_final("Parsing completed.");
 
     result
 }
 
 #[cfg(feature = "tauri")]
-/// It takes a path to a directory containing raw modules, parses them, and returns a JSON string
-/// containing all the parsed modules. While parsing, emits events to the provided tauri window
-/// to convey parsing status.
+/// The function `parse_to_json_vec` takes in options and a window, sets up a progress helper, parses
+/// raws in a Dwarf Fortress directory, and returns a vector of strings.
 ///
 /// Arguments:
 ///
-/// * `raw_module_location`: The path to the directory containing the raw modules.
-/// * `window`: The active tauri window to receive events.
+/// * `options`: A reference to a `ParserOptions` struct from the `crate::options` module.
+/// * `window`: The `window` parameter is of type `tauri::Window` and represents the Tauri window
+/// object. It is used to interact with the Tauri window and perform operations such as displaying
+/// progress updates.
 ///
 /// Returns:
 ///
-/// A JSON string of all the mods in the location.
-pub fn parse_location_with_tauri_emit<P: AsRef<Path>>(
-    raw_module_location: &P,
+/// a vector of JSON strings.
+pub fn parse_to_json_vec(
+    options: &crate::options::ParserOptions,
     window: tauri::Window,
-) -> String {
+) -> Vec<String> {
     // setup progress helper
     let mut progress_helper = structs::ProgressHelper::with_tauri_window(window);
-    progress_helper.update_current_task("Parsing all raws in a single location.");
+    progress_helper.update_current_task("Parsing all raws in dwarf fortress directory.");
 
-    let result = with_progress::parse_location(raw_module_location, &mut progress_helper);
+    let result = with_progress::parse_to_json_vec(options, &mut progress_helper);
     progress_helper.send_final("Parsing completed.");
 
     result

@@ -6,7 +6,13 @@ use std::{
 
 use walkdir::WalkDir;
 
-use crate::parser::{RawsStyleSerializable, TypedJsonSerializable};
+use crate::{
+    options::{ParserOptions, ParsingJob},
+    parser::{
+        creature::raw::Creature, object_types::ObjectType, raws::RawObject,
+        select_creature::raw::SelectCreature,
+    },
+};
 
 /// Get a vec of subdirectories for a given directory
 ///
@@ -59,184 +65,6 @@ pub fn get_parent_dir_name<P: AsRef<Path>>(full_path: &P) -> String {
     }
 }
 
-/// It takes a string of json and writes it to a file, wrapping it in square brackets to make it a valid
-/// json array
-///
-/// Arguments:
-///
-/// * `parsed_json_string`: String
-/// * `out_filepath`: Path
-pub fn write_json_string_to_file<P: AsRef<Path>>(parsed_json_string: &String, out_filepath: &P) {
-    log::info!("Saving json to to {:?}", out_filepath.as_ref().display());
-
-    let out_file = match File::create(out_filepath) {
-        Ok(f) => f,
-        Err(e) => {
-            log::error!(
-                "Unable to open {} for writing \n{:?}",
-                out_filepath.as_ref().display(),
-                e
-            );
-            return;
-        }
-    };
-
-    let mut stream = BufWriter::new(out_file);
-    let write_error = &format!(
-        "Unable to write to {}",
-        out_filepath.as_ref().to_string_lossy()
-    );
-    match write!(stream, "[") {
-        Ok(_x) => (),
-        Err(e) => {
-            log::error!("{}\n{:?}", write_error, e);
-            return;
-        }
-    };
-
-    match write!(stream, "{parsed_json_string}") {
-        Ok(_x) => (),
-        Err(e) => {
-            log::error!("{}\n{:?}", write_error, e);
-            return;
-        }
-    };
-
-    match write!(stream, "]") {
-        Ok(_x) => (),
-        Err(e) => {
-            log::error!("{}\n{:?}", write_error, e);
-            return;
-        }
-    };
-    match stream.flush() {
-        Ok(_x) => (),
-        Err(e) => {
-            log::error!("{}\n{:?}", write_error, e);
-        }
-    };
-}
-
-#[allow(dead_code)]
-/// It takes a string of json and writes it to a file, wrapping it in square brackets to make it a valid
-/// json array
-///
-/// Arguments:
-///
-/// * `parsed_json_string_vec`: String
-/// * `out_filepath`: Path
-pub fn write_json_string_vec_to_file<P: AsRef<Path>>(
-    parsed_json_string_vec: &Vec<String>,
-    out_filepath: &P,
-) {
-    log::info!("Saving json to to {:?}", out_filepath.as_ref().display());
-
-    let out_file = match File::create(out_filepath) {
-        Ok(f) => f,
-        Err(e) => {
-            log::error!(
-                "Unable to open {} for writing \n{:?}",
-                out_filepath.as_ref().display(),
-                e
-            );
-            return;
-        }
-    };
-
-    let mut stream = BufWriter::new(out_file);
-    let write_error = &format!(
-        "Unable to write to {}",
-        out_filepath.as_ref().to_string_lossy()
-    );
-    match write!(stream, "[") {
-        Ok(_x) => (),
-        Err(e) => {
-            log::error!("{}\n{:?}", write_error, e);
-            return;
-        }
-    };
-
-    for parsed_json_string in parsed_json_string_vec {
-        match write!(stream, "{parsed_json_string}") {
-            Ok(_x) => (),
-            Err(e) => {
-                log::error!("{}\n{:?}", write_error, e);
-                return;
-            }
-        };
-    }
-
-    match write!(stream, "]") {
-        Ok(_x) => (),
-        Err(e) => {
-            log::error!("{}\n{:?}", write_error, e);
-            return;
-        }
-    };
-    match stream.flush() {
-        Ok(_x) => (),
-        Err(e) => {
-            log::error!("{}\n{:?}", write_error, e);
-        }
-    };
-}
-
-/// Takes a vector of objects that implement a trait, and returns a vector of JSON strings representing
-/// those objects.
-///
-/// Arguments:
-///
-/// * `serializable_vec`: `Vec<Box<impl json_conversion::TypedJsonSerializable + ?Sized>>`
-///
-/// Returns:
-///
-/// A vector of JSON strings.
-pub fn stringify_raw_vec(
-    serializable_vec: Vec<Box<impl TypedJsonSerializable + ?Sized>>,
-) -> Vec<String> {
-    let mut results: Vec<String> = Vec::new();
-    if serializable_vec.is_empty() {
-        return results;
-    }
-
-    for raw_object in serializable_vec {
-        match raw_object.to_typed_json_string() {
-            Ok(s) => {
-                results.push(s.to_string());
-            }
-            Err(e) => {
-                log::error!("Failure to serialize parsed raw data\n{}", e);
-            }
-        }
-    }
-    results
-}
-
-/// It takes a vector of objects that implement the `RawsStyleSerializable` trait, and returns a vector
-/// of strings that are the raws-style serialized versions of those objects
-///
-/// Arguments:
-///
-/// * `raws_stringable_vec`: `Vec<Box<impl RawsStyleSerializable + ?Sized>>`
-///
-/// Returns:
-///
-/// A vector of strings.
-pub fn raws_stringify_df_vec(
-    raws_stringable_vec: Vec<Box<impl RawsStyleSerializable + ?Sized>>,
-) -> Vec<String> {
-    let mut results: Vec<String> = Vec::new();
-    if raws_stringable_vec.is_empty() {
-        return results;
-    }
-
-    for df_object in raws_stringable_vec {
-        results.push(df_object.to_raws_style());
-    }
-
-    results
-}
-
 /// "Given a path to a game directory, return a `PathBuf` to that directory if it exists and is a
 /// directory, otherwise return an error."
 ///
@@ -251,6 +79,10 @@ pub fn raws_stringify_df_vec(
 /// Returns:
 ///
 /// A Result<PathBuf, String>
+///
+/// # Errors
+///
+/// * If the path doesn't exist
 pub fn path_from_game_directory<P: AsRef<Path>>(game_path: &P) -> Result<PathBuf, String> {
     //1. "validate" folder is as expected
     let game_path = Path::new(game_path.as_ref());
@@ -273,23 +105,29 @@ pub fn path_from_game_directory<P: AsRef<Path>>(game_path: &P) -> Result<PathBuf
     Ok(game_path.to_path_buf())
 }
 
-/// It takes a string of raws-style strings (i.e. [content]) and writes it to file, one per line.
+/// Save a vector of strings to a file, one string per line.
 ///
 /// Arguments:
 ///
 /// * `parsed_raws_string_vec`: String
 /// * `out_filepath`: Path
-pub fn write_raws_string_vec_to_file<P: AsRef<Path>>(
-    parsed_raws_string_vec: &Vec<String>,
-    out_filepath: &P,
-) {
-    log::info!("Saving raws to to {:?}", out_filepath.as_ref().display());
+pub fn write_json_string_vec_to_file<P: AsRef<Path>>(strings_vec: &Vec<String>, out_filepath: &P) {
+    log::info!(
+        "write_json_string_vec_to_file: Writing {} strings to file {:?}",
+        strings_vec.len(),
+        out_filepath.as_ref().display()
+    );
+
+    if strings_vec.is_empty() {
+        log::warn!("write_json_string_vec_to_file: Provided string vector is empty!");
+        return;
+    }
 
     let out_file = match File::create(out_filepath) {
         Ok(f) => f,
         Err(e) => {
             log::error!(
-                "Unable to open {} for writing \n{:?}",
+                "write_json_string_vec_to_file: Unable to open {} for writing \n{:?}",
                 out_filepath.as_ref().display(),
                 e
             );
@@ -299,24 +137,174 @@ pub fn write_raws_string_vec_to_file<P: AsRef<Path>>(
 
     let mut stream = BufWriter::new(out_file);
     let write_error = &format!(
-        "Unable to write to {}",
+        "write_json_string_vec_to_file: Unable to write to {}",
         out_filepath.as_ref().to_string_lossy()
     );
 
-    for parsed_json_string in parsed_raws_string_vec {
-        match writeln!(stream, "{parsed_json_string}") {
+    if strings_vec.len() == 1 {
+        match writeln!(stream, "{}", strings_vec.first().unwrap_or(&String::new())) {
             Ok(_x) => (),
             Err(e) => {
-                log::error!("{}\n{:?}", write_error, e);
+                log::error!("write_json_string_vec_to_file: {}\n{:?}", write_error, e);
                 return;
             }
         };
+        match stream.flush() {
+            Ok(_x) => (),
+            Err(e) => {
+                log::error!("write_json_string_vec_to_file: {}\n{:?}", write_error, e);
+            }
+        };
+        return;
     }
+
+    let strings_vec = strings_vec.iter();
+    // Write the first value with an open bracket '[' at the beginning
+    // Write all next values with a comma ',' in front
+    // Finish with a closing bracket ']'
+    for (i, string) in strings_vec.enumerate() {
+        match i {
+            0 => match write!(stream, "[{string}") {
+                Ok(_x) => (),
+                Err(e) => {
+                    log::error!("write_json_string_vec_to_file: {}\n{:?}", write_error, e);
+                    return;
+                }
+            },
+            _ => match write!(stream, ",{string}") {
+                Ok(_x) => (),
+                Err(e) => {
+                    log::error!("write_json_string_vec_to_file: {}\n{:?}", write_error, e);
+                    return;
+                }
+            },
+        }
+    }
+
+    match writeln!(stream, "]") {
+        Ok(_x) => (),
+        Err(e) => {
+            log::error!("write_json_string_vec_to_file: {}\n{:?}", write_error, e);
+            return;
+        }
+    };
 
     match stream.flush() {
         Ok(_x) => (),
         Err(e) => {
-            log::error!("{}\n{:?}", write_error, e);
+            log::error!("write_json_string_vec_to_file: {}\n{:?}", write_error, e);
         }
     };
+}
+
+pub fn options_has_valid_paths(options: &ParserOptions) -> bool {
+    let target_path = &options.target_path;
+    // Guard against invalid path
+    if !target_path.exists() {
+        log::error!(
+            "write_json_string_vec_to_file: Provided path for parsing doesn't exist!\n{}",
+            target_path.display()
+        );
+        return false;
+    }
+    if (options.job == ParsingJob::All
+        || options.job == ParsingJob::SingleModule
+        || options.job == ParsingJob::SingleLocation
+        || options.job == ParsingJob::AllModuleInfoFiles)
+        && target_path.is_file()
+    {
+        log::error!(
+            "write_json_string_vec_to_file: Target path needs to be a directory for parsing {:?}\n{}",
+            options.job,
+            target_path.display()
+        );
+        return false;
+    }
+
+    // Exit early if we aren't writing to a file.
+    if !options.output_to_file {
+        return true;
+    }
+
+    let output_path = &options.output_path;
+    // Guard against invalid path
+    if !target_path.exists() {
+        log::error!(
+            "write_json_string_vec_to_file: Provided path for parsing doesn't exist!\n{}",
+            output_path.display()
+        );
+        return false;
+    }
+    // Output path needs to be a file (always)
+    if !output_path.is_file() {
+        log::error!(
+            "write_json_string_vec_to_file: Output path needs to be a file\n{}",
+            output_path.display()
+        );
+        return false;
+    }
+    true
+}
+
+/// The function `raws_to_string` converts a vector of raw objects into a JSON string representation.
+///
+/// Arguments:
+///
+/// * `raws`: The `raws` parameter is a vector of `Box<dyn RawObject>`.
+///
+/// Returns:
+///
+/// The function `raws_to_string` returns a `String` that represents the input `Vec<Box<dyn RawObject>>`
+/// as a JSON array.
+pub fn raws_to_string(raws: Vec<Box<dyn RawObject>>) -> String {
+    // It should be an array, so start with '[' character,
+    // then add each raw object, separated by a comma.
+    // Finally add the closing ']' character.
+    // (The last item cannot have a comma before ']')
+    let mut json = String::from('[');
+    for raw in raws {
+        json.push_str(serde_json::to_string(&raw).unwrap_or_default().as_str());
+        json.push(',');
+    }
+    json.pop(); // remove trailing comma
+    json.push(']');
+    json
+}
+
+/// The function `get_only_creatures_from_raws` takes a slice of `RawObject` trait objects and returns a
+/// vector containing only the objects that are of type `DFCreature`.
+///
+/// Arguments:
+///
+/// * `all_raws`: A slice of boxed objects that implement the `RawObject` trait.
+///
+/// Returns:
+///
+/// a vector of `DFCreature` objects.
+pub fn get_only_creatures_from_raws(all_raws: &[Box<dyn RawObject>]) -> Vec<Creature> {
+    all_raws
+        .iter()
+        .filter(|r| r.get_type() == &ObjectType::Creature)
+        .map(|r| r.as_any().downcast_ref::<Creature>())
+        .map(|r| r.unwrap_or(&Creature::default()).clone())
+        .collect::<Vec<Creature>>()
+}
+
+/// The function `get_only_select_creatures_from_raws` filters a slice of raw objects and returns a
+/// vector containing only the objects of type `SelectCreature`.
+///
+/// Arguments:
+///
+/// * `all_raws`: A slice of boxed objects that implement the `RawObject` trait.
+///
+/// Returns:
+///
+/// a vector of `SelectCreature` objects.
+pub fn get_only_select_creatures_from_raws(all_raws: &[Box<dyn RawObject>]) -> Vec<SelectCreature> {
+    all_raws
+        .iter()
+        .filter(|r| r.get_type() == &ObjectType::SelectCreature)
+        .map(|r| r.as_any().downcast_ref::<SelectCreature>())
+        .map(|r| r.unwrap_or(&SelectCreature::default()).clone())
+        .collect::<Vec<SelectCreature>>()
 }
