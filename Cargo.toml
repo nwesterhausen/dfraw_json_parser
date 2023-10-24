@@ -1,6 +1,6 @@
 [package]
 name = "dfraw_json_parser"
-version = "0.13.0"
+version = "0.14.0-alpha"
 edition = "2021"
 authors = ["Nicholas Westerhausen <nick@westmail.cc>"]
 description = "Library which parses Dwarf Fortress raw files into JSON"
