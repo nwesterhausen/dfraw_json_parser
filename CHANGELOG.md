@@ -5,7 +5,17 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## v0.13.0 (2023-09-18)
+## v0.13.0 (2023-10-24)
+
+<csr-id-1a1950a5b43bb0474355ce2f7e29a78bdffd081e/>
+<csr-id-c1ff0a07d29ae8213e3070ffc3d78c674f766832/>
+<csr-id-946b03da912a6028cdec964373b0a34f0af55317/>
+<csr-id-5c07ce1c3df8ba57c87d2e4dcae6f808ff49e319/>
+<csr-id-238e76e7008f7a90b2fe10cb2f7122d5b06b2ef4/>
+<csr-id-03501d4430066100dfeac48740851eba34be0f01/>
+<csr-id-891a33a87ab43f793aafc6477e83ce976f9e0a6e/>
+<csr-id-de14e788e06faa5d35092219aabb8b5a4370dd44/>
+<csr-id-7bb7703c8f4ac0c60b6d6f696ac6fe1ea32b1eab/>
 
 ### Changed
 
@@ -18,6 +28,197 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
  - <csr-id-946b03da912a6028cdec964373b0a34f0af55317/> update rust crate clap to 4.3
  - <csr-id-5c07ce1c3df8ba57c87d2e4dcae6f808ff49e319/> update rust crate clap to 4.2
  - <csr-id-238e76e7008f7a90b2fe10cb2f7122d5b06b2ef4/> update rust crate fern to 0.6.2
+
+### Other
+
+ - <csr-id-04e94f04e8e3831bade62a15059a3ed7077b54ec/> Logic Rewrite
+   * refactor: wipe and rewrite all for new engine
+   
+   * refactor: example cli runs. metadata is good but need to rework raw parsing
+   
+   * refactor: continue rewrite
+   
+   * refactor: finish creature parsing rewrite
+   
+   * chore: clear clippy warnings
+   
+   * fix: remove unused dependencies
+   
+   * fix: add missing tags
+   
+   * feat; handle copy_tags_from
+   
+   * fix: with progress response
+   
+   * feat: add rs-ts
+   
+   * refactor: continue rewrite
+   
+   * refactor: continue rewrite
+   
+   * change: use formatting for rs-ts
+   
+   * docs: update readme and remove old type file
+   
+   * feat: add plant_growths
+   
+   * fix: use default pattern for module info file
+   
+   * feat: add options struct for passing options to parser
+   
+   * chore: disable clippy::must_use_candidate
+   
+   * chore: allow clippy::must_use_candidate
+   
+   * feat: plant parsing
+   
+   * fix: remove formatting from rs-ts
+   
+   * feat: add shrub details for plant
+   
+   * feat: add plant seed
+   
+   * feat: handle plant materials
+   
+   * feat: add inorganic parsing
+   
+   * fix: plant raws serializing empties
+   
+   * feat: add temperature and state names
+   
+   * feat: parse material templates
+   
+   * fix: respect parser options
+   
+   * feat: add syndromes
+   
+   * chore: update bindings
+   
+   * chore: add helper script to update bindings
+   
+   * feat: update tauri_lib with new logic
+   
+   * feat: update cli and tauri_lib for new logic
+   
+   * fix: make sure cli works and update examples
+   
+   * chore: update bindings
+   
+   * fix: improve library methods
+   
+   * feat: add first-pass graphics and other utility
+   
+   * fix: graphic parsing includes layers
+   
+   * chore: update bindings
+   
+   * feat: add TilePage parsing
+   
+   * fix: improve graphic parsing
+   
+   * fix: improve graphic parsing
+   
+   * chore: update bindings
+   
+   * ci: update tauri dependencies
+   
+   * ci: update clippy check
+   
+   * ci: fix clippy check
+   
+   * ci: fix formatting
+   
+   * ci: add libsoup-3.0 dependency for tauri dependency soup3
+   
+   * ci: add additional `soup3` dependency
+   
+   * ci: add tauri v2 requirements
+   
+   based on comment https://github.com/tauri-apps/tauri/issues/3701#issuecomment-1499791223
+   
+   * feat(tauri): return objects instead of json string
+   
+   Tauri handles serde serialization automatically.
+   
+   * feat: some changes to help enable + Send + Sync
+   
+   * fix: expose names
+   
+   * fix: expose graphics
+   
+   * ci: add a step to verify type bindings
+   
+   * ci: prettier bindings
+   
+   * feat: parse syndromes and other material properties
+   
+   * fix: remove liquid density
+   
+   * feat: handle more tokens
+   
+   * feat: more tokens
+   
+   * chore: update bindings
+   
+   * feat: implement search string generation
+   
+   * chore: remove boilerplate
+   
+   * feat: expose build_search_string
+   
+   * chore: update bindings
+   
+   * feat: impl Searchable as part of RawObject
+   
+   * feat: expose name on raw object for sorting
+   
+   * fix: page number - 1
+   
+   * fix: less verbose logs
+   
+   * dev: add launch config for debug
+   
+   * fix: correct the parsing logic
+   
+   * chore: update logging messages
+   
+   * fix: caste and creature are together
+   
+   * fix: hopefully final change for creature caste
+   
+   * feat: add entity object
+   
+   * feat: add remaining entity fields and parsing
+   
+   * feat: actually add entity parsing
+   
+   * fix: handle creature tags on entity
+   
+   * fix: add entity to clone raw object box
+   
+   * fix: entity wasn't getting updated
+   
+   * feat: add Position raw under Entity
+   
+   * feat: improved turnaround on non-supported raw files
+   
+   * chore: update bindings
+   
+   * feat: add convenience functions to creature
+   
+   * fix: expose DoesNotExist
+   
+   * feat: expose all tile pages used
+   
+   * fix: check parse_graphics for graphics go-ahead
+   
+   * fix: guard against page number 0
+   
+   * feat: expose location on metadata
+   
+   * chore: set tauri back to stable before merge
+   
+   ---------
 
 ### New Features
 
@@ -33,6 +234,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
  - <csr-id-7b516eabb1630e3e4f51b6c6c3e3151727a010be/> update rust crate log to 0.4.18
  - <csr-id-ff9da26d227f3f792479c5b0d38c60427496531c/> update rust crate tauri to 1.3
  - <csr-id-cf8952ac17ccbe4ab01d0729b01d59327ab56ff6/> update rust crate regex to 1.8
+ - <csr-id-692f5c6069b6ce4b3bf0088b513dae384770d159/> update rust crate regex to 1.10
+ - <csr-id-b44b1dcc83a5cdf200acb88f555041f02eb0b436/> update rust crate tauri to 1.5
+ - <csr-id-45f13d9e74b177f5211b8e9eb259c92458f1ef0a/> include sapling in helper function
 
 ### Other
 
@@ -48,10 +252,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 <csr-read-only-do-not-edit/>
 
- - 19 commits contributed to the release over the course of 222 calendar days.
- - 237 days passed between releases.
- - 19 commits were understood as [conventional](https://www.conventionalcommits.org).
- - 0 issues like '(#ID)' were seen in commit messages
+ - 4 commits contributed to the release over the course of 35 calendar days.
+ - 35 days passed between releases.
+ - 4 commits were understood as [conventional](https://www.conventionalcommits.org).
+ - 1 unique issue was worked on: [#35](https://github.com/nwesterhausen/dfraw_json_parser/issues/35)
 
 ### Commit Details
 
@@ -59,26 +263,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 <details><summary>view details</summary>
 
+ * **[#35](https://github.com/nwesterhausen/dfraw_json_parser/issues/35)**
+    - Logic Rewrite ([`04e94f0`](https://github.com/nwesterhausen/dfraw_json_parser/commit/04e94f04e8e3831bade62a15059a3ed7077b54ec))
  * **Uncategorized**
-    - include sapling sprites ([`fd3d92f`](https://github.com/nwesterhausen/dfraw_json_parser/commit/fd3d92fae81b4a5f855fa9bfd8bcea80cb3cb41d))
-    - include library methods for dynamic return ([`c95096e`](https://github.com/nwesterhausen/dfraw_json_parser/commit/c95096e0e85d7e19fd9bdfa56176729d2eb0b97e))
-    - replace with let .. else ([`891a33a`](https://github.com/nwesterhausen/dfraw_json_parser/commit/891a33a87ab43f793aafc6477e83ce976f9e0a6e))
-    - update actions/checkout action to v4 ([`1a1950a`](https://github.com/nwesterhausen/dfraw_json_parser/commit/1a1950a5b43bb0474355ce2f7e29a78bdffd081e))
-    - 🔥 use serde rename_all camelCase ([`de14e78`](https://github.com/nwesterhausen/dfraw_json_parser/commit/de14e788e06faa5d35092219aabb8b5a4370dd44))
-    - 🔥 removed manual vector slicing ([`7bb7703`](https://github.com/nwesterhausen/dfraw_json_parser/commit/7bb7703c8f4ac0c60b6d6f696ac6fe1ea32b1eab))
-    - update rust crate clap to 4.4 ([`c1ff0a0`](https://github.com/nwesterhausen/dfraw_json_parser/commit/c1ff0a07d29ae8213e3070ffc3d78c674f766832))
-    - update rust crate log to 0.4.20 ([`0bcac7e`](https://github.com/nwesterhausen/dfraw_json_parser/commit/0bcac7e447473577396fa317959b55e3663d3628))
-    - update rust crate regex to 1.9 ([`6c8ab81`](https://github.com/nwesterhausen/dfraw_json_parser/commit/6c8ab8132385f83e447c557dd09626c10b54d976))
-    - update rust crate phf to 0.11.2 ([`080fade`](https://github.com/nwesterhausen/dfraw_json_parser/commit/080fade8efc95aa9b3bb95b7a26fbc046f9d5829))
-    - update rust crate tauri to 1.4 ([`561c955`](https://github.com/nwesterhausen/dfraw_json_parser/commit/561c95598d64e444f4d2803d31533cdc714f2103))
-    - update rust crate log to 0.4.19 ([`f0f9772`](https://github.com/nwesterhausen/dfraw_json_parser/commit/f0f97723d32725d63611fea545bd71b01a7d201a))
-    - update rust crate log to 0.4.18 ([`7b516ea`](https://github.com/nwesterhausen/dfraw_json_parser/commit/7b516eabb1630e3e4f51b6c6c3e3151727a010be))
-    - update rust crate clap to 4.3 ([`946b03d`](https://github.com/nwesterhausen/dfraw_json_parser/commit/946b03da912a6028cdec964373b0a34f0af55317))
-    - update rust crate tauri to 1.3 ([`ff9da26`](https://github.com/nwesterhausen/dfraw_json_parser/commit/ff9da26d227f3f792479c5b0d38c60427496531c))
-    - update rust crate regex to 1.8 ([`cf8952a`](https://github.com/nwesterhausen/dfraw_json_parser/commit/cf8952ac17ccbe4ab01d0729b01d59327ab56ff6))
-    - update rust crate clap to 4.2 ([`5c07ce1`](https://github.com/nwesterhausen/dfraw_json_parser/commit/5c07ce1c3df8ba57c87d2e4dcae6f808ff49e319))
-    - update rust crate fern to 0.6.2 ([`238e76e`](https://github.com/nwesterhausen/dfraw_json_parser/commit/238e76e7008f7a90b2fe10cb2f7122d5b06b2ef4))
-    - proper version tag for clippy-check ([`03501d4`](https://github.com/nwesterhausen/dfraw_json_parser/commit/03501d4430066100dfeac48740851eba34be0f01))
+    - Update rust crate regex to 1.10 ([`692f5c6`](https://github.com/nwesterhausen/dfraw_json_parser/commit/692f5c6069b6ce4b3bf0088b513dae384770d159))
+    - Update rust crate tauri to 1.5 ([`b44b1dc`](https://github.com/nwesterhausen/dfraw_json_parser/commit/b44b1dcc83a5cdf200acb88f555041f02eb0b436))
+    - Include sapling in helper function ([`45f13d9`](https://github.com/nwesterhausen/dfraw_json_parser/commit/45f13d9e74b177f5211b8e9eb259c92458f1ef0a))
 </details>
 
 ## v0.12.0 (2023-01-24)
@@ -110,6 +300,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## v0.11.0 (2023-01-21)
 
 <csr-id-5a2f3fdee7fc81636dda87b67e1c187e29965f7e/>
+<csr-id-edf44ef452e9952e7ebd7e49a09af69e9ffebf4b/>
+
+
 <csr-id-edf44ef452e9952e7ebd7e49a09af69e9ffebf4b/>
 
 ### New Features
@@ -203,6 +396,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 <csr-id-8f246a2cb0410202ea54bd581c45ff48306a6f57/>
 <csr-id-a4ff82d5790c6b3b07676eae32b2fbeadb587643/>
 
+
+<csr-id-9aaabf7317998f58325feccfddb49c0c9d4a531e/>
+<csr-id-3e363ff91a2f87f4be26593c6cfc6e9e37882494/>
+<csr-id-bac89e814c58315b6629755d25f06ec8d24e4ce2/>
+<csr-id-d1a86054f8995bdb12350ab84f8bf1cdfc9e88f5/>
+<csr-id-2f7e6995b52c09be2cc051ba40c0a71b6a67af2f/>
+<csr-id-417a67917caa8b7f5e1c410da56fa76cac33d4e3/>
+<csr-id-74fca046ff2fe3e26df372d4ed481773301d05b9/>
+<csr-id-15d15708f68bb3ff7d7a61c40742e316c985a46f/>
+<csr-id-d5648c59538e93ad0f9c96e5ce9a6a2e33a41740/>
+<csr-id-8f246a2cb0410202ea54bd581c45ff48306a6f57/>
+<csr-id-a4ff82d5790c6b3b07676eae32b2fbeadb587643/>
+
 ### Chore
 
  - <csr-id-d8f6f90df5667470625152ed476b6fa4945de12c/> update rust crate clap to 4.1
@@ -264,13 +470,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
     - Merge branch 'main' into add-items ([`b053d13`](https://github.com/nwesterhausen/dfraw_json_parser/commit/b053d13cafd92edb24df2861f1a0aca1800b24b6))
     - ⚡️ propogate path as ref ([`b53d1a0`](https://github.com/nwesterhausen/dfraw_json_parser/commit/b53d1a008b109833bdd8ca36ab5c4ca7a9106bfd))
     - 📝 improve library documentation ([`7e118c7`](https://github.com/nwesterhausen/dfraw_json_parser/commit/7e118c7fb20f7b84f5d38343b5563276e995b1e5))
-    - update rust crate regex to 1.7 ([`46067f4`](https://github.com/nwesterhausen/dfraw_json_parser/commit/46067f419a8a8d6912f2c626286eafa2f9c9393e))
-    - update rust crate clap to 4.1 ([`d8f6f90`](https://github.com/nwesterhausen/dfraw_json_parser/commit/d8f6f90df5667470625152ed476b6fa4945de12c))
+    - Update rust crate regex to 1.7 ([`46067f4`](https://github.com/nwesterhausen/dfraw_json_parser/commit/46067f419a8a8d6912f2c626286eafa2f9c9393e))
+    - Update rust crate clap to 4.1 ([`d8f6f90`](https://github.com/nwesterhausen/dfraw_json_parser/commit/d8f6f90df5667470625152ed476b6fa4945de12c))
     - 🚀 cherry pick clippy.yml and update renovate config ([`9aaabf7`](https://github.com/nwesterhausen/dfraw_json_parser/commit/9aaabf7317998f58325feccfddb49c0c9d4a531e))
     - ⚙️ empty renovate config ([`3e363ff`](https://github.com/nwesterhausen/dfraw_json_parser/commit/3e363ff91a2f87f4be26593c6cfc6e9e37882494))
     - Create .renovaterc ([`663d101`](https://github.com/nwesterhausen/dfraw_json_parser/commit/663d1018edf7a4287c6b8c7da35062a29f60596f))
-    - update rust crate regex to 1.7 ([`8ea5911`](https://github.com/nwesterhausen/dfraw_json_parser/commit/8ea5911026b8b65f86393dbbac3223678710caaf))
-    - update rust crate clap to 4.1 ([`bac89e8`](https://github.com/nwesterhausen/dfraw_json_parser/commit/bac89e814c58315b6629755d25f06ec8d24e4ce2))
+    - Update rust crate regex to 1.7 ([`8ea5911`](https://github.com/nwesterhausen/dfraw_json_parser/commit/8ea5911026b8b65f86393dbbac3223678710caaf))
+    - Update rust crate clap to 4.1 ([`bac89e8`](https://github.com/nwesterhausen/dfraw_json_parser/commit/bac89e814c58315b6629755d25f06ec8d24e4ce2))
     - 🚀 cherry pick clippy.yml and update renovate config ([`d1a8605`](https://github.com/nwesterhausen/dfraw_json_parser/commit/d1a86054f8995bdb12350ab84f8bf1cdfc9e88f5))
     - ⚙️ empty renovate config ([`2f7e699`](https://github.com/nwesterhausen/dfraw_json_parser/commit/2f7e6995b52c09be2cc051ba40c0a71b6a67af2f))
     - Create .renovaterc ([`a06b323`](https://github.com/nwesterhausen/dfraw_json_parser/commit/a06b3235590f5badf2a1bcdf8f6a06384f454628))
@@ -392,6 +598,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 <csr-id-b5ac4440b1189f0c7ef8fdaeca97d36d334a3100/>
 
+
+
 ### Refactor
 
  - <csr-id-b5ac4440b1189f0c7ef8fdaeca97d36d334a3100/> 🔥 refactor typings for consistency
@@ -419,6 +627,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## v0.8.1 (2023-01-09)
 
 <csr-id-e87e4363aea2a138d7e1deb7c7a47f8c262ef9ff/>
+
+
 
 ### Chore
 
@@ -451,6 +661,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## v0.8.0 (2023-01-09)
 
 <csr-id-77cc03033f66655cfe58e102dbbea9500d91a98b/>
+<csr-id-48d50ad26512c5a35b8c3d136a49da3b4f1cc95b/>
+<csr-id-9669a1cd9d2be7518d989a26fbd4dc656edd4c9b/>
+
+
 <csr-id-48d50ad26512c5a35b8c3d136a49da3b4f1cc95b/>
 <csr-id-9669a1cd9d2be7518d989a26fbd4dc656edd4c9b/>
 
@@ -666,6 +880,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 <csr-id-59e2dff2d583cd8c5c55411688a6c8f4ddcf361a/>
 
 
+<csr-id-5e6dde45b3489ad93660372f654fa637a4379d98/>
+<csr-id-a6f00156cddc9b0c42b5f0a19883d5382c19d160/>
+<csr-id-5a9740e01528680c3f6543673fbd722913ac57c2/>
+<csr-id-7932e59c509f1da93e8f431fbbef9a164de144d1/>
+<csr-id-bb5de4483e6c0b5bfb15a0a5e2defdd067bd6c9d/>
+<csr-id-a8301caede5aa2090b769c05e19a699267e07b07/>
+<csr-id-8d79e7bc493584248b8adbc98ae4f178f517a6a6/>
+<csr-id-59e2dff2d583cd8c5c55411688a6c8f4ddcf361a/>
+
+
 <csr-id-a8301caede5aa2090b769c05e19a699267e07b07/>
 <csr-id-8d79e7bc493584248b8adbc98ae4f178f517a6a6/>
 <csr-id-59e2dff2d583cd8c5c55411688a6c8f4ddcf361a/>
@@ -754,6 +978,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 <csr-id-373da1570664724774cddd13d34ae50c05a47dd8/>
 
+
+
 ### Chore
 
  - <csr-id-373da1570664724774cddd13d34ae50c05a47dd8/> 🔖 bump version
@@ -797,6 +1023,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 <csr-id-0c7aebb62c9b8cae212207bddcae6edbece83995/>
 
+
+
 ### Chore
 
  - <csr-id-0c7aebb62c9b8cae212207bddcae6edbece83995/> ⬆️ update dependencies
@@ -833,7 +1061,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
  * **Uncategorized**
     - Merge pull request #6 from nwesterhausen/nwesterhausen/issue5 ([`116e5fe`](https://github.com/nwesterhausen/dfraw_json_parser/commit/116e5fe8872c2e2d4e6e46f579dd27ddab38f866))
-    - support DF 50.xx Fixes #5 ([`1b1eafa`](https://github.com/nwesterhausen/dfraw_json_parser/commit/1b1eafa8dec31e412e03d6a5f6270e49fde4e61b))
+    - Support DF 50.xx Fixes #5 ([`1b1eafa`](https://github.com/nwesterhausen/dfraw_json_parser/commit/1b1eafa8dec31e412e03d6a5f6270e49fde4e61b))
     - ⬆️ update dependencies ([`0c7aebb`](https://github.com/nwesterhausen/dfraw_json_parser/commit/0c7aebb62c9b8cae212207bddcae6edbece83995))
     - 🔥 don't check in Cargo.lock ([`c8dba22`](https://github.com/nwesterhausen/dfraw_json_parser/commit/c8dba2275374c1cbff53b285388b00cb79dfb844))
     - 📝 update rustdoc ([`bd06df5`](https://github.com/nwesterhausen/dfraw_json_parser/commit/bd06df53aef97bd7a7e44276f707a58d52387541))
@@ -842,9 +1070,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
     - 🐛 fix type definition ([`b47b6f3`](https://github.com/nwesterhausen/dfraw_json_parser/commit/b47b6f3e60c84d3af03ee84444c85b84c14b6112))
     - ✨ improve library-ness, bump to 0.2.0 ([`4182217`](https://github.com/nwesterhausen/dfraw_json_parser/commit/41822170b73e9b26df9561789791945f6658db40))
     - ✨ update from other project, make library ([`5698147`](https://github.com/nwesterhausen/dfraw_json_parser/commit/5698147910b87f039fe755f46af7111f384b8e38))
-    - remove powershell runner and test raws ([`eb80888`](https://github.com/nwesterhausen/dfraw_json_parser/commit/eb808885c62180480f5c3f0f30aa2ba4354de33b))
+    - Remove powershell runner and test raws ([`eb80888`](https://github.com/nwesterhausen/dfraw_json_parser/commit/eb808885c62180480f5c3f0f30aa2ba4354de33b))
     - Update Cargo.toml ([`3005293`](https://github.com/nwesterhausen/dfraw_json_parser/commit/30052931cc877fca0bada03d87a3bde24f8ae2b4))
-    - format cargo.toml ([`9d5b6ef`](https://github.com/nwesterhausen/dfraw_json_parser/commit/9d5b6ef1422634ed300038eb8a6c9b6f5aaac374))
+    - Format cargo.toml ([`9d5b6ef`](https://github.com/nwesterhausen/dfraw_json_parser/commit/9d5b6ef1422634ed300038eb8a6c9b6f5aaac374))
 </details>
 
 ## v0.1.1 (2022-01-18)
@@ -866,17 +1094,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
  * **Uncategorized**
     - Merge pull request #2 from nwesterhausen/creature-improvements ([`d0f1b5e`](https://github.com/nwesterhausen/dfraw_json_parser/commit/d0f1b5e586045b06049cf64f95d49a88d8f56e19))
-    - cargo fmt ([`ceac5e5`](https://github.com/nwesterhausen/dfraw_json_parser/commit/ceac5e58fcc84ef6417d050d597b1a73ec899bce))
-    - do more heavy lifting in rust program ([`a146143`](https://github.com/nwesterhausen/dfraw_json_parser/commit/a146143e0c2fa254f4f592d6b6cd66349782860a))
-    - cargo fmt ([`e63ebe1`](https://github.com/nwesterhausen/dfraw_json_parser/commit/e63ebe1cd82f1f7d618aa5b56811397f8adbde3c))
-    - fix milkable parsing ([`b102c4f`](https://github.com/nwesterhausen/dfraw_json_parser/commit/b102c4f91625dc3d1de067fa11c0af28a88de130))
-    - added tokens to match statement ([`695f7a6`](https://github.com/nwesterhausen/dfraw_json_parser/commit/695f7a64290451d50b77fc79f7f3aa051634a445))
-    - rewrite creature raw struct ([`2b43dfe`](https://github.com/nwesterhausen/dfraw_json_parser/commit/2b43dfe73c441dc8ea074f076054c89ded21f626))
-    - decouple string conversion from reader ([`cd6ae5c`](https://github.com/nwesterhausen/dfraw_json_parser/commit/cd6ae5ce96b1d568131ee816a23f7a4a386cc252))
-    - play with building modal ala dfwiki ([`ef58bbe`](https://github.com/nwesterhausen/dfraw_json_parser/commit/ef58bbe70c5e510b25df5a42b45379a26bce21be))
-    - improve results display ([`88e4600`](https://github.com/nwesterhausen/dfraw_json_parser/commit/88e460038c410269a40d2ecb3d4b5e2cb936fe1c))
-    - abstract names ([`69c29c0`](https://github.com/nwesterhausen/dfraw_json_parser/commit/69c29c0ac70ba58d32c5654ab3c2464a2ec821ef))
-    - remove print messages ([`78125b1`](https://github.com/nwesterhausen/dfraw_json_parser/commit/78125b128be9351848f5a084b22b4f740ddb3b8c))
+    - Cargo fmt ([`ceac5e5`](https://github.com/nwesterhausen/dfraw_json_parser/commit/ceac5e58fcc84ef6417d050d597b1a73ec899bce))
+    - Do more heavy lifting in rust program ([`a146143`](https://github.com/nwesterhausen/dfraw_json_parser/commit/a146143e0c2fa254f4f592d6b6cd66349782860a))
+    - Cargo fmt ([`e63ebe1`](https://github.com/nwesterhausen/dfraw_json_parser/commit/e63ebe1cd82f1f7d618aa5b56811397f8adbde3c))
+    - Fix milkable parsing ([`b102c4f`](https://github.com/nwesterhausen/dfraw_json_parser/commit/b102c4f91625dc3d1de067fa11c0af28a88de130))
+    - Added tokens to match statement ([`695f7a6`](https://github.com/nwesterhausen/dfraw_json_parser/commit/695f7a64290451d50b77fc79f7f3aa051634a445))
+    - Rewrite creature raw struct ([`2b43dfe`](https://github.com/nwesterhausen/dfraw_json_parser/commit/2b43dfe73c441dc8ea074f076054c89ded21f626))
+    - Decouple string conversion from reader ([`cd6ae5c`](https://github.com/nwesterhausen/dfraw_json_parser/commit/cd6ae5ce96b1d568131ee816a23f7a4a386cc252))
+    - Play with building modal ala dfwiki ([`ef58bbe`](https://github.com/nwesterhausen/dfraw_json_parser/commit/ef58bbe70c5e510b25df5a42b45379a26bce21be))
+    - Improve results display ([`88e4600`](https://github.com/nwesterhausen/dfraw_json_parser/commit/88e460038c410269a40d2ecb3d4b5e2cb936fe1c))
+    - Abstract names ([`69c29c0`](https://github.com/nwesterhausen/dfraw_json_parser/commit/69c29c0ac70ba58d32c5654ab3c2464a2ec821ef))
+    - Remove print messages ([`78125b1`](https://github.com/nwesterhausen/dfraw_json_parser/commit/78125b128be9351848f5a084b22b4f740ddb3b8c))
 </details>
 
 ## v0.1.0 (2022-01-11)
@@ -896,32 +1124,32 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 <details><summary>view details</summary>
 
  * **Uncategorized**
-    - cargo fmt ([`773599d`](https://github.com/nwesterhausen/dfraw_json_parser/commit/773599d4fa25f90b0d609d380bee85a6acc3083a))
+    - Cargo fmt ([`773599d`](https://github.com/nwesterhausen/dfraw_json_parser/commit/773599d4fa25f90b0d609d380bee85a6acc3083a))
     - Update README.md ([`8a329a8`](https://github.com/nwesterhausen/dfraw_json_parser/commit/8a329a8bed1194d9d1841de1df09dc5a55f45f9a))
-    - remove 'NOT IMPLEMENTED' message ([`c0649c4`](https://github.com/nwesterhausen/dfraw_json_parser/commit/c0649c456c02b2ee266cdeaec86ae45ada25f7e7))
-    - add web server ([`0026ce6`](https://github.com/nwesterhausen/dfraw_json_parser/commit/0026ce66f1bb92fe2b7e9575f135ed180d341242))
-    - add args for web server and port ([`57ca9b6`](https://github.com/nwesterhausen/dfraw_json_parser/commit/57ca9b6ea66b1c533287068c202b9c0998db6fc4))
-    - remove perl script from repo ([`042c5a2`](https://github.com/nwesterhausen/dfraw_json_parser/commit/042c5a2b2ed94e346b49148797c05c529886bb72))
-    - move parser to module ([`cfe7bad`](https://github.com/nwesterhausen/dfraw_json_parser/commit/cfe7bad8daca8112f73aff50356ff7f5d8513d43))
+    - Remove 'NOT IMPLEMENTED' message ([`c0649c4`](https://github.com/nwesterhausen/dfraw_json_parser/commit/c0649c456c02b2ee266cdeaec86ae45ada25f7e7))
+    - Add web server ([`0026ce6`](https://github.com/nwesterhausen/dfraw_json_parser/commit/0026ce66f1bb92fe2b7e9575f135ed180d341242))
+    - Add args for web server and port ([`57ca9b6`](https://github.com/nwesterhausen/dfraw_json_parser/commit/57ca9b6ea66b1c533287068c202b9c0998db6fc4))
+    - Remove perl script from repo ([`042c5a2`](https://github.com/nwesterhausen/dfraw_json_parser/commit/042c5a2b2ed94e346b49148797c05c529886bb72))
+    - Move parser to module ([`cfe7bad`](https://github.com/nwesterhausen/dfraw_json_parser/commit/cfe7bad8daca8112f73aff50356ff7f5d8513d43))
     - Merge pull request #1 from nwesterhausen/rust-conv ([`36e47b8`](https://github.com/nwesterhausen/dfraw_json_parser/commit/36e47b84bc23d2b2cd073adbf3154f91392ed355))
-    - add long_help for arguments ([`244985a`](https://github.com/nwesterhausen/dfraw_json_parser/commit/244985a3e8b06cb1de62d6efe9dddc928d17f8e8))
-    - remove enumeration ([`e85c4ad`](https://github.com/nwesterhausen/dfraw_json_parser/commit/e85c4adb3f451bc2472bd47d33ddaab865271851))
-    - working ([`7e120e3`](https://github.com/nwesterhausen/dfraw_json_parser/commit/7e120e33711e95aa9397d1b00c3c20536c6779fa))
-    - handle directory globbing inside rust ([`474831c`](https://github.com/nwesterhausen/dfraw_json_parser/commit/474831c8d3253c1accac591f56ad98b6cda474a3))
-    - raws_dir optional, and not specified means no parsing ([`eba5318`](https://github.com/nwesterhausen/dfraw_json_parser/commit/eba5318a3898bcaabadfa0fdff858adb6183966e))
-    - add argument parser clap and walkdir ([`1f5747b`](https://github.com/nwesterhausen/dfraw_json_parser/commit/1f5747bd581deb51d98623304daa54d54b026602))
-    - update readme with rust info ([`65d3a27`](https://github.com/nwesterhausen/dfraw_json_parser/commit/65d3a278540740e98d38355aec20807600e33c07))
-    - improve readability ([`5c72c99`](https://github.com/nwesterhausen/dfraw_json_parser/commit/5c72c99286e55b0de4a7cadb1a24867065016f5f))
-    - comment html code and spread out javascript ([`46d08f0`](https://github.com/nwesterhausen/dfraw_json_parser/commit/46d08f0c3c9d7be886dd99a1619d15f81a2b7900))
-    - fix warning about snake_case ([`65bfc11`](https://github.com/nwesterhausen/dfraw_json_parser/commit/65bfc11b86508f8123f8e56f5e5cf84606deaa2b))
-    - change web directory to www ([`6b78592`](https://github.com/nwesterhausen/dfraw_json_parser/commit/6b785921ac44ea8dc89ec5ecd3fb831ab11b3295))
-    - add webpage which lets you search the out.json file ([`122772a`](https://github.com/nwesterhausen/dfraw_json_parser/commit/122772ac559e87b3ae20681569a2c85ca22cc99e))
-    - keep track of when we reach the final file and don't put a comma ([`8849753`](https://github.com/nwesterhausen/dfraw_json_parser/commit/884975378bdab366ba8c595ac9af044b06e209f3))
-    - df raw files are ASCII, decode as such ([`e03da5c`](https://github.com/nwesterhausen/dfraw_json_parser/commit/e03da5c3deb3947f2d1ec059ff3851490cf2e659))
-    - semi-working rust impl ([`456e614`](https://github.com/nwesterhausen/dfraw_json_parser/commit/456e614d542587bcb0801c256de0bf16a7d3527b))
-    - redone in perl with powershell runner ([`942e6e3`](https://github.com/nwesterhausen/dfraw_json_parser/commit/942e6e360e3c1813002a716c0e776ae1b2517f9c))
-    - rewrite to perl ([`234e503`](https://github.com/nwesterhausen/dfraw_json_parser/commit/234e50385c4490e0dd024265807a6a568a155a46))
-    - ditonal changes -- now not working properly ([`b52aaa4`](https://github.com/nwesterhausen/dfraw_json_parser/commit/b52aaa48b626ffd46d16a556ba64061bd07c783b))
-    - initial commit ([`abb1950`](https://github.com/nwesterhausen/dfraw_json_parser/commit/abb1950f4ab12e53b87f54b8c8cc1f122d0cee9a))
+    - Add long_help for arguments ([`244985a`](https://github.com/nwesterhausen/dfraw_json_parser/commit/244985a3e8b06cb1de62d6efe9dddc928d17f8e8))
+    - Remove enumeration ([`e85c4ad`](https://github.com/nwesterhausen/dfraw_json_parser/commit/e85c4adb3f451bc2472bd47d33ddaab865271851))
+    - Working ([`7e120e3`](https://github.com/nwesterhausen/dfraw_json_parser/commit/7e120e33711e95aa9397d1b00c3c20536c6779fa))
+    - Handle directory globbing inside rust ([`474831c`](https://github.com/nwesterhausen/dfraw_json_parser/commit/474831c8d3253c1accac591f56ad98b6cda474a3))
+    - Raws_dir optional, and not specified means no parsing ([`eba5318`](https://github.com/nwesterhausen/dfraw_json_parser/commit/eba5318a3898bcaabadfa0fdff858adb6183966e))
+    - Add argument parser clap and walkdir ([`1f5747b`](https://github.com/nwesterhausen/dfraw_json_parser/commit/1f5747bd581deb51d98623304daa54d54b026602))
+    - Update readme with rust info ([`65d3a27`](https://github.com/nwesterhausen/dfraw_json_parser/commit/65d3a278540740e98d38355aec20807600e33c07))
+    - Improve readability ([`5c72c99`](https://github.com/nwesterhausen/dfraw_json_parser/commit/5c72c99286e55b0de4a7cadb1a24867065016f5f))
+    - Comment html code and spread out javascript ([`46d08f0`](https://github.com/nwesterhausen/dfraw_json_parser/commit/46d08f0c3c9d7be886dd99a1619d15f81a2b7900))
+    - Fix warning about snake_case ([`65bfc11`](https://github.com/nwesterhausen/dfraw_json_parser/commit/65bfc11b86508f8123f8e56f5e5cf84606deaa2b))
+    - Change web directory to www ([`6b78592`](https://github.com/nwesterhausen/dfraw_json_parser/commit/6b785921ac44ea8dc89ec5ecd3fb831ab11b3295))
+    - Add webpage which lets you search the out.json file ([`122772a`](https://github.com/nwesterhausen/dfraw_json_parser/commit/122772ac559e87b3ae20681569a2c85ca22cc99e))
+    - Keep track of when we reach the final file and don't put a comma ([`8849753`](https://github.com/nwesterhausen/dfraw_json_parser/commit/884975378bdab366ba8c595ac9af044b06e209f3))
+    - Df raw files are ASCII, decode as such ([`e03da5c`](https://github.com/nwesterhausen/dfraw_json_parser/commit/e03da5c3deb3947f2d1ec059ff3851490cf2e659))
+    - Semi-working rust impl ([`456e614`](https://github.com/nwesterhausen/dfraw_json_parser/commit/456e614d542587bcb0801c256de0bf16a7d3527b))
+    - Redone in perl with powershell runner ([`942e6e3`](https://github.com/nwesterhausen/dfraw_json_parser/commit/942e6e360e3c1813002a716c0e776ae1b2517f9c))
+    - Rewrite to perl ([`234e503`](https://github.com/nwesterhausen/dfraw_json_parser/commit/234e50385c4490e0dd024265807a6a568a155a46))
+    - Ditonal changes -- now not working properly ([`b52aaa4`](https://github.com/nwesterhausen/dfraw_json_parser/commit/b52aaa48b626ffd46d16a556ba64061bd07c783b))
+    - Initial commit ([`abb1950`](https://github.com/nwesterhausen/dfraw_json_parser/commit/abb1950f4ab12e53b87f54b8c8cc1f122d0cee9a))
 </details>
 
