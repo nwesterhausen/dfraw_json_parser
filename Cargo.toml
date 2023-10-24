@@ -32,7 +32,8 @@ slug = "0.1"
 typetag = "0.2"
 walkdir = "2"
 # Tauri feature dependency needs tauri lib
-tauri = { version = "2.0.0-alpha", optional = true }
+# tauri = { version = "2.0.0-alpha", optional = true }
+tauri = { version = "1.5.2", optional = true }
 
 [dependencies.phf]
 version = "0.11.2"
