@@ -2,6 +2,7 @@ use serde::{Deserialize, Serialize};
 use slug::slugify;
 
 use crate::parser::{
+    biome::{phf_map::BIOME_TOKENS, tokens::Biome},
     material::{
         phf_table::{MATERIAL_PROPERTY_TOKENS, MATERIAL_USAGE_TOKENS},
         raw::Material,
@@ -51,7 +52,7 @@ pub struct Plant {
     frequency: u16,
     /// List of biomes this plant can grow in
     #[serde(skip_serializing_if = "Vec::is_empty")]
-    biomes: Vec<String>,
+    biomes: Vec<Biome>,
 
     /// Growth Tokens define the growths of the plant (leaves, fruit, etc.)
     #[serde(skip_serializing_if = "Vec::is_empty")]
@@ -191,7 +192,14 @@ impl RawObject for Plant {
                 self.pref_strings.push(String::from(value));
             }
             PlantTag::Biome => {
-                self.biomes.push(String::from(value));
+                let Some(biome) = BIOME_TOKENS.get(value) else {
+                    log::warn!(
+                        "PlantParsing: called `Option::unwrap()` on a `None` value for presumed biome: {}",
+                        value
+                    );
+                    return;
+                };
+                self.biomes.push(biome.clone());
             }
             PlantTag::UndergroundDepth => {
                 self.underground_depth = parse_min_max_range(value).unwrap_or([0, 0]);
@@ -232,7 +240,12 @@ impl Searchable for Plant {
         vec.push(self.get_identifier().to_string());
         vec.extend(self.name.as_vec());
         vec.extend(self.pref_strings.clone());
-        vec.extend(self.biomes.clone());
+        vec.extend(
+            self.biomes
+                .clone()
+                .iter()
+                .map(std::string::ToString::to_string),
+        );
         vec.extend(self.tags.iter().map(|tag| format!("{tag:?}")));
         vec.extend(
             self.growths
