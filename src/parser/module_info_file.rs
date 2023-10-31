@@ -162,7 +162,16 @@ impl ModuleInfoFile {
                             let digits_only =
                                 NON_DIGIT_RE.replace_all(captured_value, "").to_string();
                             match digits_only.parse() {
-                                Ok(n) => info_file_data.numeric_version = n,
+                                Ok(n) => {
+                                    info_file_data.numeric_version = n;
+                                    info_file_data.object_id = format!(
+                                        "{}-{}-{}-{}",
+                                        info_file_data.location,
+                                        "MODULE",
+                                        slugify(info_file_data.identifier.as_str()),
+                                        n
+                                    );
+                                }
                                 Err(_e) => {
                                     log::debug!(
                                         "{} - Unable to parse any numbers from {} for NUMERIC_VERSION",
