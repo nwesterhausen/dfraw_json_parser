@@ -1,12 +1,18 @@
 use serde::{Deserialize, Serialize};
-use tracing::{debug, trace, warn};
 
 use crate::parser::{
-    biome, clean_search_vec, creature_caste::Caste, creature_caste::TOKEN_MAP as CASTE_TOKENS,
-    creature_variation::Requirements as CreatureVariationRequirements,
-    helpers::build_object_id_from_pieces, helpers::parse_min_max_range, object_types::ObjectType,
-    select_creature::SelectCreature, serializer_helper, Name, RawMetadata, RawObject, Searchable,
-    SingPlurName, Tile,
+    biome::{phf_map::BIOME_TOKENS, tokens::Biome},
+    creature_caste::{phf_table::CASTE_TOKENS, raw::Caste},
+    creature_variation::raw::CreatureVariationRequirements,
+    helpers::object_id::build_object_id_from_pieces,
+    names::{Name, SingPlurName},
+    object_types::ObjectType,
+    ranges::parse_min_max_range,
+    raws::{RawMetadata, RawObject},
+    searchable::{clean_search_vec, Searchable},
+    select_creature::raw::SelectCreature,
+    serializer_helper,
+    tile::Tile,
 };
 
 use super::{phf_table::CREATURE_TOKENS, tokens::CreatureTag};
@@ -33,7 +39,7 @@ pub struct Creature {
     #[serde(skip_serializing_if = "Vec::is_empty")]
     tags: Vec<CreatureTag>,
     #[serde(skip_serializing_if = "Vec::is_empty")]
-    biomes: Vec<biome::Token>,
+    biomes: Vec<Biome>,
     #[serde(skip_serializing_if = "Vec::is_empty")]
     pref_strings: Vec<String>,
     #[serde(skip_serializing_if = "Tile::is_default")]
@@ -318,88 +324,6 @@ impl Creature {
     pub fn does_not_exist(&self) -> bool {
         self.tags.contains(&CreatureTag::DoesNotExist)
     }
-    pub fn get_biomes(&self) -> Vec<biome::Token> {
-        self.biomes.clone()
-    }
-
-    pub fn set_name(&mut self, name: Name) {
-        self.name = name;
-    }
-    pub fn parse_tags_from_xml(&mut self, xml_tags: &[String]) {
-        for tag in xml_tags {
-            if tag.contains("has_male") {
-                self.add_caste("MALE");
-            } else if tag.contains("has_female") {
-                self.add_caste("FEMALE");
-            } else if tag.starts_with("biome_") {
-                // Parse the biome from "biome_pool_temperate_freshwater" or "biome_savanna_temperate"
-                let biome = tag
-                    .split('_')
-                    .skip(1)
-                    .collect::<Vec<&str>>()
-                    .join("_")
-                    .to_uppercase();
-                if let Some(biome) = biome::TOKEN_MAP.get(&biome) {
-                    self.biomes.push(biome.clone());
-                } else {
-                    warn!(
-                        "Creature::parse_tags_from_xml: ({}) Unknown biome '{}'",
-                        self.identifier, biome
-                    );
-                }
-            } else if tag.starts_with("has_any_") {
-                // Remove the "has_any_" prefix and parse the caste tag
-                let mut caste_tag = tag
-                    .split('_')
-                    .skip(2)
-                    .collect::<Vec<&str>>()
-                    .join("_")
-                    .to_uppercase();
-                // Handle some edge cases
-                if caste_tag.ends_with("INTELLIGENT_LEARNS") {
-                    caste_tag = String::from("CAN_LEARN");
-                } else if caste_tag.ends_with("INTELLIGENT_SPEAKS") {
-                    caste_tag = String::from("CAN_SPEAK");
-                } else if caste_tag.ends_with("CAN_SWIM") {
-                    caste_tag = String::from("SWIMS_INNATE");
-                } else if caste_tag.ends_with("FLY_RACE_GAIT") {
-                    caste_tag = String::from("FLIER");
-                }
-                // Parse the tag
-                if let Some(_caste_tag) = CASTE_TOKENS.get(&caste_tag) {
-                    self.select_caste("ALL");
-                    if let Some(caste) = self.castes.last_mut() {
-                        caste.parse_tag(caste_tag.as_str(), "");
-                    } else {
-                        debug!(
-                            "Creature::parse_tags_from_xml: ({}) No castes found to apply tag {}",
-                            self.identifier, caste_tag
-                        );
-                    }
-                } else {
-                    // Try parsing the tag as a creature tag
-                    if let Some(tag) = CREATURE_TOKENS.get(&caste_tag) {
-                        self.tags.push(tag.clone());
-                    } else {
-                        warn!(
-                            "Creature::parse_tags_from_xml: ({}) Unknown tag {}",
-                            self.identifier, caste_tag
-                        );
-                    }
-                }
-            } else {
-                // Try to parse the tag
-                if let Some(tag) = CREATURE_TOKENS.get(&tag.to_uppercase()) {
-                    self.tags.push(tag.clone());
-                } else {
-                    warn!(
-                        "Creature::parse_tags_from_xml: ({}) Unknown tag {}",
-                        self.identifier, tag
-                    );
-                }
-            }
-        }
-    }
 }
 
 #[typetag::serde]
@@ -425,12 +349,12 @@ impl RawObject for Creature {
             return;
         }
         if !CREATURE_TOKENS.contains_key(key) {
-            trace!("CreatureParsing: Unknown tag {} with value {}", key, value);
+            log::trace!("CreatureParsing: Unknown tag {} with value {}", key, value);
             return;
         }
 
         let Some(tag) = CREATURE_TOKENS.get(key) else {
-            warn!(
+            log::warn!(
                 "Creature::parse_tag: called `Option::unwrap()` on a `None` value for presumed creature tag: {}",
                 key
             );
@@ -439,8 +363,8 @@ impl RawObject for Creature {
 
         match tag {
             CreatureTag::Biome => {
-                let Some(biome) = biome::TOKEN_MAP.get(value) else {
-                    warn!(
+                let Some(biome) = BIOME_TOKENS.get(value) else {
+                    log::warn!(
                         "CreatureParsing: called `Option::unwrap()` on a `None` value for presumed biome: {}",
                         value
                     );
@@ -518,12 +442,12 @@ impl CreatureVariationRequirements for Creature {
             return;
         }
         if !CREATURE_TOKENS.contains_key(key) {
-            debug!("CreatureParsing: Unknown tag {} with value {}", key, value);
+            log::debug!("CreatureParsing: Unknown tag {} with value {}", key, value);
             return;
         }
 
         let Some(tag) = CREATURE_TOKENS.get(key) else {
-            warn!(
+            log::warn!(
                 "CreatureParsing: called `Option::unwrap()` on a `None` value for presumed creature tag: {}",
                 key
             );
@@ -532,8 +456,8 @@ impl CreatureVariationRequirements for Creature {
 
         match tag {
             CreatureTag::Biome => {
-                let Some(biome) = biome::TOKEN_MAP.get(value) else {
-                    warn!(
+                let Some(biome) = BIOME_TOKENS.get(value) else {
+                    log::warn!(
                         "CreatureParsing: called `Option::unwrap()` on a `None` value for presumed biome: {}",
                         value
                     );
