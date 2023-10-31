@@ -89,6 +89,9 @@ impl Plant {
             ..Plant::default()
         }
     }
+    pub fn get_biomes(&self) -> Vec<Biome> {
+        self.biomes.clone()
+    }
 }
 
 #[typetag::serde]
