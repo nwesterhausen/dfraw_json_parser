@@ -97,6 +97,8 @@ pub struct RawMetadata {
     // The location of the owning raw module
     // i.e. installed_mods, mods, or vanilla
     raw_module_location: RawModuleLocation,
+    // The object ID of the raw
+    module_object_id: String,
     // Optionally hide or unhide from exporting
     // By default will be hidden
     #[serde(skip)]
@@ -119,6 +121,7 @@ impl RawMetadata {
             object_type: object_type.clone(),
             raw_module_location: module_info.get_location(),
             hidden: !attach_metadata_to_raws,
+            module_object_id: module_info.get_object_id(),
         }
     }
     /// (Hidden from export) Used only for serialization
@@ -140,6 +143,10 @@ impl RawMetadata {
     /// Get the (string) version of the module the raw is from.
     pub fn get_module_version(&self) -> &str {
         &self.module_version
+    }
+    /// Get the object identifier of the raw module the raw is from.
+    pub fn get_module_object_id(&self) -> &str {
+        &self.module_object_id
     }
     /// Get the full path to the raw file the raw is from.
     pub fn get_raw_file_path(&self) -> &str {
