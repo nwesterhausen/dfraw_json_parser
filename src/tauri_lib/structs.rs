@@ -1,4 +1,7 @@
 #[cfg(feature = "tauri")]
+use crate::tauri_lib::tauri::Manager;
+
+#[cfg(feature = "tauri")]
 #[derive(Clone, serde::Serialize)]
 #[serde(rename_all = "camelCase")]
 #[derive(ts_rs::TS)]
