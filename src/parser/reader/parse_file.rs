@@ -84,6 +84,15 @@ pub fn parse_raw_file_with_info<P: AsRef<Path>>(
         options.attach_metadata_to_raws,
     );
 
+    // If we aren't supposed to parse this type, we should quit here
+    if !options.raws_to_parse.contains(&&object_type) {
+        log::debug!(
+            "parse_raw_file_with_info: Quitting early because object type {:?} is not included in options!",
+            object_type
+        );
+        return created_raws;
+    }
+
     // If the type of object is not in our known_list, we should quit here
     if !PARSABLE_OBJECT_TYPES.contains(&&object_type) {
         log::debug!(
