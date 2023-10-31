@@ -1,5 +1,5 @@
 #[cfg(feature = "tauri")]
-use crate::tauri_lib::tauri::Manager;
+use tauri::Manager;
 
 #[cfg(feature = "tauri")]
 #[derive(Clone, serde::Serialize)]
