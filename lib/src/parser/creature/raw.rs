@@ -324,6 +324,9 @@ impl Creature {
     pub fn does_not_exist(&self) -> bool {
         self.tags.contains(&CreatureTag::DoesNotExist)
     }
+    pub fn get_biomes(&self) -> Vec<Biome> {
+        self.biomes.clone()
+    }
 }
 
 #[typetag::serde]
