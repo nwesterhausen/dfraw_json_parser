@@ -7,6 +7,9 @@ mod structs;
 mod with_progress;
 
 #[cfg(feature = "tauri")]
+pub use structs::ProgressPayload;
+
+#[cfg(feature = "tauri")]
 /// Parse a directory of raws, and return a JSON string of the parsed raws. While parsing, this will
 /// emit tauri events to the supplied window. The event is titled `PROGRESS` and it uses the `ProgressPayload`
 /// payload for the payload.

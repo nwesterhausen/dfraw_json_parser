@@ -1,4 +1,7 @@
 #[cfg(feature = "tauri")]
+use tauri::Manager;
+
+#[cfg(feature = "tauri")]
 #[derive(Clone, serde::Serialize)]
 #[serde(rename_all = "camelCase")]
 #[derive(ts_rs::TS)]
@@ -10,12 +13,12 @@
 /// * `percentage`: The percentage of completed steps out of total steps.
 /// * `current_module`: The name of the module that is currently being processed.
 pub struct ProgressPayload {
-    current_task: String,
-    percentage: f64,
-    current_module: String,
-    current_file: String,
-    current_location: String,
-    running_total: usize,
+    pub current_task: String,
+    pub percentage: f64,
+    pub current_module: String,
+    pub current_file: String,
+    pub current_location: String,
+    pub running_total: usize,
 }
 
 #[cfg(feature = "tauri")]

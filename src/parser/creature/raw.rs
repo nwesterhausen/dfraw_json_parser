@@ -1,7 +1,7 @@
 use serde::{Deserialize, Serialize};
 
 use crate::parser::{
-    biomes::BIOMES,
+    biome::{phf_map::BIOME_TOKENS, tokens::Biome},
     creature_caste::{phf_table::CASTE_TOKENS, raw::Caste},
     creature_variation::raw::CreatureVariationRequirements,
     helpers::object_id::build_object_id_from_pieces,
@@ -39,7 +39,7 @@ pub struct Creature {
     #[serde(skip_serializing_if = "Vec::is_empty")]
     tags: Vec<CreatureTag>,
     #[serde(skip_serializing_if = "Vec::is_empty")]
-    biomes: Vec<String>,
+    biomes: Vec<Biome>,
     #[serde(skip_serializing_if = "Vec::is_empty")]
     pref_strings: Vec<String>,
     #[serde(skip_serializing_if = "Tile::is_default")]
@@ -324,6 +324,9 @@ impl Creature {
     pub fn does_not_exist(&self) -> bool {
         self.tags.contains(&CreatureTag::DoesNotExist)
     }
+    pub fn get_biomes(&self) -> Vec<Biome> {
+        self.biomes.clone()
+    }
 }
 
 #[typetag::serde]
@@ -363,7 +366,14 @@ impl RawObject for Creature {
 
         match tag {
             CreatureTag::Biome => {
-                self.biomes.push(String::from(value));
+                let Some(biome) = BIOME_TOKENS.get(value) else {
+                    log::warn!(
+                        "CreatureParsing: called `Option::unwrap()` on a `None` value for presumed biome: {}",
+                        value
+                    );
+                    return;
+                };
+                self.biomes.push(biome.clone());
             }
             CreatureTag::Name => {
                 self.name = Name::from_value(value);
@@ -449,7 +459,14 @@ impl CreatureVariationRequirements for Creature {
 
         match tag {
             CreatureTag::Biome => {
-                self.biomes.retain(|x| x != value);
+                let Some(biome) = BIOME_TOKENS.get(value) else {
+                    log::warn!(
+                        "CreatureParsing: called `Option::unwrap()` on a `None` value for presumed biome: {}",
+                        value
+                    );
+                    return;
+                };
+                self.biomes.retain(|x| x != biome);
             }
             CreatureTag::Name => {
                 self.name = Name::default();
@@ -544,9 +561,7 @@ impl Searchable for Creature {
         }
         // Add biomes
         for biome in &self.biomes {
-            if let Some(biome_str) = BIOMES.get(biome) {
-                vec.push((*biome_str).to_string());
-            }
+            vec.push(biome.to_string());
         }
         // Add pref strings
         vec.extend(self.pref_strings.clone());

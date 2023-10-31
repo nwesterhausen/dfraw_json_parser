@@ -2,7 +2,7 @@ use std::path::Path;
 
 use crate::{options::ParserOptions, parser::module_info_file::ModuleInfoFile};
 
-pub mod biomes;
+pub mod biome;
 pub mod body_size;
 pub mod color;
 pub mod creature;
