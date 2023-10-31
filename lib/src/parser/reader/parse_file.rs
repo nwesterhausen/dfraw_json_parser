@@ -1,26 +1,28 @@
 use encoding_rs_io::DecodeReaderBytesBuilder;
 use std::{
+    fs::File,
     io::{BufRead, BufReader},
     path::Path,
 };
-use tracing::{debug, error, trace};
 
 use crate::{
     options::ParserOptions,
     parser::{
-        creature::Creature,
-        entity::Entity,
-        graphics::{Graphic, GraphicTypeToken, TilePage, GRAPHIC_TYPE_TOKEN_MAP},
-        inorganic::Inorganic,
-        material_template::MaterialTemplate,
+        creature::raw::Creature,
+        entity::raw::Entity,
+        graphics::{
+            phf_table::GRAPHIC_TYPE_TAGS, raw::Graphic, tile_page::TilePage, tokens::GraphicType,
+        },
+        inorganic::raw::Inorganic,
+        material_template::raw::MaterialTemplate,
         module_info_file::ModuleInfoFile,
-        plant::Plant,
-        select_creature::SelectCreature,
-        DF_ENCODING, PARSABLE_OBJECT_TYPES, RAW_TOKEN_RE, {ObjectType, OBJECT_TOKEN_MAP},
-        {RawMetadata, RawObject},
+        object_types::{ObjectType, OBJECT_TOKENS},
+        plant::raw::Plant,
+        raws::{RawMetadata, RawObject},
+        reader::parsable_types::PARSABLE_OBJECT_TYPES,
+        refs::{DF_ENCODING, RAW_TOKEN_RE},
+        select_creature::raw::SelectCreature,
     },
-    util::try_get_file,
-    ParserError,
 };
 
 use super::header::read_raw_file_type;
@@ -28,18 +30,8 @@ use super::header::read_raw_file_type;
 pub fn parse_raw_file<P: AsRef<Path>>(
     raw_file_path: &P,
     options: &ParserOptions,
-) -> Result<Vec<Box<dyn RawObject>>, ParserError> {
-    let mod_info_file = match ModuleInfoFile::from_raw_file_path(raw_file_path) {
-        Ok(m) => m,
-        Err(e) => {
-            error!(
-                "parse_raw_file: Unable to get module info file for {}\n{:?}",
-                raw_file_path.as_ref().display(),
-                e
-            );
-            ModuleInfoFile::empty()
-        }
-    };
+) -> Vec<Box<dyn RawObject>> {
+    let mod_info_file = ModuleInfoFile::from_raw_file_path(raw_file_path);
 
     parse_raw_file_with_info(raw_file_path, &mod_info_file, options)
 }
@@ -49,10 +41,19 @@ pub fn parse_raw_file_with_info<P: AsRef<Path>>(
     raw_file_path: &P,
     mod_info_file: &ModuleInfoFile,
     options: &ParserOptions,
-) -> Result<Vec<Box<dyn RawObject>>, ParserError> {
+) -> Vec<Box<dyn RawObject>> {
     let mut created_raws: Vec<Box<dyn RawObject>> = Vec::new();
 
-    let file = try_get_file(raw_file_path)?;
+    let file = match File::open(raw_file_path) {
+        Ok(f) => f,
+        Err(e) => {
+            log::error!(
+                "parse_raw_file_with_info: Error opening raw file for parsing!\n{:?}",
+                e
+            );
+            return created_raws;
+        }
+    };
 
     let decoding_reader = DecodeReaderBytesBuilder::new()
         .encoding(Some(*DF_ENCODING))
@@ -70,11 +71,11 @@ pub fn parse_raw_file_with_info<P: AsRef<Path>>(
     let mut temp_entity = Entity::empty();
 
     let mut last_parsed_type = ObjectType::Unknown;
-    let mut last_graphic_type = GraphicTypeToken::Unknown;
+    let mut last_graphic_type = GraphicType::Unknown;
     let mut temp_tile_page = TilePage::empty();
 
     // Metadata
-    let object_type = read_raw_file_type(raw_file_path)?;
+    let object_type = read_raw_file_type(raw_file_path);
     let mut raw_metadata = RawMetadata::new(
         mod_info_file,
         &object_type,
@@ -84,26 +85,26 @@ pub fn parse_raw_file_with_info<P: AsRef<Path>>(
     );
 
     // If we aren't supposed to parse this type, we should quit here
-    if !options.raws_to_parse.contains(&object_type) {
-        debug!(
+    if !options.raws_to_parse.contains(&&object_type) {
+        log::debug!(
             "parse_raw_file_with_info: Quitting early because object type {:?} is not included in options!",
             object_type
         );
-        return Ok(Vec::new());
+        return created_raws;
     }
 
     // If the type of object is not in our known_list, we should quit here
     if !PARSABLE_OBJECT_TYPES.contains(&&object_type) {
-        debug!(
+        log::debug!(
             "parse_raw_file_with_info: Quitting early because object type {:?} is not parsable!",
             object_type
         );
-        return Ok(Vec::new());
+        return created_raws;
     }
 
     for (index, line) in reader.lines().enumerate() {
         if line.is_err() {
-            error!(
+            log::error!(
                 "parse_raw_file_with_info: Error processing {}:{}",
                 raw_file_path.as_ref().display(),
                 index
@@ -113,7 +114,7 @@ pub fn parse_raw_file_with_info<P: AsRef<Path>>(
         let line = match line {
             Ok(l) => l,
             Err(e) => {
-                error!("parse_raw_file_with_info: Line-reading error\n{:?}", e);
+                log::error!("parse_raw_file_with_info: Line-reading error\n{:?}", e);
                 continue;
             }
         };
@@ -143,7 +144,7 @@ pub fn parse_raw_file_with_info<P: AsRef<Path>>(
                 }
             };
 
-            trace!(
+            log::trace!(
                 "parse_raw_file_with_info: Key: {} Value: {}",
                 captured_key,
                 captured_value
@@ -151,36 +152,25 @@ pub fn parse_raw_file_with_info<P: AsRef<Path>>(
 
             match captured_key {
                 "OBJECT" => {
-                    if !OBJECT_TOKEN_MAP.contains_key(captured_value) {
+                    if !OBJECT_TOKENS.contains_key(captured_value) {
                         // We don't know what this object is, so we can't parse it.
                         // We should log this as an error.
-                        error!(
+                        log::error!(
                             "parse_raw_file_with_info: Unknown object type: {} Raw: {}",
                             captured_value.to_uppercase(),
                             raw_filename
                         );
-                        return Err(ParserError::InvalidRawFile(format!(
-                            "Unknown object type: {}",
-                            captured_value.to_uppercase()
-                        )));
+                        return created_raws;
                     }
                     // Check of object_type matches the captured_value as ObjectType.
                     // If it doesn't, we should log this as an error.
-                    if &object_type
-                        != OBJECT_TOKEN_MAP
-                            .get(captured_value)
-                            .unwrap_or(&ObjectType::Unknown)
-                    {
-                        error!(
+                    if &object_type != OBJECT_TOKENS.get(captured_value).unwrap() {
+                        log::error!(
                             "parse_raw_file_with_info: Object type mismatch: {} != {}",
                             object_type,
                             captured_value.to_uppercase()
                         );
-                        return Err(ParserError::InvalidRawFile(format!(
-                            "Object type mismatch: {} != {}",
-                            object_type,
-                            captured_value.to_uppercase()
-                        )));
+                        return created_raws;
                     }
                 }
                 "CREATURE" => {
@@ -294,9 +284,9 @@ pub fn parse_raw_file_with_info<P: AsRef<Path>>(
                     // We haven't started a graphic yet, so we need to start one.
 
                     last_parsed_type = ObjectType::Graphics;
-                    last_graphic_type = *GRAPHIC_TYPE_TOKEN_MAP
+                    last_graphic_type = *GRAPHIC_TYPE_TAGS
                         .get(captured_key)
-                        .unwrap_or(&GraphicTypeToken::Unknown);
+                        .unwrap_or(&GraphicType::Unknown);
 
                     temp_graphic =
                         Graphic::new(captured_value, &raw_metadata.clone(), last_graphic_type);
@@ -352,11 +342,11 @@ pub fn parse_raw_file_with_info<P: AsRef<Path>>(
                             }
                             ObjectType::Graphics => {
                                 // We have a graphic, so we can add a tag to it.
-                                if temp_graphic.get_graphic_type() == GraphicTypeToken::Tile {
+                                if temp_graphic.get_graphic_type() == GraphicType::Tile {
                                     // Update graphic type (every line should have a graphic type tag)
-                                    last_graphic_type = *GRAPHIC_TYPE_TOKEN_MAP
+                                    last_graphic_type = *GRAPHIC_TYPE_TAGS
                                         .get(captured_key)
-                                        .unwrap_or(&GraphicTypeToken::Unknown);
+                                        .unwrap_or(&GraphicType::Unknown);
                                 }
 
                                 temp_graphic.parse_sprite_from_tag(
@@ -410,11 +400,11 @@ pub fn parse_raw_file_with_info<P: AsRef<Path>>(
         }
     }
 
-    debug!(
+    log::debug!(
         "parse_raw_file_with_info: Parsed {} raws from {}",
         created_raws.len(),
         raw_filename
     );
 
-    Ok(created_raws)
+    created_raws
 }
