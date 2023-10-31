@@ -68,6 +68,9 @@ impl ModuleInfoFile {
     pub fn empty() -> Self {
         ModuleInfoFile::default()
     }
+    pub fn get_object_id(&self) -> String {
+        String::from(&self.object_id)
+    }
     pub fn from_raw_file_path<P: AsRef<Path>>(full_path: &P) -> Self {
         // Take the full path for the raw file and navigate up to the parent directory
         // e.g from `data/vanilla/vanilla_creatures/objects/creature_standard.txt` to `data/vanilla/vanilla_creatures`
