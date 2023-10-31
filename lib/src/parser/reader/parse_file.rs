@@ -85,7 +85,7 @@ pub fn parse_raw_file_with_info<P: AsRef<Path>>(
     );
 
     // If we aren't supposed to parse this type, we should quit here
-    if !options.raws_to_parse.contains(&&object_type) {
+    if !options.raws_to_parse.contains(&object_type) {
         log::debug!(
             "parse_raw_file_with_info: Quitting early because object type {:?} is not included in options!",
             object_type

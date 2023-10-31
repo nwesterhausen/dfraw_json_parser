@@ -1,5 +1,7 @@
-use tracing::debug;
+#[cfg(feature = "tauri")]
+use crate::tauri_lib::tauri::Manager;
 
+#[cfg(feature = "tauri")]
 #[derive(Clone, serde::Serialize)]
 #[serde(rename_all = "camelCase")]
 #[derive(ts_rs::TS)]
@@ -68,7 +70,7 @@ impl ProgressHelper {
         self.step_advance();
         self.progress_cache.current_file = String::from(current_file);
         if let Err(e) = self.tauri_window.emit("PROGRESS", &self.progress_cache) {
-            debug!("Tauri window emit error {:?}", e);
+            log::debug!("Tauri window emit error {:?}", e);
         };
     }
     pub fn send_final(&mut self, message: &str) {
@@ -77,7 +79,7 @@ impl ProgressHelper {
         self.progress_cache.current_task = String::from(message);
         self.progress_cache.percentage = 1.0;
         if let Err(e) = self.tauri_window.emit("PROGRESS", &self.progress_cache) {
-            debug!("Tauri window emit error {:?}", e);
+            log::debug!("Tauri window emit error {:?}", e);
         };
     }
 }
