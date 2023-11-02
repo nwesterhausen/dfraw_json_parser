@@ -183,7 +183,7 @@ fn main() {
                 log::debug!("Parsing options: {:#?}", options);
                 locations.push(RawModuleLocation::InstalledMods);
             }
-            options.set_job(ParsingJob::All);
+            options.set_job(ParsingJob::AllModulesInLocations);
             options.set_locations_to_parse(locations.clone());
 
             // If no locations were specified, parse just vanilla
@@ -199,11 +199,6 @@ fn main() {
                     output_path.pop();
                     options.set_output_path(&output_path);
                 }
-            }
-
-            // If we have just one location, update the job to be a single location
-            if locations.len() == 1_usize {
-                options.set_job(ParsingJob::SingleLocation);
             }
 
             log::info!("Parsing options: {:#?}", options);

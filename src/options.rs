@@ -68,8 +68,7 @@ pub struct ParserOptions {
 pub enum ParsingJob {
     SingleRaw,
     SingleModule,
-    SingleLocation,
-    All,
+    AllModulesInLocations,
     SingleModuleInfoFile,
     AllModuleInfoFiles,
 }
@@ -92,7 +91,7 @@ impl Default for ParserOptions {
             ],
             locations_to_parse: vec![RawModuleLocation::Vanilla],
             target_path: PathBuf::from(""),
-            job: ParsingJob::All,
+            job: ParsingJob::AllModulesInLocations,
             output_path: PathBuf::from(""),
         }
     }

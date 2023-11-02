@@ -197,6 +197,17 @@ pub fn write_json_string_vec_to_file<P: AsRef<Path>>(strings_vec: &Vec<String>, 
     };
 }
 
+/**
+ * Check if the provided options are valid.
+ *
+ * Arguments:
+ *
+ * * `options`: The `ParserOptions` to check.
+ *
+ * Returns:
+ *
+ * True if the options are valid, false otherwise.
+ */
 pub fn options_has_valid_paths(options: &ParserOptions) -> bool {
     let target_path = &options.target_path;
     // Guard against invalid path
@@ -207,9 +218,8 @@ pub fn options_has_valid_paths(options: &ParserOptions) -> bool {
         );
         return false;
     }
-    if (options.job == ParsingJob::All
+    if (options.job == ParsingJob::AllModulesInLocations
         || options.job == ParsingJob::SingleModule
-        || options.job == ParsingJob::SingleLocation
         || options.job == ParsingJob::AllModuleInfoFiles)
         && target_path.is_file()
     {
