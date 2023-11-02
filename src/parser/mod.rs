@@ -20,6 +20,7 @@ pub mod milkable;
 pub mod module_info_file;
 pub mod names;
 pub mod object_types;
+pub mod parse;
 pub mod plant;
 pub mod plant_growth;
 pub mod position;
