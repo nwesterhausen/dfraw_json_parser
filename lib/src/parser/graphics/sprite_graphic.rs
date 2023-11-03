@@ -2,7 +2,7 @@ use itertools::Itertools;
 use serde::{Deserialize, Serialize};
 use tracing::warn;
 
-use crate::parser::serializer_helper;
+use crate::parser::helpers::serializer_helper;
 
 use super::{
     dimensions::Dimensions,

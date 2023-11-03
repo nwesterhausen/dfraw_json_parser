@@ -1,6 +1,10 @@
 use serde::{Deserialize, Serialize};
 
+<<<<<<< HEAD:lib/src/parser/position/raw.rs
 use crate::parser::{serializer_helper, Color, SingPlurName};
+=======
+use crate::parser::{color::Color, helpers::serializer_helper, names::SingPlurName};
+>>>>>>> 2b37a6f (refactor: expose 1 level down):src/parser/position/raw.rs
 
 use super::tokens::PositionToken;
 

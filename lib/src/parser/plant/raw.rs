@@ -2,24 +2,18 @@ use serde::{Deserialize, Serialize};
 use slug::slugify;
 
 use crate::parser::{
-    biome::{phf_map::BIOME_TOKENS, tokens::Biome},
-    material::{
-        phf_table::{MATERIAL_PROPERTY_TOKENS, MATERIAL_USAGE_TOKENS},
-        raw::Material,
-    },
+    biome::{Biome, BIOME_TOKENS},
+    helpers::serializer_helper,
+    material::{Material, MATERIAL_PROPERTY_TOKENS, MATERIAL_USAGE_TOKENS},
+    metadata::Metadata,
     names::Name,
-    object_types::ObjectType,
-    plant_growth::{
-        phf_table::{GROWTH_TOKENS, GROWTH_TYPE_TOKENS},
-        raw::PlantGrowth,
-        tokens::{GrowthTag, GrowthType},
-    },
+    object_type::ObjectType,
+    plant_growth::{GrowthTag, GrowthType, PlantGrowth, GROWTH_TOKENS, GROWTH_TYPE_TOKENS},
     ranges::parse_min_max_range,
-    raws::{RawMetadata, RawObject},
+    raws::RawObject,
     searchable::{clean_search_vec, Searchable},
-    serializer_helper,
-    shrub::{phf_table::SHRUB_TOKENS, raw::Shrub},
-    tree::{phf_table::TREE_TOKENS, raw::Tree},
+    shrub::{Shrub, SHRUB_TOKENS},
+    tree::{Tree, TREE_TOKENS},
 };
 
 use super::{phf_table::PLANT_TOKENS, tokens::PlantTag};
@@ -31,8 +25,8 @@ use super::{phf_table::PLANT_TOKENS, tokens::PlantTag};
 #[serde(rename_all = "camelCase")]
 pub struct Plant {
     /// Common Raw file Things
-    #[serde(skip_serializing_if = "RawMetadata::is_hidden")]
-    metadata: RawMetadata,
+    #[serde(skip_serializing_if = "Metadata::is_hidden")]
+    metadata: Metadata,
     identifier: String,
     object_id: String,
 
@@ -75,7 +69,7 @@ impl Plant {
             ..Plant::default()
         }
     }
-    pub fn new(identifier: &str, metadata: &RawMetadata) -> Plant {
+    pub fn new(identifier: &str, metadata: &Metadata) -> Plant {
         Plant {
             identifier: String::from(identifier),
             metadata: metadata.clone(),
@@ -96,7 +90,7 @@ impl Plant {
 
 #[typetag::serde]
 impl RawObject for Plant {
-    fn get_metadata(&self) -> &RawMetadata {
+    fn get_metadata(&self) -> &Metadata {
         &self.metadata
     }
     fn get_identifier(&self) -> &str {

@@ -2,9 +2,19 @@ use serde::{Deserialize, Serialize};
 use tracing::warn;
 
 use crate::parser::{
+<<<<<<< HEAD:lib/src/parser/creature_caste/raw.rs
     helpers::parse_min_max_range,
     names::{Name, SingPlurName},
     serializer_helper, BodySize, Milkable, Searchable, Tile,
+=======
+    body_size::BodySize,
+    helpers::serializer_helper,
+    milkable::Milkable,
+    names::{Name, SingPlurName},
+    ranges::parse_min_max_range,
+    searchable::Searchable,
+    tile::Tile,
+>>>>>>> 2b37a6f (refactor: expose 1 level down):src/parser/creature_caste/raw.rs
 };
 
 use super::{phf_table::CASTE_TOKENS, tokens::CasteTag};

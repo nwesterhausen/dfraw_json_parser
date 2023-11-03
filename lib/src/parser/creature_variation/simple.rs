@@ -1,7 +1,13 @@
 use serde::{Deserialize, Serialize};
 use tracing::debug;
 
+<<<<<<< HEAD:lib/src/parser/creature_variation/simple.rs
 use crate::parser::{creature::Creature, creature_variation::raw::CreatureVariation, RawObject};
+=======
+use crate::parser::{
+    creature::Creature, creature_variation::raw::CreatureVariation, raws::RawObject,
+};
+>>>>>>> 2b37a6f (refactor: expose 1 level down):src/parser/creature_variation/simple.rs
 
 use super::tokens::CVTag;
 

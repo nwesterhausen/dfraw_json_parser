@@ -8,20 +8,19 @@ use std::{
 use crate::{
     options::ParserOptions,
     parser::{
-        creature::raw::Creature,
-        entity::raw::Entity,
-        graphics::{
-            phf_table::GRAPHIC_TYPE_TAGS, raw::Graphic, tile_page::TilePage, tokens::GraphicType,
-        },
-        inorganic::raw::Inorganic,
-        material_template::raw::MaterialTemplate,
-        module_info_file::ModuleInfoFile,
-        object_types::{ObjectType, OBJECT_TOKENS},
-        plant::raw::Plant,
-        raws::{RawMetadata, RawObject},
+        creature::Creature,
+        entity::Entity,
+        graphics::{Graphic, GraphicType, TilePage, GRAPHIC_TYPE_TAGS},
+        info_txt::ModuleInfoFile,
+        inorganic::Inorganic,
+        material_template::MaterialTemplate,
+        metadata::Metadata,
+        object_type::{ObjectType, OBJECT_TOKENS},
+        plant::Plant,
+        raws::RawObject,
         reader::parsable_types::PARSABLE_OBJECT_TYPES,
         refs::{DF_ENCODING, RAW_TOKEN_RE},
-        select_creature::raw::SelectCreature,
+        select_creature::SelectCreature,
     },
 };
 
@@ -76,7 +75,7 @@ pub fn parse_raw_file_with_info<P: AsRef<Path>>(
 
     // Metadata
     let object_type = read_raw_file_type(raw_file_path);
-    let mut raw_metadata = RawMetadata::new(
+    let mut raw_metadata = Metadata::new(
         mod_info_file,
         &object_type,
         raw_filename.as_str(),
@@ -121,7 +120,7 @@ pub fn parse_raw_file_with_info<P: AsRef<Path>>(
 
         if index == 0 {
             raw_filename = String::from(&line);
-            raw_metadata = RawMetadata::new(
+            raw_metadata = Metadata::new(
                 mod_info_file,
                 &object_type,
                 raw_filename.as_str(),
@@ -164,7 +163,10 @@ pub fn parse_raw_file_with_info<P: AsRef<Path>>(
                     }
                     // Check of object_type matches the captured_value as ObjectType.
                     // If it doesn't, we should log this as an error.
-                    if &object_type != OBJECT_TOKENS.get(captured_value).unwrap() {
+                    let captured_type = OBJECT_TOKENS
+                        .get(captured_value)
+                        .unwrap_or(&ObjectType::Unknown);
+                    if object_type != *captured_type {
                         log::error!(
                             "parse_raw_file_with_info: Object type mismatch: {} != {}",
                             object_type,

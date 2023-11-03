@@ -1,4 +1,4 @@
-use crate::parser::object_types::ObjectType;
+use crate::parser::object_type::ObjectType;
 
 pub const PARSABLE_OBJECT_TYPES: [&ObjectType; 8] = [
     &ObjectType::Creature,

@@ -2,7 +2,15 @@ use serde::{Deserialize, Serialize};
 use slug::slugify;
 
 use crate::parser::{
+<<<<<<< HEAD:lib/src/parser/material_template/raw.rs
     clean_search_vec, material::Material, ObjectType, RawMetadata, RawObject, Searchable,
+=======
+    material::Material,
+    metadata::Metadata,
+    object_type::ObjectType,
+    raws::RawObject,
+    searchable::{clean_search_vec, Searchable},
+>>>>>>> 2b37a6f (refactor: expose 1 level down):src/parser/material_template/raw.rs
 };
 
 #[derive(ts_rs::TS)]
@@ -11,7 +19,7 @@ use crate::parser::{
 #[serde(rename_all = "camelCase")]
 pub struct MaterialTemplate {
     identifier: String,
-    metadata: RawMetadata,
+    metadata: Metadata,
     object_id: String,
     material: Material,
 }
@@ -20,7 +28,7 @@ impl MaterialTemplate {
     pub fn empty() -> MaterialTemplate {
         MaterialTemplate::default()
     }
-    pub fn new(identifier: &str, metadata: &RawMetadata) -> MaterialTemplate {
+    pub fn new(identifier: &str, metadata: &Metadata) -> MaterialTemplate {
         MaterialTemplate {
             identifier: String::from(identifier),
             metadata: metadata.clone(),
@@ -47,7 +55,7 @@ impl RawObject for MaterialTemplate {
         &self.identifier
     }
 
-    fn get_metadata(&self) -> &RawMetadata {
+    fn get_metadata(&self) -> &Metadata {
         &self.metadata
     }
 

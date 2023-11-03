@@ -6,9 +6,16 @@ use crate::parser::{
     graphics::{Graphic, TilePage},
     inorganic::Inorganic,
     material_template::MaterialTemplate,
+<<<<<<< HEAD:lib/src/parser/helpers/clone_raw_object_box.rs
     plant::Plant,
     select_creature::SelectCreature,
     ObjectType, RawObject,
+=======
+    object_type::ObjectType,
+    plant::Plant,
+    raws::RawObject,
+    select_creature::SelectCreature,
+>>>>>>> 2b37a6f (refactor: expose 1 level down):src/parser/helpers/clone_raw_object_box.rs
 };
 
 #[allow(clippy::borrowed_box)]

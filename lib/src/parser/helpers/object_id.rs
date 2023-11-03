@@ -1,6 +1,10 @@
 use slug::slugify;
 
+<<<<<<< HEAD:lib/src/parser/helpers/object_id.rs
 use crate::parser::{ObjectType, RawMetadata};
+=======
+use crate::parser::{metadata::Metadata, object_type::ObjectType};
+>>>>>>> 2b37a6f (refactor: expose 1 level down):src/parser/helpers/object_id.rs
 
 /// The function `build_object_id_from_pieces` takes in metadata, an identifier, and a raw type, and
 /// returns a formatted string. This is a convenience function for building object IDs so they all
@@ -16,7 +20,7 @@ use crate::parser::{ObjectType, RawMetadata};
 ///
 /// a string.
 pub fn build_object_id_from_pieces(
-    metadata: &RawMetadata,
+    metadata: &Metadata,
     identifier: &str,
     raw_type: &ObjectType,
 ) -> String {

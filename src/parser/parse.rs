@@ -11,9 +11,7 @@ use crate::{
     options::{ParserOptions, ParsingJob},
     parse_module_info_file_direct,
     parser::{
-        helpers::{
-            absorb_select_creature::absorb_select_creature, apply_copy_from::apply_copy_tags_from,
-        },
+        helpers::{absorb_select_creature, apply_copy_tags_from},
         parse_raws_from_single_file,
         raw_locations::RawModuleLocation,
         raws::RawObject,

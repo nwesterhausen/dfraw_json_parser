@@ -2,8 +2,17 @@ use serde::{Deserialize, Serialize};
 use tracing::warn;
 
 use crate::parser::{
+<<<<<<< HEAD:lib/src/parser/graphics/raw.rs
     clean_search_vec, helpers::build_object_id_from_pieces, object_types::ObjectType,
     serializer_helper, RawMetadata, RawObject, Searchable,
+=======
+    helpers::build_object_id_from_pieces,
+    helpers::serializer_helper,
+    metadata::Metadata,
+    object_type::ObjectType,
+    raws::RawObject,
+    searchable::{clean_search_vec, Searchable},
+>>>>>>> 2b37a6f (refactor: expose 1 level down):src/parser/graphics/raw.rs
 };
 
 use super::{
@@ -21,7 +30,7 @@ use super::{
 #[serde(rename_all = "camelCase")]
 pub struct Graphic {
     #[serde(skip_serializing_if = "serializer_helper::is_metadata_hidden")]
-    metadata: RawMetadata,
+    metadata: Metadata,
     identifier: String,
     object_id: String,
 
@@ -49,7 +58,7 @@ impl Graphic {
     pub fn empty() -> Self {
         Self::default()
     }
-    pub fn new(identifier: &str, metadata: &RawMetadata, graphic_type: GraphicType) -> Self {
+    pub fn new(identifier: &str, metadata: &Metadata, graphic_type: GraphicType) -> Self {
         Self {
             identifier: String::from(identifier),
             metadata: metadata.clone(),
@@ -216,7 +225,7 @@ impl Graphic {
 
 #[typetag::serde]
 impl RawObject for Graphic {
-    fn get_metadata(&self) -> &RawMetadata {
+    fn get_metadata(&self) -> &Metadata {
         &self.metadata
     }
     fn get_identifier(&self) -> &str {
