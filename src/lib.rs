@@ -62,25 +62,60 @@ for the steam workshop if it is a mod downloaded from the steam workshop.
 
 */
 
-#![warn(clippy::pedantic)]
+#![warn(clippy::pedantic, clippy::missing_docs_in_private_items)]
 #![allow(clippy::must_use_candidate)]
 
-use options::{ParserOptions, ParsingJob};
-use parser::{info_txt::ModuleInfoFile, RawObject, Searchable};
 use std::path::{Path, PathBuf};
-use util::options_has_valid_paths;
 use walkdir::DirEntry;
 
-use crate::parser::raw_locations::RawModuleLocation;
-
-pub mod options;
-pub mod parser;
-#[cfg(feature = "tauri")]
+/// Options used to control the parsing process.
+mod options;
+/// The parser module contains the functions and structs used to parse raws.
+mod parser;
+/// Structs and functions used just when interacting with Tauri.
 mod tauri_lib;
-pub mod util;
+/// The util module contains utility functions used by the parser.
+mod util;
 
-#[cfg(feature = "tauri")]
-pub use crate::tauri_lib::structs::ProgressPayload;
+pub use options::*;
+pub use parser::biome::*;
+pub use parser::body_size::*;
+pub use parser::color::*;
+pub use parser::creature::*;
+pub use parser::creature_caste::*;
+pub use parser::creature_effect::*;
+pub use parser::creature_variation::*;
+pub use parser::entity::*;
+pub use parser::graphic::*;
+pub use parser::helpers::*;
+pub use parser::info_txt::*;
+pub use parser::inorganic::*;
+pub use parser::material::*;
+pub use parser::material_mechanics::*;
+pub use parser::material_template::*;
+pub use parser::metadata::*;
+pub use parser::milkable::*;
+pub use parser::names::*;
+pub use parser::object_type::*;
+pub use parser::parse::*;
+pub use parser::plant::*;
+pub use parser::plant_growth::*;
+pub use parser::position::*;
+pub use parser::raw_locations::*;
+pub use parser::raws::*;
+pub use parser::reader::*;
+pub use parser::refs::*;
+pub use parser::searchable::*;
+pub use parser::seed_material::*;
+pub use parser::select_creature::*;
+pub use parser::shrub::*;
+pub use parser::syndrome::*;
+pub use parser::temperature::*;
+pub use parser::tile::*;
+pub use parser::tree::*;
+pub use util::*;
+
+pub use crate::tauri_lib::ProgressPayload;
 
 /// Given the supplied `ParserOptions`, parse the raws and return a vector of boxed dynamic raw objects.
 ///
@@ -193,7 +228,7 @@ pub fn parse_with_tauri_emit(
     window: tauri::Window,
 ) -> Vec<Box<dyn RawObject>> {
     // setup progress helper
-    let progress_helper = tauri_lib::structs::ProgressHelper::with_tauri_window(window);
+    let progress_helper = tauri_lib::ProgressHelper::with_tauri_window(window);
 
     parser::parse::parse(options, Some(&progress_helper))
 }
@@ -216,7 +251,7 @@ pub fn parse_with_tauri_emit_to_json_vec(
     window: tauri::Window,
 ) -> Vec<String> {
     // setup progress helper
-    let progress_helper = tauri_lib::structs::ProgressHelper::with_tauri_window(window);
+    let progress_helper = tauri_lib::ProgressHelper::with_tauri_window(window);
 
     let results = parser::parse::parse(options, Some(&progress_helper));
 
@@ -275,7 +310,7 @@ fn parse_module_info_files_at_location<P: AsRef<Path>>(location_path: &P) -> Vec
 /// The function `parse_module_info_file_direct` returns a `ModuleInfoFile` object.
 fn parse_module_info_file_direct<P: AsRef<Path>>(module_info_file_path: &P) -> ModuleInfoFile {
     // Get information from the module info file
-    parser::parse_info_file_from_file_path(module_info_file_path)
+    crate::parse_info_file_from_file_path(module_info_file_path)
 }
 
 /// The function `parse_info_modules` parses module information files based on the provided options.
@@ -423,5 +458,5 @@ pub fn parse_info_modules_to_file(options: &ParserOptions) {
 ///
 /// The function `build_search_string` returns a `String` value.
 pub fn build_search_string(raw_object: &dyn Searchable) -> String {
-    crate::parser::get_search_string(raw_object)
+    crate::get_search_string(raw_object)
 }

@@ -1,7 +1,7 @@
 use serde::{Deserialize, Serialize};
 
 use crate::parser::{
-    creature_effect::EFFECT_TOKENS,
+    creature_effect::CREATURE_EFFECT_TOKENS,
     helpers::serializer_helper,
     searchable::{clean_search_vec, Searchable},
 };
@@ -52,7 +52,7 @@ impl Syndrome {
         }
     }
     pub fn parse_tag(&mut self, key: &str, value: &str) {
-        if EFFECT_TOKENS.contains_key(key) {
+        if CREATURE_EFFECT_TOKENS.contains_key(key) {
             self.conditions.push(String::from(value));
             return;
         }

@@ -3,6 +3,7 @@ use std::path::PathBuf;
 use serde::{Deserialize, Serialize};
 
 use crate::parser::{
+    graphic::{dimensions::Dimensions, phf_table::TILE_PAGE_TAGS, tokens::TilePageTag},
     helpers::build_object_id_from_pieces,
     helpers::serializer_helper,
     metadata::Metadata,
@@ -10,8 +11,6 @@ use crate::parser::{
     raws::RawObject,
     searchable::{clean_search_vec, Searchable},
 };
-
-use super::{dimensions::Dimensions, phf_table::TILE_PAGE_TAGS, tokens::TilePageTag};
 
 #[derive(ts_rs::TS)]
 #[ts(export)]

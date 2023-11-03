@@ -1,13 +1,12 @@
 use itertools::Itertools;
 use serde::{Deserialize, Serialize};
 
-use crate::parser::helpers::serializer_helper;
-
-use super::{
+use crate::parser::graphic::{
     dimensions::Dimensions,
     phf_table::{CONDITION_TAGS, GRAPHIC_TYPE_TAGS},
-    tokens::{ColorModification, Condition, GraphicType},
+    tokens::{ColorModification, GraphicCondition, GraphicType},
 };
+use crate::parser::helpers::serializer_helper;
 
 #[derive(ts_rs::TS)]
 #[ts(export)]
@@ -15,7 +14,7 @@ use super::{
 #[derive(Serialize, Deserialize, Debug, Clone, Default)]
 #[serde(rename_all = "camelCase")]
 pub struct SpriteGraphic {
-    primary_condition: Condition,
+    primary_condition: GraphicCondition,
     tile_page_id: String,
     offset: Dimensions,
     #[serde(skip_serializing_if = "ColorModification::is_default")]
@@ -24,8 +23,8 @@ pub struct SpriteGraphic {
     large_image: bool,
     #[serde(skip_serializing_if = "Dimensions::is_empty")]
     offset2: Dimensions,
-    #[serde(skip_serializing_if = "Condition::is_none")]
-    secondary_condition: Condition,
+    #[serde(skip_serializing_if = "GraphicCondition::is_none")]
+    secondary_condition: GraphicCondition,
     #[serde(skip_serializing_if = "serializer_helper::is_zero")]
     color_pallet_swap: u32,
     #[serde(skip_serializing_if = "String::is_empty")]
@@ -79,7 +78,7 @@ impl SpriteGraphic {
             | GraphicType::Weapon => {
                 // parse template ""
                 Some(Self {
-                    primary_condition: Condition::CopyOfTemplate,
+                    primary_condition: GraphicCondition::CopyOfTemplate,
                     tile_page_id: format!("{key}:{value}"),
                     ..Self::default()
                 })
@@ -105,7 +104,7 @@ impl SpriteGraphic {
         let mut split = token.split(':');
 
         let sprite_condition = match split.next() {
-            Some(v) => *CONDITION_TAGS.get(v).unwrap_or(&Condition::None),
+            Some(v) => *CONDITION_TAGS.get(v).unwrap_or(&GraphicCondition::None),
             _ => {
                 return None;
             }
@@ -446,7 +445,7 @@ impl SpriteGraphic {
         };
 
         let primary_condition =
-            if let Some(parsed_condition) = Condition::from_token(condition.as_str()) {
+            if let Some(parsed_condition) = GraphicCondition::from_token(condition.as_str()) {
                 parsed_condition
             } else {
                 log::warn!(
@@ -454,7 +453,7 @@ impl SpriteGraphic {
                 condition,
                 token
             );
-                Condition::None
+                GraphicCondition::None
             };
 
         Some(Self {
@@ -541,7 +540,7 @@ impl SpriteGraphic {
         };
 
         let primary_condition =
-            if let Some(parsed_condition) = Condition::from_token(condition.as_str()) {
+            if let Some(parsed_condition) = GraphicCondition::from_token(condition.as_str()) {
                 parsed_condition
             } else {
                 log::warn!(
@@ -549,22 +548,22 @@ impl SpriteGraphic {
                     condition,
                     token
                 );
-                Condition::None
+                GraphicCondition::None
             };
 
         let secondary_condition = match split.next() {
             Some(v) => {
-                if let Some(condition) = Condition::from_token(v) {
+                if let Some(condition) = GraphicCondition::from_token(v) {
                     condition
                 } else {
                     log::warn!("Failed to parse {} as secondary_condition in {}", v, token);
-                    Condition::None
+                    GraphicCondition::None
                 }
             }
-            _ => Condition::None,
+            _ => GraphicCondition::None,
         };
 
-        if primary_condition == Condition::None {
+        if primary_condition == GraphicCondition::None {
             log::warn!(
                 "Failed to parse {} as primary_condition large_animal_sprite {}",
                 condition,
@@ -663,20 +662,21 @@ impl SpriteGraphic {
             _ => ColorModification::AsIs,
         };
 
-        let primary_condition = if let Some(parsed_condition) = Condition::from_token(condition) {
-            parsed_condition
-        } else {
-            log::warn!(
-                "Failed to parse {} as primary_condition in {}",
-                condition,
-                split.join(":")
-            );
-            Condition::None
-        };
+        let primary_condition =
+            if let Some(parsed_condition) = GraphicCondition::from_token(condition) {
+                parsed_condition
+            } else {
+                log::warn!(
+                    "Failed to parse {} as primary_condition in {}",
+                    condition,
+                    split.join(":")
+                );
+                GraphicCondition::None
+            };
 
         let secondary_condition = match split.get(5) {
             Some(v) => {
-                if let Some(condition) = Condition::from_token(v) {
+                if let Some(condition) = GraphicCondition::from_token(v) {
                     condition
                 } else {
                     log::warn!(
@@ -684,13 +684,13 @@ impl SpriteGraphic {
                         v,
                         split.join(":")
                     );
-                    Condition::None
+                    GraphicCondition::None
                 }
             }
-            _ => Condition::None,
+            _ => GraphicCondition::None,
         };
 
-        if primary_condition == Condition::None {
+        if primary_condition == GraphicCondition::None {
             log::warn!(
                 "Failed to parse {} as primary_condition large_animal_sprite {}",
                 condition,

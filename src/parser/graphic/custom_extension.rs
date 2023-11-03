@@ -2,7 +2,7 @@ use serde::{Deserialize, Serialize};
 
 use crate::parser::helpers::serializer_helper;
 
-use super::tokens::GraphicType;
+use crate::parser::graphic::GraphicType;
 
 #[derive(ts_rs::TS)]
 #[ts(export)]

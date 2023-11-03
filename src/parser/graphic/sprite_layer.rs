@@ -1,6 +1,8 @@
 use serde::{Deserialize, Serialize};
 
-use super::{dimensions::Dimensions, phf_table::CONDITION_TAGS, tokens::Condition};
+use crate::parser::graphic::{
+    dimensions::Dimensions, phf_table::CONDITION_TAGS, tokens::GraphicCondition,
+};
 
 #[derive(ts_rs::TS)]
 #[ts(export)]
@@ -13,7 +15,7 @@ pub struct SpriteLayer {
     offset: Dimensions,
     offset_2: Dimensions,
     large_image: bool,
-    conditions: Vec<(Condition, String)>,
+    conditions: Vec<(GraphicCondition, String)>,
 }
 
 impl SpriteLayer {

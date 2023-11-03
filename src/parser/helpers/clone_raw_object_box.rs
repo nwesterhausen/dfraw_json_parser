@@ -1,7 +1,7 @@
 use crate::parser::{
     creature::Creature,
     entity::Entity,
-    graphics::{Graphic, TilePage},
+    graphic::{Graphic, TilePage},
     inorganic::Inorganic,
     material_template::MaterialTemplate,
     object_type::ObjectType,

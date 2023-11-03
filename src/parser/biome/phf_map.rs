@@ -1,5 +1,11 @@
 use super::tokens::Biome;
 
+/// The perfect hash table for biome tokens and the Biome enum.
+/// 
+/// This is a mapping which takes the string of how the biome is written in the
+/// raws and returns the Biome enum variant.
+/// 
+/// This is made static by the `phf` crate at compile time.
 pub static BIOME_TOKENS: phf::Map<&'static str, Biome> = phf::phf_map! {
     "MOUNTAIN" => Biome::Mountain,
     "MOUNTAINS" => Biome::Mountains,

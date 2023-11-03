@@ -1,20 +1,16 @@
 use serde::{Deserialize, Serialize};
 
 use crate::parser::{
+    graphic::{
+        CustomGraphicExtension, GraphicType, SpriteGraphic, SpriteLayer, CUSTOM_GRAPHIC_TAGS,
+        GROWTH_TAGS, PLANT_GRAPHIC_TEMPLATES,
+    },
     helpers::build_object_id_from_pieces,
     helpers::serializer_helper,
     metadata::Metadata,
     object_type::ObjectType,
     raws::RawObject,
     searchable::{clean_search_vec, Searchable},
-};
-
-use super::{
-    custom_extension::CustomGraphicExtension,
-    phf_table::{CUSTOM_GRAPHIC_TAGS, GROWTH_TAGS, PLANT_GRAPHIC_TEMPLATES},
-    sprite_graphic::SpriteGraphic,
-    sprite_layer::SpriteLayer,
-    tokens::GraphicType,
 };
 
 #[derive(ts_rs::TS)]
@@ -201,10 +197,20 @@ impl Graphic {
         }
     }
 
+    /// Get the type of the `Graphic`.
+    ///
+    /// Returns:
+    ///
+    /// A `GraphicType` enum value.
     pub fn get_graphic_type(&self) -> GraphicType {
         self.kind
     }
 
+    /// Returns a vector of strings containing the tile page IDs of all sprites and layers in a `Graphic`.
+    ///
+    /// Returns:
+    ///
+    /// A vector of tile page identifiers.
     pub fn get_tile_pages(&self) -> Vec<String> {
         let mut vec = Vec::new();
         for sprite in &self.sprites {

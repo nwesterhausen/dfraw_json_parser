@@ -35,29 +35,45 @@ use crate::parser::{
 #[ts(export)]
 #[allow(clippy::module_name_repetitions)]
 pub struct Metadata {
-    // The name of the raw module the raw is from.
+    /// The name of the raw module the raw is from.
     module_name: String,
-    // The version of the raw module the raw is from.
+    /// The version of the raw module the raw is from.
     module_version: String,
-    // The path to the file containing the raw.
+    /// The path to the file containing the raw.
     raw_file_path: String,
-    // The raw identifier (as described at the top of the raw text file).
+    /// The raw identifier (as described at the top of the raw text file).
     raw_identifier: String,
-    // The type of raw (creature, plant, etc).
-    // Example: [OBJECT:TYPE]
+    /// The type of raw (creature, plant, etc).
+    ///
+    /// Example: `[OBJECT:CREATURE]`
     object_type: ObjectType,
-    // The location of the owning raw module
-    // i.e. installed_mods, mods, or vanilla
+    /// The location of the owning raw module
+    ///
+    /// i.e. installed_mods, mods, or vanilla
     raw_module_location: RawModuleLocation,
-    // The object ID of the raw
+    /// The object ID of the raw
     module_object_id: String,
-    // Optionally hide or unhide from exporting
-    // By default will be hidden
     #[serde(skip)]
+    /// Optionally hide or unhide from exporting
+    ///
+    /// By default will be hidden from serialization
     hidden: bool,
 }
 
 impl Metadata {
+    /// Creates a new `Metadata` struct with values taken from the information passed in.
+    ///
+    /// Arguments:
+    ///
+    /// * `module_info`: The `ModuleInfoFile` struct containing information about the module the raw is from.
+    /// * `object_type`: The `ObjectType` of the raw.
+    /// * `raw_identifier`: The identifier of the raw.
+    /// * `raw_file_path`: The path to the raw file.
+    /// * `attach_metadata_to_raws`: Whether or not to attach metadata to raws.
+    ///
+    /// Returns:
+    ///
+    /// * `Metadata`: The newly created `Metadata` struct.
     pub fn new<P: AsRef<Path>>(
         module_info: &ModuleInfoFile,
         object_type: &ObjectType,

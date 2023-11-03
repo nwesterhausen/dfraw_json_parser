@@ -3,6 +3,7 @@ use serde::{Deserialize, Serialize};
 #[derive(ts_rs::TS)]
 #[ts(export)]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, Default)]
+/// This enum represents the raw tokens that describe a creature.
 pub enum CreatureTag {
     ArtificialHiveable,
     DoesNotExist,

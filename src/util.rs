@@ -6,12 +6,7 @@ use std::{
 
 use walkdir::WalkDir;
 
-use crate::{
-    options::{ParserOptions, ParsingJob},
-    parser::{
-        creature::Creature, object_type::ObjectType, select_creature::SelectCreature, RawObject,
-    },
-};
+use crate::{Creature, ObjectType, ParserOptions, ParsingJob, RawObject, SelectCreature};
 
 /// Get a vec of subdirectories for a given directory
 ///

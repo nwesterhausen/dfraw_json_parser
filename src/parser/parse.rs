@@ -4,23 +4,35 @@ use std::path::{Path, PathBuf};
 
 use walkdir::{DirEntry, WalkDir};
 
-#[cfg(feature = "tauri")]
-use crate::tauri_lib::structs::ProgressHelper;
-
 use crate::{
-    options::{ParserOptions, ParsingJob},
-    parse_module_info_file_direct,
-    parser::{
-        helpers::{absorb_select_creature, apply_copy_tags_from},
-        parse_raws_from_single_file,
-        raw_locations::RawModuleLocation,
-        raws::RawObject,
-    },
-    util::{options_has_valid_paths, subdirectories},
-    ProgressPayload,
+    absorb_select_creature, apply_copy_tags_from, options_has_valid_paths,
+    parse_module_info_file_direct, parse_raws_from_single_file, subdirectories,
+    tauri_lib::ProgressHelper, ParserOptions, ParsingJob, ProgressPayload, RawModuleLocation,
+    RawObject,
 };
 
 #[allow(clippy::too_many_lines)]
+/// The main parsing function. Follows these steps:
+///
+/// 1. Validate options
+/// 2. Parse each location
+/// 3. Parse each module in each location
+/// 4. Parse each raw file in each module
+/// 5. Apply `absorb_select_creature`
+/// 6. Apply `apply_copy_tags_from`
+///
+/// If the `tauri` feature is enabled, this function will also send progress updates to the
+/// `ProgressHelper`. In all the sub-parsing that is done, a `ProgressPayload` struct is used to track progress
+/// and send updates to the `ProgressHelper`.
+///
+/// # Parameters
+///
+/// * `options`: The `ParserOptions` struct to use when parsing.
+/// * `progress_helper`: An optional `ProgressHelper` struct to use when sending progress updates.
+///
+/// # Returns
+///
+/// A `Vec` of `Box<dyn RawObject>` objects.
 pub fn parse(
     options: &ParserOptions,
     progress_helper: Option<&ProgressHelper>,
@@ -177,6 +189,25 @@ pub fn parse(
     results
 }
 
+#[allow(clippy::too_many_lines)]
+/// Parses a single location. Follows these steps:
+///
+/// 1. Get a list of all subdirectories in the location
+/// 2. Parse each module in the location
+///
+/// If the `tauri` feature is enabled, this function will also send progress updates to the
+/// `ProgressHelper`.
+///
+/// # Parameters
+///
+/// * `location_path`: The path of the location to parse.
+/// * `options`: The `ParserOptions` struct to use when parsing.
+/// * `progress_helper`: An optional `ProgressHelper` struct to use when sending progress updates.
+/// * `progress_payload`: A `ProgressPayload` struct to use when sending progress updates.
+///
+/// # Returns
+///
+/// A tuple containing a `Vec` of `Box<dyn RawObject>` objects and a `ProgressPayload` struct.
 fn parse_location<P: AsRef<Path>>(
     location_path: &P,
     options: &ParserOptions,
@@ -230,6 +261,25 @@ fn parse_location<P: AsRef<Path>>(
 }
 
 #[allow(clippy::too_many_lines)]
+/// Parses a single module. Follows these steps:
+///
+/// 1. Get information from the module info file
+/// 2. Get a list of all raw files in the module
+/// 3. Parse each raw file in the module
+///
+/// If the `tauri` feature is enabled, this function will also send progress updates to the
+/// `ProgressHelper`.
+///
+/// # Parameters
+///
+/// * `module_path`: The path of the module to parse.
+/// * `options`: The `ParserOptions` struct to use when parsing.
+/// * `progress_helper`: An optional `ProgressHelper` struct to use when sending progress updates.
+/// * `progress_payload`: A `ProgressPayload` struct to use when sending progress updates.
+///
+/// # Returns
+///
+/// A tuple containing a `Vec` of `Box<dyn RawObject>` objects and a `ProgressPayload` struct.
 fn parse_module<P: AsRef<Path>>(
     module_path: &P,
     options: &ParserOptions,

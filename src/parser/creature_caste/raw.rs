@@ -2,10 +2,10 @@ use serde::{Deserialize, Serialize};
 
 use crate::parser::{
     body_size::BodySize,
+    helpers::parse_min_max_range,
     helpers::serializer_helper,
     milkable::Milkable,
     names::{Name, SingPlurName},
-    ranges::parse_min_max_range,
     searchable::Searchable,
     tile::Tile,
 };

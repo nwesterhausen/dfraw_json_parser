@@ -8,22 +8,30 @@ use serde::{Deserialize, Serialize};
 #[serde(rename_all = "camelCase")]
 pub struct MaterialMechanics {
     #[serde(skip_serializing_if = "MechanicalProperties::is_empty")]
+    /// The impact properties of the material.
     impact: MechanicalProperties,
     #[serde(skip_serializing_if = "MechanicalProperties::is_empty")]
+    /// The compressive properties of the material.
     compressive: MechanicalProperties,
     #[serde(skip_serializing_if = "MechanicalProperties::is_empty")]
+    /// The tensile properties of the material.
     tensile: MechanicalProperties,
     #[serde(skip_serializing_if = "MechanicalProperties::is_empty")]
+    /// The torsion properties of the material.
     torsion: MechanicalProperties,
     #[serde(skip_serializing_if = "MechanicalProperties::is_empty")]
+    /// The shear properties of the material.
     shear: MechanicalProperties,
     #[serde(skip_serializing_if = "MechanicalProperties::is_empty")]
+    /// The bending properties of the material.
     bending: MechanicalProperties,
 
     #[serde(skip_serializing_if = "serializer_helper::is_zero_i32")]
+    /// The maximum edge size of the material.
     max_edge: i32,
 
     #[serde(skip_serializing_if = "serializer_helper::is_zero_i32")]
+    /// The solid density of the material.
     solid_density: i32,
 }
 
@@ -34,33 +42,55 @@ pub struct MaterialMechanics {
 #[serde(rename_all = "camelCase")]
 pub struct MechanicalProperties {
     #[serde(rename = "yield")]
+    /// The yield stress of the material.
     yield_stress: i32,
+    /// The fracture stress of the material.
     fracture: i32,
+    /// The elasticity of the material.
     elasticity: i32,
 }
 
 impl MechanicalProperties {
+    /// Create a new `MechanicalProperties` struct with all values set to zero.
     pub fn new() -> Self {
         Self::default()
     }
+    /// The function `is_empty` returns true if all values are zero.
     pub fn is_empty(&self) -> bool {
         self.yield_stress == 0 && self.fracture == 0 && self.elasticity == 0
     }
+    /// The function `set_yield` sets the yield stress of the material.
+    ///
+    /// Arguments:
+    ///
+    /// * `value`: The value to set the yield stress to.
     pub fn set_yield(&mut self, value: i32) {
         self.yield_stress = value;
     }
+    /// The function `set_fracture` sets the fracture stress of the material.
+    ///
+    /// Arguments:
+    ///
+    /// * `value`: The value to set the fracture stress to.
     pub fn set_fracture(&mut self, value: i32) {
         self.fracture = value;
     }
+    /// The function `set_elasticity` sets the elasticity of the material.
+    ///
+    /// Arguments:
+    ///
+    /// * `value`: The value to set the elasticity to.
     pub fn set_elasticity(&mut self, value: i32) {
         self.elasticity = value;
     }
 }
 
 impl MaterialMechanics {
+    /// Create a new `MaterialMechanics` struct with all default values.
     pub fn new() -> Self {
         Self::default()
     }
+    /// The function `is_empty` returns true if all values are the defaults
     pub fn is_empty(&self) -> bool {
         self.impact.is_empty()
             && self.compressive.is_empty()
@@ -69,6 +99,13 @@ impl MaterialMechanics {
             && self.shear.is_empty()
             && self.bending.is_empty()
     }
+    /// The function `parse_tag` takes a `MaterialProperty` and a string value and sets the
+    /// appropriate value in the `MaterialMechanics` struct.
+    ///
+    /// Arguments:
+    ///
+    /// * `key`: The `MaterialProperty` to set.
+    /// * `value`: The value to set the property to.
     pub fn parse_tag(&mut self, key: &MaterialProperty, value: &str) {
         match key {
             MaterialProperty::ImpactYield => {

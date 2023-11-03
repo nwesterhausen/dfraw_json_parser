@@ -3,13 +3,13 @@ use serde::{Deserialize, Serialize};
 use crate::parser::{
     biome::{Biome, BIOME_TOKENS},
     creature_caste::{Caste, CASTE_TOKENS},
-    creature_variation::raw::CreatureVariationRequirements,
+    creature_variation::CreatureVariationRequirements,
     helpers::build_object_id_from_pieces,
+    helpers::parse_min_max_range,
     helpers::serializer_helper,
     metadata::Metadata,
     names::{Name, SingPlurName},
     object_type::ObjectType,
-    ranges::parse_min_max_range,
     raws::RawObject,
     searchable::{clean_search_vec, Searchable},
     select_creature::SelectCreature,
@@ -18,6 +18,10 @@ use crate::parser::{
 
 use super::{phf_table::CREATURE_TOKENS, tokens::CreatureTag};
 
+#[derive(ts_rs::TS)]
+#[ts(export)]
+#[derive(Serialize, Deserialize, Debug, Clone, Default)]
+#[serde(rename_all = "camelCase")]
 /// The `Creature` struct represents a creature in a Dwarf Fortress, with the properties
 /// that can be set in the raws. Not all the raws are represented here, only the ones that
 /// are currently supported by the library.
@@ -28,49 +32,60 @@ use super::{phf_table::CREATURE_TOKENS, tokens::CreatureTag};
 /// based on the properties of the creature they are applied to. But right now the application
 /// of those changes is not applied, in order to preserve the original creature. So instead,
 /// they are saved and can be applied later (at the consumer's discretion).
-#[derive(ts_rs::TS)]
-#[ts(export)]
-#[derive(Serialize, Deserialize, Debug, Clone, Default)]
-#[serde(rename_all = "camelCase")]
 pub struct Creature {
     #[serde(skip_serializing_if = "serializer_helper::is_metadata_hidden")]
+    /// Provide information about the raws the `Creature` is found in.
     metadata: Metadata,
+    /// The identifier of the creature. This is used to uniquely identify the creature.
     identifier: String,
+    #[serde(skip_serializing_if = "Vec::is_empty")]
+    /// A vector of `Caste` objects that belong to this creature.
     castes: Vec<Caste>,
     #[serde(skip_serializing_if = "Vec::is_empty")]
+    /// A vector of `CreatureTag` objects that belong to this creature.
     tags: Vec<CreatureTag>,
     #[serde(skip_serializing_if = "Vec::is_empty")]
+    /// A vector of `Biome` objects where the creature can be found.
     biomes: Vec<Biome>,
     #[serde(skip_serializing_if = "Vec::is_empty")]
+    /// A vector of strings describing what Dwarves like about the `Creature`.
     pref_strings: Vec<String>,
     #[serde(skip_serializing_if = "Tile::is_default")]
+    /// The `Tile` object that describes how to draw the creature on screen.
     tile: Tile,
-    // integers
     #[serde(skip_serializing_if = "serializer_helper::is_default_frequency")]
-    frequency: u16, //Defaults to 50 if not specified
-    // [min, max] ranges
-    /// Default [1, 1]
+    /// How often the creature appears in the world. Defaults to 50 if not specified.
+    frequency: u16,
     #[serde(skip_serializing_if = "serializer_helper::min_max_is_ones")]
+    /// The size of groups the creature appears in. Defaults to `[1, 1]`` if not specified.
     cluster_number: [u16; 2],
-    /// Default [1, 1]
     #[serde(skip_serializing_if = "serializer_helper::min_max_is_ones")]
+    /// The total population that the creature will spawn into the world with.
+    /// Defaults to `[1, 1]`` if not specified.
     population_number: [u16; 2],
-    /// Default [0, 0] (aboveground)
     #[serde(skip_serializing_if = "serializer_helper::min_max_is_zeroes")]
+    /// The underground depth where the `Creature` is found. Default `[0, 0]` (aboveground)
     underground_depth: [u16; 2],
-    // strings
     #[serde(skip_serializing_if = "SingPlurName::is_empty")]
+    /// The name of the creature when it is a baby. Can be overridden at the caste level.
     general_baby_name: SingPlurName,
     #[serde(skip_serializing_if = "SingPlurName::is_empty")]
+    /// The name of the creature when it is a child. Can be overridden at the caste level.
     general_child_name: SingPlurName,
+    /// The general name of the creature.
     name: Name,
-    // Special tokens
     #[serde(skip_serializing_if = "String::is_empty")]
+    /// The name of another `Creature` to copy tags from.
     copy_tags_from: String,
     #[serde(skip_serializing_if = "Vec::is_empty")]
+    /// A vector of strings that represent the `CREATURE_VARIATION` raws that should be applied
     apply_creature_variation: Vec<String>,
+    /// The object ID of the creature. This is used to uniquely identify the creature even if
+    /// there are multiple versions of the creature in the raws.
     object_id: String,
     #[serde(skip_serializing_if = "Vec::is_empty")]
+    /// A vector of `SelectCreature` objects that represent the `SELECT_CREATURE` raws that should
+    /// be applied to this creature.
     select_creature_variation: Vec<SelectCreature>,
 }
 
@@ -322,9 +337,24 @@ impl Creature {
         self.castes.as_slice()
     }
 
-    pub fn does_not_exist(&self) -> bool {
-        self.tags.contains(&CreatureTag::DoesNotExist)
+    /// Check if the creature has the given tag.
+    ///
+    /// Arguments:
+    ///
+    /// * `tag`: A reference to the `CreatureTag` to check for.
+    ///
+    /// Returns:
+    ///
+    /// Returns true if the creature has the given tag, and false otherwise.
+    pub fn has_tag(&self, tag: &CreatureTag) -> bool {
+        self.tags.contains(tag)
     }
+
+    /// Get the `Creature`'s biome information.
+    ///
+    /// Returns:
+    ///
+    /// A vector of `Biome` objects.
     pub fn get_biomes(&self) -> Vec<Biome> {
         self.biomes.clone()
     }

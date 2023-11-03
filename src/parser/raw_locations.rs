@@ -19,6 +19,11 @@ pub enum RawModuleLocation {
 }
 
 impl RawModuleLocation {
+    /// Returns a `PathBuf` representing the location of the raw module within the DF directory.
+    ///
+    /// Returns:
+    ///
+    /// * `PathBuf`: The path to this raw module location.
     pub fn get_path(self) -> PathBuf {
         match self {
             RawModuleLocation::Mods => PathBuf::from("mods"),
@@ -27,6 +32,16 @@ impl RawModuleLocation {
             RawModuleLocation::Unknown => PathBuf::from("unknown"),
         }
     }
+    /// Create a new `RawModuleLocation` from a `PathBuf`. This looks at the path to determine
+    /// which `RawModuleLocation` it is.
+    ///
+    /// Arguments:
+    ///
+    /// * `path`: The path to the raw module location.
+    ///
+    /// Returns:
+    ///
+    /// * `RawModuleLocation`: The newly created `RawModuleLocation`.
     pub fn from_path<P: AsRef<Path>>(path: &P) -> Self {
         match path.as_ref().file_name() {
             Some(file_name) => match file_name.to_string_lossy().as_ref() {
@@ -44,7 +59,18 @@ impl RawModuleLocation {
             None => RawModuleLocation::Unknown,
         }
     }
-    pub fn from_sourced_directory(sourced_directory: &str) -> Self {
+    /// Create a new `RawModuleLocation` from a `&str`. This looks at the string to determine
+    /// which `RawModuleLocation` it is. This expects you to pass in the parent directory the
+    /// raw module is in. (Literally matching `mods`, `installed_mods`, or `vanilla`).
+    ///
+    /// Arguments:
+    ///
+    /// * `sourced_directory`: The string name the raw module location directory.
+    ///
+    /// Returns:
+    ///
+    /// * `RawModuleLocation`: The newly created `RawModuleLocation`.
+    pub fn from_directory_str(sourced_directory: &str) -> Self {
         match sourced_directory {
             "mods" => RawModuleLocation::Mods,
             "vanilla" => RawModuleLocation::Vanilla,
@@ -58,6 +84,16 @@ impl RawModuleLocation {
             }
         }
     }
+    /// Create a new `RawModuleLocation` from a `PathBuf` representing the full path to an
+    /// `info.txt` file. This looks at the path to determine which `RawModuleLocation` it is.
+    ///
+    /// Arguments:
+    ///
+    /// * `full_path`: The full path to the `info.txt` file.
+    ///
+    /// Returns:
+    ///
+    /// * `RawModuleLocation`: The newly created `RawModuleLocation`.
     pub fn from_info_text_file_path<P: AsRef<Path>>(full_path: &P) -> Self {
         // info.txt is relative by 2 parents from our module location
         // <MODULE LOCATION>/<RAW MODULE>/info.txt
@@ -70,7 +106,7 @@ impl RawModuleLocation {
                             .unwrap_or_default()
                             .to_string_lossy(),
                     );
-                    return Self::from_sourced_directory(path_string.as_str());
+                    return Self::from_directory_str(path_string.as_str());
                 }
                 None => RawModuleLocation::Unknown,
             },

@@ -2,8 +2,7 @@ use std::path::{Component, Path, PathBuf};
 
 use clap::{Parser, ValueEnum};
 use dfraw_json_parser::{
-    options::{ParserOptions, ParsingJob},
-    parser::raw_locations::RawModuleLocation,
+    RawModuleLocation, {ParserOptions, ParsingJob},
 };
 use fern::colors::{Color, ColoredLevelConfig};
 
