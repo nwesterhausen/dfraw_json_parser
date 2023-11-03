@@ -62,7 +62,8 @@ for the steam workshop if it is a mod downloaded from the steam workshop.
 
 */
 
-#![warn(clippy::pedantic, clippy::missing_docs_in_private_items)]
+// Reminder about clippy::missing_docs_in_private_items
+#![warn(clippy::pedantic)]
 #![allow(clippy::must_use_candidate)]
 
 use std::path::{Path, PathBuf};
