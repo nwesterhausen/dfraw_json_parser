@@ -18,7 +18,11 @@ pub enum PositionToken {
     /// Arguments: position
     ///
     /// This position can only be chosen for the task from the nobles screen, and is available only if there is an *argument* present.
+<<<<<<< HEAD:lib/src/parser/position/tokens.rs
     /// For example, the GENERAL is `[APPOINTED_BY:MONARCH]`. Contrast `[ELECTED]`. Being appointed by a MONARCH seems to handle a lot of
+=======
+    /// For example, the GENERAL is `APPOINTED_BY:MONARCH`. Contrast ELECTED. Being appointed by a MONARCH seems to handle a lot of
+>>>>>>> 6f58260 (docs: add doc comments):src/parser/position/tokens.rs
     /// worldgen stuff, and interferes with fort mode titles. Multiple entries are allowed. If you have neither an ELECTED-token nor a
     /// APPOINTED_BY-token, the holder may always be changed (like the expedition leader)
     AppointedBy,
@@ -34,6 +38,7 @@ pub enum PositionToken {
     ///
     /// Creatures of this position will have this color, instead of their profession color
     ///
+<<<<<<< HEAD:lib/src/parser/position/tokens.rs
     /// e.g. `[COLOR:5:0:1]`.
     Color,
     /// Arguments: position, 'ALL'
@@ -41,6 +46,15 @@ pub enum PositionToken {
     /// This position will act as a commander of the specified position.
     ///
     /// E.g. GENERAL is `[COMMANDER:LIEUTENANT:ALL]`. Unknown if values other than ALL work. Multiple entries are allowed
+=======
+    /// e.g. `COLOR:5:0:1`.
+    Color,
+    /// Arguments: position, 'ALL'
+    ///
+    /// This position will act as a commander of the specified position
+    ///
+    /// E.g. GENERAL is `COMMANDER:LIEUTENANT:ALL`. Unknown if values other than ALL work. Multiple entries are allowed
+>>>>>>> 6f58260 (docs: add doc comments):src/parser/position/tokens.rs
     Commander,
     /// This position is a puppet ruler left behind in a conquered site.
     ConqueredSite,
@@ -57,11 +71,19 @@ pub enum PositionToken {
     /// The population will periodically select the most skill-eligible creature to fill this position for site-level positions
     /// at the player's fort. For responsibilities or positions that use more than one skill, no skill takes priority in electing
     /// a creature: an accomplished comedian is more qualified for the TRADE responsibility than a skilled appraiser.
+<<<<<<< HEAD:lib/src/parser/position/tokens.rs
     /// A creature may be elected to multiple positions at the same time. Contrast `[APPOINTED_BY]`. More info: Elections
     Elected,
     /// Arguments: weapon skill
     ///
     /// A mandatory sub-tag of `[RESPONSIBILITY:EXECUTIONS]`. Determines the weapon chosen by the executioner for their work.
+=======
+    /// A creature may be elected to multiple positions at the same time. Contrast `APPOINTED_BY`. More info: Elections
+    Elected,
+    /// Arguments: weapon skill
+    ///
+    /// A mandatory sub-tag of `RESPONSIBILITY:EXECUTIONS`. Determines the weapon chosen by the executioner for their work.
+>>>>>>> 6f58260 (docs: add doc comments):src/parser/position/tokens.rs
     ExecutionSkill,
     /// The various members who have filled this role will be listed in the civilization's history.
     ExportedInLegends,
@@ -69,7 +91,7 @@ pub enum PositionToken {
     Flashes,
     /// Arguments: 'MALE' or 'FEMALE'
     ///
-    /// The position can only be held by the specified gender. Currently bugged Bug:2714
+    /// The position can only be held by the specified gender.
     Gender,
     /// The position can assign quests to adventurers.
     KillQuest,
@@ -83,7 +105,11 @@ pub enum PositionToken {
     ///
     /// The name the area takes on when under the control of a LAND_HOLDER.
     ///
+<<<<<<< HEAD:lib/src/parser/position/tokens.rs
     /// E.g. for the DUKE, `[LAND_NAME:a duchy]`.
+=======
+    /// E.g. for the DUKE, `LAND_NAME:a duchy`.
+>>>>>>> 6f58260 (docs: add doc comments):src/parser/position/tokens.rs
     ///
     /// If the position is not a LAND_HOLDER, the land_name is still displayed left of the position in the nobles menu.
     LandName,
@@ -91,11 +117,11 @@ pub enum PositionToken {
     ///
     /// The maximum number of mandates the position can make at once.
     MandateMax,
-    /// The position holder cannot be assigned labors. Currently nonfunctional.Bug:3721
+    /// The position holder cannot be assigned labors. Currently nonfunctional.
     MenialWorkExemption,
     /// The spouse of the position holder doesn't have to work, either - see above.
     MenialWorkExemptionSpouse,
-    /// This position cannot be appointed from the nobles screen. Intended for militia captains and other squad leaders to reduce clutter. Currently nonfunctionalBug:8965
+    /// This position cannot be appointed from the nobles screen. Intended for militia captains and other squad leaders to reduce clutter. Currently nonfunctional
     MilitaryScreenOnly,
     /// Arguments: SingPlurName
     ///
@@ -105,13 +131,21 @@ pub enum PositionToken {
     ///
     /// If the creature holding the position is male, this is the position's name.
     ///
+<<<<<<< HEAD:lib/src/parser/position/tokens.rs
     /// E.g. for MONARCH, `[NAME_MALE:king:kings]`
+=======
+    /// E.g. for MONARCH, `NAME_MALE:king:kings`
+>>>>>>> 6f58260 (docs: add doc comments):src/parser/position/tokens.rs
     NameMale,
     /// Arguments: SingPlurName
     ///
     /// If the creature holding the position is female, this is the position's name.
     ///
+<<<<<<< HEAD:lib/src/parser/position/tokens.rs
     /// E.g. for MONARCH, `[NAME_FEMALE:queen:queens]`
+=======
+    /// E.g. for MONARCH, `NAME_FEMALE:queen:queens`
+>>>>>>> 6f58260 (docs: add doc comments):src/parser/position/tokens.rs
     NameFemale,
     /// arguments: description
     ///
@@ -119,18 +153,30 @@ pub enum PositionToken {
     Description,
     /// Arguments: number or 'AS_NEEDED'
     ///
+<<<<<<< HEAD:lib/src/parser/position/tokens.rs
     /// How many of the position there should be. If the `[SITE]` token exists, this is per site, otherwise this is per civilization.
     ///
     /// `AS_NEEDED` applies only to positions involved with the military command chain; this is used to allow armies to expand to
     /// whatever size they need to be. Non-military positions with `NUMBER:AS_NEEDED` will not be appointed.
     /// The problem with Lieutenants and Captains not been created, is their `AS_NEEDED` number.
+=======
+    /// How many of the position there should be. If the `SITE` token exists, this is per site, otherwise this is per civilization.
+    ///
+    /// AS_NEEDED applies only to positions involved with the military command chain; this is used to allow armies to expand to
+    /// whatever size they need to be. Non-military positions with `NUMBER:AS_NEEDED` will not be appointed.
+    /// The problem with Lieutenants and Captains not been created, is their AS_NEEDED number.
+>>>>>>> 6f58260 (docs: add doc comments):src/parser/position/tokens.rs
     /// They are only then created when the're needed, and that has some pretty unusual conditions.
     /// When a fixed number is used, they are appointed with the creation of the civ.
     Number,
     /// Arguments: number (0 - 30_000) or 'NONE'
     ///
     /// How important the position is in society; a lower number is more important and displayed higher in the Nobles menu.
+<<<<<<< HEAD:lib/src/parser/position/tokens.rs
     /// For `MONARCH` it's 1, for `MILITIA_CAPTAIN` it's 200. The game just assumes that anything with `[PRECEDENCE:1]` is the ruler,
+=======
+    /// For MONARCH it's 1, for MILITIA_CAPTAIN it's 200. The game just assumes that anything with `PRECEDENCE:1` is the ruler,
+>>>>>>> 6f58260 (docs: add doc comments):src/parser/position/tokens.rs
     /// for both embark screen and mountain home purposes.
     ///
     /// A civ-position will also be created without precedence. Positions may have the same precedence and will be appointed,
@@ -150,7 +196,11 @@ pub enum PositionToken {
     RejectedCreature,
     /// Arguments: position
     ///
+<<<<<<< HEAD:lib/src/parser/position/tokens.rs
     /// This position is absorbed by another down the line. For example, expedition leader is `[REPLACED_BY:MAYOR]`.
+=======
+    /// This position is absorbed by another down the line. For example, expedition leader is `REPLACED_BY:MAYOR`.
+>>>>>>> 6f58260 (docs: add doc comments):src/parser/position/tokens.rs
     /// Only a single entry is allowed.
     ReplacedBy,
     /// Arguments: number (0 - 10_000_000)

@@ -3,6 +3,7 @@ use serde::{Deserialize, Serialize};
 #[derive(ts_rs::TS)]
 #[ts(export)]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, Default)]
+/// The Biome enum contains all the possible biomes in Dwarf Fortress.
 pub enum Biome {
     Mountain,
     Mountains,

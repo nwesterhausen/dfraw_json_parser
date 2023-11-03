@@ -3,13 +3,13 @@ use slug::slugify;
 
 use crate::parser::{
     biome::{Biome, BIOME_TOKENS},
+    helpers::parse_min_max_range,
     helpers::serializer_helper,
     material::{Material, MATERIAL_PROPERTY_TOKENS, MATERIAL_USAGE_TOKENS},
     metadata::Metadata,
     names::Name,
     object_type::ObjectType,
     plant_growth::{GrowthTag, GrowthType, PlantGrowth, GROWTH_TOKENS, GROWTH_TYPE_TOKENS},
-    ranges::parse_min_max_range,
     raws::RawObject,
     searchable::{clean_search_vec, Searchable},
     shrub::{Shrub, SHRUB_TOKENS},

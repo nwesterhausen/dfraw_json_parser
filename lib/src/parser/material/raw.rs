@@ -11,7 +11,7 @@ use crate::parser::{
     Color, MaterialMechanics, Searchable, StateName, Temperatures, Tile,
 =======
     color::Color,
-    creature_effect::EFFECT_TOKENS,
+    creature_effect::CREATURE_EFFECT_TOKENS,
     helpers::serializer_helper,
     material::phf_table::MATERIAL_PROPERTY_TOKENS,
     material_mechanics::MaterialMechanics,
@@ -283,25 +283,25 @@ impl Material {
                 // Temperatures
                 Property::SpecificHeat => self
                     .temperatures
-                    .update_specific_heat(value.parse::<u32>().unwrap_or(0)),
+                    .set_specific_heat(value.parse::<u32>().unwrap_or(0)),
                 Property::IgnitionPoint => self
                     .temperatures
-                    .update_ignition_point(value.parse::<u32>().unwrap_or(0)),
+                    .set_ignition_point(value.parse::<u32>().unwrap_or(0)),
                 Property::MeltingPoint => self
                     .temperatures
-                    .update_melting_point(value.parse::<u32>().unwrap_or(0)),
+                    .set_melting_point(value.parse::<u32>().unwrap_or(0)),
                 Property::BoilingPoint => self
                     .temperatures
-                    .update_boiling_point(value.parse::<u32>().unwrap_or(0)),
+                    .set_boiling_point(value.parse::<u32>().unwrap_or(0)),
                 Property::HeatDamagePoint => self
                     .temperatures
-                    .update_heat_damage_point(value.parse::<u32>().unwrap_or(0)),
+                    .set_heat_damage_point(value.parse::<u32>().unwrap_or(0)),
                 Property::ColdDamagePoint => self
                     .temperatures
-                    .update_cold_damage_point(value.parse::<u32>().unwrap_or(0)),
+                    .set_cold_damage_point(value.parse::<u32>().unwrap_or(0)),
                 Property::MaterialFixedTemperature => self
                     .temperatures
-                    .update_material_fixed_temperature(value.parse::<u32>().unwrap_or(0)),
+                    .set_material_fixed_temperature(value.parse::<u32>().unwrap_or(0)),
                 // Syndrome
                 Property::Syndrome => {
                     let syndrome = Syndrome::new();
@@ -383,6 +383,7 @@ impl Material {
 
         // Materials can have syndromes attached and syndromes have creature effects attached.
 <<<<<<< HEAD:lib/src/parser/material/raw.rs
+<<<<<<< HEAD:lib/src/parser/material/raw.rs
         if SYNDROME_TOKEN_MAP.contains_key(key)
             || CREATURE_EFFECT_TOKENS.contains_key(key)
             || key == "CE"
@@ -390,6 +391,12 @@ impl Material {
 =======
         if SYNDROME_TOKEN.contains_key(key) || EFFECT_TOKENS.contains_key(key) || key == "CE" {
 >>>>>>> 2b37a6f (refactor: expose 1 level down):src/parser/material/raw.rs
+=======
+        if SYNDROME_TOKEN.contains_key(key)
+            || CREATURE_EFFECT_TOKENS.contains_key(key)
+            || key == "CE"
+        {
+>>>>>>> 6f58260 (docs: add doc comments):src/parser/material/raw.rs
             // We need to add the tag to the last syndrome added (all syndromes start with SYNDROME key)
             if let Some(syndrome) = self.syndromes.last_mut() {
                 syndrome.parse_tag(key, value);

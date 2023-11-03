@@ -1,6 +1,6 @@
 use std::path::Path;
 
-use crate::{options::ParserOptions, parser::info_txt::ModuleInfoFile, parser::raws::RawObject};
+use crate::{options::ParserOptions, parser::info_txt::ModuleInfoFile, RawObject};
 
 mod header;
 mod parsable_types;

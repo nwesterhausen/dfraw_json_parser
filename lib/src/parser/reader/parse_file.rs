@@ -10,7 +10,7 @@ use crate::{
     parser::{
         creature::Creature,
         entity::Entity,
-        graphics::{Graphic, GraphicType, TilePage, GRAPHIC_TYPE_TAGS},
+        graphic::{Graphic, GraphicType, TilePage, GRAPHIC_TYPE_TAGS},
         info_txt::ModuleInfoFile,
         inorganic::Inorganic,
         material_template::MaterialTemplate,

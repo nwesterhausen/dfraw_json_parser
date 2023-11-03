@@ -3,7 +3,7 @@ use tracing::warn;
 use crate::parser::{
     creature::Creature,
     entity::Entity,
-    graphics::{Graphic, TilePage},
+    graphic::{Graphic, TilePage},
     inorganic::Inorganic,
     material_template::MaterialTemplate,
 <<<<<<< HEAD:lib/src/parser/helpers/clone_raw_object_box.rs

@@ -2,15 +2,15 @@ use std::path::{Path, PathBuf};
 
 use serde::{Deserialize, Serialize};
 
-use crate::parser::{object_type::ObjectType, raw_locations::RawModuleLocation};
+use crate::{ObjectType, RawModuleLocation};
 
-/// Option struct for passing to any parse function.
 #[allow(clippy::module_name_repetitions)]
 #[allow(clippy::struct_excessive_bools)]
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 #[derive(ts_rs::TS)]
 #[ts(export)]
+/// Option struct for passing to any parse function.
 pub struct ParserOptions {
     /// Whether to attach a metadata field to the raws.
     /// If true, all raws will have a `metadata` field which shows information about the
@@ -65,11 +65,20 @@ pub struct ParserOptions {
 
 #[derive(Debug, Clone, Serialize, Deserialize, PartialEq, Eq, ts_rs::TS)]
 #[ts(export)]
+/// The job to perform when parsing.
 pub enum ParsingJob {
+    /// Parse an exact raw file. When this is the job, the `target_path` should be the path to the raw file.
     SingleRaw,
+    /// Parse a single module. When this is the job, the `target_path` should be the path to the module (which includes the
+    /// info.txt file).
     SingleModule,
+    /// Parse all modules within the locations provided. When this is the job, the `target_path` should be the path to
+    /// the dwarf fortress directory.
     AllModulesInLocations,
+    /// Parse an exact info.txt file. When this is the job, the `target_path` should be the path to the info.txt file.
     SingleModuleInfoFile,
+    /// Parse all info.txt files within the locations provided. When this is the job, the `target_path` should be the path to
+    /// the dwarf fortress directory.
     AllModuleInfoFiles,
 }
 

@@ -3,10 +3,14 @@ use tracing::{debug, warn};
 
 use crate::parser::{
 <<<<<<< HEAD:lib/src/parser/syndrome/raw.rs
+<<<<<<< HEAD:lib/src/parser/syndrome/raw.rs
     creature_effect::TOKEN_MAP as CREATURE_EFFECT_TOKENS,
     serializer_helper, {clean_search_vec, Searchable},
 =======
     creature_effect::EFFECT_TOKENS,
+=======
+    creature_effect::CREATURE_EFFECT_TOKENS,
+>>>>>>> 6f58260 (docs: add doc comments):src/parser/syndrome/raw.rs
     helpers::serializer_helper,
     searchable::{clean_search_vec, Searchable},
 >>>>>>> 2b37a6f (refactor: expose 1 level down):src/parser/syndrome/raw.rs
@@ -58,7 +62,7 @@ impl Syndrome {
         }
     }
     pub fn parse_tag(&mut self, key: &str, value: &str) {
-        if EFFECT_TOKENS.contains_key(key) {
+        if CREATURE_EFFECT_TOKENS.contains_key(key) {
             self.conditions.push(String::from(value));
             return;
         }

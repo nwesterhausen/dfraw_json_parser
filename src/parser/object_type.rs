@@ -2,7 +2,12 @@ use std::fmt::{Debug, Display};
 
 use serde::{Deserialize, Serialize};
 
+<<<<<<< HEAD
 pub static OBJECT_TOKEN_MAP: phf::Map<&'static str, ObjectType> = phf::phf_map! {
+=======
+/// A PHF map of the string literal object tokens to the `ObjectType` enum.
+pub static OBJECT_TOKENS: phf::Map<&'static str, ObjectType> = phf::phf_map! {
+>>>>>>> 6f58260 (docs: add doc comments)
     "CREATURE" => ObjectType::Creature,
     "INORGANIC" => ObjectType::Inorganic,
     "PLANT" => ObjectType::Plant,
@@ -48,6 +53,9 @@ pub static OBJECT_TOKEN_MAP: phf::Map<&'static str, ObjectType> = phf::phf_map! 
 #[derive(ts_rs::TS)]
 #[ts(export)]
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize, Default)]
+/// The various types of raw objects. These are identified in the raws by the `OBJECT` token.
+///
+/// e.g. `[OBJECT:CREATURE]`
 pub enum ObjectType {
     Creature,
     Inorganic,

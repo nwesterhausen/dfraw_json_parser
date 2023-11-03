@@ -1,5 +1,6 @@
 use super::tokens::{CreatureEffectProperty, CreatureEffectToken};
 
+/// This is a PHF map of all the creature effect tokens that are used in the raws.
 pub static CREATURE_EFFECT_TOKENS: phf::Map<&'static str, CreatureEffectToken> = phf::phf_map! {
     "CE_PAIN" => CreatureEffectToken::Pain,
     "CE_SWELLING" => CreatureEffectToken::Swelling,
@@ -55,7 +56,7 @@ pub static CREATURE_EFFECT_TOKENS: phf::Map<&'static str, CreatureEffectToken> =
     "CE_ERRATIC_BEHAVIOR" => CreatureEffectToken::ErraticBehavior,
 };
 
-#[allow(dead_code)]
+/// This is a PHF map of all the creature effect property tokens that are used in the raws.
 pub static CREATURE_EFFECT_PROPERTY_TOKENS: phf::Map<&'static str, CreatureEffectProperty> = phf::phf_map! {
     "SEV" => CreatureEffectProperty::Severity,
     "PROB" => CreatureEffectProperty::Probability,

@@ -5,7 +5,13 @@ use serde::{Deserialize, Serialize};
 #[ts(export)]
 #[derive(Serialize, Deserialize, Debug, Clone, Default)]
 #[serde(rename_all = "camelCase")]
+<<<<<<< HEAD:lib/src/parser/simple_structs/temperatures.rs
 /// The temperature properties of a material
+=======
+/// This struct describes the temperatures of a material. The way temperatures are defined in the raws
+/// is by many individual tokens, each of which describes a different temperature-related property. This
+/// struct is used to group all of those tokens together.
+>>>>>>> 6f58260 (docs: add doc comments):src/parser/temperature.rs
 pub struct Temperatures {
     /// This determines how long it takes the material to heat up or cool down.
     /// A material with a high specific heat capacity will hold more heat and affect its surroundings more
@@ -42,6 +48,11 @@ pub struct Temperatures {
 }
 
 impl Temperatures {
+    /// Check if the `Temperatures` struct is empty/default.
+    ///
+    /// Returns:
+    ///
+    /// * `bool`: True if the `Temperatures` struct is empty, false otherwise.
     pub fn is_empty(&self) -> bool {
         self.specific_heat == 0
             && self.ignition_point == 0
@@ -51,25 +62,60 @@ impl Temperatures {
             && self.cold_damage_point == 0
             && self.material_fixed_temperature == 0
     }
-    pub fn update_specific_heat(&mut self, value: u32) {
+    /// Set the `specific_heat` field.
+    ///
+    /// Arguments:
+    ///
+    /// * `value`: The value to set the `specific_heat` field to.
+    pub fn set_specific_heat(&mut self, value: u32) {
         self.specific_heat = value;
     }
-    pub fn update_ignition_point(&mut self, value: u32) {
+    /// Set the `ignition_point` field.
+    ///
+    /// Arguments:
+    ///
+    /// * `value`: The value to set the `ignition_point` field to.
+    pub fn set_ignition_point(&mut self, value: u32) {
         self.ignition_point = value;
     }
-    pub fn update_melting_point(&mut self, value: u32) {
+    /// Set the `melting_point` field.
+    ///
+    /// Arguments:
+    ///
+    /// * `value`: The value to set the `melting_point` field to.
+    pub fn set_melting_point(&mut self, value: u32) {
         self.melting_point = value;
     }
-    pub fn update_boiling_point(&mut self, value: u32) {
+    /// Set the `boiling_point` field.
+    ///
+    /// Arguments:
+    ///
+    /// * `value`: The value to set the `boiling_point` field to.
+    pub fn set_boiling_point(&mut self, value: u32) {
         self.boiling_point = value;
     }
-    pub fn update_heat_damage_point(&mut self, value: u32) {
+    /// Set the `heat_damage_point` field.
+    ///
+    /// Arguments:
+    ///
+    /// * `value`: The value to set the `heat_damage_point` field to.
+    pub fn set_heat_damage_point(&mut self, value: u32) {
         self.heat_damage_point = value;
     }
-    pub fn update_cold_damage_point(&mut self, value: u32) {
+    /// Set the `cold_damage_point` field.
+    ///
+    /// Arguments:
+    ///
+    /// * `value`: The value to set the `cold_damage_point` field to.
+    pub fn set_cold_damage_point(&mut self, value: u32) {
         self.cold_damage_point = value;
     }
-    pub fn update_material_fixed_temperature(&mut self, value: u32) {
+    /// Set the `material_fixed_temperature` field.
+    ///
+    /// Arguments:
+    ///
+    /// * `value`: The value to set the `material_fixed_temperature` field to.
+    pub fn set_material_fixed_temperature(&mut self, value: u32) {
         self.material_fixed_temperature = value;
     }
 }
