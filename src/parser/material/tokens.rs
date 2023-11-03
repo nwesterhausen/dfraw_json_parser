@@ -3,7 +3,7 @@ use serde::{Deserialize, Serialize};
 #[derive(ts_rs::TS)]
 #[ts(export)]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, Default)]
-pub enum MaterialType {
+pub enum Type {
     Inorganic,
     Stone,
     Metal,
@@ -54,7 +54,7 @@ pub enum FuelType {
 #[derive(ts_rs::TS)]
 #[ts(export)]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, Default)]
-pub enum MaterialState {
+pub enum State {
     Solid,
     Liquid,
     Gas,
@@ -76,7 +76,7 @@ pub enum MaterialState {
 #[derive(ts_rs::TS)]
 #[ts(export)]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, Default)]
-pub enum MaterialUsage {
+pub enum Usage {
     /// Lets the game know that an animal was likely killed in the production of this item.
     /// Entities opposed to killing animals (Elves in vanilla) will refuse to accept these items in trade.
     ImpliesAnimalKill,
@@ -242,7 +242,7 @@ pub enum MaterialUsage {
 #[derive(ts_rs::TS)]
 #[ts(export)]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, Default)]
-pub enum MaterialProperty {
+pub enum Property {
     /// Imports the properties of the specified preexisting material template.
     UseMaterialTemplate,
     /// Applies a prefix to all items made from the material. For PLANT and CREATURE materials, this defaults to the plant/creature name.
@@ -443,127 +443,127 @@ impl FuelType {
         matches!(self, FuelType::None)
     }
 }
-impl MaterialType {
+impl Type {
     /// Used just to help serialization
     pub fn is_default(&self) -> bool {
-        matches!(self, MaterialType::Unknown)
+        matches!(self, Type::Unknown)
     }
 }
 
-impl std::fmt::Display for MaterialType {
+impl std::fmt::Display for Type {
     fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
         match self {
-            MaterialType::Inorganic => write!(f, "Inorganic"),
-            MaterialType::Stone => write!(f, "Stone"),
-            MaterialType::Metal => write!(f, "Metal"),
-            MaterialType::Coal => write!(f, "Coal"),
-            MaterialType::CreatureMaterial => write!(f, "CreatureMaterial"),
-            MaterialType::LocalCreatureMaterial => write!(f, "LocalCreatureMaterial"),
-            MaterialType::PlantMaterial => write!(f, "PlantMaterial"),
-            MaterialType::LocalPlantMaterial => write!(f, "LocalPlantMaterial"),
-            MaterialType::GetMaterialFromReagent => write!(f, "GetMaterialFromReagent"),
-            MaterialType::Amber => write!(f, "Amber"),
-            MaterialType::Coral => write!(f, "Coral"),
-            MaterialType::GlassGreen => write!(f, "GlassGreen"),
-            MaterialType::GlassClear => write!(f, "GlassClear"),
-            MaterialType::GlassCrystal => write!(f, "GlassCrystal"),
-            MaterialType::Water => write!(f, "Water"),
-            MaterialType::Potash => write!(f, "Potash"),
-            MaterialType::Ash => write!(f, "Ash"),
-            MaterialType::PearlAsh => write!(f, "PearlAsh"),
-            MaterialType::Lye => write!(f, "Lye"),
-            MaterialType::Mud => write!(f, "Mud"),
-            MaterialType::Vomit => write!(f, "Vomit"),
-            MaterialType::Salt => write!(f, "Salt"),
-            MaterialType::FilthB => write!(f, "FilthB"),
-            MaterialType::FilthY => write!(f, "FilthY"),
-            MaterialType::UnknownSubstance => write!(f, "UnknownSubstance"),
-            MaterialType::Grime => write!(f, "Grime"),
-            MaterialType::Unknown => write!(f, "Unknown"),
+            Type::Inorganic => write!(f, "Inorganic"),
+            Type::Stone => write!(f, "Stone"),
+            Type::Metal => write!(f, "Metal"),
+            Type::Coal => write!(f, "Coal"),
+            Type::CreatureMaterial => write!(f, "CreatureMaterial"),
+            Type::LocalCreatureMaterial => write!(f, "LocalCreatureMaterial"),
+            Type::PlantMaterial => write!(f, "PlantMaterial"),
+            Type::LocalPlantMaterial => write!(f, "LocalPlantMaterial"),
+            Type::GetMaterialFromReagent => write!(f, "GetMaterialFromReagent"),
+            Type::Amber => write!(f, "Amber"),
+            Type::Coral => write!(f, "Coral"),
+            Type::GlassGreen => write!(f, "GlassGreen"),
+            Type::GlassClear => write!(f, "GlassClear"),
+            Type::GlassCrystal => write!(f, "GlassCrystal"),
+            Type::Water => write!(f, "Water"),
+            Type::Potash => write!(f, "Potash"),
+            Type::Ash => write!(f, "Ash"),
+            Type::PearlAsh => write!(f, "PearlAsh"),
+            Type::Lye => write!(f, "Lye"),
+            Type::Mud => write!(f, "Mud"),
+            Type::Vomit => write!(f, "Vomit"),
+            Type::Salt => write!(f, "Salt"),
+            Type::FilthB => write!(f, "FilthB"),
+            Type::FilthY => write!(f, "FilthY"),
+            Type::UnknownSubstance => write!(f, "UnknownSubstance"),
+            Type::Grime => write!(f, "Grime"),
+            Type::Unknown => write!(f, "Unknown"),
         }
     }
 }
 
-impl std::fmt::Display for MaterialUsage {
+impl std::fmt::Display for Usage {
     fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
         match self {
-            MaterialUsage::ImpliesAnimalKill => write!(f, "ImpliesAnimalKill"),
-            MaterialUsage::AlcoholPlant => write!(f, "AlcoholPlant"),
-            MaterialUsage::AlcoholCreature => write!(f, "AlcoholCreature"),
-            MaterialUsage::Alcohol => write!(f, "Alcohol"),
-            MaterialUsage::CheesePlant => write!(f, "CheesePlant"),
-            MaterialUsage::CheeseCreature => write!(f, "CheeseCreature"),
-            MaterialUsage::Cheese => write!(f, "Cheese"),
-            MaterialUsage::PowderMiscPlant => write!(f, "PowderMiscPlant"),
-            MaterialUsage::PowderMiscCreature => write!(f, "PowderMiscCreature"),
-            MaterialUsage::PowderMisc => write!(f, "PowderMisc"),
-            MaterialUsage::StockpileGlobOrStockpileGlobSolid => {
+            Usage::ImpliesAnimalKill => write!(f, "ImpliesAnimalKill"),
+            Usage::AlcoholPlant => write!(f, "AlcoholPlant"),
+            Usage::AlcoholCreature => write!(f, "AlcoholCreature"),
+            Usage::Alcohol => write!(f, "Alcohol"),
+            Usage::CheesePlant => write!(f, "CheesePlant"),
+            Usage::CheeseCreature => write!(f, "CheeseCreature"),
+            Usage::Cheese => write!(f, "Cheese"),
+            Usage::PowderMiscPlant => write!(f, "PowderMiscPlant"),
+            Usage::PowderMiscCreature => write!(f, "PowderMiscCreature"),
+            Usage::PowderMisc => write!(f, "PowderMisc"),
+            Usage::StockpileGlobOrStockpileGlobSolid => {
                 write!(f, "StockpileGlobOrStockpileGlobSolid")
             }
-            MaterialUsage::StockpileGlobPaste => write!(f, "StockpileGlobPaste"),
-            MaterialUsage::StockpileGlobPressed => write!(f, "StockpileGlobPressed"),
-            MaterialUsage::StockpilePlantGrowth => write!(f, "StockpilePlantGrowth"),
-            MaterialUsage::LiquidMiscPlant => write!(f, "LiquidMiscPlant"),
-            MaterialUsage::LiquidMiscCreature => write!(f, "LiquidMiscCreature"),
-            MaterialUsage::LiquidMiscOther => write!(f, "LiquidMiscOther"),
-            MaterialUsage::LiquidMisc => write!(f, "LiquidMisc"),
-            MaterialUsage::StructuralPlantMat => write!(f, "StructuralPlantMat"),
-            MaterialUsage::SeedMat => write!(f, "SeedMat"),
-            MaterialUsage::Bone => write!(f, "Bone"),
-            MaterialUsage::Wood => write!(f, "Wood"),
-            MaterialUsage::ThreadPlant => write!(f, "ThreadPlant"),
-            MaterialUsage::Tooth => write!(f, "Tooth"),
-            MaterialUsage::Horn => write!(f, "Horn"),
-            MaterialUsage::Hair => write!(f, "Hair"),
-            MaterialUsage::Pearl => write!(f, "Pearl"),
-            MaterialUsage::Shell => write!(f, "Shell"),
-            MaterialUsage::Leather => write!(f, "Leather"),
-            MaterialUsage::Silk => write!(f, "Silk"),
-            MaterialUsage::Soap => write!(f, "Soap"),
-            MaterialUsage::GeneratesMiasma => write!(f, "GeneratesMiasma"),
-            MaterialUsage::Meat => write!(f, "Meat"),
-            MaterialUsage::Rots => write!(f, "Rots"),
-            MaterialUsage::NervousTissue => write!(f, "NervousTissue"),
-            MaterialUsage::BloodMapDescriptor => write!(f, "BloodMapDescriptor"),
-            MaterialUsage::IchorMapDescriptor => write!(f, "IchorMapDescriptor"),
-            MaterialUsage::GooMapDescriptor => write!(f, "GooMapDescriptor"),
-            MaterialUsage::SlimeMapDescriptor => write!(f, "SlimeMapDescriptor"),
-            MaterialUsage::PusMapDescriptor => write!(f, "PusMapDescriptor"),
-            MaterialUsage::SweatMapDescriptor => write!(f, "SweatMapDescriptor"),
-            MaterialUsage::TearsMapDescriptor => write!(f, "TearsMapDescriptor"),
-            MaterialUsage::SpitMapDescriptor => write!(f, "SpitMapDescriptor"),
-            MaterialUsage::Evaporates => write!(f, "Evaporates"),
-            MaterialUsage::EntersBlood => write!(f, "EntersBlood"),
-            MaterialUsage::EdibleVermin => write!(f, "EdibleVermin"),
-            MaterialUsage::EdibleRaw => write!(f, "EdibleRaw"),
-            MaterialUsage::EdibleCooked => write!(f, "EdibleCooked"),
-            MaterialUsage::DoNotCleanGlob => write!(f, "DoNotCleanGlob"),
-            MaterialUsage::NoStoneStockpile => write!(f, "NoStoneStockpile"),
-            MaterialUsage::ItemsMetal => write!(f, "ItemsMetal"),
-            MaterialUsage::ItemsBarred => write!(f, "ItemsBarred"),
-            MaterialUsage::ItemsScaled => write!(f, "ItemsScaled"),
-            MaterialUsage::ItemsLeather => write!(f, "ItemsLeather"),
-            MaterialUsage::ItemsSoft => write!(f, "ItemsSoft"),
-            MaterialUsage::ItemsHard => write!(f, "ItemsHard"),
-            MaterialUsage::IsStone => write!(f, "IsStone"),
-            MaterialUsage::IsCeramic => write!(f, "IsCeramic"),
-            MaterialUsage::Undiggable => write!(f, "Undiggable"),
-            MaterialUsage::DisplayUnglazed => write!(f, "DisplayUnglazed"),
-            MaterialUsage::Yarn => write!(f, "Yarn"),
-            MaterialUsage::StockpileThreadMetal => write!(f, "StockpileThreadMetal"),
-            MaterialUsage::IsMetal => write!(f, "IsMetal"),
-            MaterialUsage::IsGlass => write!(f, "IsGlass"),
-            MaterialUsage::CrystalGlassable => write!(f, "CrystalGlassable"),
-            MaterialUsage::ItemsWeapon => write!(f, "ItemsWeapon"),
-            MaterialUsage::ItemsWeaponRanged => write!(f, "ItemsWeaponRanged"),
-            MaterialUsage::ItemsAnvil => write!(f, "ItemsAnvil"),
-            MaterialUsage::ItemsAmmo => write!(f, "ItemsAmmo"),
-            MaterialUsage::ItemsDigger => write!(f, "ItemsDigger"),
-            MaterialUsage::ItemsArmor => write!(f, "ItemsArmor"),
-            MaterialUsage::ItemsDelicate => write!(f, "ItemsDelicate"),
-            MaterialUsage::ItemsSiegeEngine => write!(f, "ItemsSiegeEngine"),
-            MaterialUsage::ItemsQuern => write!(f, "ItemsQuern"),
-            MaterialUsage::Unknown => write!(f, "Unknown"),
+            Usage::StockpileGlobPaste => write!(f, "StockpileGlobPaste"),
+            Usage::StockpileGlobPressed => write!(f, "StockpileGlobPressed"),
+            Usage::StockpilePlantGrowth => write!(f, "StockpilePlantGrowth"),
+            Usage::LiquidMiscPlant => write!(f, "LiquidMiscPlant"),
+            Usage::LiquidMiscCreature => write!(f, "LiquidMiscCreature"),
+            Usage::LiquidMiscOther => write!(f, "LiquidMiscOther"),
+            Usage::LiquidMisc => write!(f, "LiquidMisc"),
+            Usage::StructuralPlantMat => write!(f, "StructuralPlantMat"),
+            Usage::SeedMat => write!(f, "SeedMat"),
+            Usage::Bone => write!(f, "Bone"),
+            Usage::Wood => write!(f, "Wood"),
+            Usage::ThreadPlant => write!(f, "ThreadPlant"),
+            Usage::Tooth => write!(f, "Tooth"),
+            Usage::Horn => write!(f, "Horn"),
+            Usage::Hair => write!(f, "Hair"),
+            Usage::Pearl => write!(f, "Pearl"),
+            Usage::Shell => write!(f, "Shell"),
+            Usage::Leather => write!(f, "Leather"),
+            Usage::Silk => write!(f, "Silk"),
+            Usage::Soap => write!(f, "Soap"),
+            Usage::GeneratesMiasma => write!(f, "GeneratesMiasma"),
+            Usage::Meat => write!(f, "Meat"),
+            Usage::Rots => write!(f, "Rots"),
+            Usage::NervousTissue => write!(f, "NervousTissue"),
+            Usage::BloodMapDescriptor => write!(f, "BloodMapDescriptor"),
+            Usage::IchorMapDescriptor => write!(f, "IchorMapDescriptor"),
+            Usage::GooMapDescriptor => write!(f, "GooMapDescriptor"),
+            Usage::SlimeMapDescriptor => write!(f, "SlimeMapDescriptor"),
+            Usage::PusMapDescriptor => write!(f, "PusMapDescriptor"),
+            Usage::SweatMapDescriptor => write!(f, "SweatMapDescriptor"),
+            Usage::TearsMapDescriptor => write!(f, "TearsMapDescriptor"),
+            Usage::SpitMapDescriptor => write!(f, "SpitMapDescriptor"),
+            Usage::Evaporates => write!(f, "Evaporates"),
+            Usage::EntersBlood => write!(f, "EntersBlood"),
+            Usage::EdibleVermin => write!(f, "EdibleVermin"),
+            Usage::EdibleRaw => write!(f, "EdibleRaw"),
+            Usage::EdibleCooked => write!(f, "EdibleCooked"),
+            Usage::DoNotCleanGlob => write!(f, "DoNotCleanGlob"),
+            Usage::NoStoneStockpile => write!(f, "NoStoneStockpile"),
+            Usage::ItemsMetal => write!(f, "ItemsMetal"),
+            Usage::ItemsBarred => write!(f, "ItemsBarred"),
+            Usage::ItemsScaled => write!(f, "ItemsScaled"),
+            Usage::ItemsLeather => write!(f, "ItemsLeather"),
+            Usage::ItemsSoft => write!(f, "ItemsSoft"),
+            Usage::ItemsHard => write!(f, "ItemsHard"),
+            Usage::IsStone => write!(f, "IsStone"),
+            Usage::IsCeramic => write!(f, "IsCeramic"),
+            Usage::Undiggable => write!(f, "Undiggable"),
+            Usage::DisplayUnglazed => write!(f, "DisplayUnglazed"),
+            Usage::Yarn => write!(f, "Yarn"),
+            Usage::StockpileThreadMetal => write!(f, "StockpileThreadMetal"),
+            Usage::IsMetal => write!(f, "IsMetal"),
+            Usage::IsGlass => write!(f, "IsGlass"),
+            Usage::CrystalGlassable => write!(f, "CrystalGlassable"),
+            Usage::ItemsWeapon => write!(f, "ItemsWeapon"),
+            Usage::ItemsWeaponRanged => write!(f, "ItemsWeaponRanged"),
+            Usage::ItemsAnvil => write!(f, "ItemsAnvil"),
+            Usage::ItemsAmmo => write!(f, "ItemsAmmo"),
+            Usage::ItemsDigger => write!(f, "ItemsDigger"),
+            Usage::ItemsArmor => write!(f, "ItemsArmor"),
+            Usage::ItemsDelicate => write!(f, "ItemsDelicate"),
+            Usage::ItemsSiegeEngine => write!(f, "ItemsSiegeEngine"),
+            Usage::ItemsQuern => write!(f, "ItemsQuern"),
+            Usage::Unknown => write!(f, "Unknown"),
         }
     }
 }

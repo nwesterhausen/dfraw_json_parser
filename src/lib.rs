@@ -66,7 +66,7 @@ for the steam workshop if it is a mod downloaded from the steam workshop.
 #![allow(clippy::must_use_candidate)]
 
 use options::{ParserOptions, ParsingJob};
-use parser::{module_info_file::ModuleInfoFile, raws::RawObject, searchable::Searchable};
+use parser::{info_txt::ModuleInfoFile, RawObject, Searchable};
 use std::path::{Path, PathBuf};
 use util::options_has_valid_paths;
 use walkdir::DirEntry;
@@ -423,5 +423,5 @@ pub fn parse_info_modules_to_file(options: &ParserOptions) {
 ///
 /// The function `build_search_string` returns a `String` value.
 pub fn build_search_string(raw_object: &dyn Searchable) -> String {
-    crate::parser::searchable::get_search_string(raw_object)
+    crate::parser::get_search_string(raw_object)
 }

@@ -2,11 +2,12 @@ use serde::{Deserialize, Serialize};
 use slug::slugify;
 
 use crate::parser::{
-    material::raw::Material,
-    object_types::ObjectType,
-    raws::{RawMetadata, RawObject},
+    helpers::serializer_helper,
+    material::Material,
+    metadata::Metadata,
+    object_type::ObjectType,
+    raws::RawObject,
     searchable::{clean_search_vec, Searchable},
-    serializer_helper,
 };
 
 use super::{
@@ -21,7 +22,7 @@ use super::{
 pub struct Inorganic {
     identifier: String,
     #[serde(skip_serializing_if = "serializer_helper::is_metadata_hidden")]
-    metadata: RawMetadata,
+    metadata: Metadata,
     object_id: String,
     material: Material,
 
@@ -47,7 +48,7 @@ impl Inorganic {
     pub fn empty() -> Inorganic {
         Inorganic::default()
     }
-    pub fn new(identifier: &str, metadata: &RawMetadata) -> Inorganic {
+    pub fn new(identifier: &str, metadata: &Metadata) -> Inorganic {
         Inorganic {
             identifier: String::from(identifier),
             metadata: metadata.clone(),
@@ -70,7 +71,7 @@ impl RawObject for Inorganic {
     fn get_name(&self) -> &str {
         &self.identifier
     }
-    fn get_metadata(&self) -> &RawMetadata {
+    fn get_metadata(&self) -> &Metadata {
         &self.metadata
     }
     fn is_empty(&self) -> bool {

@@ -1,4 +1,4 @@
-use crate::parser::serializer_helper;
+use crate::parser::helpers::serializer_helper;
 use serde::{Deserialize, Serialize};
 
 #[derive(ts_rs::TS)]

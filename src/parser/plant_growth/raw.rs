@@ -1,7 +1,7 @@
 use serde::{Deserialize, Serialize};
 
+use crate::parser::helpers::serializer_helper;
 use crate::parser::searchable::clean_search_vec;
-use crate::parser::serializer_helper;
 use crate::parser::{names::SingPlurName, searchable::Searchable};
 
 use super::{

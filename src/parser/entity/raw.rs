@@ -2,12 +2,13 @@ use serde::{Deserialize, Serialize};
 
 use crate::parser::{
     color::Color,
-    helpers::object_id::build_object_id_from_pieces,
-    object_types::ObjectType,
-    position::{phf_table::POSITION_TOKENS, raw::Position},
-    raws::{RawMetadata, RawObject},
+    helpers::build_object_id_from_pieces,
+    helpers::serializer_helper,
+    metadata::Metadata,
+    object_type::ObjectType,
+    position::{Position, POSITION_TOKENS},
+    raws::RawObject,
     searchable::{clean_search_vec, Searchable},
-    serializer_helper,
 };
 
 use super::{phf_table::ENTITY_TOKENS, tokens::EntityToken};
@@ -18,7 +19,7 @@ use super::{phf_table::ENTITY_TOKENS, tokens::EntityToken};
 #[serde(rename_all = "camelCase")]
 pub struct Entity {
     #[serde(skip_serializing_if = "serializer_helper::is_metadata_hidden")]
-    metadata: RawMetadata,
+    metadata: Metadata,
     identifier: String,
     object_id: String,
 
@@ -169,7 +170,7 @@ impl Entity {
             ..Default::default()
         }
     }
-    pub fn new(identifier: &str, metadata: &RawMetadata) -> Self {
+    pub fn new(identifier: &str, metadata: &Metadata) -> Self {
         Entity {
             identifier: String::from(identifier),
             metadata: metadata.clone(),
@@ -188,7 +189,7 @@ impl RawObject for Entity {
     fn get_object_id(&self) -> &str {
         self.object_id.as_str()
     }
-    fn get_metadata(&self) -> &RawMetadata {
+    fn get_metadata(&self) -> &Metadata {
         &self.metadata
     }
     fn get_identifier(&self) -> &str {

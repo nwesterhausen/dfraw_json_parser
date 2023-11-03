@@ -1,11 +1,12 @@
 use serde::{Deserialize, Serialize};
 
 use crate::parser::{
-    helpers::object_id::build_object_id_from_pieces,
-    object_types::ObjectType,
-    raws::{RawMetadata, RawObject},
+    helpers::build_object_id_from_pieces,
+    helpers::serializer_helper,
+    metadata::Metadata,
+    object_type::ObjectType,
+    raws::RawObject,
     searchable::{clean_search_vec, Searchable},
-    serializer_helper,
 };
 
 #[derive(ts_rs::TS)]
@@ -14,14 +15,14 @@ use crate::parser::{
 #[serde(rename_all = "camelCase")]
 pub struct SelectCreature {
     #[serde(skip_serializing_if = "serializer_helper::is_metadata_hidden")]
-    metadata: RawMetadata,
+    metadata: Metadata,
     identifier: String,
     object_id: String,
 
     tags: Vec<String>,
 }
 impl SelectCreature {
-    pub fn new(identifier: &str, metadata: &RawMetadata) -> SelectCreature {
+    pub fn new(identifier: &str, metadata: &Metadata) -> SelectCreature {
         SelectCreature {
             identifier: String::from(identifier),
             metadata: metadata.clone(),
@@ -41,7 +42,7 @@ impl SelectCreature {
 
 #[typetag::serde]
 impl RawObject for SelectCreature {
-    fn get_metadata(&self) -> &RawMetadata {
+    fn get_metadata(&self) -> &Metadata {
         &self.metadata
     }
     fn get_identifier(&self) -> &str {

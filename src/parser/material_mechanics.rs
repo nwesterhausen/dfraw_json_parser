@@ -1,4 +1,4 @@
-use crate::parser::{material::tokens::MaterialProperty, serializer_helper};
+use crate::parser::{helpers::serializer_helper, material::Property as MaterialProperty};
 use serde::{Deserialize, Serialize};
 
 #[derive(ts_rs::TS)]

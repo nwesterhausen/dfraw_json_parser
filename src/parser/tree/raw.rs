@@ -1,6 +1,6 @@
 use serde::{Deserialize, Serialize};
 
-use crate::parser::{color::Color, names::Name, serializer_helper};
+use crate::parser::{color::Color, helpers::serializer_helper, names::Name};
 
 use super::{
     phf_table::TREE_TOKENS,

@@ -2,7 +2,7 @@ use std::path::{Path, PathBuf};
 
 use serde::{Deserialize, Serialize};
 
-use crate::parser::{object_types::ObjectType, raw_locations::RawModuleLocation};
+use crate::parser::{object_type::ObjectType, raw_locations::RawModuleLocation};
 
 /// Option struct for passing to any parse function.
 #[allow(clippy::module_name_repetitions)]

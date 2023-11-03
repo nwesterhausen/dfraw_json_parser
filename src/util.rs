@@ -9,8 +9,7 @@ use walkdir::WalkDir;
 use crate::{
     options::{ParserOptions, ParsingJob},
     parser::{
-        creature::raw::Creature, object_types::ObjectType, raws::RawObject,
-        select_creature::raw::SelectCreature,
+        creature::Creature, object_type::ObjectType, select_creature::SelectCreature, RawObject,
     },
 };
 

@@ -1,17 +1,18 @@
 use serde::{Deserialize, Serialize};
 
 use crate::parser::{
-    biome::{phf_map::BIOME_TOKENS, tokens::Biome},
-    creature_caste::{phf_table::CASTE_TOKENS, raw::Caste},
+    biome::{Biome, BIOME_TOKENS},
+    creature_caste::{Caste, CASTE_TOKENS},
     creature_variation::raw::CreatureVariationRequirements,
-    helpers::object_id::build_object_id_from_pieces,
+    helpers::build_object_id_from_pieces,
+    helpers::serializer_helper,
+    metadata::Metadata,
     names::{Name, SingPlurName},
-    object_types::ObjectType,
+    object_type::ObjectType,
     ranges::parse_min_max_range,
-    raws::{RawMetadata, RawObject},
+    raws::RawObject,
     searchable::{clean_search_vec, Searchable},
-    select_creature::raw::SelectCreature,
-    serializer_helper,
+    select_creature::SelectCreature,
     tile::Tile,
 };
 
@@ -33,7 +34,7 @@ use super::{phf_table::CREATURE_TOKENS, tokens::CreatureTag};
 #[serde(rename_all = "camelCase")]
 pub struct Creature {
     #[serde(skip_serializing_if = "serializer_helper::is_metadata_hidden")]
-    metadata: RawMetadata,
+    metadata: Metadata,
     identifier: String,
     castes: Vec<Caste>,
     #[serde(skip_serializing_if = "Vec::is_empty")]
@@ -101,7 +102,7 @@ impl Creature {
     /// Returns:
     ///
     /// a `Creature` object.
-    pub fn new(identifier: &str, metadata: &RawMetadata) -> Self {
+    pub fn new(identifier: &str, metadata: &Metadata) -> Self {
         Creature {
             identifier: String::from(identifier),
             metadata: metadata.clone(),
@@ -331,7 +332,7 @@ impl Creature {
 
 #[typetag::serde]
 impl RawObject for Creature {
-    fn get_metadata(&self) -> &RawMetadata {
+    fn get_metadata(&self) -> &Metadata {
         &self.metadata
     }
     fn get_identifier(&self) -> &str {

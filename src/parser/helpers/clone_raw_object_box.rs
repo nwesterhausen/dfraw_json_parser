@@ -1,13 +1,13 @@
 use crate::parser::{
-    creature::raw::Creature,
-    entity::raw::Entity,
-    graphics::{raw::Graphic, tile_page::TilePage},
-    inorganic::raw::Inorganic,
-    material_template::raw::MaterialTemplate,
-    object_types::ObjectType,
-    plant::raw::Plant,
+    creature::Creature,
+    entity::Entity,
+    graphics::{Graphic, TilePage},
+    inorganic::Inorganic,
+    material_template::MaterialTemplate,
+    object_type::ObjectType,
+    plant::Plant,
     raws::RawObject,
-    select_creature::raw::SelectCreature,
+    select_creature::SelectCreature,
 };
 
 #[allow(clippy::borrowed_box)]

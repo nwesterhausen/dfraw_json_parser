@@ -1,6 +1,6 @@
 use serde::{Deserialize, Serialize};
 
-use crate::parser::{color::Color, names::SingPlurName, serializer_helper};
+use crate::parser::{color::Color, helpers::serializer_helper, names::SingPlurName};
 
 use super::tokens::PositionToken;
 

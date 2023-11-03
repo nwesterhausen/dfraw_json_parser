@@ -1,7 +1,7 @@
 use itertools::Itertools;
 use serde::{Deserialize, Serialize};
 
-use crate::parser::serializer_helper;
+use crate::parser::helpers::serializer_helper;
 
 use super::{
     dimensions::Dimensions,

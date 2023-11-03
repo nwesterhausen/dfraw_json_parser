@@ -10,7 +10,7 @@ use slug::slugify;
 
 use crate::{parser::refs::NON_DIGIT_RE, util::get_parent_dir_name};
 
-use super::{
+use crate::parser::{
     raw_locations::RawModuleLocation,
     refs::{DF_ENCODING, RAW_TOKEN_RE},
 };

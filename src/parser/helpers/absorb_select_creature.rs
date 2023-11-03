@@ -1,7 +1,7 @@
 use crate::{
     parser::{
-        creature::raw::Creature, helpers::clone_raw_vector::with_purge, object_types::ObjectType,
-        raws::RawObject, select_creature::raw::SelectCreature,
+        creature::Creature, helpers::clone_raw_vector::with_purge, object_type::ObjectType,
+        raws::RawObject, select_creature::SelectCreature,
     },
     util::get_only_select_creatures_from_raws,
 };
