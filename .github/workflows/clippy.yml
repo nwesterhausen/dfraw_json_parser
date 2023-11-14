@@ -7,7 +7,12 @@ jobs:
     name: 'Clippy Check Nightly'
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - name: Harden Runner
+        uses: step-security/harden-runner@1b05615854632b887b69ae1be8cbefe72d3ae423 # v2.6.0
+        with:
+          egress-policy: audit
+
+      - uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11 # v4.1.1
       - name: Install dependencies (for 'tauri' flag)
         # You can remove libayatana-appindicator3-dev if you don't use the system tray feature.
         run: |
@@ -24,16 +29,16 @@ jobs:
           sudo apt-get install -y javascriptcoregtk-4.1 \
               libsoup-3.0 \
               webkit2gtk-4.1
-      - uses: dtolnay/rust-toolchain@stable
+      - uses: dtolnay/rust-toolchain@d76c2a93c593483c9892fd8d2538734f73ed8588 # stable
         name: Install Clippy
         with:
           components: clippy
       - name: Rust cache
-        uses: swatinem/rust-cache@v2
+        uses: swatinem/rust-cache@a95ba195448af2da9b00fb742d14ffaaf3c21f43 # v2.7.0
         with:
           shared-key: clippy
           cache-on-failure: true
-      - uses: nwesterhausen/clippy-check@v1
+      - uses: nwesterhausen/clippy-check@0888eda19b093be682431e08dfd7f3a56f9ac693 # v1
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
           options: |
@@ -43,7 +48,12 @@ jobs:
     needs: clippy_check
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - name: Harden Runner
+        uses: step-security/harden-runner@1b05615854632b887b69ae1be8cbefe72d3ae423 # v2.6.0
+        with:
+          egress-policy: audit
+
+      - uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11 # v4.1.1
       - name: Install dependencies (for 'tauri' flag)
         # You can remove libayatana-appindicator3-dev if you don't use the system tray feature.
         run: |
@@ -60,12 +70,12 @@ jobs:
           sudo apt-get install -y javascriptcoregtk-4.1 \
               libsoup-3.0 \
               webkit2gtk-4.1
-      - uses: dtolnay/rust-toolchain@stable
+      - uses: dtolnay/rust-toolchain@d76c2a93c593483c9892fd8d2538734f73ed8588 # stable
         name: Install Clippy
         with:
           components: clippy
       - name: Rust cache
-        uses: swatinem/rust-cache@v2
+        uses: swatinem/rust-cache@a95ba195448af2da9b00fb742d14ffaaf3c21f43 # v2.7.0
         with:
           shared-key: clippy
           cache-on-failure: true
