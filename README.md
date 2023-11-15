@@ -1,5 +1,9 @@
 # dfraw_json_parser
 
+[![supports df 50.xx](https://img.shields.io/badge/Supports%20Dwarf%20Fortress-0.50.xx-%235E3E0D?style=plastic)](https://bay12games.com/dwarves/)
+[![Clippy Check](https://github.com/nwesterhausen/dfraw_json_parser/actions/workflows/clippy.yml/badge.svg)](https://github.com/nwesterhausen/dfraw_json_parser/actions/workflows/clippy.yml)
+[![OpenSSF Scorecard](https://api.securityscorecards.dev/projects/github.com/nwesterhausen/dfraw_json_parser/badge)](https://securityscorecards.dev/viewer/?uri=github.com/nwesterhausen/dfraw_json_parser)
+
 A solution to present information about what raws are in your save game, in a searchable format.
 
 I made this because I was playing with [Splint's Vanilla Expanded Mod](http://www.bay12forums.com/smf/index.php?topic=177593.0)
