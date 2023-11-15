@@ -34,7 +34,7 @@ jobs:
         with:
           components: clippy
       - name: Rust cache
-        uses: swatinem/rust-cache@a95ba195448af2da9b00fb742d14ffaaf3c21f43 # v2.7.0
+        uses: swatinem/rust-cache@3cf7f8cc28d1b4e7d01e3783be10a97d55d483c8 # v2.7.1
         with:
           shared-key: clippy
           cache-on-failure: true
@@ -75,7 +75,7 @@ jobs:
         with:
           components: clippy
       - name: Rust cache
-        uses: swatinem/rust-cache@a95ba195448af2da9b00fb742d14ffaaf3c21f43 # v2.7.0
+        uses: swatinem/rust-cache@3cf7f8cc28d1b4e7d01e3783be10a97d55d483c8 # v2.7.1
         with:
           shared-key: clippy
           cache-on-failure: true
