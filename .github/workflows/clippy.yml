@@ -29,10 +29,11 @@ jobs:
           sudo apt-get install -y javascriptcoregtk-4.1 \
               libsoup-3.0 \
               webkit2gtk-4.1
-      - uses: dtolnay/rust-toolchain@d76c2a93c593483c9892fd8d2538734f73ed8588 # stable
-        name: Install Clippy
+      - uses: dtolnay/rust-toolchain@439cf607258077187679211f12aa6f19af4a0af7 # master
         with:
-          components: clippy
+          toolchain: stable 
+          components: clippy          
+        name: Install Clippy
       - name: Rust cache
         uses: swatinem/rust-cache@3cf7f8cc28d1b4e7d01e3783be10a97d55d483c8 # v2.7.1
         with:
@@ -70,10 +71,9 @@ jobs:
           sudo apt-get install -y javascriptcoregtk-4.1 \
               libsoup-3.0 \
               webkit2gtk-4.1
-      - uses: dtolnay/rust-toolchain@d76c2a93c593483c9892fd8d2538734f73ed8588 # stable
-        name: Install Clippy
+      - uses: dtolnay/rust-toolchain@439cf607258077187679211f12aa6f19af4a0af7 # master
         with:
-          components: clippy
+          toolchain: stable 
       - name: Rust cache
         uses: swatinem/rust-cache@3cf7f8cc28d1b4e7d01e3783be10a97d55d483c8 # v2.7.1
         with:
