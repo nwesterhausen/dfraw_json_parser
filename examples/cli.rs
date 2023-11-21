@@ -1,278 +1,198 @@
-use std::path::{Component, Path, PathBuf};
+use dfraw_json_parser::parser::{object_types::ObjectType, raw_locations::RawModuleLocation};
+use std::path::PathBuf;
 
-use clap::{Parser, ValueEnum};
-use dfraw_json_parser::{
-    options::{ParserOptions, ParsingJob},
-    parser::raw_locations::RawModuleLocation,
-};
-use fern::colors::{Color, ColoredLevelConfig};
+const LONG_HELP: &str = "Usage: dfraw-json-parser [OPTIONS] <dwarf-fortress-path>
 
-const HELP_OUT_DIR: &str = "Specify the directory that the JSON database should be saved into.
+Default behavior:
+    - Parse the vanilla raws
+    - Parse all object types
+    - Print a summary of the parsed raws
+    - Save the parsed raws to 'parsed-raws.json'
+    - Log at the 'info' level
 
-If raw files are parsed, a JSON database (an array of objects) is
-saved to disk in a location specified by this argument. This will
-create an 'raws.json' file in the directory specified by this argument.
+The following options are supported:
+    -c, --creature      Parse creature raws
+    -p, --plant         Parse plant raws
+    -e, --entity        Parse entity raws
+    -i, --inorganic     Parse inorganic raws
+    -g, --graphics      Parse graphics raws
 
-If not specified, the current working directory will be used.";
+    -s, --summary       Print a summary of the parsed raws
 
-const HELP_TARGET_PATH: &str = "Specify the path to parse raws from.
+    -o, --output PATH   Set the output path for the parsed raws
+        Default value: 'parsed-raws.json'
 
-If you choose `-p RawFile`, or `-p RawModuleInfoFile`, this must be a file path.
+    -r, --raw PATH      Parse a raw file
+        This can be included multiple times to parse multiple raw files
+        directly. 
 
-If you choose `-p RawModule` this must be the path to the module folder.
+    -l, --legends PATH  Parse a legends export
+        This can be included multiple times to parse multiple legends
+        exports. These should be 'legends-plus' exports from DFHack.
 
-If you choose `-p All` (or leave it unset), this must be the path to the Dwarf Fortress 
-game directory (e.g. `C:/Program Files/Dwarf Fortress`).";
+    -m, --module PATH   Parse a raw module
+        This can be included multiple times to parse multiple raw modules
+        directly. This could be to specify a single raw module to parse, or
+        to specify a raw module to parse in addition to the raw modules
+        specified by the --vanilla, --mods, and --installed flags.
 
-const HELP_PARSE: &str = "What level of parsing to perform.
+    -v, --verbose       Increase the verbosity of the output
+        Default log level: 'info'
 
-Choose from:
-    - RawFile: Parse a single raw file
-    - RawModuleInfoFile: Parse a single raw module info file
-    - RawModule: Parse a single raw module
-    - All: Parse all, limited to locations if specified
+        This supports up to two levels of verbosity. The first level is
+        'debug', and the second level is 'trace'. (e.g. '-vv' or '--verbose --verbose')
 
-If All is chosen, the flags for parse_vanilla, parse_mods_downloaded, and parse_mods_installed will all 
-influence exactly which locations are parsed. All also includes a modules.json which is a database of all
-modules and their info.
-";
+    -q, --quiet         Decrease the verbosity of the output
+        Default log level: 'info'
 
-#[allow(clippy::struct_excessive_bools)]
-#[derive(Parser, Debug)]
-#[command(author, version, about, long_about = None)] // Read from `Cargo.toml`
+        This supports up to two levels of verbosity. The first level is
+        'warn', and the second level is 'error'. (e.g. '-qq' or '--quiet --quiet')
+
+    --vanilla           Parse the vanilla raws
+    --mods              Parse the raws from all mods
+    --installed         Parse the raws from installed mods
+
+    -h, --help              Print this help message
+    -V, --version           Print the version number";
+
+#[derive(Debug)]
 struct Args {
-    // Verbose (debug) logging
-    #[clap(short, long, long_help = "Enable verbose (debug) logging")]
-    verbose: bool,
-
-    // Target path to parse
-    #[clap(short, long, long_help = HELP_TARGET_PATH)]
-    #[arg(required = true)]
-    target_path: String,
-
-    /// Path to save JSON to
-    #[clap(short, long, default_value_t = String::new(), long_help = HELP_OUT_DIR)]
-    out_dir: String,
-
-    /// What to parse
-    #[arg(value_enum)]
-    #[clap(long, default_value_t = ParseTarget::All, long_help = HELP_PARSE)]
-    parse: ParseTarget,
-
-    /// Parse vanilla location
-    #[clap(long, default_value_t = false, long_help = "Parse vanilla raws")]
-    parse_vanilla: bool,
-
-    /// Parse workshop mods location (downloaded mods)
-    #[clap(
-        long,
-        default_value_t = false,
-        long_help = "Parse downloaded workshop mods"
-    )]
-    parse_mods_downloaded: bool,
-
-    /// Parse installed mods location
-    #[clap(long, default_value_t = false, long_help = "Parse installed mods")]
-    parse_mods_installed: bool,
-
-    /// Include Metadata in output
-    #[clap(
-        long,
-        default_value_t = false,
-        long_help = "Include metadata in output"
-    )]
-    include_metadata: bool,
+    pub log_level: log::LevelFilter,
+    pub locations: Vec<RawModuleLocation>,
+    pub object_types: Vec<ObjectType>,
+    pub legends_exports: Vec<PathBuf>,
+    pub print_summary: bool,
+    pub output_path: PathBuf,
+    pub df_path: PathBuf,
+    pub raw_file_paths: Vec<PathBuf>,
+    pub raw_module_paths: Vec<PathBuf>,
 }
 
-#[derive(Debug, Copy, Clone, PartialEq, Eq, PartialOrd, Ord, ValueEnum)]
-enum ParseTarget {
-    /// Parse a single raw file
-    RawFile,
-    /// Parse a single raw module info file
-    RawModuleInfoFile,
-    /// Parse a single raw module
-    RawModule,
-    /// Parse all, limited to locations if specified
-    All,
+impl std::default::Default for Args {
+    fn default() -> Self {
+        Self {
+            log_level: log::LevelFilter::Info,
+            locations: Vec::new(),
+            object_types: Vec::new(),
+            legends_exports: Vec::new(),
+            print_summary: false,
+            output_path: PathBuf::from("parsed-raws.json"),
+            df_path: PathBuf::new(),
+            raw_file_paths: Vec::new(),
+            raw_module_paths: Vec::new(),
+        }
+    }
 }
 
-#[allow(clippy::too_many_lines)]
-fn main() {
-    let args = Args::parse();
-    let log_level = if args.verbose {
-        log::LevelFilter::Debug
-    } else {
-        log::LevelFilter::Info
-    };
+fn parse_args() -> Result<Args, lexopt::Error> {
+    use lexopt::prelude::*;
 
-    // Specify color configuration
-    let colors = ColoredLevelConfig::new()
-        // Specify info as cyan
-        .info(Color::Cyan);
-    // Configure logger at runtime
-    fern::Dispatch::new()
-        // Perform allocation-free log formatting
-        .format(move |out, message, record| {
-            out.finish(format_args!(
-                "{} [{}] {}",
-                chrono::Local::now().format("%Y-%m-%d %H:%M:%S"),
-                colors.color(record.level()),
-                message
-            ));
-        })
-        // Add blanket level filter -
-        .level(log_level)
-        // Output to stdout, files, and other Dispatch configurations
-        .chain(std::io::stdout())
-        // Apply globally
-        .apply()
-        .expect("Failed to start logger");
+    // Establish default values for the CLI arguments
+    let mut args = Args::default();
+    let mut include_graphics = false;
 
-    let target_path = normalize_path(Path::new(args.target_path.as_str()));
-    let mut output_path = normalize_path(Path::new(args.out_dir.as_str()));
+    let mut parser = lexopt::Parser::from_env();
 
-    // Check if output path is only a directory (and doesn't specify a file).
-    // If so, we should add the default filename.
-    if output_path.is_dir() {
-        output_path.push("raws.json");
-    }
-
-    // It's possible the output file doesn't exist. We should touch an empty file to ensure it does.
-    if !output_path.exists() {
-        if let Err(e) = std::fs::File::create(&output_path) {
-            log::error!("Unable to create output file: {}", e);
-        }
-    }
-
-    let mut options = ParserOptions::new(target_path);
-    options.set_output_path(&output_path);
-
-    if args.include_metadata {
-        options.attach_metadata_to_raws();
-    }
-
-    let parse_target = args.parse;
-
-    match parse_target {
-        ParseTarget::RawFile => {
-            options.set_job(ParsingJob::SingleRaw);
-            log::info!("Parsing options: {:#?}", options);
-            dfraw_json_parser::parse_to_file(&options);
-        }
-        ParseTarget::RawModuleInfoFile => {
-            options.set_job(ParsingJob::SingleModuleInfoFile);
-            log::info!("Parsing options: {:#?}", options);
-            dfraw_json_parser::parse_module_info_file(&options);
-        }
-        ParseTarget::RawModule => {
-            options.set_job(ParsingJob::SingleModule);
-            log::info!("Parsing options: {:#?}", options);
-            dfraw_json_parser::parse_to_file(&options);
-        }
-        ParseTarget::All => {
-            let mut locations: Vec<RawModuleLocation> = Vec::new();
-            if args.parse_vanilla {
-                log::debug!("Parsing options: {:#?}", options);
-                locations.push(RawModuleLocation::Vanilla);
+    // Parse the CLI arguments
+    while let Some(arg) = parser.next()? {
+        match arg {
+            Short('c') | Long("creature") => {
+                args.object_types.push(ObjectType::Creature);
             }
-            if args.parse_mods_downloaded {
-                log::debug!("Parsing options: {:#?}", options);
-                locations.push(RawModuleLocation::Mods);
+            Short('p') | Long("plant") => {
+                args.object_types.push(ObjectType::Plant);
             }
-            if args.parse_mods_installed {
-                log::debug!("Parsing options: {:#?}", options);
-                locations.push(RawModuleLocation::InstalledMods);
+            Short('e') | Long("entity") => {
+                args.object_types.push(ObjectType::Entity);
             }
-            options.set_job(ParsingJob::All);
-            options.set_locations_to_parse(locations.clone());
-
-            // If no locations were specified, parse just vanilla
-            if locations.is_empty() {
-                options.set_locations_to_parse(vec![RawModuleLocation::Vanilla]);
+            Short('i') | Long("inorganic") => {
+                args.object_types.push(ObjectType::Inorganic);
             }
 
-            // If we have all 3 locations in the list,
-            if locations.len() == 3_usize {
-                // Check if the provided output_path ends with a filename (e.g. *.json or similar).
-                if output_path.is_file() {
-                    // Remove the filename from the path for parsing ALL
-                    output_path.pop();
-                    options.set_output_path(&output_path);
+            Long("vanilla") => {
+                args.locations.push(RawModuleLocation::Vanilla);
+            }
+            Long("mods") => {
+                args.locations.push(RawModuleLocation::Mods);
+            }
+            Long("installed") => {
+                args.locations.push(RawModuleLocation::InstalledMods);
+            }
+
+            Short('s') | Long("summary") => {
+                args.print_summary = true;
+            }
+            Short('g') | Long("graphics") => {
+                include_graphics = true;
+            }
+
+            Short('o') | Long("output") => {
+                args.output_path = PathBuf::from(parser.value()?);
+            }
+            Short('r') | Long("raw") => {
+                args.raw_file_paths.push(PathBuf::from(parser.value()?));
+            }
+            Short('l') | Long("legends") => {
+                args.legends_exports.push(PathBuf::from(parser.value()?));
+            }
+            Short('m') | Long("module") => {
+                args.raw_module_paths.push(PathBuf::from(parser.value()?));
+            }
+
+            Short('v') | Long("verbose") => {
+                if args.log_level == log::LevelFilter::Info {
+                    args.log_level = log::LevelFilter::Debug;
+                } else {
+                    args.log_level = log::LevelFilter::Trace;
+                }
+            }
+            Short('q') | Long("quiet") => {
+                if args.log_level == log::LevelFilter::Info {
+                    args.log_level = log::LevelFilter::Warn;
+                } else {
+                    args.log_level = log::LevelFilter::Error;
                 }
             }
 
-            // If we have just one location, update the job to be a single location
-            if locations.len() == 1_usize {
-                options.set_job(ParsingJob::SingleLocation);
+            Short('h') | Long("help") => {
+                println!("{LONG_HELP}");
+                std::process::exit(0);
             }
 
-            log::info!("Parsing options: {:#?}", options);
-            dfraw_json_parser::parse_to_file(&options);
+            Value(val) if args.df_path.to_str().is_none() => {
+                args.df_path = PathBuf::from(val);
+            }
 
-            let mut module_json_fname = String::new();
-            if output_path.is_file() {
-                // Remove the filename portion of the path
-                module_json_fname = format!(
-                    "{}_modules.json",
-                    output_path
-                        .clone()
-                        .file_name()
-                        .unwrap_or_default()
-                        .to_str()
-                        .unwrap()
-                        .to_string()
-                        .trim()
-                        .replace(".json", "")
-                );
-                output_path.pop();
+            _ => {
+                println!("Unknown argument: {arg:?}");
             }
-            // Change the output path to be a modules.json file
-            output_path.push(module_json_fname);
-            options.set_output_path(&output_path);
-            if !output_path.exists() {
-                if let Err(e) = std::fs::File::create(&output_path) {
-                    log::error!("Unable to create output file: {}", e);
-                }
-            }
-            options.set_job(ParsingJob::AllModuleInfoFiles);
-            dfraw_json_parser::parse_info_modules_to_file(&options);
         }
     }
+
+    // If no locations were specified, parse just vanilla
+    if args.locations.is_empty() {
+        args.locations.push(RawModuleLocation::Vanilla);
+    }
+    // If no object types were specified, parse all
+    if args.object_types.is_empty() {
+        args.object_types.push(ObjectType::Creature);
+        args.object_types.push(ObjectType::Plant);
+        args.object_types.push(ObjectType::Entity);
+        args.object_types.push(ObjectType::Inorganic);
+    }
+    // Include graphic types if requested
+    if include_graphics {
+        args.object_types.push(ObjectType::Graphics);
+        args.object_types.push(ObjectType::TilePage);
+    }
+
+    Ok(args)
 }
 
-/// The `normalize_path` function takes a path and returns a normalized version of it by removing
-/// redundant components such as "." and "..".
-///
-/// Arguments:
-///
-/// * `path`: The `path` parameter is of type `&Path`, which represents a file or directory path.
-///
-/// Returns:
-///
-/// The function `normalize_path` returns a `PathBuf` object.
-fn normalize_path(path: &Path) -> PathBuf {
-    let mut components = path.components().peekable();
-    let mut ret = if let Some(c @ Component::Prefix(..)) = components.peek().copied() {
-        components.next();
-        PathBuf::from(c.as_os_str())
-    } else {
-        PathBuf::new()
-    };
+pub fn main() -> Result<(), lexopt::Error> {
+    let args = parse_args()?;
 
-    for component in components {
-        match component {
-            Component::Prefix(..) => unreachable!(),
-            Component::RootDir => {
-                ret.push(component.as_os_str());
-            }
-            Component::CurDir => {}
-            Component::ParentDir => {
-                ret.pop();
-            }
-            Component::Normal(c) => {
-                ret.push(c);
-            }
-        }
-    }
-    ret
+    println!("Parsed arguments: {args:#?}");
+
+    Ok(())
 }

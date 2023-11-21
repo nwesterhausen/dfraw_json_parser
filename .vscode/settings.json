@@ -16,6 +16,7 @@
     "Hiveable",
     "ITEMSPECIFIC",
     "itertools",
+    "lexopt",
     "Megabeast",
     "MINIFORGE",
     "PLATEMAIL",
