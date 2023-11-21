@@ -1,6 +1,5 @@
 use encoding_rs_io::DecodeReaderBytesBuilder;
 use std::{
-    fs::File,
     io::{BufRead, BufReader},
     path::Path,
 };
@@ -23,6 +22,7 @@ use crate::{
         refs::{DF_ENCODING, RAW_TOKEN_RE},
         select_creature::raw::SelectCreature,
     },
+    util::try_get_file,
 };
 
 use super::header::read_raw_file_type;
@@ -44,15 +44,12 @@ pub fn parse_raw_file_with_info<P: AsRef<Path>>(
 ) -> Vec<Box<dyn RawObject>> {
     let mut created_raws: Vec<Box<dyn RawObject>> = Vec::new();
 
-    let file = match File::open(raw_file_path) {
-        Ok(f) => f,
-        Err(e) => {
-            log::error!(
-                "parse_raw_file_with_info: Error opening raw file for parsing!\n{:?}",
-                e
-            );
-            return created_raws;
-        }
+    let Some(file) = try_get_file(raw_file_path) else {
+        log::error!(
+            "parse_raw_file_with_info: Unable to open file {}",
+            raw_file_path.as_ref().display()
+        );
+        return created_raws;
     };
 
     let decoding_reader = DecodeReaderBytesBuilder::new()

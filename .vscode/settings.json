@@ -30,7 +30,8 @@
     "untameable",
     "VAMPCURSE",
     "walkdir",
-    "worldgen"
+    "worldgen",
+    "xmlparser"
   ],
   "rust-analyzer.cargo.features": ["tauri"],
   "conventionalCommits.scopes": ["deps"],
