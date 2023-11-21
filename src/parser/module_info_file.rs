@@ -324,4 +324,8 @@ impl ModuleInfoFile {
     pub fn get_parent_directory(&self) -> String {
         String::from(&self.parent_directory)
     }
+
+    pub(crate) fn set_module_name(&mut self, arg: &str) {
+        self.name = String::from(arg);
+    }
 }

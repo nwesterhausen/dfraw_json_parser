@@ -1,5 +1,9 @@
-use dfraw_json_parser::parser::{object_types::ObjectType, raw_locations::RawModuleLocation};
-use std::path::PathBuf;
+use dfraw_json_parser::{
+    options::ParserOptions,
+    parser::{object_types::ObjectType, raw_locations::RawModuleLocation},
+};
+use fern::colors::{Color, ColoredLevelConfig};
+use std::path::{Path, PathBuf};
 
 const LONG_HELP: &str = "Usage: dfraw-json-parser [OPTIONS] <dwarf-fortress-path>
 
@@ -90,6 +94,7 @@ fn parse_args() -> Result<Args, lexopt::Error> {
     // Establish default values for the CLI arguments
     let mut args = Args::default();
     let mut include_graphics = false;
+    let mut df_path: Option<PathBuf> = None;
 
     let mut parser = lexopt::Parser::from_env();
 
@@ -158,9 +163,13 @@ fn parse_args() -> Result<Args, lexopt::Error> {
                 println!("{LONG_HELP}");
                 std::process::exit(0);
             }
+            Short('V') | Long("version") => {
+                println!("dfraw-json-parser v{}", env!("CARGO_PKG_VERSION"));
+                std::process::exit(0);
+            }
 
-            Value(val) if args.df_path.to_str().is_none() => {
-                args.df_path = PathBuf::from(val);
+            Value(val) if df_path.is_none() => {
+                df_path = Some(PathBuf::from(val));
             }
 
             _ => {
@@ -186,13 +195,74 @@ fn parse_args() -> Result<Args, lexopt::Error> {
         args.object_types.push(ObjectType::TilePage);
     }
 
+    // For all paths, resolve them to absolute paths
+    args.df_path = to_absolute_path(&df_path.unwrap_or_default(), "dwarf fortress path")?;
+
+    for path in &mut args.raw_file_paths {
+        *path = to_absolute_path(path, "raw file")?;
+    }
+    for path in &mut args.raw_module_paths {
+        *path = to_absolute_path(path, "raw module")?;
+    }
+    for path in &mut args.legends_exports {
+        *path = to_absolute_path(path, "legends export")?;
+    }
+
     Ok(args)
+}
+
+fn to_absolute_path(path: &Path, descriptor: &str) -> Result<PathBuf, lexopt::Error> {
+    path.canonicalize()
+        .or(Err(lexopt::Error::Custom(Box::new(std::io::Error::new(
+            std::io::ErrorKind::NotFound,
+            format!("Unable to find {} path {}", descriptor, path.display()),
+        )))))
 }
 
 pub fn main() -> Result<(), lexopt::Error> {
     let args = parse_args()?;
 
-    println!("Parsed arguments: {args:#?}");
+    // Initialize the logger
+    // Specify color configuration
+    let colors = ColoredLevelConfig::new()
+        // Specify info as cyan
+        .info(Color::Cyan);
+    // Configure logger at runtime
+    fern::Dispatch::new()
+        // Perform allocation-free log formatting
+        .format(move |out, message, record| {
+            out.finish(format_args!(
+                "{} [{}] {}",
+                chrono::Local::now().format("%Y-%m-%d %H:%M:%S"),
+                colors.color(record.level()),
+                message
+            ));
+        })
+        // Add blanket level filter -
+        .level(args.log_level)
+        // Output to stdout, files, and other Dispatch configurations
+        .chain(std::io::stdout())
+        // Apply globally
+        .apply()
+        .expect("Failed to start logger");
+
+    // Build ParserOptions for the parser
+    let _options = ParserOptions {
+        locations_to_parse: args.locations,
+        raws_to_parse: args.object_types,
+        ..Default::default()
+    };
+
+    // Parse a legends export if requested
+    for legends_export in &args.legends_exports {
+        let results =
+            dfraw_json_parser::legends_export::reader::parse_legends_export(legends_export);
+        let json = results
+            .iter()
+            .map(|r| serde_json::to_string(r).unwrap())
+            .collect::<Vec<String>>();
+        dfraw_json_parser::util::write_json_string_vec_to_file(&json, &args.output_path);
+    }
 
     Ok(())
 }

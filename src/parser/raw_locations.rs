@@ -16,6 +16,7 @@ pub enum RawModuleLocation {
     Vanilla,
     #[default]
     Unknown,
+    LegendsExport,
 }
 
 impl RawModuleLocation {
@@ -25,6 +26,7 @@ impl RawModuleLocation {
             RawModuleLocation::InstalledMods => ["data", "installed_mods"].iter().collect(),
             RawModuleLocation::Vanilla => ["data", "vanilla"].iter().collect(),
             RawModuleLocation::Unknown => PathBuf::from("unknown"),
+            RawModuleLocation::LegendsExport => PathBuf::from("."),
         }
     }
     pub fn from_path<P: AsRef<Path>>(path: &P) -> Self {

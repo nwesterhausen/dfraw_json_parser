@@ -60,6 +60,13 @@ impl Name {
     pub fn get_adjective(&self) -> &str {
         &self.adjective
     }
+    pub fn new(name_singular: &str, name_plural: &str, name_adjective: &str) -> Self {
+        Self {
+            singular: name_singular.to_string(),
+            plural: name_plural.to_string(),
+            adjective: name_adjective.to_string(),
+        }
+    }
 }
 
 #[derive(ts_rs::TS)]
@@ -101,6 +108,13 @@ impl SingPlurName {
             vec.push(self.plural.clone());
         }
         vec
+    }
+
+    pub fn new(name_singular: &str, name_plural: &str) -> Self {
+        Self {
+            singular: name_singular.to_string(),
+            plural: name_plural.to_string(),
+        }
     }
 }
 
