@@ -1,11 +1,11 @@
 use encoding_rs_io::DecodeReaderBytesBuilder;
 
-use std::fs::File;
 use std::io::{BufRead, BufReader};
 use std::path::Path;
 
 use crate::parser::object_types::{ObjectType, OBJECT_TOKENS};
 use crate::parser::refs::{DF_ENCODING, RAW_TOKEN_RE};
+use crate::util::try_get_file;
 
 /// It reads a file, line by line, and checks the first line for the filename, reads lines until it encounters the
 /// \[OBJECT:(type)] tag in the file.
@@ -20,30 +20,10 @@ use crate::parser::refs::{DF_ENCODING, RAW_TOKEN_RE};
 /// `RawObjectKind` for the type of \[OBJECT\] tag encountered, and `RawObjectKind::None` if it is unsupported.
 #[allow(clippy::too_many_lines)]
 pub fn read_raw_file_type<P: AsRef<Path>>(input_path: &P) -> ObjectType {
-    let caller = "Raw File Type Checker";
-    // Validate file exists
-    if !input_path.as_ref().exists() {
-        log::error!(
-            "{} - Path doesn't exist {}",
-            caller,
-            input_path.as_ref().display()
-        );
-        return ObjectType::Unknown;
-    }
-    if !input_path.as_ref().is_file() {
-        log::error!(
-            "{} - Path does not point to a file {}",
-            caller,
-            input_path.as_ref().display(),
-        );
-        return ObjectType::Unknown;
-    }
-
     // Open the file
-    let Ok(file) = File::open(input_path) else {
+    let Some(file) = try_get_file(input_path) else {
         log::error!(
-            "{} - Unable to open file {}",
-            caller,
+            "read_raw_file_type: Unable to open file {}",
             input_path.as_ref().display()
         );
         return ObjectType::Unknown;
@@ -62,8 +42,7 @@ pub fn read_raw_file_type<P: AsRef<Path>>(input_path: &P) -> ObjectType {
     for (index, line) in reader.lines().enumerate() {
         if line.is_err() {
             log::error!(
-                "{} - Error processing {}:{}",
-                caller,
+                "read_raw_file_type: Error processing {}:{}",
                 input_path.as_ref().display(),
                 index
             );
@@ -73,7 +52,7 @@ pub fn read_raw_file_type<P: AsRef<Path>>(input_path: &P) -> ObjectType {
         let line = match line {
             Ok(l) => l,
             Err(e) => {
-                log::error!("Line-reading error\n{:?}", e);
+                log::error!("read_raw_file_type: Line-reading error\n{:?}", e);
                 continue;
             }
         };
@@ -99,8 +78,7 @@ pub fn read_raw_file_type<P: AsRef<Path>>(input_path: &P) -> ObjectType {
             };
 
             log::trace!(
-                "{} - Key: {} Value: {}",
-                caller,
+                "read_raw_file_type: Key: {} Value: {}",
                 captured_key,
                 captured_value
             );
@@ -110,8 +88,7 @@ pub fn read_raw_file_type<P: AsRef<Path>>(input_path: &P) -> ObjectType {
                 // We are only concerned with the \[OBJECT\] key
                 "OBJECT" => {
                     log::trace!(
-                        "{} - {} is a {} raw file",
-                        caller,
+                        "read_raw_file_type: {} is a {} raw file",
                         raw_filename,
                         captured_value
                     );
@@ -127,8 +104,7 @@ pub fn read_raw_file_type<P: AsRef<Path>>(input_path: &P) -> ObjectType {
 
     // Reading through the entire file and not finding an \[OBJECT\] tag means the raw file is invalid
     log::warn!(
-        "{} - no [OBJECT] tag in {}",
-        caller,
+        "read_raw_file_type: no [OBJECT] tag in {}",
         input_path.as_ref().display()
     );
     ObjectType::Unknown

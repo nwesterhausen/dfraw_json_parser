@@ -308,3 +308,36 @@ pub fn get_only_select_creatures_from_raws(all_raws: &[Box<dyn RawObject>]) -> V
         .map(|r| r.unwrap_or(&SelectCreature::default()).clone())
         .collect::<Vec<SelectCreature>>()
 }
+
+pub fn try_get_file<P: AsRef<Path>>(file_path: &P) -> Option<File> {
+    let caller = "File Exists Validator";
+    // Validate file exists
+    if !file_path.as_ref().exists() {
+        log::error!(
+            "{} - Path doesn't exist {}",
+            caller,
+            file_path.as_ref().display()
+        );
+        return None;
+    }
+    if !file_path.as_ref().is_file() {
+        log::error!(
+            "{} - Path does not point to a file {}",
+            caller,
+            file_path.as_ref().display(),
+        );
+        return None;
+    }
+
+    // Open the file
+    let Ok(file) = File::open(file_path) else {
+        log::error!(
+            "{} - Unable to open file {}",
+            caller,
+            file_path.as_ref().display()
+        );
+        return None;
+    };
+
+    Some(file)
+}

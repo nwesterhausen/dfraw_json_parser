@@ -80,6 +80,7 @@ use walkdir::{DirEntry, WalkDir};
 
 use crate::parser::raw_locations::RawModuleLocation;
 
+pub mod legends_export;
 pub mod options;
 pub mod parser;
 #[cfg(feature = "tauri")]

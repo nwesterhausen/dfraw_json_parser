@@ -1,5 +1,4 @@
 use std::{
-    fs::File,
     io::{BufRead, BufReader},
     path::Path,
 };
@@ -8,7 +7,10 @@ use encoding_rs_io::DecodeReaderBytesBuilder;
 use serde::{Deserialize, Serialize};
 use slug::slugify;
 
-use crate::{parser::refs::NON_DIGIT_RE, util::get_parent_dir_name};
+use crate::{
+    parser::refs::NON_DIGIT_RE,
+    util::{get_parent_dir_name, try_get_file},
+};
 
 use super::{
     raw_locations::RawModuleLocation,
@@ -69,6 +71,14 @@ impl ModuleInfoFile {
         ModuleInfoFile::default()
     }
     pub fn from_raw_file_path<P: AsRef<Path>>(full_path: &P) -> Self {
+        // Validate that the passed file exists
+        if try_get_file(full_path).is_none() {
+            log::error!(
+                "raw_file_path::from_raw_file_path: Unable to validate raw exists {}",
+                full_path.as_ref().display()
+            );
+            return ModuleInfoFile::empty();
+        }
         // Take the full path for the raw file and navigate up to the parent directory
         // e.g from `data/vanilla/vanilla_creatures/objects/creature_standard.txt` to `data/vanilla/vanilla_creatures`
         // Then run parse on `data/vanilla/vanilla_creatures/info.txt`
@@ -88,16 +98,12 @@ impl ModuleInfoFile {
         let parent_dir = get_parent_dir_name(info_file_path);
         let location = RawModuleLocation::from_info_text_file_path(info_file_path);
 
-        let file = match File::open(info_file_path) {
-            Ok(f) => f,
-            Err(e) => {
-                log::error!(
-                    "DFInfoFile - Error opening raw file for parsing in \"{}\"\n{:?}",
-                    parent_dir,
-                    e
-                );
-                return ModuleInfoFile::empty();
-            }
+        let Some(file) = try_get_file(info_file_path) else {
+            log::error!(
+                "ModuleInfoFile::parse: Unable to open file {}",
+                info_file_path.as_ref().display()
+            );
+            return ModuleInfoFile::empty();
         };
 
         let decoding_reader = DecodeReaderBytesBuilder::new()
@@ -106,18 +112,21 @@ impl ModuleInfoFile {
         let reader = BufReader::new(decoding_reader);
 
         // info.txt details
-        let mut caller = String::from("DFInfoFile");
         let mut info_file_data: ModuleInfoFile = ModuleInfoFile::new("", location, &parent_dir);
 
         for (index, line) in reader.lines().enumerate() {
             if line.is_err() {
-                log::error!("{} - Error processing {:?}:{}", caller, parent_dir, index);
+                log::error!(
+                    "ModuleInfoFile::parse: Error processing {:?}:{}",
+                    parent_dir,
+                    index
+                );
                 continue;
             }
             let line = match line {
                 Ok(l) => l,
                 Err(e) => {
-                    log::error!("{} - Line-reading error\n{:?}", caller, e);
+                    log::error!("ModuleInfoFile::parse:  Line-reading error\n{:?}", e);
                     continue;
                 }
             };
@@ -136,8 +145,7 @@ impl ModuleInfoFile {
                 };
 
                 log::trace!(
-                    "{} - Key: {} Value: {}",
-                    caller,
+                    "ModuleInfoFile::parse: Key: {} Value: {}",
                     captured_key,
                     captured_value
                 );
@@ -147,14 +155,12 @@ impl ModuleInfoFile {
                     "ID" => {
                         // the [ID:identifier] tag should be the top of the info.txt file
                         info_file_data = ModuleInfoFile::new(captured_value, location, &parent_dir);
-                        caller = format!("DFInfoFile ({})", &captured_value);
                     }
                     "NUMERIC_VERSION" => match captured_value.parse() {
                         Ok(n) => info_file_data.numeric_version = n,
                         Err(_e) => {
                             log::debug!(
-                                "{} - 'NUMERIC_VERSION' should be integer '{}' from {}",
-                                caller,
+                                "ModuleInfoFile::parse: 'NUMERIC_VERSION' should be integer '{}' from {}",
                                 captured_value,
                                 info_file_data.get_identifier()
                             );
@@ -165,8 +171,8 @@ impl ModuleInfoFile {
                                 Ok(n) => info_file_data.numeric_version = n,
                                 Err(_e) => {
                                     log::debug!(
-                                        "{} - Unable to parse any numbers from {} for NUMERIC_VERSION",
-                                        caller,
+                                        "ModuleInfoFile::parse: Unable to parse any numbers from {} for NUMERIC_VERSION",
+                                        
                                         captured_value
                                     );
                                 }
@@ -177,8 +183,8 @@ impl ModuleInfoFile {
                         Ok(n) => info_file_data.earliest_compatible_numeric_version = n,
                         Err(_e) => {
                             log::debug!(
-                                "{} - 'EARLIEST_COMPATIBLE_NUMERIC_VERSION' should be integer '{}' from {}",
-                                caller,
+                                "ModuleInfoFile::parse: 'EARLIEST_COMPATIBLE_NUMERIC_VERSION' should be integer '{}' from {}",
+                                
                                 captured_value,
                                 info_file_data.get_identifier()
                             );
@@ -189,8 +195,8 @@ impl ModuleInfoFile {
                                 Ok(n) => info_file_data.earliest_compatible_numeric_version = n,
                                 Err(_e) => {
                                     log::debug!(
-                                        "{} - Unable to parse any numbers from {} for EARLIEST_COMPATIBLE_NUMERIC_VERSION",
-                                        caller,
+                                        "ModuleInfoFile::parse: Unable to parse any numbers from {} for EARLIEST_COMPATIBLE_NUMERIC_VERSION",
+                                        
                                         captured_value
                                     );
                                 }
@@ -199,11 +205,7 @@ impl ModuleInfoFile {
                     },
                     "DISPLAYED_VERSION" => {
                         info_file_data.displayed_version = String::from(captured_value);
-                        caller = format!(
-                            "DFInfoFile ({}@v{})",
-                            info_file_data.get_identifier(),
-                            &captured_value
-                        );
+                     
                     }
                     "EARLIEST_COMPATIBLE_DISPLAYED_VERSION" => {
                         info_file_data.earliest_compatible_displayed_version =
@@ -264,8 +266,8 @@ impl ModuleInfoFile {
                         Ok(n) => info_file_data.steam_file_id = n,
                         Err(_e) => {
                             log::debug!(
-                                "{} - 'STEAM_FILE_ID' should be integer {}",
-                                caller,
+                                "ModuleInfoFile::parse: 'STEAM_FILE_ID' should be integer {}",
+                                
                                 parent_dir
                             );
                             // match on \D to replace any non-digit characters with empty string
@@ -275,8 +277,7 @@ impl ModuleInfoFile {
                                 Ok(n) => info_file_data.steam_file_id = n,
                                 Err(_e) => {
                                     log::debug!(
-                                        "{} - Unable to parse any numbers from {} for STEAM_FILE_ID",
-                                        caller,
+                                        "ModuleInfoFile::parse: Unable to parse any numbers from {} for STEAM_FILE_ID",
                                         captured_value
                                     );
                                 }

@@ -5,3 +5,8 @@ Cargo.lock
 
 # Ignore cli output in example dir
 examples/www/out.json
+
+
+# Ingore Mac OS X system files
+.DS_Store
+._*
