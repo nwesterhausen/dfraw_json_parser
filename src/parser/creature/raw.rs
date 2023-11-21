@@ -327,6 +327,32 @@ impl Creature {
     pub fn get_biomes(&self) -> Vec<Biome> {
         self.biomes.clone()
     }
+
+    pub fn set_name(&mut self, name: Name) {
+        self.name = name;
+    }
+    pub fn parse_tags_from_xml(&mut self, xml_tags: &[String]) {
+        for tag in xml_tags {
+            if tag.starts_with("biome_") {
+                // Parse the biome from "biome_pool_temperate_freshwater" or "biome_savanna_temperate"
+                let biome = tag
+                    .split('_')
+                    .skip(1)
+                    .collect::<Vec<&str>>()
+                    .join("_")
+                    .to_uppercase();
+                if let Some(biome) = BIOME_TOKENS.get(&biome) {
+                    self.biomes.push(biome.clone());
+                } else {
+                    log::warn!(
+                        "Creature::parse_tags_from_xml: ({}) Unknown biome '{}'",
+                        self.identifier,
+                        biome
+                    );
+                }
+            }
+        }
+    }
 }
 
 #[typetag::serde]

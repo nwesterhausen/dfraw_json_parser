@@ -98,6 +98,13 @@ pub fn parse(
                         );
                         return Vec::new();
                     }
+                    parser::raw_locations::RawModuleLocation::LegendsExport => {
+                        log::error!(
+                            "parse: LegendsExport location provided to parse! Provided options:\n{:#?}",
+                            options
+                        );
+                        return Vec::new();
+                    }
                 }
             } else {
                 log::error!(

@@ -157,6 +157,10 @@ pub fn parse(options: &ParserOptions) -> Vec<Box<dyn RawObject>> {
                         );
                         return Vec::new();
                     }
+                    RawModuleLocation::LegendsExport => {
+                        log::error!("LegendsExport location is not allowed in ParserOptions");
+                        return Vec::new();
+                    }
                 }
             } else {
                 log::error!(
@@ -606,6 +610,12 @@ pub fn parse_info_modules(options: &ParserOptions) -> Vec<ModuleInfoFile> {
                         log::error!(
                             "draw_json_parser: Unknown location provided to parse! Provided options:\n{:#?}",
                             options
+                        );
+                        return Vec::new();
+                    }
+                    RawModuleLocation::LegendsExport => {
+                        log::error!(
+                            "draw_json_parser: LegendsExport location is not allowed in ParserOptions"
                         );
                         return Vec::new();
                     }
