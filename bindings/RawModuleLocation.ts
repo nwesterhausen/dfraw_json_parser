@@ -4,4 +4,5 @@ export type RawModuleLocation =
   | "InstalledMods"
   | "Mods"
   | "Vanilla"
-  | "Unknown";
+  | "Unknown"
+  | "LegendsExport";

@@ -36,4 +36,11 @@ pub static CREATURE_TOKENS: phf::Map<&'static str, CreatureTag> = phf::phf_map! 
     "GLOWTILE" => CreatureTag::GlowTile,
     "CHANGE_FREQUENCY_PERC" => CreatureTag::ChangeFrequencyPercent,
     "CLUSTER_NUMBER" => CreatureTag::ClusterNumber,
+    "MATES_TO_BREED" => CreatureTag::MatesToBreed,
+    "ALL_CASTES_ALIVE" => CreatureTag::AllCastesAlive,
+    "TWO_GENDERS" => CreatureTag::TwoGenders,
+    "SMALL_RACE" => CreatureTag::SmallRace,
+    "OCCURS_AS_ENTITY_RACE" => CreatureTag::OccursAsEntityRace,
+    "EQUIPMENT" => CreatureTag::Equipment,
+    "EQUIPMENT_WAGON" => CreatureTag::EquipmentWagon,
 };

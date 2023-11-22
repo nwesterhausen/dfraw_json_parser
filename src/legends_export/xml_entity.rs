@@ -23,12 +23,6 @@ pub(crate) struct ExportedEntity {
 // }
 
 impl ExportedEntity {
-    pub fn new(id: u32) -> Self {
-        Self {
-            entity_id: id,
-            ..Self::default()
-        }
-    }
     pub fn set_id(&mut self, id: u32) {
         self.entity_id = id;
     }
@@ -41,7 +35,7 @@ impl ExportedEntity {
     pub fn set_child_id(&mut self, child_id: u32) {
         self.child_id = child_id;
     }
-
+    #[allow(dead_code)]
     pub fn into_entity(self, legend_metadata: &RawMetadata) -> Entity {
         Entity::new(
             format!("{}-{}{}", self.race, self.entity_type, self.entity_id).as_str(),

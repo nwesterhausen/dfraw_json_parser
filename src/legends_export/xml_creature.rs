@@ -12,12 +12,6 @@ impl ExportedCreature {
     pub fn is_empty(&self) -> bool {
         self.creature_id.is_empty()
     }
-    pub fn new(creature_id: &str) -> Self {
-        Self {
-            creature_id: creature_id.to_string(),
-            ..Self::default()
-        }
-    }
     pub fn set_creature_id(&mut self, creature_id: &str) {
         self.creature_id = creature_id.to_string();
     }

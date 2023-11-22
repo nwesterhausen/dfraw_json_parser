@@ -333,7 +333,11 @@ impl Creature {
     }
     pub fn parse_tags_from_xml(&mut self, xml_tags: &[String]) {
         for tag in xml_tags {
-            if tag.starts_with("biome_") {
+            if tag.contains("has_male") {
+                self.add_caste("MALE");
+            } else if tag.contains("has_female") {
+                self.add_caste("FEMALE");
+            } else if tag.starts_with("biome_") {
                 // Parse the biome from "biome_pool_temperate_freshwater" or "biome_savanna_temperate"
                 let biome = tag
                     .split('_')
@@ -348,6 +352,59 @@ impl Creature {
                         "Creature::parse_tags_from_xml: ({}) Unknown biome '{}'",
                         self.identifier,
                         biome
+                    );
+                }
+            } else if tag.starts_with("has_any_") {
+                // Remove the "has_any_" prefix and parse the caste tag
+                let mut caste_tag = tag
+                    .split('_')
+                    .skip(2)
+                    .collect::<Vec<&str>>()
+                    .join("_")
+                    .to_uppercase();
+                // Handle some edge cases
+                if caste_tag.ends_with("INTELLIGENT_LEARNS") {
+                    caste_tag = String::from("CAN_LEARN");
+                } else if caste_tag.ends_with("INTELLIGENT_SPEAKS") {
+                    caste_tag = String::from("CAN_SPEAK");
+                } else if caste_tag.ends_with("CAN_SWIM") {
+                    caste_tag = String::from("SWIMS_INNATE");
+                } else if caste_tag.ends_with("FLY_RACE_GAIT") {
+                    caste_tag = String::from("FLIER");
+                }
+                // Parse the tag
+                if let Some(_caste_tag) = CASTE_TOKENS.get(&caste_tag) {
+                    self.select_caste("ALL");
+                    if let Some(caste) = self.castes.last_mut() {
+                        caste.parse_tag(caste_tag.as_str(), "");
+                    } else {
+                        log::debug!(
+                            "Creature::parse_tags_from_xml: ({}) No castes found to apply tag {}",
+                            self.identifier,
+                            caste_tag
+                        );
+                    }
+                } else {
+                    // Try parsing the tag as a creature tag
+                    if let Some(tag) = CREATURE_TOKENS.get(&caste_tag) {
+                        self.tags.push(tag.clone());
+                    } else {
+                        log::warn!(
+                            "Creature::parse_tags_from_xml: ({}) Unknown tag {}",
+                            self.identifier,
+                            caste_tag
+                        );
+                    }
+                }
+            } else {
+                // Try to parse the tag
+                if let Some(tag) = CREATURE_TOKENS.get(&tag.to_uppercase()) {
+                    self.tags.push(tag.clone());
+                } else {
+                    log::warn!(
+                        "Creature::parse_tags_from_xml: ({}) Unknown tag {}",
+                        self.identifier,
+                        tag
                     );
                 }
             }
