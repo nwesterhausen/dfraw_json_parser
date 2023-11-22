@@ -22,6 +22,10 @@ The following options are supported:
     -g, --graphics      Parse graphics raws
 
     -s, --summary       Print a summary of the parsed raws
+    
+    -m, --metadata      Attach metadata to the parsed raws
+        This includes the raws' file paths and other information about the
+        raws' source.
 
     -o, --output PATH   Set the output path for the parsed raws
         Default value: 'parsed-raws.json'
@@ -66,6 +70,7 @@ struct Args {
     pub object_types: Vec<ObjectType>,
     pub legends_exports: Vec<PathBuf>,
     pub print_summary: bool,
+    pub attach_metadata: bool,
     pub output_path: PathBuf,
     pub df_path: PathBuf,
     pub raw_file_paths: Vec<PathBuf>,
@@ -80,6 +85,7 @@ impl std::default::Default for Args {
             object_types: Vec::new(),
             legends_exports: Vec::new(),
             print_summary: false,
+            attach_metadata: false,
             output_path: PathBuf::from("parsed-raws.json"),
             df_path: PathBuf::new(),
             raw_file_paths: Vec::new(),
@@ -126,6 +132,9 @@ fn parse_args() -> Result<Args, lexopt::Error> {
 
             Short('s') | Long("summary") => {
                 args.print_summary = true;
+            }
+            Short('m') | Long("metadata") => {
+                args.attach_metadata = true;
             }
             Short('g') | Long("graphics") => {
                 include_graphics = true;
@@ -250,6 +259,7 @@ pub fn main() -> Result<(), lexopt::Error> {
     let _options = ParserOptions {
         locations_to_parse: args.locations,
         raws_to_parse: args.object_types,
+        attach_metadata_to_raws: args.attach_metadata,
         ..Default::default()
     };
 

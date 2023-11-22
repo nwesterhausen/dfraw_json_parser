@@ -63,6 +63,10 @@ The following options are supported:
     -g, --graphics      Parse graphics raws
 
     -s, --summary       Print a summary of the parsed raws
+    
+    -m, --metadata      Attach metadata to the parsed raws
+        This includes the raws' file paths and other information about the
+        raws' source.
 
     -o, --output PATH   Set the output path for the parsed raws
         Default value: 'parsed-raws.json'
