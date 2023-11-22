@@ -65,7 +65,7 @@ for the steam workshop if it is a mod downloaded from the steam workshop.
 #![warn(clippy::pedantic)]
 #![allow(clippy::must_use_candidate)]
 
-use options::{ParserOptions, ParsingJob};
+use options::ParserOptions;
 use parser::{
     helpers::{
         absorb_select_creature::absorb_select_creature, apply_copy_from::apply_copy_tags_from,
@@ -85,6 +85,24 @@ pub mod options;
 pub mod parser;
 #[cfg(feature = "tauri")]
 mod tauri_lib;
+
+/// This module contains utility functions for file operations and directory traversal.
+///
+/// The functions in this module provide functionality for working with directories, files, and paths.
+/// It includes functions for getting subdirectories of a given directory, retrieving the name of the parent directory,
+/// validating game directories, writing raw objects and string vectors to files, and converting raw objects to JSON strings.
+/// These utility functions are used in the context of a JSON parser for Dwarf Fortress raw files.
+///
+/// The main functions in this module are:
+/// - `subdirectories`: Retrieves a vector of subdirectories for a given directory.
+/// - `get_parent_dir_name`: Retrieves the name of the parent directory for a given path.
+/// - `path_from_game_directory`: Validates and returns a `PathBuf` for a given game directory path.
+/// - `write_raw_vec_to_file`: Writes a vector of raw objects to a file in JSON format.
+/// - `write_json_string_vec_to_file`: Writes a vector of strings to a file, with each string on a separate line.
+/// - `options_has_valid_paths`: Validates the paths in the `ParserOptions` struct.
+/// - `raws_to_string`: Converts a vector of raw objects to a JSON string representation.
+///
+/// These utility functions are used in the context of a JSON parser for Dwarf Fortress raw files.
 pub mod util;
 
 #[cfg(feature = "tauri")]
@@ -105,76 +123,51 @@ pub fn parse(options: &ParserOptions) -> Vec<Box<dyn RawObject>> {
     // Guard against invalid path
     if !options_has_valid_paths(options) {
         log::error!(
-            "Returning early for bad path. Provided options:\n{:#?}",
+            "Some provided paths are invalid. Provided options:\n{:#?}",
             options
         );
         return Vec::new();
     }
-    let target_path = Path::new(&options.target_path);
     let mut results: Vec<Box<dyn RawObject>> = Vec::new();
 
-    match options.job {
-        ParsingJob::All => {
-            // Set file paths for each location
-            let data_path = target_path.join("data");
-            let vanilla_path = data_path.join("vanilla");
-            let installed_mods_path = data_path.join("installed_mods");
-            let workshop_mods_path = target_path.join("mods");
+    // No job is specified, instead it is inferred from the options
+    // First we can check if any locations are specified
+    if !options.locations_to_parse.is_empty() {
+        // Parse all locations that are specified.
+        let target_path = Path::new(&options.dwarf_fortress_directory);
 
-            // Parse each location
-            if options
-                .locations_to_parse
-                .contains(&RawModuleLocation::Vanilla)
-            {
-                results.extend(parse_location(&vanilla_path, options));
-            }
-            if options
-                .locations_to_parse
-                .contains(&RawModuleLocation::InstalledMods)
-            {
-                results.extend(parse_location(&installed_mods_path, options));
-            }
-            if options
-                .locations_to_parse
-                .contains(&RawModuleLocation::Mods)
-            {
-                results.extend(parse_location(&workshop_mods_path, options));
-            }
-        }
-        ParsingJob::SingleLocation => {
-            // Set the file path for the chosen location
-            let location_path = if let Some(location) = options.locations_to_parse.first() {
-                match location {
-                    RawModuleLocation::Vanilla => target_path.join("data").join("vanilla"),
-                    RawModuleLocation::InstalledMods => {
-                        target_path.join("data").join("installed_mods")
-                    }
-                    RawModuleLocation::Mods => target_path.join("mods"),
-                    RawModuleLocation::Unknown => {
-                        log::error!(
-                            "Unknown location provided to parse! Provided options:\n{:#?}",
-                            options
-                        );
-                        return Vec::new();
-                    }
-                    RawModuleLocation::LegendsExport => {
-                        log::error!("LegendsExport location is not allowed in ParserOptions");
-                        return Vec::new();
-                    }
-                }
-            } else {
-                log::error!(
-                    "No location provided to parse! Provided options:\n{:#?}",
-                    options
-                );
-                return Vec::new();
-            };
+        // Build paths for each location
+        let data_path = target_path.join("data");
+        let vanilla_path = data_path.join("vanilla");
+        let installed_mods_path = data_path.join("installed_mods");
+        let workshop_mods_path = target_path.join("mods");
 
-            // Parse the location
-            results.extend(parse_location(&location_path, options));
+        // Parse each location
+        if options
+            .locations_to_parse
+            .contains(&RawModuleLocation::Vanilla)
+        {
+            results.extend(parse_location(&vanilla_path, options));
         }
-        ParsingJob::SingleModule => {
-            // The provided path should be a module directory
+        if options
+            .locations_to_parse
+            .contains(&RawModuleLocation::InstalledMods)
+        {
+            results.extend(parse_location(&installed_mods_path, options));
+        }
+        if options
+            .locations_to_parse
+            .contains(&RawModuleLocation::Mods)
+        {
+            results.extend(parse_location(&workshop_mods_path, options));
+        }
+    }
+
+    // Next we can check if any raw modules are specified
+    if !options.raw_modules_to_parse.is_empty() {
+        // Parse all raw modules that are specified.
+        for raw_module in &options.raw_modules_to_parse {
+            let target_path = Path::new(&raw_module);
 
             // Check for info.txt
             let info_txt_path = target_path.join("info.txt");
@@ -198,17 +191,25 @@ pub fn parse(options: &ParserOptions) -> Vec<Box<dyn RawObject>> {
 
             results.extend(parse_module(&target_path, options));
         }
-        ParsingJob::SingleRaw => {
-            // The provided path should be a raw file directly
+    }
+
+    // Next we can check if any raw files are specified
+    if !options.raw_files_to_parse.is_empty() {
+        // Parse all raw files that are specified.
+        for raw_file in &options.raw_files_to_parse {
+            let target_path = Path::new(&raw_file);
+
             results.extend(parser::parse_raws_from_single_file(&target_path, options));
         }
-        ParsingJob::SingleModuleInfoFile | ParsingJob::AllModuleInfoFiles => {
-            // The provided path should be the info.txt file for a module
-            log::warn!(
-                "Unable to parse info.txt file in this dispatch. Provided options:\n{:#?}",
-                options
-            );
-            return Vec::new();
+    }
+
+    // Finally we can check if any legends exports are specified
+    if !options.legends_exports_to_parse.is_empty() {
+        // Parse all legends exports that are specified.
+        for legends_export in &options.legends_exports_to_parse {
+            let target_path = Path::new(&legends_export);
+
+            results.extend(legends_export::parse_legends_export(&target_path, options));
         }
     }
 
@@ -222,40 +223,78 @@ pub fn parse(options: &ParserOptions) -> Vec<Box<dyn RawObject>> {
     results
 }
 
-/// Parses the module info file using the provided parser options.
+/// The function `parse_module_info_files` parses module information files based on the provided options.
 ///
-/// The only part of the parser options that is used is the `target_path` field and the `job` field.
+/// Arguments:
 ///
-/// Note: This expects the `job` field to be `ParsingJob::SingleModuleInfoFile`. If it is not, it will return an empty `ModuleInfoFile`.
+/// * `options`: A reference to a `ParserOptions` struct, which contains various options for parsing
+/// module information.
 ///
-/// # Arguments
+/// Returns:
 ///
-/// * `options` - A reference to the parser options.
-///
-/// # Returns
-///
-/// Returns a `ModuleInfoFile` struct containing the parsed module information.
-pub fn parse_module_info_file(options: &ParserOptions) -> ModuleInfoFile {
+/// The function `parse_module_info_files` returns a `Vec<ModuleInfoFile>`.
+pub fn parse_module_info_files(options: &ParserOptions) -> Vec<ModuleInfoFile> {
     // Guard against invalid path
     if !options_has_valid_paths(options) {
-        log::error!(
-            "Returning early for bad path. Provided options:\n{:#?}",
-            options
-        );
-        return ModuleInfoFile::default();
+        log::error!("Some paths were invalid. Provided options:\n{:#?}", options);
+        return Vec::new();
     }
-    let target_path = Path::new(&options.target_path);
 
-    if let ParsingJob::SingleModuleInfoFile = options.job {
-        // The provided path should be the info.txt file for a module
-        parse_module_info_file_direct(&target_path)
-    } else {
-        log::error!(
-            "Wrong job provided to parse module info file! Provided options:\n{:#?}",
-            options
-        );
-        ModuleInfoFile::default()
+    let mut results = Vec::new();
+
+    if !options.locations_to_parse.is_empty() {
+        let target_path = Path::new(&options.dwarf_fortress_directory);
+
+        // Build paths for each location
+        let data_path = target_path.join("data");
+        let vanilla_path = data_path.join("vanilla");
+        let installed_mods_path = data_path.join("installed_mods");
+        let workshop_mods_path = target_path.join("mods");
+
+        // Parse each location
+        if options
+            .locations_to_parse
+            .contains(&RawModuleLocation::Vanilla)
+        {
+            results.extend(parse_module_info_files_at_location(&vanilla_path));
+        }
+        if options
+            .locations_to_parse
+            .contains(&RawModuleLocation::InstalledMods)
+        {
+            results.extend(parse_module_info_files_at_location(&installed_mods_path));
+        }
+        if options
+            .locations_to_parse
+            .contains(&RawModuleLocation::Mods)
+        {
+            results.extend(parse_module_info_files_at_location(&workshop_mods_path));
+        }
     }
+
+    // Parse any raw modules that are specified
+    if !options.raw_modules_to_parse.is_empty() {
+        // Parse all raw modules that are specified.
+        for raw_module_path in options.raw_modules_to_parse.as_slice() {
+            results.push(parse_module_info_file_in_module(raw_module_path));
+        }
+    }
+
+    // Parse any module info files that are specified directly
+    if !options.module_info_files_to_parse.is_empty() {
+        // Parse all module info files that are specified.
+        for module_info_file_path in options.module_info_files_to_parse.as_slice() {
+            results.push(parse_module_info_file_direct(module_info_file_path));
+        }
+    }
+
+    results
+}
+
+fn parse_module_info_file_in_module<P: AsRef<Path>>(module_path: &P) -> ModuleInfoFile {
+    let module_path: PathBuf = module_path.as_ref().to_path_buf();
+    let module_info_file_path = module_path.join("info.txt");
+    parse_module_info_file_direct(&module_info_file_path)
 }
 
 /// Parses the input data to JSON format based on the provided options.
@@ -274,26 +313,6 @@ pub fn parse_to_json(options: &ParserOptions) -> Vec<String> {
         json_results.push(serde_json::to_string(&result).unwrap_or_default());
     }
     json_results
-}
-
-/// Parses the input data and writes the output to a JSON file, based on the provided options.
-///
-/// # Arguments
-///
-/// * `options` - A reference to a `ParserOptions` struct that contains the parsing options.
-pub fn parse_to_file(options: &ParserOptions) {
-    // Guard against bad output path
-    if !options_has_valid_paths(options) {
-        log::error!(
-            "Returning early for bad output path. Provided options:\n{:#?}",
-            options
-        );
-        return;
-    }
-
-    let results = parse_to_json(options);
-
-    util::write_json_string_vec_to_file(&results, &options.output_path);
 }
 
 #[cfg(feature = "tauri")]
@@ -424,6 +443,17 @@ fn parse_module_info_files_at_location<P: AsRef<Path>>(location_path: &P) -> Vec
 ///
 /// The function `parse_module_info_file_direct` returns a `ModuleInfoFile` object.
 fn parse_module_info_file_direct<P: AsRef<Path>>(module_info_file_path: &P) -> ModuleInfoFile {
+    // Check if the file exists
+    if !module_info_file_path.as_ref().exists() {
+        log::error!(
+            "parse_module_info_file_direct: File {:?} does not exist",
+            module_info_file_path
+                .as_ref()
+                .file_name()
+                .unwrap_or_default(),
+        );
+        return ModuleInfoFile::default();
+    }
     // Get information from the module info file
     parser::parse_info_file_from_file_path(module_info_file_path)
 }
@@ -547,133 +577,6 @@ fn parse_module<P: AsRef<Path>>(
     results
 }
 
-/// The function `parse_info_modules` parses module information files based on the provided options.
-///
-/// Arguments:
-///
-/// * `options`: A reference to a `ParserOptions` struct, which contains various options for parsing
-/// module information.
-///
-/// Returns:
-///
-/// The function `parse_info_modules` returns a `Vec<ModuleInfoFile>`.
-pub fn parse_info_modules(options: &ParserOptions) -> Vec<ModuleInfoFile> {
-    // Guard against invalid path
-    if !options_has_valid_paths(options) {
-        log::error!(
-            "draw_json_parser: returning early for bad path. Provided options:\n{:#?}",
-            options
-        );
-        return Vec::new();
-    }
-    let target_path = Path::new(&options.target_path);
-    let mut results: Vec<ModuleInfoFile> = Vec::new();
-
-    match options.job {
-        ParsingJob::All | ParsingJob::AllModuleInfoFiles => {
-            // Set file paths for each location
-            let data_path = target_path.join("data");
-            let vanilla_path = data_path.join("vanilla");
-            let installed_mods_path = data_path.join("installed_mods");
-            let workshop_mods_path = target_path.join("mods");
-
-            // Parse each location
-            if options
-                .locations_to_parse
-                .contains(&RawModuleLocation::Vanilla)
-            {
-                results.extend(parse_module_info_files_at_location(&vanilla_path));
-            }
-            if options
-                .locations_to_parse
-                .contains(&RawModuleLocation::InstalledMods)
-            {
-                results.extend(parse_module_info_files_at_location(&installed_mods_path));
-            }
-            if options
-                .locations_to_parse
-                .contains(&RawModuleLocation::Mods)
-            {
-                results.extend(parse_module_info_files_at_location(&workshop_mods_path));
-            }
-        }
-        ParsingJob::SingleLocation => {
-            // Set the file path for the chosen location
-            let location_path = if let Some(location) = options.locations_to_parse.first() {
-                match location {
-                    RawModuleLocation::Vanilla => target_path.join("data").join("vanilla"),
-                    RawModuleLocation::InstalledMods => {
-                        target_path.join("data").join("installed_mods")
-                    }
-                    RawModuleLocation::Mods => target_path.join("mods"),
-                    RawModuleLocation::Unknown => {
-                        log::error!(
-                            "draw_json_parser: Unknown location provided to parse! Provided options:\n{:#?}",
-                            options
-                        );
-                        return Vec::new();
-                    }
-                    RawModuleLocation::LegendsExport => {
-                        log::error!(
-                            "draw_json_parser: LegendsExport location is not allowed in ParserOptions"
-                        );
-                        return Vec::new();
-                    }
-                }
-            } else {
-                log::error!(
-                    "draw_json_parser: No location provided to parse! Provided options:\n{:#?}",
-                    options
-                );
-                return Vec::new();
-            };
-
-            // Parse the location
-            results.extend(parse_module_info_files_at_location(&location_path));
-        }
-        ParsingJob::SingleModule => {
-            // The provided path should be a module directory
-
-            // Check for info.txt
-            let info_txt_path = target_path.join("info.txt");
-            if !info_txt_path.exists() {
-                let dir_name = target_path.file_name().unwrap_or_default();
-                let dir_name_str = dir_name.to_str().unwrap_or("");
-
-                if !(dir_name_str.eq("mod_upload")
-                    || dir_name_str.eq("examples and notes")
-                    || dir_name_str.eq("interaction examples"))
-                {
-                    log::error!(
-                        "draw_json_parser: No info.txt as expected in {:?}. Is this DF 50.xx? Provided options:\n{:#?}",
-                        target_path.file_name().unwrap_or_default(),
-                        options
-                    );
-                }
-
-                return Vec::new();
-            }
-
-            let module_info_file = parse_module_info_file_direct(&info_txt_path);
-            results.push(module_info_file);
-        }
-        ParsingJob::SingleRaw => {
-            // The provided path should be a raw file directly
-            log::warn!(
-                "draw_json_parser: Unable to parse info.txt file in this dispatch. Provided options:\n{:#?}",
-                options
-            );
-            return Vec::new();
-        }
-        ParsingJob::SingleModuleInfoFile => {
-            // The provided path should be the info.txt file for a module
-            results.push(parse_module_info_file_direct(&target_path));
-        }
-    }
-    log::info!("draw_json_parser: Parsed {} info.txt files", results.len());
-    results
-}
-
 /// The function `parse_info_modules_to_json` takes a `ParserOptions` object as input, parses the
 /// information modules using the options, and returns a vector of JSON strings representing the parsed
 /// results.
@@ -686,32 +589,12 @@ pub fn parse_info_modules(options: &ParserOptions) -> Vec<ModuleInfoFile> {
 ///
 /// The function `parse_info_modules_to_json` returns a vector of strings.
 pub fn parse_info_modules_to_json(options: &ParserOptions) -> Vec<String> {
-    let results = parse_info_modules(options);
+    let results = parse_module_info_files(options);
     let mut json_results = Vec::new();
     for result in results {
         json_results.push(serde_json::to_string(&result).unwrap_or_default());
     }
     json_results
-}
-
-/// The function `parse_info_modules_to_file` parses information modules to JSON and writes the results
-/// to a file.
-///
-/// Arguments:
-///
-/// * `options`: A reference to a `ParserOptions` struct.
-pub fn parse_info_modules_to_file(options: &ParserOptions) {
-    // Guard against bad output path
-    if !options_has_valid_paths(options) {
-        log::error!(
-            "draw_json_parser: Returning early for bad output path. Provided options:\n{:#?}",
-            options
-        );
-        return;
-    }
-
-    let results = parse_info_modules_to_json(options);
-    util::write_json_string_vec_to_file(&results, &options.output_path);
 }
 
 /// The function `build_search_string` takes a `raw_object` that implements the `Searchable` trait and

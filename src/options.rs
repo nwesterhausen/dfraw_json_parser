@@ -33,20 +33,20 @@ pub struct ParserOptions {
     /// Default: false.
     pub skip_apply_creature_variations: bool,
     /// What kind of raws to parse. If this is left empty, all raws will be parsed.
-    /// Default: [ Creature, Plant, Inorganic, MaterialTemplate ]
+    ///
+    /// Default: [ Creature, Plant, Inorganic, MaterialTemplate, Graphics, TilePage ]
     pub raws_to_parse: Vec<ObjectType>,
-    /// What locations to parse raws from. If this is left empty, all locations will be parsed.
-    /// When parsing a single file, this is ignored. If the job is to parse a single location,
-    /// only the first location in this list will be used.
-    /// Default: Vanilla.
+    /// What locations to parse raws from. If this is left empty, no locations will be parsed.
+    ///
+    /// (i.e. only the specific raw files, modules, or legends_plus exports specified will be parsed)
+    ///
+    /// Default: [Vanilla]
     pub locations_to_parse: Vec<RawModuleLocation>,
-    /// The path to the dwarf fortress directory if parsing ALL or a SingleLocation. If
-    /// parsing a single module, this should be the path to the module (which includes the
-    /// info.txt file). If parsing a single raw file, this should be the path directly to the raw.
-    pub target_path: PathBuf,
-    /// The job to perform.
-    /// Default: All
-    pub job: ParsingJob,
+    /// The path to the dwarf fortress directory. If no locations are specified, then this is not used.
+    ///
+    /// If specific raw files, modules or legends_plus exports are specified, then this is not used when
+    /// parsing those.
+    pub dwarf_fortress_directory: PathBuf,
     /// Whether to serialize the result to json. If true, the result will be serialized to json before
     /// being returned.
     ///
@@ -54,24 +54,42 @@ pub struct ParserOptions {
     ///
     /// Default: false
     pub serialize_result_to_json: bool,
-    /// The path to write the json output to. This is only used if `serialize_result_to_json` is true.
+    /// Optionally specify one or more legends_plus exports to parse in addition to the raws.
+    /// These exports include information about generated creatures which are not included in the
+    /// raws.
     ///
-    /// If left empty, ./output.json will be used.
-    pub output_path: PathBuf,
-    /// Whether output to a file or not
-    /// Default: false
-    pub output_to_file: bool,
-}
-
-#[derive(Debug, Clone, Serialize, Deserialize, PartialEq, Eq, ts_rs::TS)]
-#[ts(export)]
-pub enum ParsingJob {
-    SingleRaw,
-    SingleModule,
-    SingleLocation,
-    All,
-    SingleModuleInfoFile,
-    AllModuleInfoFiles,
+    /// Default: None
+    pub legends_exports_to_parse: Vec<PathBuf>,
+    /// Optionally specify one or more raw files to parse directly. These should be the raw files
+    /// themselves, not the containing directory.
+    ///
+    /// (e.g. `creature_standard.txt` in `data/vanilla/vanilla_creatures/objects/`)
+    ///
+    /// Note that these will be parsed in addition to the raws in the specified locations in the other
+    /// options. That means that if you specify a raw file that is also in the vanilla raws, it will
+    /// be parsed twice (if vanilla is in the locations to parse).
+    ///
+    /// Default: None
+    pub raw_files_to_parse: Vec<PathBuf>,
+    /// Optionally specify one or more raw modules to parse directly. These should be the module
+    /// directories, not the info.txt file.
+    ///
+    /// (e.g. `vanilla_creatures` in `data/vanilla/`)
+    ///
+    /// Note that these will be parsed in addition to the raws in the specified locations in the other
+    /// options. That means that if you specify a module that is also in the vanilla raws, it will
+    /// be parsed twice (if vanilla is in the locations to parse).
+    ///
+    /// Default: None
+    pub raw_modules_to_parse: Vec<PathBuf>,
+    /// Optionally specify one or more module info files to parse directly. These should be the info.txt
+    /// files themselves, not the containing directory.
+    ///
+    /// (e.g. `info.txt` in `data/vanilla/vanilla_creatures/`)
+    ///
+    /// Note that if you are calling the `parse` function, this will be ignored. This is only used
+    /// when calling the `parse_module_info_files` function.
+    pub module_info_files_to_parse: Vec<PathBuf>,
 }
 
 impl Default for ParserOptions {
@@ -81,7 +99,6 @@ impl Default for ParserOptions {
             skip_apply_copy_tags_from: false,
             skip_apply_creature_variations: false,
             serialize_result_to_json: false,
-            output_to_file: false,
             raws_to_parse: vec![
                 ObjectType::Creature,
                 ObjectType::Plant,
@@ -91,9 +108,11 @@ impl Default for ParserOptions {
                 ObjectType::TilePage,
             ],
             locations_to_parse: vec![RawModuleLocation::Vanilla],
-            target_path: PathBuf::from(""),
-            job: ParsingJob::All,
-            output_path: PathBuf::from(""),
+            dwarf_fortress_directory: PathBuf::from(""),
+            legends_exports_to_parse: Vec::new(),
+            raw_files_to_parse: Vec::new(),
+            raw_modules_to_parse: Vec::new(),
+            module_info_files_to_parse: Vec::new(),
         }
     }
 }
@@ -110,7 +129,7 @@ impl ParserOptions {
     /// For `ParsingJob::SingleRaw`, this should be the path directly to the raw.
     pub fn new<P: AsRef<Path>>(target_path: P) -> Self {
         Self {
-            target_path: target_path.as_ref().to_path_buf(),
+            dwarf_fortress_directory: target_path.as_ref().to_path_buf(),
             ..Default::default()
         }
     }
@@ -155,19 +174,6 @@ impl ParserOptions {
         self.locations_to_parse = locations_to_parse;
     }
 
-    /// Sets the job to perform.
-    /// * `ParsingJob::SingleRaw` will parse a single raw file. (e.g. `creature_standard.txt` in `data/vanilla/vanilla_creatures/objects/`)
-    /// * `ParsingJob::SingleModule` will parse a single module (e.g. `vanilla_creatures` in `data/vanilla/`)
-    /// * `ParsingJob::SingleLocation` will parse a single location (e.g. `data/vanilla`)
-    /// * `ParsingJob::All` will parse all raws in all locations (i.e. all locations in `locations_to_parse`)
-    /// * `ParsingJob::SingleModuleInfoFile` will parse the info.txt file at the provided path.
-    /// * `ParsingJob::AllModuleInfoFiles` will parse all info.txt files in all locations (i.e. all locations in `locations_to_parse`)
-    ///
-    /// Default: All
-    pub fn set_job(&mut self, job: ParsingJob) {
-        self.job = job;
-    }
-
     /// Whether to serialize the result to json. If true, the result will be serialized to json before
     ///
     /// (This means the result will be a `Vec` of `String` instead of a `Vec` of `Box<dyn RawObject>`.)
@@ -177,16 +183,57 @@ impl ParserOptions {
         self.serialize_result_to_json = true;
     }
 
-    /// Sets the path to write the json output to. This is only used if `serialize_result_to_json` is true.
+    /// Optionally specify one or more `legends_plus` exports to parse in addition to the raws.
     ///
-    /// If left empty, ./output.json will be used.
-    pub fn set_output_path<P: AsRef<Path>>(&mut self, output_path: P) {
-        self.output_path = output_path.as_ref().to_path_buf();
+    /// These exports include information about generated creatures which are not included in the
+    /// raws.
+    ///
+    /// Default: None
+    pub fn add_legends_export_to_parse<P: AsRef<Path>>(&mut self, legends_export_to_parse: &P) {
+        self.legends_exports_to_parse
+            .push(legends_export_to_parse.as_ref().to_path_buf());
     }
 
-    /// Whether output to a file or not
-    /// Default: false
-    pub fn output_to_file(&mut self) {
-        self.output_to_file = true;
+    /// Optionally specify one or more raw files to parse directly. These should be the raw files
+    ///
+    /// (e.g. `creature_standard.txt` in `data/vanilla/vanilla_creatures/objects/`)
+    ///
+    /// Note that these will be parsed in addition to the raws in the specified locations in the other
+    /// options. That means that if you specify a raw file that is also in the vanilla raws, it will
+    /// be parsed twice (if vanilla is in the locations to parse).
+    ///
+    /// Default: None
+    pub fn add_raw_file_to_parse<P: AsRef<Path>>(&mut self, raw_file_to_parse: &P) {
+        self.raw_files_to_parse
+            .push(raw_file_to_parse.as_ref().to_path_buf());
+    }
+
+    /// Optionally specify one or more raw modules to parse directly. These should be the module
+    /// directories, not the info.txt file.
+    ///     
+    /// (e.g. `vanilla_creatures` in `data/vanilla/`)
+    ///
+    /// Note that these will be parsed in addition to the raws in the specified locations in the other
+    /// options. That means that if you specify a module that is also in the vanilla raws, it will
+    /// be parsed twice (if vanilla is in the locations to parse).
+    ///
+    /// Default: None
+    pub fn add_raw_module_to_parse<P: AsRef<Path>>(&mut self, raw_module_to_parse: &P) {
+        self.raw_modules_to_parse
+            .push(raw_module_to_parse.as_ref().to_path_buf());
+    }
+
+    /// Optionally specify one or more module info files to parse directly. These should be the info.txt
+    /// files themselves, not the containing directory.
+    ///
+    /// (e.g. `info.txt` in `data/vanilla/vanilla_creatures/`)
+    ///
+    /// Note that if you are calling the `parse` function, this will be ignored. This is only used
+    /// when calling the `parse_module_info_files` function.
+    ///
+    /// Default: None
+    pub fn add_module_info_file_to_parse<P: AsRef<Path>>(&mut self, module_info_file_to_parse: &P) {
+        self.module_info_files_to_parse
+            .push(module_info_file_to_parse.as_ref().to_path_buf());
     }
 }

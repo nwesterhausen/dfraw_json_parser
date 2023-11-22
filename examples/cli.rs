@@ -22,8 +22,11 @@ The following options are supported:
     -g, --graphics      Parse graphics raws
 
     -s, --summary       Print a summary of the parsed raws
+
+    -P, --pretty        Pretty-print the parsed raws
+        This is only used when saving the parsed raws to a file.
     
-    -m, --metadata      Attach metadata to the parsed raws
+    -M, --metadata      Attach metadata to the parsed raws
         This includes the raws' file paths and other information about the
         raws' source.
 
@@ -71,6 +74,7 @@ struct Args {
     pub legends_exports: Vec<PathBuf>,
     pub print_summary: bool,
     pub attach_metadata: bool,
+    pub pretty_print: bool,
     pub output_path: PathBuf,
     pub df_path: PathBuf,
     pub raw_file_paths: Vec<PathBuf>,
@@ -86,6 +90,7 @@ impl std::default::Default for Args {
             legends_exports: Vec::new(),
             print_summary: false,
             attach_metadata: false,
+            pretty_print: false,
             output_path: PathBuf::from("parsed-raws.json"),
             df_path: PathBuf::new(),
             raw_file_paths: Vec::new(),
@@ -94,6 +99,7 @@ impl std::default::Default for Args {
     }
 }
 
+#[allow(clippy::too_many_lines)]
 fn parse_args() -> Result<Args, lexopt::Error> {
     use lexopt::prelude::*;
 
@@ -133,8 +139,11 @@ fn parse_args() -> Result<Args, lexopt::Error> {
             Short('s') | Long("summary") => {
                 args.print_summary = true;
             }
-            Short('m') | Long("metadata") => {
+            Short('M') | Long("metadata") => {
                 args.attach_metadata = true;
+            }
+            Short('P') | Long("pretty") => {
+                args.pretty_print = true;
             }
             Short('g') | Long("graphics") => {
                 include_graphics = true;
@@ -187,10 +196,6 @@ fn parse_args() -> Result<Args, lexopt::Error> {
         }
     }
 
-    // If no locations were specified, parse just vanilla
-    if args.locations.is_empty() {
-        args.locations.push(RawModuleLocation::Vanilla);
-    }
     // If no object types were specified, parse all
     if args.object_types.is_empty() {
         args.object_types.push(ObjectType::Creature);
@@ -256,23 +261,26 @@ pub fn main() -> Result<(), lexopt::Error> {
         .expect("Failed to start logger");
 
     // Build ParserOptions for the parser
-    let _options = ParserOptions {
+    let options = ParserOptions {
         locations_to_parse: args.locations,
         raws_to_parse: args.object_types,
         attach_metadata_to_raws: args.attach_metadata,
+        raw_files_to_parse: args.raw_file_paths,
+        raw_modules_to_parse: args.raw_module_paths,
+        legends_exports_to_parse: args.legends_exports,
         ..Default::default()
     };
 
-    // Parse a legends export if requested
-    for legends_export in &args.legends_exports {
-        let results =
-            dfraw_json_parser::legends_export::reader::parse_legends_export(legends_export);
-        let json = results
-            .iter()
-            .map(|r| serde_json::to_string(r).unwrap())
-            .collect::<Vec<String>>();
-        dfraw_json_parser::util::write_json_string_vec_to_file(&json, &args.output_path);
+    // Parse the raws
+    let raws = dfraw_json_parser::parse(&options);
+
+    // Print a summary of the parsed raws
+    if args.print_summary {
+        println!("Summary not implemented yet..");
     }
+
+    // Save the parsed raws to a file
+    dfraw_json_parser::util::write_raw_vec_to_file(&raws, &args.output_path, args.pretty_print);
 
     Ok(())
 }

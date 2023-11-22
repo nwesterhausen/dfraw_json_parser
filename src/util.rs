@@ -1,3 +1,4 @@
+
 use std::{
     fs::File,
     io::{BufWriter, Write},
@@ -7,7 +8,7 @@ use std::{
 use walkdir::WalkDir;
 
 use crate::{
-    options::{ParserOptions, ParsingJob},
+    options::ParserOptions,
     parser::{
         creature::raw::Creature, object_types::ObjectType, raws::RawObject,
         select_creature::raw::SelectCreature,
@@ -105,6 +106,60 @@ pub fn path_from_game_directory<P: AsRef<Path>>(game_path: &P) -> Result<PathBuf
     Ok(game_path.to_path_buf())
 }
 
+/// Save a vector of parsed raw objects to a file in JSON format.
+///
+/// Arguments:
+///
+/// * `raws_vec`: A vector of boxed objects that implement the `RawObject` trait.
+/// * `out_filepath`: A path to the output file.
+/// * `pretty_print`: A boolean value indicating whether to pretty print the JSON output.
+pub fn write_raw_vec_to_file<P: AsRef<Path>>(
+    raws_vec: &Vec<Box<dyn RawObject>>,
+    out_filepath: &P,
+    pretty_print: bool,
+) {
+    log::info!(
+        "write_raw_vec_to_file: Writing {} raws to file {:?}",
+        raws_vec.len(),
+        out_filepath.as_ref().display()
+    );
+
+    if raws_vec.is_empty() {
+        log::warn!("write_raw_vec_to_file: Provided raw vector is empty!");
+        return;
+    }
+
+    let out_file = match File::create(out_filepath) {
+        Ok(f) => f,
+        Err(e) => {
+            log::error!(
+                "write_raw_vec_to_file: Unable to open {} for writing \n{:?}",
+                out_filepath.as_ref().display(),
+                e
+            );
+            return;
+        }
+    };
+
+    if pretty_print {
+        serde_json::to_writer_pretty(out_file, raws_vec).unwrap_or_else(|e| {
+            log::error!(
+                "write_raw_vec_to_file: Unable to write to {} \n{:?}",
+                out_filepath.as_ref().display(),
+                e
+            );
+        });
+    } else {
+        serde_json::to_writer(out_file, raws_vec).unwrap_or_else(|e| {
+            log::error!(
+                "write_raw_vec_to_file: Unable to write to {} \n{:?}",
+                out_filepath.as_ref().display(),
+                e
+            );
+        });
+    }
+}
+
 /// Save a vector of strings to a file, one string per line.
 ///
 /// Arguments:
@@ -198,51 +253,102 @@ pub fn write_json_string_vec_to_file<P: AsRef<Path>>(strings_vec: &Vec<String>, 
 }
 
 pub fn options_has_valid_paths(options: &ParserOptions) -> bool {
-    let target_path = &options.target_path;
-    // Guard against invalid path
-    if !target_path.exists() {
-        log::error!(
-            "write_json_string_vec_to_file: Provided path for parsing doesn't exist!\n{}",
-            target_path.display()
-        );
-        return false;
-    }
-    if (options.job == ParsingJob::All
-        || options.job == ParsingJob::SingleModule
-        || options.job == ParsingJob::SingleLocation
-        || options.job == ParsingJob::AllModuleInfoFiles)
-        && target_path.is_file()
-    {
-        log::error!(
-            "write_json_string_vec_to_file: Target path needs to be a directory for parsing {:?}\n{}",
-            options.job,
-            target_path.display()
-        );
-        return false;
+    // Guard against invalid path if locations are set
+    if !options.locations_to_parse.is_empty() {
+        let target_path = &options.dwarf_fortress_directory;
+        if !target_path.exists() {
+            log::error!(
+                "options_validator: Provided Dwarf Fortress path for doesn't exist!\n{}",
+                target_path.display()
+            );
+            return false;
+        }
+
+        if !target_path.is_dir() {
+            log::error!(
+                "options_validator: Dwarf Fortress path needs to be a directory!\n{}",
+                target_path.display()
+            );
+            return false;
+        }
     }
 
-    // Exit early if we aren't writing to a file.
-    if !options.output_to_file {
-        return true;
+    // Validate any raw file paths
+    for raw_file_path in &options.raw_files_to_parse {
+        if !raw_file_path.exists() {
+            log::error!(
+                "options_validator: Provided raw file path doesn't exist!\n{}",
+                raw_file_path.display()
+            );
+            return false;
+        }
+
+        if !raw_file_path.is_file() {
+            log::error!(
+                "options_validator: Provided raw file path needs to be a file!\n{}",
+                raw_file_path.display()
+            );
+            return false;
+        }
     }
 
-    let output_path = &options.output_path;
-    // Guard against invalid path
-    if !target_path.exists() {
-        log::error!(
-            "write_json_string_vec_to_file: Provided path for parsing doesn't exist!\n{}",
-            output_path.display()
-        );
-        return false;
+    // Validate any raw module paths
+    for raw_module_path in &options.raw_modules_to_parse {
+        if !raw_module_path.exists() {
+            log::error!(
+                "options_validator: Provided raw module path doesn't exist!\n{}",
+                raw_module_path.display()
+            );
+            return false;
+        }
+
+        if !raw_module_path.is_dir() {
+            log::error!(
+                "options_validator: Provided raw module path needs to be a directory!\n{}",
+                raw_module_path.display()
+            );
+            return false;
+        }
     }
-    // Output path needs to be a file (always)
-    if !output_path.is_file() {
-        log::error!(
-            "write_json_string_vec_to_file: Output path needs to be a file\n{}",
-            output_path.display()
-        );
-        return false;
+
+    // Validate any legends export paths
+    for legends_export_path in &options.legends_exports_to_parse {
+        if !legends_export_path.exists() {
+            log::error!(
+                "options_validator: Provided legends export path doesn't exist!\n{}",
+                legends_export_path.display()
+            );
+            return false;
+        }
+
+        if !legends_export_path.is_file() {
+            log::error!(
+                "options_validator: Provided legends export path needs to be a file!\n{}",
+                legends_export_path.display()
+            );
+            return false;
+        }
     }
+
+    // Validate any module info file paths
+    for module_info_file_path in &options.module_info_files_to_parse {
+        if !module_info_file_path.exists() {
+            log::error!(
+                "options_validator: Provided module info file path doesn't exist!\n{}",
+                module_info_file_path.display()
+            );
+            return false;
+        }
+
+        if !module_info_file_path.is_file() {
+            log::error!(
+                "options_validator: Provided module info file path needs to be a file!\n{}",
+                module_info_file_path.display()
+            );
+            return false;
+        }
+    }
+
     true
 }
 
