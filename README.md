@@ -46,68 +46,60 @@ cargo run --example cli -- --help
 ### cli.rs
 
 ```sh
-Library which parses Dwarf Fortress raw files into JSON
+Usage: dfraw-json-parser [OPTIONS] <dwarf-fortress-path>
 
-Usage: cli.exe [OPTIONS] --target-path <TARGET_PATH>
+Default behavior:
+    - Parse the vanilla raws
+    - Parse all object types
+    - Print a summary of the parsed raws
+    - Save the parsed raws to 'parsed-raws.json'
+    - Log at the 'info' level
 
-Options:
-  -t, --target-path <TARGET_PATH>
-          Specify the path to parse raws from.
+The following options are supported:
+    -c, --creature      Parse creature raws
+    -p, --plant         Parse plant raws
+    -e, --entity        Parse entity raws
+    -i, --inorganic     Parse inorganic raws
+    -g, --graphics      Parse graphics raws
 
-          If you choose `-p RawFile`, or `-p RawModuleInfoFile`, this must be a file path.
+    -s, --summary       Print a summary of the parsed raws
 
-          If you choose `-p RawModule` this must be the path to the module folder.
+    -o, --output PATH   Set the output path for the parsed raws
+        Default value: 'parsed-raws.json'
 
-          If you choose `-p All` (or leave it unset), this must be the path to the Dwarf Fortress
-          game directory (e.g. `C:/Program Files/Dwarf Fortress`).
+    -r, --raw PATH      Parse a raw file
+        This can be included multiple times to parse multiple raw files
+        directly. 
 
-  -o, --out-dir <OUT_DIR>
-          Specify the directory that the JSON database should be saved into.
+    -l, --legends PATH  Parse a legends export
+        This can be included multiple times to parse multiple legends
+        exports. These should be 'legends-plus' exports from DFHack.
 
-          If raw files are parsed, a JSON database (an array of objects) is
-          saved to disk in a location specified by this argument. This will
-          create an 'raws.json' file in the directory specified by this argument.
+    -m, --module PATH   Parse a raw module
+        This can be included multiple times to parse multiple raw modules
+        directly. This could be to specify a single raw module to parse, or
+        to specify a raw module to parse in addition to the raw modules
+        specified by the --vanilla, --mods, and --installed flags.
 
-          If not specified, the current working directory will be used.
+    -v, --verbose       Increase the verbosity of the output
+        Default log level: 'info'
 
-          [default: ]
+        This supports up to two levels of verbosity. The first level is
+        'debug', and the second level is 'trace'. (e.g. '-vv' or '--verbose --verbose')
 
-      --parse <PARSE>
-          What level of parsing to perform.
+    -q, --quiet         Decrease the verbosity of the output
+        Default log level: 'info'
 
-          Choose from:
-              - RawFile: Parse a single raw file
-              - RawModuleInfoFile: Parse a single raw module info file
-              - RawModule: Parse a single raw module
-              - All: Parse all, limited to locations if specified
+        This supports up to two levels of verbosity. The first level is
+        'warn', and the second level is 'error'. (e.g. '-qq' or '--quiet --quiet')
 
-          If All is chosen, the flags for parse_vanilla, parse_mods_downloaded, and parse_mods_installed will all
-          influence exactly which locations are parsed. All also includes a modules.json which is a database of all
-          modules and their info.
+    --vanilla           Parse the vanilla raws
+    --mods              Parse the raws from all mods
+    --installed         Parse the raws from installed mods
 
+    -h, --help              Print this help message
+    -V, --version           Print the version number
 
-          [default: all]
-
-          Possible values:
-          - raw-file:             Parse a single raw file
-          - raw-module-info-file: Parse a single raw module info file
-          - raw-module:           Parse a single raw module
-          - all:                  Parse all, limited to locations if specified
-
-      --parse-vanilla
-          Parse vanilla raws
-
-      --parse-mods-downloaded
-          Parse downloaded workshop mods
-
-      --parse-mods-installed
-          Parse installed mods
-
-  -h, --help
-          Print help (see a summary with '-h')
-
-  -V, --version
-          Print version
 ```
 
 ### How to use

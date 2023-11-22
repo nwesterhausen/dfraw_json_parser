@@ -42,6 +42,14 @@ pub enum CreatureTag {
     ClusterNumber,
     #[default]
     Unknown,
+    // Tokens found in the legends xml exports but not in the raws
+    MatesToBreed,
+    TwoGenders,
+    AllCastesAlive,
+    SmallRace,
+    OccursAsEntityRace,
+    Equipment,
+    EquipmentWagon,
 }
 
 impl std::fmt::Display for CreatureTag {
@@ -84,6 +92,13 @@ impl std::fmt::Display for CreatureTag {
             CreatureTag::ChangeFrequencyPercent => write!(f, "ChangeFrequencyPercent"),
             CreatureTag::ClusterNumber => write!(f, "ClusterNumber"),
             CreatureTag::Unknown => write!(f, "Unknown"),
+            CreatureTag::MatesToBreed => write!(f, "MatesToBreed"),
+            CreatureTag::TwoGenders => write!(f, "TwoGenders"),
+            CreatureTag::AllCastesAlive => write!(f, "AllCastesAlive"),
+            CreatureTag::SmallRace => write!(f, "SmallRace"),
+            CreatureTag::OccursAsEntityRace => write!(f, "OccursAsEntityRace"),
+            CreatureTag::Equipment => write!(f, "Equipment"),
+            CreatureTag::EquipmentWagon => write!(f, "EquipmentWagon"),
         }
     }
 }

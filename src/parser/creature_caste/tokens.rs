@@ -140,4 +140,19 @@ pub enum CasteTag {
     ChangeBodySizePercent,
     #[default]
     Unknown,
+    // Tokens found in the XML exports..
+    NightCreature,
+    NightCreatureHunter,
+    NightCreatureBogeyman,
+    NightCreatureNightmare,
+    LargePredator,
+    NotFireImmune,
+    HasBlood,
+    Grasp,
+    RaceGait,
+    CannotBreatheWater,
+    NaturalAnimal,
+    CuriousBeast,
+    CannotBreatheAir,
+    Utterances,
 }
