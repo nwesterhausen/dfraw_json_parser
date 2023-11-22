@@ -41,84 +41,54 @@ pub fn parse(
         );
         return Vec::new();
     }
-    let target_path = Path::new(&options.target_path);
     let mut results: Vec<Box<dyn RawObject>> = Vec::new();
 
-    match options.job {
-        crate::options::ParsingJob::All => {
-            // Set file paths for each location
-            let data_path = target_path.join("data");
-            let vanilla_path = data_path.join("vanilla");
-            let installed_mods_path = data_path.join("installed_mods");
-            let workshop_mods_path = target_path.join("mods");
+    // No job is specified, instead it is inferred from the options
+    // First we can check if any locations are specified
+    if !options.locations_to_parse.is_empty() {
+        // Parse all locations that are specified.
+        let target_path = Path::new(&options.dwarf_fortress_directory);
 
-            // Parse each location
-            if options
-                .locations_to_parse
-                .contains(&parser::raw_locations::RawModuleLocation::Vanilla)
-            {
-                results.extend(parse_location(&vanilla_path, options, progress_helper));
-            }
-            if options
-                .locations_to_parse
-                .contains(&parser::raw_locations::RawModuleLocation::InstalledMods)
-            {
-                results.extend(parse_location(
-                    &installed_mods_path,
-                    options,
-                    progress_helper,
-                ));
-            }
-            if options
-                .locations_to_parse
-                .contains(&parser::raw_locations::RawModuleLocation::Mods)
-            {
-                results.extend(parse_location(
-                    &workshop_mods_path,
-                    options,
-                    progress_helper,
-                ));
-            }
-        }
-        crate::options::ParsingJob::SingleLocation => {
-            // Set the file path for the chosen location
-            let location_path = if let Some(location) = options.locations_to_parse.first() {
-                match location {
-                    parser::raw_locations::RawModuleLocation::Vanilla => {
-                        target_path.join("data").join("vanilla")
-                    }
-                    parser::raw_locations::RawModuleLocation::InstalledMods => {
-                        target_path.join("data").join("installed_mods")
-                    }
-                    parser::raw_locations::RawModuleLocation::Mods => target_path.join("mods"),
-                    parser::raw_locations::RawModuleLocation::Unknown => {
-                        log::error!(
-                            "parse: Unknown location provided to parse! Provided options:\n{:#?}",
-                            options
-                        );
-                        return Vec::new();
-                    }
-                    parser::raw_locations::RawModuleLocation::LegendsExport => {
-                        log::error!(
-                            "parse: LegendsExport location provided to parse! Provided options:\n{:#?}",
-                            options
-                        );
-                        return Vec::new();
-                    }
-                }
-            } else {
-                log::error!(
-                    "parse: No location provided to parse! Provided options:\n{:#?}",
-                    options
-                );
-                return Vec::new();
-            };
+        // Build paths for each location
+        let data_path = target_path.join("data");
+        let vanilla_path = data_path.join("vanilla");
+        let installed_mods_path = data_path.join("installed_mods");
+        let workshop_mods_path = target_path.join("mods");
 
-            // Parse the location
-            results.extend(parse_location(&location_path, options, progress_helper));
+        // Parse each location
+        if options
+            .locations_to_parse
+            .contains(&crate::parser::raw_locations::RawModuleLocation::Vanilla)
+        {
+            results.extend(parse_location(&vanilla_path, options, progress_helper));
         }
-        crate::options::ParsingJob::SingleModule => {
-            // The provided path should be a module directory
+        if options
+            .locations_to_parse
+            .contains(&crate::parser::raw_locations::RawModuleLocation::InstalledMods)
+        {
+            results.extend(parse_location(
+                &installed_mods_path,
+                options,
+                progress_helper,
+            ));
+        }
+        if options
+            .locations_to_parse
+            .contains(&crate::parser::raw_locations::RawModuleLocation::Mods)
+        {
+            results.extend(parse_location(
+                &workshop_mods_path,
+                options,
+                progress_helper,
+            ));
+        }
+    }
+
+    // Next we can check if any raw modules are specified
+    if !options.raw_modules_to_parse.is_empty() {
+        // Parse all raw modules that are specified.
+        for raw_module in &options.raw_modules_to_parse {
+            let target_path = Path::new(&raw_module);
 
             // Check for info.txt
             let info_txt_path = target_path.join("info.txt");
@@ -131,7 +101,7 @@ pub fn parse(
                     || dir_name_str.eq("interaction examples"))
                 {
                     log::error!(
-                        "parse: No info.txt as expected in {:?}. Is this DF 50.xx? Provided options:\n{:#?}",
+                        "No info.txt as expected in {:?}. Is this DF 50.xx? Provided options:\n{:#?}",
                         target_path.file_name().unwrap_or_default(),
                         options
                     );
@@ -142,17 +112,28 @@ pub fn parse(
 
             results.extend(parse_module(&target_path, options, progress_helper));
         }
-        crate::options::ParsingJob::AllModuleInfoFiles
-        | crate::options::ParsingJob::SingleModuleInfoFile => {
-            log::warn!(
-                "parse: Unable to parse info.txt files in this dispatch. Provided options:\n{:#?}",
-                options
-            );
-            return Vec::new();
-        }
-        crate::options::ParsingJob::SingleRaw => {
-            // The provided path should be a raw file directly
+    }
+
+    // Next we can check if any raw files are specified
+    if !options.raw_files_to_parse.is_empty() {
+        // Parse all raw files that are specified.
+        for raw_file in &options.raw_files_to_parse {
+            let target_path = Path::new(&raw_file);
+
             results.extend(parser::parse_raws_from_single_file(&target_path, options));
+        }
+    }
+
+    // Finally we can check if any legends exports are specified
+    if !options.legends_exports_to_parse.is_empty() {
+        // Parse all legends exports that are specified.
+        for legends_export in &options.legends_exports_to_parse {
+            let target_path = Path::new(&legends_export);
+            // Todo: Add progress helper for legends export parsing
+            results.extend(crate::legends_export::parse_legends_export(
+                &target_path,
+                options,
+            ));
         }
     }
 

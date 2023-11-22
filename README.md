@@ -63,8 +63,11 @@ The following options are supported:
     -g, --graphics      Parse graphics raws
 
     -s, --summary       Print a summary of the parsed raws
+
+    -P, --pretty        Pretty-print the parsed raws
+        This is only used when saving the parsed raws to a file. 
     
-    -m, --metadata      Attach metadata to the parsed raws
+    -M, --metadata      Attach metadata to the parsed raws
         This includes the raws' file paths and other information about the
         raws' source.
 

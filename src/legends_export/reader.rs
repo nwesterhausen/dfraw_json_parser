@@ -3,6 +3,7 @@ use std::path::Path;
 
 use quick_xml::{events::Event, Reader};
 
+use crate::options::ParserOptions;
 use crate::parser::object_types::ObjectType;
 use crate::{parser::raws::RawObject, util::try_get_file};
 
@@ -39,11 +40,10 @@ enum Parent {
 /// # Returns
 ///
 /// A vector of boxed dynamic `RawObject` trait objects.
-///
-/// # Panics
-///
-/// This function will panic if the input path is not a valid file.
-pub fn parse_legends_export<P: AsRef<Path>>(input_path: &P) -> Vec<Box<dyn RawObject>> {
+pub fn parse_legends_export<P: AsRef<Path>>(
+    input_path: &P,
+    options: &ParserOptions,
+) -> Vec<Box<dyn RawObject>> {
     let mut results = Vec::new();
     let Some(mut file) = try_get_file(input_path) else {
         log::error!(
@@ -83,7 +83,14 @@ pub fn parse_legends_export<P: AsRef<Path>>(input_path: &P) -> Vec<Box<dyn RawOb
         // when the input is a &str or a &[u8], we don't actually need to use another
         // buffer, we could directly call `reader.read_event()`
         match reader.read_event_into(&mut buf) {
-            Err(e) => panic!("Error at position {}: {:?}", reader.buffer_position(), e),
+            Err(e) => {
+                log::error!(
+                    "parse_legends_export: Error at position {}: {:?}",
+                    reader.buffer_position(),
+                    e
+                );
+                break;
+            }
             // exits the loop when reaching end of file
             Ok(Event::Eof) => break,
 
@@ -101,7 +108,10 @@ pub fn parse_legends_export<P: AsRef<Path>>(input_path: &P) -> Vec<Box<dyn RawOb
             },
             Ok(Event::Text(e)) => {
                 if parent_tag != Parent::None {
-                    tag_txt = e.unescape().unwrap().into_owned();
+                    tag_txt = match e.unescape() {
+                        Ok(tag) => tag.into_owned(),
+                        Err(_) => String::new(),
+                    };
                 }
                 match parent_tag {
                     Parent::Creature => match current_tag {
@@ -126,11 +136,10 @@ pub fn parse_legends_export<P: AsRef<Path>>(input_path: &P) -> Vec<Box<dyn RawOb
             }
 
             Ok(Event::Empty(e)) => {
-                let tag_name = reader
-                    .decoder()
-                    .decode(e.name().as_ref())
-                    .unwrap()
-                    .into_owned();
+                let tag_name = match reader.decoder().decode(e.name().as_ref()) {
+                    Ok(tag) => tag.into_owned(),
+                    Err(_) => String::new(),
+                };
                 if parent_tag == Parent::Creature {
                     temp_creature.add_tag(&tag_name);
                 }
@@ -157,7 +166,7 @@ pub fn parse_legends_export<P: AsRef<Path>>(input_path: &P) -> Vec<Box<dyn RawOb
         buf.clear();
     }
 
-    let legend_metadata = legends_metadata(input_path.as_ref(), &ObjectType::Creature);
+    let legend_metadata = legends_metadata(input_path.as_ref(), &ObjectType::Creature, options);
 
     for creature in creatures {
         results.push(Box::new(creature.into_creature(&legend_metadata)));
