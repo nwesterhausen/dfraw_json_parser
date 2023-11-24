@@ -63,6 +63,15 @@ pub fn parse_legends_export<P: AsRef<Path>>(
         return results;
     };
 
+    log::info!(
+        "parse_legends_export: Parsing file {}",
+        input_path
+            .as_ref()
+            .file_name()
+            .unwrap_or_default()
+            .to_string_lossy()
+    );
+
     let mut reader = Reader::from_str(&file_str);
     reader.trim_text(true);
 

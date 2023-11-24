@@ -222,6 +222,8 @@ fn parse_args() -> Result<Args, lexopt::Error> {
         *path = to_absolute_path(path, "legends export")?;
     }
 
+    // println!("cli.rs::parse_args: parsed arguments: {args:#?}");
+
     Ok(args)
 }
 
@@ -268,6 +270,7 @@ pub fn main() -> Result<(), lexopt::Error> {
         raw_files_to_parse: args.raw_file_paths,
         raw_modules_to_parse: args.raw_module_paths,
         legends_exports_to_parse: args.legends_exports,
+        dwarf_fortress_directory: args.df_path,
         ..Default::default()
     };
 

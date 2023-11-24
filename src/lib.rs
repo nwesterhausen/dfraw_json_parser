@@ -75,7 +75,7 @@ use parser::{
     searchable::Searchable,
 };
 use std::path::{Path, PathBuf};
-use util::options_has_valid_paths;
+use util::validate_options;
 use walkdir::{DirEntry, WalkDir};
 
 use crate::parser::raw_locations::RawModuleLocation;
@@ -120,14 +120,12 @@ pub use tauri_lib::ProgressPayload;
 ///
 /// A vector of boxed dynamic raw objects.
 pub fn parse(options: &ParserOptions) -> Vec<Box<dyn RawObject>> {
-    // Guard against invalid path
-    if !options_has_valid_paths(options) {
-        log::error!(
-            "Some provided paths are invalid. Provided options:\n{:#?}",
-            options
-        );
+    // Guard against invalid paths
+    let Some(options) = validate_options(options) else {
+        log::error!("Some paths were invalid. Provided options:\n{:#?}", options);
         return Vec::new();
-    }
+    };
+
     let mut results: Vec<Box<dyn RawObject>> = Vec::new();
 
     // No job is specified, instead it is inferred from the options
@@ -147,19 +145,19 @@ pub fn parse(options: &ParserOptions) -> Vec<Box<dyn RawObject>> {
             .locations_to_parse
             .contains(&RawModuleLocation::Vanilla)
         {
-            results.extend(parse_location(&vanilla_path, options));
+            results.extend(parse_location(&vanilla_path, &options));
         }
         if options
             .locations_to_parse
             .contains(&RawModuleLocation::InstalledMods)
         {
-            results.extend(parse_location(&installed_mods_path, options));
+            results.extend(parse_location(&installed_mods_path, &options));
         }
         if options
             .locations_to_parse
             .contains(&RawModuleLocation::Mods)
         {
-            results.extend(parse_location(&workshop_mods_path, options));
+            results.extend(parse_location(&workshop_mods_path, &options));
         }
     }
 
@@ -189,7 +187,7 @@ pub fn parse(options: &ParserOptions) -> Vec<Box<dyn RawObject>> {
                 return Vec::new();
             }
 
-            results.extend(parse_module(&target_path, options));
+            results.extend(parse_module(&target_path, &options));
         }
     }
 
@@ -198,8 +196,11 @@ pub fn parse(options: &ParserOptions) -> Vec<Box<dyn RawObject>> {
         // Parse all raw files that are specified.
         for raw_file in &options.raw_files_to_parse {
             let target_path = Path::new(&raw_file);
-
-            results.extend(parser::parse_raws_from_single_file(&target_path, options));
+            log::info!(
+                "dfraw_json_parser: Dispatching parse for raw file {:?}",
+                target_path.file_name().unwrap_or_default()
+            );
+            results.extend(parser::parse_raws_from_single_file(&target_path, &options));
         }
     }
 
@@ -209,7 +210,7 @@ pub fn parse(options: &ParserOptions) -> Vec<Box<dyn RawObject>> {
         for legends_export in &options.legends_exports_to_parse {
             let target_path = Path::new(&legends_export);
 
-            results.extend(legends_export::parse_legends_export(&target_path, options));
+            results.extend(legends_export::parse_legends_export(&target_path, &options));
         }
     }
 
@@ -234,11 +235,11 @@ pub fn parse(options: &ParserOptions) -> Vec<Box<dyn RawObject>> {
 ///
 /// The function `parse_module_info_files` returns a `Vec<ModuleInfoFile>`.
 pub fn parse_module_info_files(options: &ParserOptions) -> Vec<ModuleInfoFile> {
-    // Guard against invalid path
-    if !options_has_valid_paths(options) {
+    // Guard against invalid paths
+    let Some(options) = validate_options(options) else {
         log::error!("Some paths were invalid. Provided options:\n{:#?}", options);
         return Vec::new();
-    }
+    };
 
     let mut results = Vec::new();
 
