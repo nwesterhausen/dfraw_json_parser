@@ -82,7 +82,7 @@ jobs:
       - name: Generate Type Bindings
         run: |
           cargo test --all-features
-          npx prettier --write bindings/*.ts
+          npx prettier --write lib/bindings/*.ts
       - name: Check for changes
         run: |
           git diff --exit-code
