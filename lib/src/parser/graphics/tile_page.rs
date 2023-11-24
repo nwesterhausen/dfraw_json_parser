@@ -1,6 +1,7 @@
 use std::path::PathBuf;
 
 use serde::{Deserialize, Serialize};
+use tracing::warn;
 
 use crate::parser::{
     helpers::object_id::build_object_id_from_pieces,
@@ -74,7 +75,7 @@ impl RawObject for TilePage {
                 self.page_dim = Dimensions::from_token(value);
             }
             TilePageTag::Unknown => {
-                log::warn!(
+                warn!(
                     "Failed to parse {} as TilePageTag for {}",
                     key,
                     self.get_object_id()

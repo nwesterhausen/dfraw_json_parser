@@ -1,4 +1,5 @@
 use itertools::Itertools;
+use tracing::{info, warn};
 
 use crate::parser::{
     creature::raw::Creature,
@@ -38,8 +39,8 @@ pub fn apply_copy_tags_from(all_raws: &mut Vec<Box<dyn RawObject>>) {
         .map(|c| c.get_copy_tags_from().to_lowercase())
         .unique()
         .collect();
-    log::info!(
-        "apply_copy_tags_from: updating {} of {} raws from {} creatures",
+    info!(
+        "updating {} of {} raws from {} creatures",
         creatures_with_copy_tags_from.len(),
         all_raws.len(),
         source_creature_identifier_list.len()
@@ -86,10 +87,7 @@ pub fn apply_copy_tags_from(all_raws: &mut Vec<Box<dyn RawObject>>) {
         }
     }
 
-    log::info!(
-        "apply_copy_tags_from: copied tags to {} creatures",
-        new_creatures.len()
-    );
+    info!("copied tags to {} creatures", new_creatures.len());
 
     let mut object_ids_to_purge: Vec<&str> = Vec::new();
 
@@ -104,16 +102,13 @@ pub fn apply_copy_tags_from(all_raws: &mut Vec<Box<dyn RawObject>>) {
         with_purge(all_raws, object_ids_to_purge.as_slice());
 
     if all_raws.len() < new_raws.len() {
-        log::warn!(
-            "apply_copy_tags_from: post purge has {} raws, but started with {}",
+        warn!(
+            "post purge has {} raws, but started with {}",
             new_raws.len(),
             all_raws.len()
         );
     } else {
-        log::info!(
-            "apply_copy_tags_from: purged {} raws",
-            all_raws.len() - new_raws.len()
-        );
+        info!("purged {} raws", all_raws.len() - new_raws.len());
     }
 
     for creature in new_creatures {
@@ -121,14 +116,14 @@ pub fn apply_copy_tags_from(all_raws: &mut Vec<Box<dyn RawObject>>) {
     }
 
     if all_raws.len() < new_raws.len() {
-        log::warn!(
-            "apply_copy_tags_from: finished with {} raws, but started with {}",
+        warn!(
+            "finished with {} raws, but started with {}",
             new_raws.len(),
             all_raws.len()
         );
     } else {
-        log::info!(
-            "apply_copy_tags_from: finished with {} raws (net {} lost)",
+        info!(
+            "finished with {} raws (net {} lost)",
             new_raws.len(),
             all_raws.len() - new_raws.len()
         );

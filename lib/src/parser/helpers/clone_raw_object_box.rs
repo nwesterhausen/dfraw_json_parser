@@ -1,3 +1,5 @@
+use tracing::warn;
+
 use crate::parser::{
     creature::raw::Creature,
     entity::raw::Entity,
@@ -87,7 +89,7 @@ pub fn clone_raw_object_box(box_ref: &Box<dyn RawObject>) -> Box<dyn RawObject> 
             Box::new(temp_entity)
         }
         _ => {
-            log::warn!(
+            warn!(
                 "clone_raw_object_box has an unhandled object type: {:?}",
                 box_ref.get_type()
             );

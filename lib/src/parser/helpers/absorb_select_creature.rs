@@ -1,3 +1,5 @@
+use tracing::info;
+
 use crate::{
     parser::{
         creature::raw::Creature, helpers::clone_raw_vector::with_purge, object_types::ObjectType,
@@ -10,8 +12,8 @@ use crate::{
 pub fn absorb_select_creature(all_raws: &mut Vec<Box<dyn RawObject>>) {
     let all_select_creatures = { get_only_select_creatures_from_raws(all_raws) };
 
-    log::info!(
-        "absorb_select_creature looking at {} SELECT_CREATURE of {} raws",
+    info!(
+        "looking at {} SELECT_CREATURE of {} raws",
         all_select_creatures.len(),
         all_raws.len()
     );
@@ -76,8 +78,8 @@ pub fn absorb_select_creature(all_raws: &mut Vec<Box<dyn RawObject>>) {
         new_raws.push(Box::new(creature));
     }
 
-    log::info!(
-        "absorb_select_creature finished with {} raws (some {} purged)",
+    info!(
+        "finished with {} raws (some {} purged)",
         new_raws.len(),
         all_raws.len() - new_raws.len()
     );

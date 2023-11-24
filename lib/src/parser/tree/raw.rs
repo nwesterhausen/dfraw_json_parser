@@ -1,4 +1,5 @@
 use serde::{Deserialize, Serialize};
+use tracing::{error, warn};
 
 use crate::parser::{color::Color, names::Name, serializer_helper};
 
@@ -132,7 +133,7 @@ impl Tree {
     #[allow(clippy::too_many_lines)]
     pub fn parse_tag(&mut self, key: &str, value: &str) {
         let Some(tag) = TREE_TOKENS.get(key) else {
-            log::warn!(
+            warn!(
                 "TreeParsing: called `Option::unwrap()` on a `None` value for presumed tree tag: {}",
                 key
             );
@@ -152,19 +153,19 @@ impl Tree {
                 self.max_trunk_height = match value.parse() {
                     Ok(n) => n,
                     Err(e) => {
-                        log::error!("max_trunk_height parsing error\n{:?}", e);
+                        error!("max_trunk_height parsing error\n{:?}", e);
                         return;
                     }
                 };
                 if self.max_trunk_height > 8 {
-                    log::warn!(
+                    warn!(
                         "max_trunk_height parsing error: value {} is greater than 8",
                         self.max_trunk_height
                     );
                     self.max_trunk_height = 8;
                 }
                 if self.max_trunk_height == 0 {
-                    log::warn!(
+                    warn!(
                         "max_trunk_height parsing error: value {} is 0",
                         self.max_trunk_height
                     );
@@ -175,19 +176,19 @@ impl Tree {
                 self.max_trunk_diameter = match value.parse() {
                     Ok(n) => n,
                     Err(e) => {
-                        log::error!("max_trunk_diameter parsing error\n{:?}", e);
+                        error!("max_trunk_diameter parsing error\n{:?}", e);
                         return;
                     }
                 };
                 if self.max_trunk_diameter > 3 {
-                    log::warn!(
+                    warn!(
                         "max_trunk_diameter parsing error: value {} is greater than 3",
                         self.max_trunk_diameter
                     );
                     self.max_trunk_diameter = 3;
                 }
                 if self.max_trunk_diameter == 0 {
-                    log::warn!(
+                    warn!(
                         "max_trunk_diameter parsing error: value {} is 0",
                         self.max_trunk_diameter
                     );
@@ -198,7 +199,7 @@ impl Tree {
                 self.trunk_period = match value.parse() {
                     Ok(n) => n,
                     Err(e) => {
-                        log::error!("trunk_period parsing error\n{:?}", e);
+                        error!("trunk_period parsing error\n{:?}", e);
                         return;
                     }
                 };
@@ -207,7 +208,7 @@ impl Tree {
                 self.trunk_width_period = match value.parse() {
                     Ok(n) => n,
                     Err(e) => {
-                        log::error!("trunk_width_period parsing error\n{:?}", e);
+                        error!("trunk_width_period parsing error\n{:?}", e);
                         return;
                     }
                 };
@@ -219,7 +220,7 @@ impl Tree {
                 self.branch_density = match value.parse() {
                     Ok(n) => n,
                     Err(e) => {
-                        log::error!("branch_density parsing error\n{:?}", e);
+                        error!("branch_density parsing error\n{:?}", e);
                         return;
                     }
                 };
@@ -228,12 +229,12 @@ impl Tree {
                 self.branch_radius = match value.parse() {
                     Ok(n) => n,
                     Err(e) => {
-                        log::error!("branch_radius parsing error\n{:?}", e);
+                        error!("branch_radius parsing error\n{:?}", e);
                         return;
                     }
                 };
                 if self.branch_radius > 3 {
-                    log::warn!(
+                    warn!(
                         "branch_radius parsing error: value {} is greater than 3",
                         self.branch_radius
                     );
@@ -247,7 +248,7 @@ impl Tree {
                 self.heavy_branch_density = match value.parse() {
                     Ok(n) => n,
                     Err(e) => {
-                        log::error!("heavy_branch_density parsing error\n{:?}", e);
+                        error!("heavy_branch_density parsing error\n{:?}", e);
                         return;
                     }
                 };
@@ -256,12 +257,12 @@ impl Tree {
                 self.heavy_branch_radius = match value.parse() {
                     Ok(n) => n,
                     Err(e) => {
-                        log::error!("heavy_branch_radius parsing error\n{:?}", e);
+                        error!("heavy_branch_radius parsing error\n{:?}", e);
                         return;
                     }
                 };
                 if self.heavy_branch_radius > 3 {
-                    log::warn!(
+                    warn!(
                         "heavy_branch_radius parsing error: value {} is greater than 3",
                         self.heavy_branch_radius
                     );
@@ -272,7 +273,7 @@ impl Tree {
                 self.trunk_branching = match value.parse() {
                     Ok(n) => n,
                     Err(e) => {
-                        log::error!("trunk_branching parsing error\n{:?}", e);
+                        error!("trunk_branching parsing error\n{:?}", e);
                         return;
                     }
                 };
@@ -284,7 +285,7 @@ impl Tree {
                 self.root_density = match value.parse() {
                     Ok(n) => n,
                     Err(e) => {
-                        log::error!("root_density parsing error\n{:?}", e);
+                        error!("root_density parsing error\n{:?}", e);
                         return;
                     }
                 };
@@ -293,7 +294,7 @@ impl Tree {
                 self.root_radius = match value.parse() {
                     Ok(n) => n,
                     Err(e) => {
-                        log::error!("root_radius parsing error\n{:?}", e);
+                        error!("root_radius parsing error\n{:?}", e);
                         return;
                     }
                 };
@@ -335,7 +336,7 @@ impl Tree {
                 self.cap_period = match value.parse() {
                     Ok(n) => n,
                     Err(e) => {
-                        log::error!("cap_period parsing error\n{:?}", e);
+                        error!("cap_period parsing error\n{:?}", e);
                         return;
                     }
                 };
@@ -344,7 +345,7 @@ impl Tree {
                 self.cap_radius = match value.parse() {
                     Ok(n) => n,
                     Err(e) => {
-                        log::error!("cap_radius parsing error\n{:?}", e);
+                        error!("cap_radius parsing error\n{:?}", e);
                         return;
                     }
                 };
@@ -377,7 +378,7 @@ impl Tree {
                 self.sapling_drown_level = match value.parse() {
                     Ok(n) => n,
                     Err(e) => {
-                        log::error!("sapling_drown_level parsing error\n{:?}", e);
+                        error!("sapling_drown_level parsing error\n{:?}", e);
                         return;
                     }
                 };
@@ -386,7 +387,7 @@ impl Tree {
                 self.tree_drown_level = match value.parse() {
                     Ok(n) => n,
                     Err(e) => {
-                        log::error!("tree_drown_level parsing error\n{:?}", e);
+                        error!("tree_drown_level parsing error\n{:?}", e);
                         return;
                     }
                 };

@@ -1,5 +1,6 @@
 use serde::{Deserialize, Serialize};
 use slug::slugify;
+use tracing::{debug, warn};
 
 use crate::parser::{
     biome::{phf_map::BIOME_TOKENS, tokens::Biome},
@@ -166,12 +167,12 @@ impl RawObject for Plant {
         }
 
         if !PLANT_TOKENS.contains_key(key) {
-            log::debug!("PlantParsing: Unknown tag {} with value {}", key, value);
+            debug!("PlantParsing: Unknown tag {} with value {}", key, value);
             return;
         }
 
         let Some(tag) = PLANT_TOKENS.get(key) else {
-            log::warn!(
+            warn!(
                 "PlantParsing: called `Option::unwrap()` on a `None` value for presumed plant tag: {}",
                 key
             );
@@ -196,7 +197,7 @@ impl RawObject for Plant {
             }
             PlantTag::Biome => {
                 let Some(biome) = BIOME_TOKENS.get(value) else {
-                    log::warn!(
+                    warn!(
                         "PlantParsing: called `Option::unwrap()` on a `None` value for presumed biome: {}",
                         value
                     );

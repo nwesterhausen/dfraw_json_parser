@@ -1,4 +1,5 @@
 use serde::{Deserialize, Serialize};
+use tracing::warn;
 
 use crate::parser::{
     body_size::BodySize,
@@ -82,7 +83,7 @@ impl Caste {
     }
     pub fn parse_tag(&mut self, key: &str, value: &str) {
         let Some(tag) = CASTE_TOKENS.get(key) else {
-            log::warn!(
+            warn!(
                 "CasteParsing: called `Option::unwrap()` on a `None` value for presumed caste tag: {}",
                 key
             );
@@ -141,7 +142,7 @@ impl Caste {
 
     pub fn remove_tag_and_value(&mut self, key: &str, value: &str) {
         let Some(tag) = CASTE_TOKENS.get(key) else {
-            log::warn!(
+            warn!(
                 "CreatureParsing: called `Option::unwrap()` on a `None` value for presumed caste tag: {}",
                 key
             );

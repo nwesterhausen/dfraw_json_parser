@@ -1,4 +1,5 @@
 use serde::{Deserialize, Serialize};
+use tracing::warn;
 
 use super::phf_table::CONDITION_TAGS;
 
@@ -312,7 +313,7 @@ impl ColorModification {
         if let "AS_IS" = token {
             Self::AsIs
         } else {
-            log::warn!("Failed to parse {} as ColorModification", token);
+            warn!("Failed to parse {} as ColorModification", token);
             Self::default()
         }
     }

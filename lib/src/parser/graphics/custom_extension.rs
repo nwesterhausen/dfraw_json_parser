@@ -1,4 +1,5 @@
 use serde::{Deserialize, Serialize};
+use tracing::warn;
 
 use crate::parser::serializer_helper;
 
@@ -70,10 +71,9 @@ impl CustomGraphicExtension {
                 value_2,
             })
         } else {
-            log::warn!(
+            warn!(
                 "CustomGraphicExtension::from_value: Failed to parse {} OR {} as u32",
-                possible_value_1,
-                possible_value_2
+                possible_value_1, possible_value_2
             );
             None
         }

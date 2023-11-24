@@ -1,4 +1,5 @@
 use serde::{Deserialize, Serialize};
+use tracing::{error, warn};
 
 use crate::parser::color::Color;
 use crate::parser::seed_material::raw::SeedMaterial;
@@ -108,7 +109,7 @@ impl Shrub {
     #[allow(clippy::too_many_lines)]
     pub fn parse_tag(&mut self, key: &str, value: &str) {
         let Some(tag) = SHRUB_TOKENS.get(key) else {
-            log::warn!("Unknown shrub token: {}", key);
+            warn!("Unknown shrub token: {}", key);
             return;
         };
 
@@ -129,7 +130,7 @@ impl Shrub {
                 self.grow_duration = match value.parse() {
                     Ok(n) => n,
                     Err(e) => {
-                        log::error!("grow_duration parsing error\n{:?}", e);
+                        error!("grow_duration parsing error\n{:?}", e);
                         return;
                     }
                 };
@@ -138,7 +139,7 @@ impl Shrub {
                 self.value = match value.parse() {
                     Ok(n) => n,
                     Err(e) => {
-                        log::error!("value parsing error\n{:?}", e);
+                        error!("value parsing error\n{:?}", e);
                         return;
                     }
                 };
@@ -147,7 +148,7 @@ impl Shrub {
                 self.picked_tile = match value.parse() {
                     Ok(n) => n,
                     Err(e) => {
-                        log::error!("picked_tile parsing error\n{:?}", e);
+                        error!("picked_tile parsing error\n{:?}", e);
                         return;
                     }
                 };
@@ -156,7 +157,7 @@ impl Shrub {
                 self.dead_picked_tile = match value.parse() {
                     Ok(n) => n,
                     Err(e) => {
-                        log::error!("dead_picked_tile parsing error\n{:?}", e);
+                        error!("dead_picked_tile parsing error\n{:?}", e);
                         return;
                     }
                 };
@@ -165,7 +166,7 @@ impl Shrub {
                 self.shrub_tile = match value.parse() {
                     Ok(n) => n,
                     Err(e) => {
-                        log::error!("shrub_tile parsing error\n{:?}", e);
+                        error!("shrub_tile parsing error\n{:?}", e);
                         return;
                     }
                 };
@@ -174,7 +175,7 @@ impl Shrub {
                 self.dead_shrub_tile = match value.parse() {
                     Ok(n) => n,
                     Err(e) => {
-                        log::error!("dead_shrub_tile parsing error\n{:?}", e);
+                        error!("dead_shrub_tile parsing error\n{:?}", e);
                         return;
                     }
                 };
@@ -183,7 +184,7 @@ impl Shrub {
                 self.cluster_size = match value.parse() {
                     Ok(n) => n,
                     Err(e) => {
-                        log::error!("cluster_size parsing error\n{:?}", e);
+                        error!("cluster_size parsing error\n{:?}", e);
                         return;
                     }
                 };
@@ -204,7 +205,7 @@ impl Shrub {
                 self.shrub_drown_level = match value.parse() {
                     Ok(n) => n,
                     Err(e) => {
-                        log::error!("shrub_drown_level parsing error\n{:?}", e);
+                        error!("shrub_drown_level parsing error\n{:?}", e);
                         return;
                     }
                 };
@@ -231,7 +232,7 @@ impl Shrub {
                 self.extract_barrel = String::from(value);
             }
             ShrubToken::Unknown => {
-                log::warn!("Unknown shrub token: {}", key);
+                warn!("Unknown shrub token: {}", key);
             }
         }
     }

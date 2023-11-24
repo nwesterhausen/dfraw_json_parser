@@ -3,6 +3,7 @@ use std::{
     io::{BufRead, BufReader},
     path::Path,
 };
+use tracing::{debug, error, trace};
 
 use crate::{
     options::ParserOptions,
@@ -45,7 +46,7 @@ pub fn parse_raw_file_with_info<P: AsRef<Path>>(
     let mut created_raws: Vec<Box<dyn RawObject>> = Vec::new();
 
     let Some(file) = try_get_file(raw_file_path) else {
-        log::error!(
+        error!(
             "parse_raw_file_with_info: Unable to open file {}",
             raw_file_path.as_ref().display()
         );
@@ -83,7 +84,7 @@ pub fn parse_raw_file_with_info<P: AsRef<Path>>(
 
     // If we aren't supposed to parse this type, we should quit here
     if !options.raws_to_parse.contains(&object_type) {
-        log::debug!(
+        debug!(
             "parse_raw_file_with_info: Quitting early because object type {:?} is not included in options!",
             object_type
         );
@@ -92,7 +93,7 @@ pub fn parse_raw_file_with_info<P: AsRef<Path>>(
 
     // If the type of object is not in our known_list, we should quit here
     if !PARSABLE_OBJECT_TYPES.contains(&&object_type) {
-        log::debug!(
+        debug!(
             "parse_raw_file_with_info: Quitting early because object type {:?} is not parsable!",
             object_type
         );
@@ -101,7 +102,7 @@ pub fn parse_raw_file_with_info<P: AsRef<Path>>(
 
     for (index, line) in reader.lines().enumerate() {
         if line.is_err() {
-            log::error!(
+            error!(
                 "parse_raw_file_with_info: Error processing {}:{}",
                 raw_file_path.as_ref().display(),
                 index
@@ -111,7 +112,7 @@ pub fn parse_raw_file_with_info<P: AsRef<Path>>(
         let line = match line {
             Ok(l) => l,
             Err(e) => {
-                log::error!("parse_raw_file_with_info: Line-reading error\n{:?}", e);
+                error!("parse_raw_file_with_info: Line-reading error\n{:?}", e);
                 continue;
             }
         };
@@ -141,7 +142,7 @@ pub fn parse_raw_file_with_info<P: AsRef<Path>>(
                 }
             };
 
-            log::trace!(
+            trace!(
                 "parse_raw_file_with_info: Key: {} Value: {}",
                 captured_key,
                 captured_value
@@ -152,7 +153,7 @@ pub fn parse_raw_file_with_info<P: AsRef<Path>>(
                     if !OBJECT_TOKENS.contains_key(captured_value) {
                         // We don't know what this object is, so we can't parse it.
                         // We should log this as an error.
-                        log::error!(
+                        error!(
                             "parse_raw_file_with_info: Unknown object type: {} Raw: {}",
                             captured_value.to_uppercase(),
                             raw_filename
@@ -162,7 +163,7 @@ pub fn parse_raw_file_with_info<P: AsRef<Path>>(
                     // Check of object_type matches the captured_value as ObjectType.
                     // If it doesn't, we should log this as an error.
                     if &object_type != OBJECT_TOKENS.get(captured_value).unwrap() {
-                        log::error!(
+                        error!(
                             "parse_raw_file_with_info: Object type mismatch: {} != {}",
                             object_type,
                             captured_value.to_uppercase()
@@ -397,7 +398,7 @@ pub fn parse_raw_file_with_info<P: AsRef<Path>>(
         }
     }
 
-    log::debug!(
+    debug!(
         "parse_raw_file_with_info: Parsed {} raws from {}",
         created_raws.len(),
         raw_filename

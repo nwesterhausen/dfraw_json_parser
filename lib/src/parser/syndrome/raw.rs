@@ -1,4 +1,5 @@
 use serde::{Deserialize, Serialize};
+use tracing::{debug, warn};
 
 use crate::parser::{
     creature_effect::phf_table::CREATURE_EFFECT_TOKENS,
@@ -57,7 +58,7 @@ impl Syndrome {
             return;
         }
         if key == "CE" {
-            log::debug!("Manual handling of CE tag: {}:{}", key, value);
+            debug!("Manual handling of CE tag: {}:{}", key, value);
             self.conditions.push(String::from(value));
             return;
         }
@@ -97,7 +98,7 @@ impl Syndrome {
             SyndromeToken::Ingested => self.tags.push(SyndromeToken::Ingested),
 
             SyndromeToken::Unknown => {
-                log::warn!("Unknown syndrome token: {}", key);
+                warn!("Unknown syndrome token: {}", key);
             }
             SyndromeToken::Class => self.classes.push(String::from(value)),
             SyndromeToken::NoHospital => self.tags.push(SyndromeToken::NoHospital),

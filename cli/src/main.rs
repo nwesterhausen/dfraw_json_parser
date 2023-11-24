@@ -2,8 +2,10 @@ use dfraw_json_parser::{
     options::ParserOptions,
     parser::{object_types::ObjectType, raw_locations::RawModuleLocation},
 };
-use fern::colors::{Color, ColoredLevelConfig};
+
 use std::path::{Path, PathBuf};
+use tracing::Level;
+use tracing_subscriber::FmtSubscriber;
 
 const LONG_HELP: &str = "Usage: dfraw-json-parser [OPTIONS] <dwarf-fortress-path>
 
@@ -68,7 +70,7 @@ The following options are supported:
 
 #[derive(Debug)]
 struct Args {
-    pub log_level: log::LevelFilter,
+    pub log_level: Level,
     pub locations: Vec<RawModuleLocation>,
     pub object_types: Vec<ObjectType>,
     pub legends_exports: Vec<PathBuf>,
@@ -84,7 +86,7 @@ struct Args {
 impl std::default::Default for Args {
     fn default() -> Self {
         Self {
-            log_level: log::LevelFilter::Info,
+            log_level: Level::INFO,
             locations: Vec::new(),
             object_types: Vec::new(),
             legends_exports: Vec::new(),
@@ -163,17 +165,17 @@ fn parse_args() -> Result<Args, lexopt::Error> {
             }
 
             Short('v') | Long("verbose") => {
-                if args.log_level == log::LevelFilter::Info {
-                    args.log_level = log::LevelFilter::Debug;
+                if args.log_level == Level::INFO {
+                    args.log_level = Level::DEBUG;
                 } else {
-                    args.log_level = log::LevelFilter::Trace;
+                    args.log_level = Level::TRACE;
                 }
             }
             Short('q') | Long("quiet") => {
-                if args.log_level == log::LevelFilter::Info {
-                    args.log_level = log::LevelFilter::Warn;
+                if args.log_level == Level::INFO {
+                    args.log_level = Level::WARN;
                 } else {
-                    args.log_level = log::LevelFilter::Error;
+                    args.log_level = Level::ERROR;
                 }
             }
 
@@ -248,28 +250,17 @@ pub fn main() -> Result<(), lexopt::Error> {
     let args = parse_args()?;
 
     // Initialize the logger
-    // Specify color configuration
-    let colors = ColoredLevelConfig::new()
-        // Specify info as cyan
-        .info(Color::Cyan);
-    // Configure logger at runtime
-    fern::Dispatch::new()
-        // Perform allocation-free log formatting
-        .format(move |out, message, record| {
-            out.finish(format_args!(
-                "{} [{}] {}",
-                chrono::Local::now().format("%Y-%m-%d %H:%M:%S"),
-                colors.color(record.level()),
-                message
-            ));
-        })
-        // Add blanket level filter -
-        .level(args.log_level)
-        // Output to stdout, files, and other Dispatch configurations
-        .chain(std::io::stdout())
-        // Apply globally
-        .apply()
-        .expect("Failed to start logger");
+    // a builder for `FmtSubscriber`.
+    let subscriber = FmtSubscriber::builder()
+        // all spans/events with a level higher than TRACE (e.g, debug, info, warn, etc.)
+        // will be written to stdout.
+        .with_max_level(args.log_level)
+        // make it pretty
+        .compact()
+        // completes the builder.
+        .finish();
+
+    tracing::subscriber::set_global_default(subscriber).expect("setting default subscriber failed");
 
     // Build ParserOptions for the parser
     let options = ParserOptions {

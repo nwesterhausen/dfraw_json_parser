@@ -6,6 +6,7 @@ use std::{
 use encoding_rs_io::DecodeReaderBytesBuilder;
 use serde::{Deserialize, Serialize};
 use slug::slugify;
+use tracing::{error, trace, debug};
 
 use crate::{
     parser::refs::NON_DIGIT_RE,
@@ -73,7 +74,7 @@ impl ModuleInfoFile {
     pub fn from_raw_file_path<P: AsRef<Path>>(full_path: &P) -> Self {
         // Validate that the passed file exists
         if try_get_file(full_path).is_none() {
-            log::error!(
+            error!(
                 "raw_file_path::from_raw_file_path: Unable to validate raw exists {}",
                 full_path.as_ref().display()
             );
@@ -99,7 +100,7 @@ impl ModuleInfoFile {
         let location = RawModuleLocation::from_info_text_file_path(info_file_path);
 
         let Some(file) = try_get_file(info_file_path) else {
-            log::error!(
+            error!(
                 "ModuleInfoFile::parse: Unable to open file {}",
                 info_file_path.as_ref().display()
             );
@@ -116,7 +117,7 @@ impl ModuleInfoFile {
 
         for (index, line) in reader.lines().enumerate() {
             if line.is_err() {
-                log::error!(
+                error!(
                     "ModuleInfoFile::parse: Error processing {:?}:{}",
                     parent_dir,
                     index
@@ -126,7 +127,7 @@ impl ModuleInfoFile {
             let line = match line {
                 Ok(l) => l,
                 Err(e) => {
-                    log::error!("ModuleInfoFile::parse:  Line-reading error\n{:?}", e);
+                    error!("ModuleInfoFile::parse:  Line-reading error\n{:?}", e);
                     continue;
                 }
             };
@@ -144,7 +145,7 @@ impl ModuleInfoFile {
                     }
                 };
 
-                log::trace!(
+                trace!(
                     "ModuleInfoFile::parse: Key: {} Value: {}",
                     captured_key,
                     captured_value
@@ -159,7 +160,7 @@ impl ModuleInfoFile {
                     "NUMERIC_VERSION" => match captured_value.parse() {
                         Ok(n) => info_file_data.numeric_version = n,
                         Err(_e) => {
-                            log::debug!(
+                            debug!(
                                 "ModuleInfoFile::parse: 'NUMERIC_VERSION' should be integer '{}' from {}",
                                 captured_value,
                                 info_file_data.get_identifier()
@@ -170,7 +171,7 @@ impl ModuleInfoFile {
                             match digits_only.parse() {
                                 Ok(n) => info_file_data.numeric_version = n,
                                 Err(_e) => {
-                                    log::debug!(
+                                    debug!(
                                         "ModuleInfoFile::parse: Unable to parse any numbers from {} for NUMERIC_VERSION",
                                         
                                         captured_value
@@ -182,7 +183,7 @@ impl ModuleInfoFile {
                     "EARLIEST_COMPATIBLE_NUMERIC_VERSION" => match captured_value.parse() {
                         Ok(n) => info_file_data.earliest_compatible_numeric_version = n,
                         Err(_e) => {
-                            log::debug!(
+                            debug!(
                                 "ModuleInfoFile::parse: 'EARLIEST_COMPATIBLE_NUMERIC_VERSION' should be integer '{}' from {}",
                                 
                                 captured_value,
@@ -194,7 +195,7 @@ impl ModuleInfoFile {
                             match digits_only.parse() {
                                 Ok(n) => info_file_data.earliest_compatible_numeric_version = n,
                                 Err(_e) => {
-                                    log::debug!(
+                                    debug!(
                                         "ModuleInfoFile::parse: Unable to parse any numbers from {} for EARLIEST_COMPATIBLE_NUMERIC_VERSION",
                                         
                                         captured_value
@@ -265,7 +266,7 @@ impl ModuleInfoFile {
                     "STEAM_FILE_ID" => match captured_value.parse() {
                         Ok(n) => info_file_data.steam_file_id = n,
                         Err(_e) => {
-                            log::debug!(
+                            debug!(
                                 "ModuleInfoFile::parse: 'STEAM_FILE_ID' should be integer {}",
                                 
                                 parent_dir
@@ -276,7 +277,7 @@ impl ModuleInfoFile {
                             match digits_only.parse() {
                                 Ok(n) => info_file_data.steam_file_id = n,
                                 Err(_e) => {
-                                    log::debug!(
+                                    debug!(
                                         "ModuleInfoFile::parse: Unable to parse any numbers from {} for STEAM_FILE_ID",
                                         captured_value
                                     );
@@ -297,7 +298,7 @@ impl ModuleInfoFile {
 
         // Check for 'unknown' identifier and try to provide any extra info
         if info_file_data.get_identifier() == "unknown" {
-            log::error!(
+            error!(
                 "Failure parsing proper info from {}",
                 info_file_path.as_ref().display()
             );

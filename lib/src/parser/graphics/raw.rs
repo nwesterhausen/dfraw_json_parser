@@ -1,4 +1,5 @@
 use serde::{Deserialize, Serialize};
+use tracing::warn;
 
 use crate::parser::{
     helpers::object_id::build_object_id_from_pieces,
@@ -76,11 +77,9 @@ impl Graphic {
         if let Some(layer) = self.layers.last_mut().unwrap().1.last_mut() {
             layer.parse_condition_token(key, value);
         } else {
-            log::warn!(
+            warn!(
                 "Graphic::parse_condition_token: [{}] Failed to parse {}:{} as LayerCondition",
-                self.identifier,
-                key,
-                value
+                self.identifier, key, value
             );
         }
     }
@@ -135,7 +134,7 @@ impl Graphic {
             {
                 self.custom_extensions.push(custom_extension);
             } else {
-                log::warn!(
+                warn!(
                     "Graphic::parse_sprite_from_tag:_extension_type [{}] Failed to parse {},{} as CustomGraphicExtension",
                     self.identifier,
                     key,
@@ -152,7 +151,7 @@ impl Graphic {
                     growth.1.push(sprite_graphic);
                 };
             } else {
-                log::warn!(
+                warn!(
                     "Graphic::parse_sprite_from_tag:_growth_type [{}] Failed to parse {},{} as SpriteGraphic",
                     self.identifier,
                     key,
@@ -170,7 +169,7 @@ impl Graphic {
                     growth.1.push(sprite_graphic);
                 };
             } else {
-                log::warn!(
+                warn!(
                     "Graphic::parse_sprite_from_tag:_plant_graphic_template [{}] Failed to parse {},{} as SpriteGraphic",
                     self.identifier,
                     key,
@@ -190,7 +189,7 @@ impl Graphic {
         if let Some(sprite_graphic) = SpriteGraphic::from_token(key, value, graphic_type) {
             self.sprites.push(sprite_graphic);
         } else {
-            log::warn!(
+            warn!(
                 "Graphic::parse_sprite_from_tag:_from_token [{}] Failed to parse [{}:{}] as SpriteGraphic::{:?}",
                 self.identifier,
                 key,
@@ -238,7 +237,7 @@ impl RawObject for Graphic {
 
     fn parse_tag(&mut self, key: &str, value: &str) {
         // Any tags should just be able to be handled by the sprite graphic, but it needs to call the right function
-        log::warn!(
+        warn!(
             "Graphics tag attempted parse with wrong method: {}:{} for {}",
             key,
             value,
