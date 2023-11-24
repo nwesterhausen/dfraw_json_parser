@@ -34,13 +34,11 @@ pub fn parse(
     progress_helper: &mut ProgressHelper,
 ) -> Vec<Box<dyn RawObject>> {
     // Guard against invalid path
-    if !crate::util::options_has_valid_paths(options) {
-        log::error!(
-            "Returning early for bad path. Provided options:\n{:#?}",
-            options
-        );
+    let Some(options) = crate::util::validate_options(options) else {
+        log::error!("Options failed to validate\n{:#?}", options);
         return Vec::new();
-    }
+    };
+
     let mut results: Vec<Box<dyn RawObject>> = Vec::new();
 
     // No job is specified, instead it is inferred from the options
@@ -60,7 +58,7 @@ pub fn parse(
             .locations_to_parse
             .contains(&crate::parser::raw_locations::RawModuleLocation::Vanilla)
         {
-            results.extend(parse_location(&vanilla_path, options, progress_helper));
+            results.extend(parse_location(&vanilla_path, &options, progress_helper));
         }
         if options
             .locations_to_parse
@@ -68,7 +66,7 @@ pub fn parse(
         {
             results.extend(parse_location(
                 &installed_mods_path,
-                options,
+                &options,
                 progress_helper,
             ));
         }
@@ -78,7 +76,7 @@ pub fn parse(
         {
             results.extend(parse_location(
                 &workshop_mods_path,
-                options,
+                &options,
                 progress_helper,
             ));
         }
@@ -110,7 +108,7 @@ pub fn parse(
                 return Vec::new();
             }
 
-            results.extend(parse_module(&target_path, options, progress_helper));
+            results.extend(parse_module(&target_path, &options, progress_helper));
         }
     }
 
@@ -120,7 +118,7 @@ pub fn parse(
         for raw_file in &options.raw_files_to_parse {
             let target_path = Path::new(&raw_file);
 
-            results.extend(parser::parse_raws_from_single_file(&target_path, options));
+            results.extend(parser::parse_raws_from_single_file(&target_path, &options));
         }
     }
 
@@ -132,7 +130,7 @@ pub fn parse(
             // Todo: Add progress helper for legends export parsing
             results.extend(crate::legends_export::parse_legends_export(
                 &target_path,
-                options,
+                &options,
             ));
         }
     }

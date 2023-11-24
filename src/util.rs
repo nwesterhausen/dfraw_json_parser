@@ -1,4 +1,3 @@
-
 use std::{
     fs::File,
     io::{BufWriter, Write},
@@ -252,16 +251,56 @@ pub fn write_json_string_vec_to_file<P: AsRef<Path>>(strings_vec: &Vec<String>, 
     };
 }
 
-pub fn options_has_valid_paths(options: &ParserOptions) -> bool {
+#[allow(clippy::too_many_lines)]
+/// The function `validate_options` validates the provided `ParserOptions` struct.
+///
+/// It checks that the provided paths exist and are valid. It will also expand any relative
+/// paths to absolute paths.
+///
+/// It returns a `ParserOptions` struct if all paths are valid, otherwise it returns `None`.
+///
+/// Arguments:
+///
+/// * `options`: The `ParserOptions` struct to validate.
+///
+/// Returns:
+///
+/// An `Option<ParserOptions>` struct. None if options were invalid.
+pub fn validate_options(options: &ParserOptions) -> Option<ParserOptions> {
+    // Copy the options into a new struct, before we validate the paths
+    let mut validated_options = ParserOptions {
+        attach_metadata_to_raws: options.attach_metadata_to_raws,
+        locations_to_parse: options.locations_to_parse.clone(),
+        raws_to_parse: options.raws_to_parse.clone(),
+        serialize_result_to_json: options.serialize_result_to_json,
+        skip_apply_copy_tags_from: options.skip_apply_copy_tags_from,
+        skip_apply_creature_variations: options.skip_apply_creature_variations,
+        ..Default::default()
+    };
+
     // Guard against invalid path if locations are set
     if !options.locations_to_parse.is_empty() {
         let target_path = &options.dwarf_fortress_directory;
+
+        // Canonicalize the path
+        let target_path = match target_path.canonicalize() {
+            Ok(p) => p,
+            Err(e) => {
+                log::error!(
+                    "options_validator: Unable to canonicalize Dwarf Fortress path!\n{:?}\n{:?}",
+                    target_path,
+                    e
+                );
+                return None;
+            }
+        };
+
         if !target_path.exists() {
             log::error!(
                 "options_validator: Provided Dwarf Fortress path for doesn't exist!\n{}",
                 target_path.display()
             );
-            return false;
+            return None;
         }
 
         if !target_path.is_dir() {
@@ -269,26 +308,34 @@ pub fn options_has_valid_paths(options: &ParserOptions) -> bool {
                 "options_validator: Dwarf Fortress path needs to be a directory!\n{}",
                 target_path.display()
             );
-            return false;
+            return None;
         }
+
+        validated_options.dwarf_fortress_directory = target_path.clone();
     }
 
     // Validate any raw file paths
     for raw_file_path in &options.raw_files_to_parse {
         if !raw_file_path.exists() {
-            log::error!(
+            log::warn!(
                 "options_validator: Provided raw file path doesn't exist!\n{}",
                 raw_file_path.display()
             );
-            return false;
-        }
-
-        if !raw_file_path.is_file() {
-            log::error!(
+        } else if !raw_file_path.is_file() {
+            log::warn!(
                 "options_validator: Provided raw file path needs to be a file!\n{}",
                 raw_file_path.display()
             );
-            return false;
+        } else {
+            // Add the canonicalized path to the raw file
+            let raw_file_path = raw_file_path.canonicalize().unwrap_or_else(|e| {
+                log::error!(
+                    "options_validator: Unable to canonicalize raw file path!\n{:?}",
+                    e
+                );
+                raw_file_path.clone()
+            });
+            validated_options.raw_files_to_parse.push(raw_file_path);
         }
     }
 
@@ -299,15 +346,21 @@ pub fn options_has_valid_paths(options: &ParserOptions) -> bool {
                 "options_validator: Provided raw module path doesn't exist!\n{}",
                 raw_module_path.display()
             );
-            return false;
-        }
-
-        if !raw_module_path.is_dir() {
+        } else if !raw_module_path.is_dir() {
             log::error!(
                 "options_validator: Provided raw module path needs to be a directory!\n{}",
                 raw_module_path.display()
             );
-            return false;
+        } else {
+            // Add the canonicalized path to the module
+            let raw_module_path = raw_module_path.canonicalize().unwrap_or_else(|e| {
+                log::error!(
+                    "options_validator: Unable to canonicalize raw module path!\n{:?}",
+                    e
+                );
+                raw_module_path.clone()
+            });
+            validated_options.raw_modules_to_parse.push(raw_module_path);
         }
     }
 
@@ -318,15 +371,23 @@ pub fn options_has_valid_paths(options: &ParserOptions) -> bool {
                 "options_validator: Provided legends export path doesn't exist!\n{}",
                 legends_export_path.display()
             );
-            return false;
-        }
-
-        if !legends_export_path.is_file() {
+        } else if !legends_export_path.is_file() {
             log::error!(
                 "options_validator: Provided legends export path needs to be a file!\n{}",
                 legends_export_path.display()
             );
-            return false;
+        } else {
+            // Add the canonicalized path to the legends export
+            let legends_export_path = legends_export_path.canonicalize().unwrap_or_else(|e| {
+                log::error!(
+                    "options_validator: Unable to canonicalize legends export path!\n{:?}",
+                    e
+                );
+                legends_export_path.clone()
+            });
+            validated_options
+                .legends_exports_to_parse
+                .push(legends_export_path);
         }
     }
 
@@ -337,19 +398,27 @@ pub fn options_has_valid_paths(options: &ParserOptions) -> bool {
                 "options_validator: Provided module info file path doesn't exist!\n{}",
                 module_info_file_path.display()
             );
-            return false;
-        }
-
-        if !module_info_file_path.is_file() {
+        } else if !module_info_file_path.is_file() {
             log::error!(
                 "options_validator: Provided module info file path needs to be a file!\n{}",
                 module_info_file_path.display()
             );
-            return false;
+        } else {
+            // Add the canonicalized path to the module info file
+            let module_info_file_path = module_info_file_path.canonicalize().unwrap_or_else(|e| {
+                log::error!(
+                    "options_validator: Unable to canonicalize module info file path!\n{:?}",
+                    e
+                );
+                module_info_file_path.clone()
+            });
+            validated_options
+                .module_info_files_to_parse
+                .push(module_info_file_path);
         }
     }
 
-    true
+    Some(validated_options)
 }
 
 /// The function `raws_to_string` converts a vector of raw objects into a JSON string representation.
