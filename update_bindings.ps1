@@ -1,2 +1,2 @@
 cargo test --all-features
-pnpx prettier --write bindings/*.ts
+pnpx prettier --write lib/bindings/*.ts
