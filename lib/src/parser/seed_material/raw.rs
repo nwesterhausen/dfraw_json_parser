@@ -1,4 +1,5 @@
 use serde::{Deserialize, Serialize};
+use tracing::warn;
 
 use crate::parser::{color::Color, names::SingPlurName};
 
@@ -26,7 +27,7 @@ impl SeedMaterial {
 
         // If the parts are less than 7, then we don't have enough information
         if parts.clone().count() < 7 {
-            log::warn!(
+            warn!(
                 "SeedMaterial::from_value() was provided a value with less than 7 parts: {}",
                 value
             );

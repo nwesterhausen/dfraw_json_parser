@@ -1,5 +1,7 @@
 use std::num::ParseIntError;
 
+use tracing::error;
+
 /// It takes a slice of strings, parses the first two strings as unsigned 16-bit integers, and returns a
 /// two-element array of unsigned 16-bit integers
 ///
@@ -18,14 +20,14 @@ pub fn parse_min_max_range_from_vec(split: &[&str]) -> Result<[u16; 2], ParseInt
     let min: u16 = match split.first().unwrap_or(&"").parse() {
         Ok(n) => n,
         Err(e) => {
-            log::error!("min_value parsing error\n{:?}", e);
+            error!("min_value parsing error\n{:?}", e);
             return Err(e);
         }
     };
     let max: u16 = match split.get(1).unwrap_or(&"").parse() {
         Ok(n) => n,
         Err(e) => {
-            log::error!("max_value parsing error\n{:?}", e);
+            error!("max_value parsing error\n{:?}", e);
             return Err(e);
         }
     };

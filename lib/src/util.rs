@@ -4,6 +4,7 @@ use std::{
     path::{Path, PathBuf},
 };
 
+use tracing::{error, info, warn};
 use walkdir::WalkDir;
 
 use crate::{
@@ -14,6 +15,7 @@ use crate::{
     },
 };
 
+#[tracing::instrument]
 /// Get a vec of subdirectories for a given directory
 ///
 /// Using the `WalkDir` crate:
@@ -99,7 +101,7 @@ pub fn path_from_game_directory<P: AsRef<Path>>(game_path: &P) -> Result<PathBuf
 
     // warn on no gamelog.txt
     if !game_path.join("gamelog.txt").exists() {
-        log::warn!("Unable to find gamelog.txt in game directory. Is it valid?");
+        warn!("Unable to find gamelog.txt in game directory. Is it valid?");
     }
 
     Ok(game_path.to_path_buf())
@@ -117,21 +119,21 @@ pub fn write_raw_vec_to_file<P: AsRef<Path>>(
     out_filepath: &P,
     pretty_print: bool,
 ) {
-    log::info!(
+    info!(
         "write_raw_vec_to_file: Writing {} raws to file {:?}",
         raws_vec.len(),
         out_filepath.as_ref().display()
     );
 
     if raws_vec.is_empty() {
-        log::warn!("write_raw_vec_to_file: Provided raw vector is empty!");
+        warn!("write_raw_vec_to_file: Provided raw vector is empty!");
         return;
     }
 
     let out_file = match File::create(out_filepath) {
         Ok(f) => f,
         Err(e) => {
-            log::error!(
+            error!(
                 "write_raw_vec_to_file: Unable to open {} for writing \n{:?}",
                 out_filepath.as_ref().display(),
                 e
@@ -142,7 +144,7 @@ pub fn write_raw_vec_to_file<P: AsRef<Path>>(
 
     if pretty_print {
         serde_json::to_writer_pretty(out_file, raws_vec).unwrap_or_else(|e| {
-            log::error!(
+            error!(
                 "write_raw_vec_to_file: Unable to write to {} \n{:?}",
                 out_filepath.as_ref().display(),
                 e
@@ -150,7 +152,7 @@ pub fn write_raw_vec_to_file<P: AsRef<Path>>(
         });
     } else {
         serde_json::to_writer(out_file, raws_vec).unwrap_or_else(|e| {
-            log::error!(
+            error!(
                 "write_raw_vec_to_file: Unable to write to {} \n{:?}",
                 out_filepath.as_ref().display(),
                 e
@@ -166,21 +168,21 @@ pub fn write_raw_vec_to_file<P: AsRef<Path>>(
 /// * `parsed_raws_string_vec`: String
 /// * `out_filepath`: Path
 pub fn write_json_string_vec_to_file<P: AsRef<Path>>(strings_vec: &Vec<String>, out_filepath: &P) {
-    log::info!(
+    info!(
         "write_json_string_vec_to_file: Writing {} strings to file {:?}",
         strings_vec.len(),
         out_filepath.as_ref().display()
     );
 
     if strings_vec.is_empty() {
-        log::warn!("write_json_string_vec_to_file: Provided string vector is empty!");
+        warn!("write_json_string_vec_to_file: Provided string vector is empty!");
         return;
     }
 
     let out_file = match File::create(out_filepath) {
         Ok(f) => f,
         Err(e) => {
-            log::error!(
+            error!(
                 "write_json_string_vec_to_file: Unable to open {} for writing \n{:?}",
                 out_filepath.as_ref().display(),
                 e
@@ -199,14 +201,14 @@ pub fn write_json_string_vec_to_file<P: AsRef<Path>>(strings_vec: &Vec<String>, 
         match writeln!(stream, "{}", strings_vec.first().unwrap_or(&String::new())) {
             Ok(_x) => (),
             Err(e) => {
-                log::error!("write_json_string_vec_to_file: {}\n{:?}", write_error, e);
+                error!("write_json_string_vec_to_file: {}\n{:?}", write_error, e);
                 return;
             }
         };
         match stream.flush() {
             Ok(_x) => (),
             Err(e) => {
-                log::error!("write_json_string_vec_to_file: {}\n{:?}", write_error, e);
+                error!("write_json_string_vec_to_file: {}\n{:?}", write_error, e);
             }
         };
         return;
@@ -221,14 +223,14 @@ pub fn write_json_string_vec_to_file<P: AsRef<Path>>(strings_vec: &Vec<String>, 
             0 => match write!(stream, "[{string}") {
                 Ok(_x) => (),
                 Err(e) => {
-                    log::error!("write_json_string_vec_to_file: {}\n{:?}", write_error, e);
+                    error!("write_json_string_vec_to_file: {}\n{:?}", write_error, e);
                     return;
                 }
             },
             _ => match write!(stream, ",{string}") {
                 Ok(_x) => (),
                 Err(e) => {
-                    log::error!("write_json_string_vec_to_file: {}\n{:?}", write_error, e);
+                    error!("write_json_string_vec_to_file: {}\n{:?}", write_error, e);
                     return;
                 }
             },
@@ -238,7 +240,7 @@ pub fn write_json_string_vec_to_file<P: AsRef<Path>>(strings_vec: &Vec<String>, 
     match writeln!(stream, "]") {
         Ok(_x) => (),
         Err(e) => {
-            log::error!("write_json_string_vec_to_file: {}\n{:?}", write_error, e);
+            error!("write_json_string_vec_to_file: {}\n{:?}", write_error, e);
             return;
         }
     };
@@ -246,12 +248,13 @@ pub fn write_json_string_vec_to_file<P: AsRef<Path>>(strings_vec: &Vec<String>, 
     match stream.flush() {
         Ok(_x) => (),
         Err(e) => {
-            log::error!("write_json_string_vec_to_file: {}\n{:?}", write_error, e);
+            error!("write_json_string_vec_to_file: {}\n{:?}", write_error, e);
         }
     };
 }
 
 #[allow(clippy::too_many_lines)]
+#[tracing::instrument]
 /// The function `validate_options` validates the provided `ParserOptions` struct.
 ///
 /// It checks that the provided paths exist and are valid. It will also expand any relative
@@ -286,17 +289,16 @@ pub fn validate_options(options: &ParserOptions) -> Option<ParserOptions> {
         let target_path = match target_path.canonicalize() {
             Ok(p) => p,
             Err(e) => {
-                log::error!(
+                error!(
                     "options_validator: Unable to canonicalize Dwarf Fortress path!\n{:?}\n{:?}",
-                    target_path,
-                    e
+                    target_path, e
                 );
                 return None;
             }
         };
 
         if !target_path.exists() {
-            log::error!(
+            error!(
                 "options_validator: Provided Dwarf Fortress path for doesn't exist!\n{}",
                 target_path.display()
             );
@@ -304,7 +306,7 @@ pub fn validate_options(options: &ParserOptions) -> Option<ParserOptions> {
         }
 
         if !target_path.is_dir() {
-            log::error!(
+            error!(
                 "options_validator: Dwarf Fortress path needs to be a directory!\n{}",
                 target_path.display()
             );
@@ -317,19 +319,19 @@ pub fn validate_options(options: &ParserOptions) -> Option<ParserOptions> {
     // Validate any raw file paths
     for raw_file_path in &options.raw_files_to_parse {
         if !raw_file_path.exists() {
-            log::warn!(
+            warn!(
                 "options_validator: Provided raw file path doesn't exist!\n{}",
                 raw_file_path.display()
             );
         } else if !raw_file_path.is_file() {
-            log::warn!(
+            warn!(
                 "options_validator: Provided raw file path needs to be a file!\n{}",
                 raw_file_path.display()
             );
         } else {
             // Add the canonicalized path to the raw file
             let raw_file_path = raw_file_path.canonicalize().unwrap_or_else(|e| {
-                log::error!(
+                error!(
                     "options_validator: Unable to canonicalize raw file path!\n{:?}",
                     e
                 );
@@ -342,19 +344,19 @@ pub fn validate_options(options: &ParserOptions) -> Option<ParserOptions> {
     // Validate any raw module paths
     for raw_module_path in &options.raw_modules_to_parse {
         if !raw_module_path.exists() {
-            log::error!(
+            error!(
                 "options_validator: Provided raw module path doesn't exist!\n{}",
                 raw_module_path.display()
             );
         } else if !raw_module_path.is_dir() {
-            log::error!(
+            error!(
                 "options_validator: Provided raw module path needs to be a directory!\n{}",
                 raw_module_path.display()
             );
         } else {
             // Add the canonicalized path to the module
             let raw_module_path = raw_module_path.canonicalize().unwrap_or_else(|e| {
-                log::error!(
+                error!(
                     "options_validator: Unable to canonicalize raw module path!\n{:?}",
                     e
                 );
@@ -367,19 +369,19 @@ pub fn validate_options(options: &ParserOptions) -> Option<ParserOptions> {
     // Validate any legends export paths
     for legends_export_path in &options.legends_exports_to_parse {
         if !legends_export_path.exists() {
-            log::error!(
+            error!(
                 "options_validator: Provided legends export path doesn't exist!\n{}",
                 legends_export_path.display()
             );
         } else if !legends_export_path.is_file() {
-            log::error!(
+            error!(
                 "options_validator: Provided legends export path needs to be a file!\n{}",
                 legends_export_path.display()
             );
         } else {
             // Add the canonicalized path to the legends export
             let legends_export_path = legends_export_path.canonicalize().unwrap_or_else(|e| {
-                log::error!(
+                error!(
                     "options_validator: Unable to canonicalize legends export path!\n{:?}",
                     e
                 );
@@ -394,19 +396,19 @@ pub fn validate_options(options: &ParserOptions) -> Option<ParserOptions> {
     // Validate any module info file paths
     for module_info_file_path in &options.module_info_files_to_parse {
         if !module_info_file_path.exists() {
-            log::error!(
+            error!(
                 "options_validator: Provided module info file path doesn't exist!\n{}",
                 module_info_file_path.display()
             );
         } else if !module_info_file_path.is_file() {
-            log::error!(
+            error!(
                 "options_validator: Provided module info file path needs to be a file!\n{}",
                 module_info_file_path.display()
             );
         } else {
             // Add the canonicalized path to the module info file
             let module_info_file_path = module_info_file_path.canonicalize().unwrap_or_else(|e| {
-                log::error!(
+                error!(
                     "options_validator: Unable to canonicalize module info file path!\n{:?}",
                     e
                 );
@@ -488,7 +490,7 @@ pub fn try_get_file<P: AsRef<Path>>(file_path: &P) -> Option<File> {
     let caller = "File Exists Validator";
     // Validate file exists
     if !file_path.as_ref().exists() {
-        log::error!(
+        error!(
             "{} - Path doesn't exist {}",
             caller,
             file_path.as_ref().display()
@@ -496,7 +498,7 @@ pub fn try_get_file<P: AsRef<Path>>(file_path: &P) -> Option<File> {
         return None;
     }
     if !file_path.as_ref().is_file() {
-        log::error!(
+        error!(
             "{} - Path does not point to a file {}",
             caller,
             file_path.as_ref().display(),
@@ -506,7 +508,7 @@ pub fn try_get_file<P: AsRef<Path>>(file_path: &P) -> Option<File> {
 
     // Open the file
     let Ok(file) = File::open(file_path) else {
-        log::error!(
+        error!(
             "{} - Unable to open file {}",
             caller,
             file_path.as_ref().display()

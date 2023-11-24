@@ -4,6 +4,7 @@ use std::{
 };
 
 use serde::{Deserialize, Serialize};
+use tracing::warn;
 
 #[derive(ts_rs::TS)]
 #[ts(export)]
@@ -36,7 +37,7 @@ impl RawModuleLocation {
                 "installed_mods" => RawModuleLocation::InstalledMods,
                 "vanilla" => RawModuleLocation::Vanilla,
                 _ => {
-                    log::warn!(
+                    warn!(
                         "RawModuleLocation - Unable to match source directory \"{dir}\"",
                         dir = file_name.to_string_lossy()
                     );
@@ -52,7 +53,7 @@ impl RawModuleLocation {
             "vanilla" => RawModuleLocation::Vanilla,
             "installed_mods" => RawModuleLocation::InstalledMods,
             _ => {
-                log::warn!(
+                warn!(
                     "RawModuleLocation - Unable to match source directory \"{dir}\"",
                     dir = sourced_directory
                 );

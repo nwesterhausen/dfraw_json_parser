@@ -1,4 +1,5 @@
 use serde::{Deserialize, Serialize};
+use tracing::{debug, trace, warn};
 
 use crate::parser::{
     biome::{phf_map::BIOME_TOKENS, tokens::Biome},
@@ -348,10 +349,9 @@ impl Creature {
                 if let Some(biome) = BIOME_TOKENS.get(&biome) {
                     self.biomes.push(biome.clone());
                 } else {
-                    log::warn!(
+                    warn!(
                         "Creature::parse_tags_from_xml: ({}) Unknown biome '{}'",
-                        self.identifier,
-                        biome
+                        self.identifier, biome
                     );
                 }
             } else if tag.starts_with("has_any_") {
@@ -378,10 +378,9 @@ impl Creature {
                     if let Some(caste) = self.castes.last_mut() {
                         caste.parse_tag(caste_tag.as_str(), "");
                     } else {
-                        log::debug!(
+                        debug!(
                             "Creature::parse_tags_from_xml: ({}) No castes found to apply tag {}",
-                            self.identifier,
-                            caste_tag
+                            self.identifier, caste_tag
                         );
                     }
                 } else {
@@ -389,10 +388,9 @@ impl Creature {
                     if let Some(tag) = CREATURE_TOKENS.get(&caste_tag) {
                         self.tags.push(tag.clone());
                     } else {
-                        log::warn!(
+                        warn!(
                             "Creature::parse_tags_from_xml: ({}) Unknown tag {}",
-                            self.identifier,
-                            caste_tag
+                            self.identifier, caste_tag
                         );
                     }
                 }
@@ -401,10 +399,9 @@ impl Creature {
                 if let Some(tag) = CREATURE_TOKENS.get(&tag.to_uppercase()) {
                     self.tags.push(tag.clone());
                 } else {
-                    log::warn!(
+                    warn!(
                         "Creature::parse_tags_from_xml: ({}) Unknown tag {}",
-                        self.identifier,
-                        tag
+                        self.identifier, tag
                     );
                 }
             }
@@ -435,12 +432,12 @@ impl RawObject for Creature {
             return;
         }
         if !CREATURE_TOKENS.contains_key(key) {
-            log::trace!("CreatureParsing: Unknown tag {} with value {}", key, value);
+            trace!("CreatureParsing: Unknown tag {} with value {}", key, value);
             return;
         }
 
         let Some(tag) = CREATURE_TOKENS.get(key) else {
-            log::warn!(
+            warn!(
                 "Creature::parse_tag: called `Option::unwrap()` on a `None` value for presumed creature tag: {}",
                 key
             );
@@ -450,7 +447,7 @@ impl RawObject for Creature {
         match tag {
             CreatureTag::Biome => {
                 let Some(biome) = BIOME_TOKENS.get(value) else {
-                    log::warn!(
+                    warn!(
                         "CreatureParsing: called `Option::unwrap()` on a `None` value for presumed biome: {}",
                         value
                     );
@@ -528,12 +525,12 @@ impl CreatureVariationRequirements for Creature {
             return;
         }
         if !CREATURE_TOKENS.contains_key(key) {
-            log::debug!("CreatureParsing: Unknown tag {} with value {}", key, value);
+            debug!("CreatureParsing: Unknown tag {} with value {}", key, value);
             return;
         }
 
         let Some(tag) = CREATURE_TOKENS.get(key) else {
-            log::warn!(
+            warn!(
                 "CreatureParsing: called `Option::unwrap()` on a `None` value for presumed creature tag: {}",
                 key
             );
@@ -543,7 +540,7 @@ impl CreatureVariationRequirements for Creature {
         match tag {
             CreatureTag::Biome => {
                 let Some(biome) = BIOME_TOKENS.get(value) else {
-                    log::warn!(
+                    warn!(
                         "CreatureParsing: called `Option::unwrap()` on a `None` value for presumed biome: {}",
                         value
                     );

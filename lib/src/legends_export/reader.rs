@@ -2,6 +2,7 @@ use std::io::Read;
 use std::path::Path;
 
 use quick_xml::{events::Event, Reader};
+use tracing::{error, info};
 
 use crate::options::ParserOptions;
 use crate::parser::object_types::ObjectType;
@@ -46,7 +47,7 @@ pub fn parse_legends_export<P: AsRef<Path>>(
 ) -> Vec<Box<dyn RawObject>> {
     let mut results = Vec::new();
     let Some(mut file) = try_get_file(input_path) else {
-        log::error!(
+        error!(
             "parse_legends_export: Unable to open file {}",
             input_path.as_ref().display()
         );
@@ -56,14 +57,14 @@ pub fn parse_legends_export<P: AsRef<Path>>(
     // Read the file into a str for parsing
     let mut file_str = String::new();
     let Ok(_) = file.read_to_string(&mut file_str) else {
-        log::error!(
+        error!(
             "parse_legends_export: Unable to read file {}",
             input_path.as_ref().display()
         );
         return results;
     };
 
-    log::info!(
+    info!(
         "parse_legends_export: Parsing file {}",
         input_path
             .as_ref()
@@ -93,7 +94,7 @@ pub fn parse_legends_export<P: AsRef<Path>>(
         // buffer, we could directly call `reader.read_event()`
         match reader.read_event_into(&mut buf) {
             Err(e) => {
-                log::error!(
+                error!(
                     "parse_legends_export: Error at position {}: {:?}",
                     reader.buffer_position(),
                     e

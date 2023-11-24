@@ -1,5 +1,6 @@
 use crate::parser::{material::tokens::MaterialProperty, serializer_helper};
 use serde::{Deserialize, Serialize};
+use tracing::warn;
 
 #[derive(ts_rs::TS)]
 #[ts(export)]
@@ -132,7 +133,7 @@ impl MaterialMechanics {
             }
 
             _ => {
-                log::warn!("Unhandled material mechanics token: '{:?}'", key);
+                warn!("Unhandled material mechanics token: '{:?}'", key);
             }
         }
     }

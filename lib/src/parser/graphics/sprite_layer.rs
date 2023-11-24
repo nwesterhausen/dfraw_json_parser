@@ -1,4 +1,5 @@
 use serde::{Deserialize, Serialize};
+use tracing::warn;
 
 use super::{dimensions::Dimensions, phf_table::CONDITION_TAGS, tokens::Condition};
 
@@ -31,10 +32,9 @@ impl SpriteLayer {
             if key == "ISSUE_MIN_LENGTH" {
                 return;
             }
-            log::warn!(
+            warn!(
                 "Failed to parse {} as LayerCondition, unknown key {}",
-                value,
-                key
+                value, key
             );
         }
     }
@@ -82,10 +82,9 @@ impl SpriteLayer {
         let offset_x: i32 = match fourth_position_token.parse() {
             Ok(n) => n,
             Err(_e) => {
-                log::warn!(
+                warn!(
                     "parse_layer_from_value: Failed to parse {} as offset_x, {}",
-                    fourth_position_token,
-                    value
+                    fourth_position_token, value
                 );
                 return None;
             }
@@ -94,10 +93,9 @@ impl SpriteLayer {
         let offset_y: i32 = match tile_offset_y.parse() {
             Ok(n) => n,
             Err(_e) => {
-                log::warn!(
+                warn!(
                     "parse_layer_from_value: Failed to parse {} as offset_y, {}",
-                    tile_offset_y,
-                    value
+                    tile_offset_y, value
                 );
                 return None;
             }
@@ -120,10 +118,9 @@ impl SpriteLayer {
             Some(v) => match v.parse() {
                 Ok(n) => n,
                 Err(_e) => {
-                    log::warn!(
+                    warn!(
                         "parse_large_creature_with_split: Failed to parse {} as offset_x1 {:?}",
-                        v,
-                        split
+                        v, split
                     );
                     return None;
                 }
@@ -137,10 +134,9 @@ impl SpriteLayer {
             Some(v) => match v.parse() {
                 Ok(n) => n,
                 Err(_e) => {
-                    log::warn!(
+                    warn!(
                         "parse_large_creature_with_split: Failed to parse {} as offset_y1 {:?}",
-                        v,
-                        split
+                        v, split
                     );
                     return None;
                 }
@@ -154,10 +150,9 @@ impl SpriteLayer {
             Some(v) => match v.parse() {
                 Ok(n) => n,
                 Err(_e) => {
-                    log::warn!(
+                    warn!(
                         "parse_large_creature_with_split: Failed to parse {} as offset_x2 {:?}",
-                        v,
-                        split
+                        v, split
                     );
                     return None;
                 }
@@ -171,10 +166,9 @@ impl SpriteLayer {
             Some(v) => match v.parse() {
                 Ok(n) => n,
                 Err(_e) => {
-                    log::warn!(
+                    warn!(
                         "parse_large_creature_with_split: Failed to parse {} as offset_y2 {:?}",
-                        v,
-                        split
+                        v, split
                     );
                     return None;
                 }

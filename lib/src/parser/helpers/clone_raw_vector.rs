@@ -1,3 +1,5 @@
+use tracing::{debug, trace};
+
 use crate::parser::raws::RawObject;
 
 use super::clone_raw_object_box::clone_raw_object_box;
@@ -23,7 +25,7 @@ pub fn with_purge(
 
     for raw in all_raws {
         if object_ids_to_purge.contains(&raw.get_object_id()) {
-            log::trace!("clone_raw_vector purging {}", raw.get_object_id());
+            trace!("clone_raw_vector purging {}", raw.get_object_id());
         } else {
             // Match the object type, downcast and clone into a new box in new_raws
             new_raws.push(clone_raw_object_box(raw));
@@ -60,7 +62,7 @@ pub fn with_limit_and_page(
     let start = limit * page;
     let end = start + limit;
 
-    log::debug!("with_limit_and_page start: {start}, end: {end}, page: {page}");
+    debug!("with_limit_and_page start: {start}, end: {end}, page: {page}");
 
     for (pos, raw) in all_raws.iter().enumerate() {
         if pos >= start && pos < end {

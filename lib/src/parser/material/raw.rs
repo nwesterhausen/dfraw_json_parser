@@ -1,4 +1,5 @@
 use serde::{Deserialize, Serialize};
+use tracing::warn;
 
 use crate::parser::{
     color::Color,
@@ -153,7 +154,7 @@ impl Material {
         // The first part is always the material type, so we can get that first.
         let material_type = split.next().unwrap_or_default();
         let Some(material_type) = MATERIAL_TYPE_TOKENS.get(material_type) else {
-            log::warn!(
+            warn!(
                 "Material::from_value() was provided a value with an invalid material type: {}",
                 value
             );
@@ -181,7 +182,7 @@ impl Material {
             MaterialType::Coal => {
                 let material_key = split.next().unwrap_or_default();
                 let Some(fuel_type) = FUEL_TYPE_TOKENS.get(material_key) else {
-                    log::warn!(
+                    warn!(
                         "Material::from_value() was provided a value with an invalid fuel type: {}",
                         value
                     );
@@ -236,7 +237,7 @@ impl Material {
                 }
             }
             _ => {
-                log::warn!(
+                warn!(
                     "Material::from_value() was provided a value with an invalid material type: {}",
                     value
                 );
@@ -250,7 +251,7 @@ impl Material {
         if MATERIAL_PROPERTY_TOKENS.contains_key(key) {
             // Parse key as a property token, then pass the value to the property (or add a generic tag)
             let Some(tag) = MATERIAL_PROPERTY_TOKENS.get(key) else {
-                log::warn!(
+                warn!(
                     "Material::parse_tag() was provided a key with an invalid property token: {}",
                     key
                 );
@@ -361,7 +362,7 @@ impl Material {
 
         if MATERIAL_USAGE_TOKENS.contains_key(key) {
             let Some(usage) = MATERIAL_USAGE_TOKENS.get(key) else {
-                log::warn!(
+                warn!(
                     "Material::parse_tag() was provided a key with an invalid usage token: {}",
                     key
                 );
@@ -383,7 +384,7 @@ impl Material {
             }
         }
 
-        log::warn!(
+        warn!(
             "Material::parse_tag() was provided a key that was not recognized: {}",
             key
         );

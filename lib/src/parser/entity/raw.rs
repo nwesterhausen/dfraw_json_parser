@@ -1,4 +1,5 @@
 use serde::{Deserialize, Serialize};
+use tracing::warn;
 
 use crate::parser::{
     color::Color,
@@ -219,7 +220,7 @@ impl RawObject for Entity {
         }
 
         let Some(tag) = ENTITY_TOKENS.get(key) else {
-            log::warn!(
+            warn!(
                 "Entity::parse_tag: called `Option::unwrap()` on a `None` value for presumed Entity tag: {}",
                 key
             );

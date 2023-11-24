@@ -1,4 +1,5 @@
 use encoding_rs_io::DecodeReaderBytesBuilder;
+use tracing::{error, trace, warn};
 
 use std::io::{BufRead, BufReader};
 use std::path::Path;
@@ -22,7 +23,7 @@ use crate::util::try_get_file;
 pub fn read_raw_file_type<P: AsRef<Path>>(input_path: &P) -> ObjectType {
     // Open the file
     let Some(file) = try_get_file(input_path) else {
-        log::error!(
+        error!(
             "read_raw_file_type: Unable to open file {}",
             input_path.as_ref().display()
         );
@@ -41,7 +42,7 @@ pub fn read_raw_file_type<P: AsRef<Path>>(input_path: &P) -> ObjectType {
     // Read in lines until we encounter the \[OBJECT tag\] or complete the file.
     for (index, line) in reader.lines().enumerate() {
         if line.is_err() {
-            log::error!(
+            error!(
                 "read_raw_file_type: Error processing {}:{}",
                 input_path.as_ref().display(),
                 index
@@ -52,7 +53,7 @@ pub fn read_raw_file_type<P: AsRef<Path>>(input_path: &P) -> ObjectType {
         let line = match line {
             Ok(l) => l,
             Err(e) => {
-                log::error!("read_raw_file_type: Line-reading error\n{:?}", e);
+                error!("read_raw_file_type: Line-reading error\n{:?}", e);
                 continue;
             }
         };
@@ -77,7 +78,7 @@ pub fn read_raw_file_type<P: AsRef<Path>>(input_path: &P) -> ObjectType {
                 }
             };
 
-            log::trace!(
+            trace!(
                 "read_raw_file_type: Key: {} Value: {}",
                 captured_key,
                 captured_value
@@ -87,7 +88,7 @@ pub fn read_raw_file_type<P: AsRef<Path>>(input_path: &P) -> ObjectType {
             match captured_key {
                 // We are only concerned with the \[OBJECT\] key
                 "OBJECT" => {
-                    log::trace!(
+                    trace!(
                         "read_raw_file_type: {} is a {} raw file",
                         raw_filename,
                         captured_value
@@ -103,7 +104,7 @@ pub fn read_raw_file_type<P: AsRef<Path>>(input_path: &P) -> ObjectType {
     }
 
     // Reading through the entire file and not finding an \[OBJECT\] tag means the raw file is invalid
-    log::warn!(
+    warn!(
         "read_raw_file_type: no [OBJECT] tag in {}",
         input_path.as_ref().display()
     );

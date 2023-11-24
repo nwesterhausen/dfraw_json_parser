@@ -1,4 +1,5 @@
 use serde::{Deserialize, Serialize};
+use tracing::{error, warn};
 
 use crate::parser::searchable::clean_search_vec;
 use crate::parser::serializer_helper;
@@ -61,7 +62,7 @@ impl PlantGrowth {
     }
     pub fn parse_tag(&mut self, key: &str, value: &str) {
         let Some(tag) = GROWTH_TOKENS.get(key) else {
-            log::warn!(
+            warn!(
                 "PlantGrowthParsing: called `Option::unwrap()` on a `None` value for presumed caste tag: {}",
                 key
             );
@@ -83,7 +84,7 @@ impl PlantGrowth {
             }
             GrowthTag::GrowthHostTile => {
                 let Some(part) = PLANT_PART_TOKENS.get(value) else {
-                    log::warn!(
+                    warn!(
                         "PlantGrowthParsing: called `Option::unwrap()` on a `None` value for presumed plant part: {}",
                         value
                     );
@@ -94,7 +95,7 @@ impl PlantGrowth {
             GrowthTag::GrowthTrunkHeightPercent => {
                 let split: Vec<&str> = value.split(':').collect::<Vec<&str>>();
                 if split.len() != 2 {
-                    log::warn!(
+                    warn!(
                         "PlantGrowthParsing: called `Option::unwrap()` on a `None` value for presumed plant part: {}",
                         value
                     );
@@ -103,14 +104,14 @@ impl PlantGrowth {
                 let percentage: i32 = match split.first().unwrap_or(&"").parse() {
                     Ok(n) => n,
                     Err(e) => {
-                        log::error!("min_value parsing error\n{:?}", e);
+                        error!("min_value parsing error\n{:?}", e);
                         return;
                     }
                 };
                 let dir: i32 = match split.get(1).unwrap_or(&"").parse() {
                     Ok(n) => n,
                     Err(e) => {
-                        log::error!("max_value parsing error\n{:?}", e);
+                        error!("max_value parsing error\n{:?}", e);
                         return;
                     }
                 };
@@ -122,7 +123,7 @@ impl PlantGrowth {
             GrowthTag::GrowthTiming => {
                 let split: Vec<&str> = value.split(':').collect::<Vec<&str>>();
                 if split.len() != 2 {
-                    log::warn!(
+                    warn!(
                         "PlantGrowthParsing: called `Option::unwrap()` on a `None` value for presumed plant part: {}",
                         value
                     );
@@ -131,14 +132,14 @@ impl PlantGrowth {
                 let start: u32 = match split.first().unwrap_or(&"").parse() {
                     Ok(n) => n,
                     Err(e) => {
-                        log::error!("min_value parsing error\n{:?}", e);
+                        error!("min_value parsing error\n{:?}", e);
                         return;
                     }
                 };
                 let end: u32 = match split.get(1).unwrap_or(&"").parse() {
                     Ok(n) => n,
                     Err(e) => {
-                        log::error!("max_value parsing error\n{:?}", e);
+                        error!("max_value parsing error\n{:?}", e);
                         return;
                     }
                 };

@@ -34,8 +34,10 @@ pub fn parse(
     progress_helper: &mut ProgressHelper,
 ) -> Vec<Box<dyn RawObject>> {
     // Guard against invalid path
+
+    use tracing::error;
     let Some(options) = crate::util::validate_options(options) else {
-        log::error!("Options failed to validate\n{:#?}", options);
+        error!("Options failed to validate\n{:#?}", options);
         return Vec::new();
     };
 
@@ -98,7 +100,7 @@ pub fn parse(
                     || dir_name_str.eq("examples and notes")
                     || dir_name_str.eq("interaction examples"))
                 {
-                    log::error!(
+                    error!(
                         "No info.txt as expected in {:?}. Is this DF 50.xx? Provided options:\n{:#?}",
                         target_path.file_name().unwrap_or_default(),
                         options
@@ -191,6 +193,8 @@ fn parse_location<P: AsRef<Path>>(
     options: &crate::options::ParserOptions,
     progress_helper: &mut ProgressHelper,
 ) -> Vec<Box<dyn RawObject>> {
+    use tracing::info;
+
     use crate::parser::raw_locations::RawModuleLocation;
 
     let mut results: Vec<Box<dyn RawObject>> = Vec::new();
@@ -199,7 +203,7 @@ fn parse_location<P: AsRef<Path>>(
     // Get a list of all subdirectories in the location
     let raw_modules_in_location: Vec<DirEntry> =
         util::subdirectories(location_path).unwrap_or_default();
-    log::info!(
+    info!(
         "parse_location: Found {} raw modules in {:?}",
         raw_modules_in_location.len(),
         module_location,
@@ -221,16 +225,26 @@ fn parse_location<P: AsRef<Path>>(
 }
 
 #[cfg(feature = "tauri")]
+#[allow(clippy::too_many_lines)]
 fn parse_module<P: AsRef<Path>>(
     module_path: &P,
     options: &crate::options::ParserOptions,
     progress_helper: &mut ProgressHelper,
 ) -> Vec<Box<dyn RawObject>> {
+    use tracing::{debug, info, warn};
+
     // Get information from the module info file
     let module_info_file_path = module_path.as_ref().join("info.txt");
-    let module_info_file = crate::parse_module_info_file_direct(&module_info_file_path);
+    let Some(module_info_file) = crate::parse_module_info_file_direct(&module_info_file_path)
+    else {
+        warn!(
+            "parse_module: No info.txt found in {:?}",
+            module_path.as_ref().file_name().unwrap_or_default(),
+        );
+        return Vec::new();
+    };
 
-    log::info!(
+    info!(
         "parse_module: Parsing raws for {} v{}",
         module_info_file.get_identifier(),
         module_info_file.get_version(),
@@ -252,7 +266,7 @@ fn parse_module<P: AsRef<Path>>(
     let mut parse_graphics = true;
 
     if !objects_path.exists() {
-        log::warn!(
+        warn!(
             "parse_module: No objects directory found in {:?}",
             module_path.as_ref().file_name().unwrap_or_default(),
         );
@@ -260,7 +274,7 @@ fn parse_module<P: AsRef<Path>>(
     }
 
     if parse_objects && !objects_path.is_dir() {
-        log::warn!(
+        warn!(
             "parse_module: Objects directory in {:?} is not a directory",
             module_path.as_ref().file_name().unwrap_or_default(),
         );
@@ -268,7 +282,7 @@ fn parse_module<P: AsRef<Path>>(
     }
 
     if !graphics_path.exists() {
-        log::debug!(
+        debug!(
             "parse_module: No graphics directory found in {:?}",
             module_path.as_ref().file_name().unwrap_or_default(),
         );
@@ -276,7 +290,7 @@ fn parse_module<P: AsRef<Path>>(
     }
 
     if parse_graphics && !graphics_path.is_dir() {
-        log::warn!(
+        warn!(
             "parse_module: Graphics directory in {:?} is not a directory",
             module_path.as_ref().file_name().unwrap_or_default(),
         );
