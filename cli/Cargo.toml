@@ -1,0 +1,26 @@
+[package]
+name = "dfraw_json_parser-cli"
+version = "0.14.0"
+edition = "2021"
+readme = "README.md"
+authors = ["Nicholas Westerhausen <nick@westmail.cc>"]
+description = "CLI for parsing Dwarf Fortress raw files into JSON"
+repository = "https://github.com/nwesterhausen/dfraw_json_parser.git"
+license = "MIT"
+homepage = "https://github.com/nwesterhausen/dfraw_json_parser"
+keywords = ["dwarf_fortress", "JSON", "parsing"]
+categories = ["parsing"]
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+log = "0.4"
+chrono = "0.4"
+lexopt = "0.3"
+
+[dependencies.fern]
+version = "0.6.2"
+features = ["colored"]
+
+[dependencies.dfraw_json_parser]
+path = "../lib"
