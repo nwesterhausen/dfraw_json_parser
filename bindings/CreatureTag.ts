@@ -37,4 +37,11 @@ export type CreatureTag =
   | "GlowTile"
   | "ChangeFrequencyPercent"
   | "ClusterNumber"
-  | "Unknown";
+  | "Unknown"
+  | "MatesToBreed"
+  | "TwoGenders"
+  | "AllCastesAlive"
+  | "SmallRace"
+  | "OccursAsEntityRace"
+  | "Equipment"
+  | "EquipmentWagon";
