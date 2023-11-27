@@ -8,20 +8,18 @@ use tracing::{debug, error, trace};
 use crate::{
     options::ParserOptions,
     parser::{
-        creature::raw::Creature,
-        entity::raw::Entity,
-        graphics::{
-            phf_table::GRAPHIC_TYPE_TAGS, raw::Graphic, tile_page::TilePage, tokens::GraphicType,
-        },
-        inorganic::raw::Inorganic,
-        material_template::raw::MaterialTemplate,
+        creature::Creature,
+        entity::Entity,
+        graphics::{Graphic, GraphicTypeToken, TilePage, GRAPHIC_TYPE_TOKEN_MAP},
+        inorganic::Inorganic,
+        material_template::MaterialTemplate,
         module_info_file::ModuleInfoFile,
         object_types::{ObjectType, OBJECT_TOKENS},
-        plant::raw::Plant,
+        plant::Plant,
         raws::{RawMetadata, RawObject},
         reader::parsable_types::PARSABLE_OBJECT_TYPES,
         refs::{DF_ENCODING, RAW_TOKEN_RE},
-        select_creature::raw::SelectCreature,
+        select_creature::SelectCreature,
     },
     util::try_get_file,
 };
@@ -69,7 +67,7 @@ pub fn parse_raw_file_with_info<P: AsRef<Path>>(
     let mut temp_entity = Entity::empty();
 
     let mut last_parsed_type = ObjectType::Unknown;
-    let mut last_graphic_type = GraphicType::Unknown;
+    let mut last_graphic_type = GraphicTypeToken::Unknown;
     let mut temp_tile_page = TilePage::empty();
 
     // Metadata
@@ -162,7 +160,11 @@ pub fn parse_raw_file_with_info<P: AsRef<Path>>(
                     }
                     // Check of object_type matches the captured_value as ObjectType.
                     // If it doesn't, we should log this as an error.
-                    if &object_type != OBJECT_TOKENS.get(captured_value).unwrap() {
+                    if &object_type
+                        != OBJECT_TOKENS
+                            .get(captured_value)
+                            .unwrap_or(&ObjectType::Unknown)
+                    {
                         error!(
                             "parse_raw_file_with_info: Object type mismatch: {} != {}",
                             object_type,
@@ -282,9 +284,9 @@ pub fn parse_raw_file_with_info<P: AsRef<Path>>(
                     // We haven't started a graphic yet, so we need to start one.
 
                     last_parsed_type = ObjectType::Graphics;
-                    last_graphic_type = *GRAPHIC_TYPE_TAGS
+                    last_graphic_type = *GRAPHIC_TYPE_TOKEN_MAP
                         .get(captured_key)
-                        .unwrap_or(&GraphicType::Unknown);
+                        .unwrap_or(&GraphicTypeToken::Unknown);
 
                     temp_graphic =
                         Graphic::new(captured_value, &raw_metadata.clone(), last_graphic_type);
@@ -340,11 +342,11 @@ pub fn parse_raw_file_with_info<P: AsRef<Path>>(
                             }
                             ObjectType::Graphics => {
                                 // We have a graphic, so we can add a tag to it.
-                                if temp_graphic.get_graphic_type() == GraphicType::Tile {
+                                if temp_graphic.get_graphic_type() == GraphicTypeToken::Tile {
                                     // Update graphic type (every line should have a graphic type tag)
-                                    last_graphic_type = *GRAPHIC_TYPE_TAGS
+                                    last_graphic_type = *GRAPHIC_TYPE_TOKEN_MAP
                                         .get(captured_key)
-                                        .unwrap_or(&GraphicType::Unknown);
+                                        .unwrap_or(&GraphicTypeToken::Unknown);
                                 }
 
                                 temp_graphic.parse_sprite_from_tag(

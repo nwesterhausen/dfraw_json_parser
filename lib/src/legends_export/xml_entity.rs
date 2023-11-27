@@ -1,4 +1,4 @@
-use crate::parser::{entity::raw::Entity, raws::RawMetadata};
+use crate::parser::{entity::Entity, RawMetadata};
 
 #[derive(Debug, Default)]
 pub(crate) struct ExportedEntity {

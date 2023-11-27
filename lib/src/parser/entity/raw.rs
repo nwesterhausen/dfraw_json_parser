@@ -3,9 +3,9 @@ use tracing::warn;
 
 use crate::parser::{
     color::Color,
-    helpers::object_id::build_object_id_from_pieces,
+    helpers::build_object_id_from_pieces,
     object_types::ObjectType,
-    position::{phf_table::POSITION_TOKENS, raw::Position},
+    position::{Position, TOKEN_MAP as POSITION_TOKEN_MAP},
     raws::{RawMetadata, RawObject},
     searchable::{clean_search_vec, Searchable},
     serializer_helper,
@@ -206,7 +206,7 @@ impl RawObject for Entity {
     }
     #[allow(clippy::too_many_lines)]
     fn parse_tag(&mut self, key: &str, value: &str) {
-        if let Some(position_token) = POSITION_TOKENS.get(key) {
+        if let Some(position_token) = POSITION_TOKEN_MAP.get(key) {
             // Tags should be attached to the last Position in the list
             if let Some(position) = self.positions.last_mut() {
                 position.parse_tag(position_token, value);

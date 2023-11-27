@@ -1,4 +1,4 @@
-use crate::parser::{creature::raw::Creature, names::Name, raws::RawMetadata};
+use crate::parser::{creature::Creature, Name, RawMetadata};
 
 #[derive(Debug, Default)]
 pub(crate) struct ExportedCreature {

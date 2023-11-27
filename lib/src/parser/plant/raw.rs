@@ -3,24 +3,20 @@ use slug::slugify;
 use tracing::{debug, warn};
 
 use crate::parser::{
-    biome::{phf_map::BIOME_TOKENS, tokens::Biome},
-    material::{
-        phf_table::{MATERIAL_PROPERTY_TOKENS, MATERIAL_USAGE_TOKENS},
-        raw::Material,
-    },
+    biome,
+    helpers::parse_min_max_range,
+    material::{Material, PROPERTY_TOKEN_MAP, USAGE_TOKEN_MAP},
     names::Name,
     object_types::ObjectType,
     plant_growth::{
-        phf_table::{GROWTH_TOKENS, GROWTH_TYPE_TOKENS},
-        raw::PlantGrowth,
-        tokens::{GrowthTag, GrowthType},
+        PlantGrowth, Token as GrowthToken, TypeToken as GrowthTypeToken,
+        TOKEN_MAP as GROWTH_TOKEN_MAP, TYPE_TOKEN_MAP as GROWTH_TYPE_TOKEN_MAP,
     },
-    ranges::parse_min_max_range,
     raws::{RawMetadata, RawObject},
     searchable::{clean_search_vec, Searchable},
     serializer_helper,
-    shrub::{phf_table::SHRUB_TOKENS, raw::Shrub},
-    tree::{phf_table::TREE_TOKENS, raw::Tree},
+    shrub::{Shrub, TOKEN_MAP as SHRUB_TOKEN_MAP},
+    tree::{Tree, TOKEN_MAP as TREE_TOKEN_MAP},
 };
 
 use super::{phf_table::PLANT_TOKENS, tokens::PlantTag};
@@ -53,7 +49,7 @@ pub struct Plant {
     frequency: u16,
     /// List of biomes this plant can grow in
     #[serde(skip_serializing_if = "Vec::is_empty")]
-    biomes: Vec<Biome>,
+    biomes: Vec<biome::Token>,
 
     /// Growth Tokens define the growths of the plant (leaves, fruit, etc.)
     #[serde(skip_serializing_if = "Vec::is_empty")]
@@ -90,7 +86,7 @@ impl Plant {
             ..Plant::default()
         }
     }
-    pub fn get_biomes(&self) -> Vec<Biome> {
+    pub fn get_biomes(&self) -> Vec<biome::Token> {
         self.biomes.clone()
     }
 }
@@ -115,7 +111,7 @@ impl RawObject for Plant {
     }
     #[allow(clippy::too_many_lines)]
     fn parse_tag(&mut self, key: &str, value: &str) {
-        if (MATERIAL_PROPERTY_TOKENS.contains_key(key) || MATERIAL_USAGE_TOKENS.contains_key(key))
+        if (PROPERTY_TOKEN_MAP.contains_key(key) || USAGE_TOKEN_MAP.contains_key(key))
             && !key.eq("USE_MATERIAL_TEMPLATE")
         {
             // have our latest material parse the tag
@@ -126,7 +122,7 @@ impl RawObject for Plant {
             return;
         }
 
-        if TREE_TOKENS.contains_key(key) {
+        if TREE_TOKEN_MAP.contains_key(key) {
             if self.tree_details.is_none() {
                 self.tree_details = Some(Tree::new(value));
             }
@@ -135,13 +131,13 @@ impl RawObject for Plant {
             return;
         }
 
-        if GROWTH_TOKENS.contains_key(key) {
-            let token = GROWTH_TOKENS.get(key).unwrap_or(&GrowthTag::Unknown);
-            if token == &GrowthTag::Growth {
+        if GROWTH_TOKEN_MAP.contains_key(key) {
+            let token = GROWTH_TOKEN_MAP.get(key).unwrap_or(&GrowthToken::Unknown);
+            if token == &GrowthToken::Growth {
                 // If we are defining a new growth, we need to create a new PlantGrowth
-                let growth_type = GROWTH_TYPE_TOKENS
+                let growth_type = GROWTH_TYPE_TOKEN_MAP
                     .get(value)
-                    .unwrap_or(&GrowthType::None)
+                    .unwrap_or(&GrowthTypeToken::None)
                     .clone();
                 let growth = PlantGrowth::new(growth_type);
                 self.growths.push(growth);
@@ -155,7 +151,7 @@ impl RawObject for Plant {
             return;
         }
 
-        if SHRUB_TOKENS.contains_key(key) {
+        if SHRUB_TOKEN_MAP.contains_key(key) {
             if self.shrub_details.is_none() {
                 self.shrub_details = Some(Shrub::new());
             }
@@ -196,7 +192,7 @@ impl RawObject for Plant {
                 self.pref_strings.push(String::from(value));
             }
             PlantTag::Biome => {
-                let Some(biome) = BIOME_TOKENS.get(value) else {
+                let Some(biome) = biome::TOKEN_MAP.get(value) else {
                     warn!(
                         "PlantParsing: called `Option::unwrap()` on a `None` value for presumed biome: {}",
                         value

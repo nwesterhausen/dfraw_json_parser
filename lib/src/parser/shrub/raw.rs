@@ -2,7 +2,7 @@ use serde::{Deserialize, Serialize};
 use tracing::{error, warn};
 
 use crate::parser::color::Color;
-use crate::parser::seed_material::raw::SeedMaterial;
+use crate::parser::seed_material::SeedMaterial;
 use crate::parser::serializer_helper;
 
 use super::phf_table::SHRUB_TOKENS;

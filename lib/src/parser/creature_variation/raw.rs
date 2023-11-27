@@ -1,4 +1,4 @@
-use crate::parser::creature::raw::Creature;
+use crate::parser::creature::Creature;
 
 use super::tokens::CVTag;
 

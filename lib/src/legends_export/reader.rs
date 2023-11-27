@@ -5,8 +5,8 @@ use quick_xml::{events::Event, Reader};
 use tracing::{error, info};
 
 use crate::options::ParserOptions;
-use crate::parser::object_types::ObjectType;
-use crate::{parser::raws::RawObject, util::try_get_file};
+use crate::parser::ObjectType;
+use crate::{parser::RawObject, util::try_get_file};
 
 use super::legends_metadata;
 use super::xml_creature::ExportedCreature;

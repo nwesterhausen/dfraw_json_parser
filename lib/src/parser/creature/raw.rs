@@ -2,16 +2,17 @@ use serde::{Deserialize, Serialize};
 use tracing::{debug, trace, warn};
 
 use crate::parser::{
-    biome::{phf_map::BIOME_TOKENS, tokens::Biome},
-    creature_caste::{phf_table::CASTE_TOKENS, raw::Caste},
-    creature_variation::raw::CreatureVariationRequirements,
-    helpers::object_id::build_object_id_from_pieces,
+    biome,
+    creature_caste::Caste,
+    creature_caste::TOKEN_MAP as CASTE_TOKENS,
+    creature_variation::Requirements as CreatureVariationRequirements,
+    helpers::build_object_id_from_pieces,
+    helpers::parse_min_max_range,
     names::{Name, SingPlurName},
     object_types::ObjectType,
-    ranges::parse_min_max_range,
     raws::{RawMetadata, RawObject},
     searchable::{clean_search_vec, Searchable},
-    select_creature::raw::SelectCreature,
+    select_creature::SelectCreature,
     serializer_helper,
     tile::Tile,
 };
@@ -40,7 +41,7 @@ pub struct Creature {
     #[serde(skip_serializing_if = "Vec::is_empty")]
     tags: Vec<CreatureTag>,
     #[serde(skip_serializing_if = "Vec::is_empty")]
-    biomes: Vec<Biome>,
+    biomes: Vec<biome::Token>,
     #[serde(skip_serializing_if = "Vec::is_empty")]
     pref_strings: Vec<String>,
     #[serde(skip_serializing_if = "Tile::is_default")]
@@ -325,7 +326,7 @@ impl Creature {
     pub fn does_not_exist(&self) -> bool {
         self.tags.contains(&CreatureTag::DoesNotExist)
     }
-    pub fn get_biomes(&self) -> Vec<Biome> {
+    pub fn get_biomes(&self) -> Vec<biome::Token> {
         self.biomes.clone()
     }
 
@@ -346,7 +347,7 @@ impl Creature {
                     .collect::<Vec<&str>>()
                     .join("_")
                     .to_uppercase();
-                if let Some(biome) = BIOME_TOKENS.get(&biome) {
+                if let Some(biome) = biome::TOKEN_MAP.get(&biome) {
                     self.biomes.push(biome.clone());
                 } else {
                     warn!(
@@ -446,7 +447,7 @@ impl RawObject for Creature {
 
         match tag {
             CreatureTag::Biome => {
-                let Some(biome) = BIOME_TOKENS.get(value) else {
+                let Some(biome) = biome::TOKEN_MAP.get(value) else {
                     warn!(
                         "CreatureParsing: called `Option::unwrap()` on a `None` value for presumed biome: {}",
                         value
@@ -539,7 +540,7 @@ impl CreatureVariationRequirements for Creature {
 
         match tag {
             CreatureTag::Biome => {
-                let Some(biome) = BIOME_TOKENS.get(value) else {
+                let Some(biome) = biome::TOKEN_MAP.get(value) else {
                     warn!(
                         "CreatureParsing: called `Option::unwrap()` on a `None` value for presumed biome: {}",
                         value

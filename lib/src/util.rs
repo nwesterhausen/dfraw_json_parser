@@ -9,10 +9,7 @@ use walkdir::WalkDir;
 
 use crate::{
     options::ParserOptions,
-    parser::{
-        creature::raw::Creature, object_types::ObjectType, raws::RawObject,
-        select_creature::raw::SelectCreature,
-    },
+    parser::{creature::Creature, select_creature::SelectCreature, ObjectType, RawObject},
 };
 
 #[tracing::instrument]

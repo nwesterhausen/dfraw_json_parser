@@ -5,7 +5,7 @@ use super::structs::ProgressHelper;
 #[cfg(feature = "tauri")]
 use crate::parser;
 #[cfg(feature = "tauri")]
-use crate::parser::raws::RawObject;
+use crate::parser::RawObject;
 #[cfg(feature = "tauri")]
 use crate::util;
 #[cfg(feature = "tauri")]
@@ -58,13 +58,13 @@ pub fn parse(
         // Parse each location
         if options
             .locations_to_parse
-            .contains(&crate::parser::raw_locations::RawModuleLocation::Vanilla)
+            .contains(&crate::parser::RawModuleLocation::Vanilla)
         {
             results.extend(parse_location(&vanilla_path, &options, progress_helper));
         }
         if options
             .locations_to_parse
-            .contains(&crate::parser::raw_locations::RawModuleLocation::InstalledMods)
+            .contains(&crate::parser::RawModuleLocation::InstalledMods)
         {
             results.extend(parse_location(
                 &installed_mods_path,
@@ -74,7 +74,7 @@ pub fn parse(
         }
         if options
             .locations_to_parse
-            .contains(&crate::parser::raw_locations::RawModuleLocation::Mods)
+            .contains(&crate::parser::RawModuleLocation::Mods)
         {
             results.extend(parse_location(
                 &workshop_mods_path,
@@ -120,7 +120,7 @@ pub fn parse(
         for raw_file in &options.raw_files_to_parse {
             let target_path = Path::new(&raw_file);
 
-            results.extend(parser::parse_raws_from_single_file(&target_path, &options));
+            results.extend(parser::parse_raw_file(&target_path, &options));
         }
     }
 
@@ -130,18 +130,15 @@ pub fn parse(
         for legends_export in &options.legends_exports_to_parse {
             let target_path = Path::new(&legends_export);
             // Todo: Add progress helper for legends export parsing
-            results.extend(crate::legends_export::parse_legends_export(
-                &target_path,
-                &options,
-            ));
+            results.extend(crate::legends_export::parse(&target_path, &options));
         }
     }
 
     // Absorb select_creature
-    parser::helpers::absorb_select_creature::absorb_select_creature(&mut results);
+    parser::helpers::absorb_select_creature(&mut results);
     // Apply copy_tags_from
     if !options.skip_apply_copy_tags_from {
-        parser::helpers::apply_copy_from::apply_copy_tags_from(&mut results);
+        parser::helpers::apply_copy_tags_from(&mut results);
     }
 
     results
@@ -195,7 +192,7 @@ fn parse_location<P: AsRef<Path>>(
 ) -> Vec<Box<dyn RawObject>> {
     use tracing::info;
 
-    use crate::parser::raw_locations::RawModuleLocation;
+    use crate::parser::RawModuleLocation;
 
     let mut results: Vec<Box<dyn RawObject>> = Vec::new();
     let module_location = RawModuleLocation::from_path(&location_path);
@@ -321,7 +318,7 @@ fn parse_module<P: AsRef<Path>>(
                 {
                     progress_helper.add_steps(1);
                     progress_helper.send_update(file_name_str);
-                    results.extend(parser::parse_raws_from_single_file(&file_path, options));
+                    results.extend(parser::parse_raw_file(&file_path, options));
                     progress_helper.add_to_running_total(results.len());
                 }
             }
@@ -345,7 +342,7 @@ fn parse_module<P: AsRef<Path>>(
                 {
                     progress_helper.add_steps(1);
                     progress_helper.send_update(file_name_str);
-                    results.extend(parser::parse_raws_from_single_file(&file_path, options));
+                    results.extend(parser::parse_raw_file(&file_path, options));
                     progress_helper.add_to_running_total(results.len());
                 }
             }

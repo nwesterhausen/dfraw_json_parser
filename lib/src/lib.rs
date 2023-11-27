@@ -65,26 +65,29 @@ for the steam workshop if it is a mod downloaded from the steam workshop.
 #![warn(clippy::pedantic)]
 #![allow(clippy::must_use_candidate)]
 
-use options::ParserOptions;
-use parser::{
-    helpers::{
-        absorb_select_creature::absorb_select_creature, apply_copy_from::apply_copy_tags_from,
-    },
-    module_info_file::ModuleInfoFile,
-    raws::RawObject,
-    searchable::Searchable,
-};
+use parser::helpers::{absorb_select_creature, apply_copy_tags_from};
 use std::path::{Path, PathBuf};
 use tracing::{debug, error, info, warn};
 use util::validate_options;
 use walkdir::{DirEntry, WalkDir};
 
-use crate::parser::raw_locations::RawModuleLocation;
+mod legends_export;
+mod options;
+mod parser;
 
-pub mod legends_export;
-pub mod options;
-pub mod parser;
 #[cfg(feature = "tauri")]
+/// This module contains functions for interacting with the Tauri application.
+///
+/// This will provide the same library functions but also allows for sending progress updates to the Tauri application.
+///
+/// The main functions in this module are:
+/// - `parse`: Parses the raws in the provided location path, and returns a vector of boxed dynamic raw objects.
+/// - `parse_to_json`: Parses the raws in the provided location path, and returns a vector of JSON strings.
+/// - `parse_info_modules_to_json`: Parses the information modules using the provided options, and returns a vector of JSON strings.
+/// - `parse_with_tauri_emit`: Parses the raws in the provided location path, and returns a vector of boxed dynamic raw objects.
+/// - `parse_with_tauri_emit_to_json_vec`: Parses the raws in the provided location path, and returns a vector of JSON strings.
+///
+/// These functions are used in the context of a JSON parser for Dwarf Fortress raw files.
 mod tauri_lib;
 
 /// This module contains utility functions for file operations and directory traversal.
@@ -105,6 +108,9 @@ mod tauri_lib;
 ///
 /// These utility functions are used in the context of a JSON parser for Dwarf Fortress raw files.
 pub mod util;
+
+pub use options::ParserOptions;
+pub use parser::*;
 
 #[cfg(feature = "tauri")]
 pub use tauri_lib::ProgressPayload;
@@ -201,7 +207,7 @@ pub fn parse(options: &ParserOptions) -> Vec<Box<dyn RawObject>> {
                 "Dispatching parse for raw file {:?}",
                 target_path.file_name().unwrap_or_default()
             );
-            results.extend(parser::parse_raws_from_single_file(&target_path, &options));
+            results.extend(parser::parse_raw_file(&target_path, &options));
         }
     }
 
@@ -211,7 +217,7 @@ pub fn parse(options: &ParserOptions) -> Vec<Box<dyn RawObject>> {
         for legends_export in &options.legends_exports_to_parse {
             let target_path = Path::new(&legends_export);
 
-            results.extend(legends_export::parse_legends_export(&target_path, &options));
+            results.extend(legends_export::parse(&target_path, &options));
         }
     }
 
@@ -458,9 +464,7 @@ fn parse_module_info_file_direct<P: AsRef<Path>>(
         return None;
     }
     // Get information from the module info file
-    Some(parser::parse_info_file_from_file_path(
-        module_info_file_path,
-    ))
+    Some(parser::ModuleInfoFile::parse(module_info_file_path))
 }
 
 /// The `parse_module` function parses raw files from a module directory and returns a vector of parsed
@@ -558,7 +562,7 @@ fn parse_module<P: AsRef<Path>>(
                     .extension()
                     .map_or(false, |ext| ext.eq_ignore_ascii_case("txt"))
                 {
-                    results.extend(parser::parse_raws_from_single_file(&file_path, options));
+                    results.extend(parser::parse_raw_file(&file_path, options));
                 }
             }
         }
@@ -579,7 +583,7 @@ fn parse_module<P: AsRef<Path>>(
                     .extension()
                     .map_or(false, |ext| ext.eq_ignore_ascii_case("txt"))
                 {
-                    results.extend(parser::parse_raws_from_single_file(&file_path, options));
+                    results.extend(parser::parse_raw_file(&file_path, options));
                 }
             }
         }
@@ -620,5 +624,5 @@ pub fn parse_info_modules_to_json(options: &ParserOptions) -> Vec<String> {
 ///
 /// The function `build_search_string` returns a `String` value.
 pub fn build_search_string(raw_object: &dyn Searchable) -> String {
-    crate::parser::searchable::get_search_string(raw_object)
+    crate::parser::get_search_string(raw_object)
 }

@@ -27,10 +27,10 @@ pub use structs::ProgressPayload;
 pub fn parse(
     options: &crate::options::ParserOptions,
     window: tauri::Window,
-) -> Vec<Box<dyn crate::parser::raws::RawObject>> {
+) -> Vec<Box<dyn crate::parser::RawObject>> {
     // setup progress helper
     let mut progress_helper = structs::ProgressHelper::with_tauri_window(window);
-    progress_helper.update_current_task("Parsing all raws in dwarf fortress directory.");
+    progress_helper.update_current_task("Parsing raws.");
 
     let result = with_progress::parse(options, &mut progress_helper);
     progress_helper.send_final("Parsing completed.");

@@ -3,13 +3,13 @@ use tracing::warn;
 
 use crate::parser::{
     color::Color,
-    creature_effect::phf_table::CREATURE_EFFECT_TOKENS,
+    creature_effect::TOKEN_MAP as CREATURE_EFFECT_TOKENS,
     material::phf_table::MATERIAL_PROPERTY_TOKENS,
     material_mechanics::MaterialMechanics,
     names::StateName,
     searchable::{clean_search_vec, Searchable},
     serializer_helper,
-    syndrome::{phf_table::SYNDROME_TOKEN, raw::Syndrome},
+    syndrome::{Syndrome, TOKEN_MAP as SYNDROME_TOKEN_MAP},
     temperature::Temperatures,
     tile::Tile,
 };
@@ -373,7 +373,7 @@ impl Material {
         }
 
         // Materials can have syndromes attached and syndromes have creature effects attached.
-        if SYNDROME_TOKEN.contains_key(key)
+        if SYNDROME_TOKEN_MAP.contains_key(key)
             || CREATURE_EFFECT_TOKENS.contains_key(key)
             || key == "CE"
         {
