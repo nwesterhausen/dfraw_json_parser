@@ -2,7 +2,7 @@ use serde::{Deserialize, Serialize};
 use tracing::{debug, warn};
 
 use crate::parser::{
-    creature_effect::phf_table::CREATURE_EFFECT_TOKENS,
+    creature_effect::TOKEN_MAP as CREATURE_EFFECT_TOKENS,
     searchable::{clean_search_vec, Searchable},
     serializer_helper,
 };

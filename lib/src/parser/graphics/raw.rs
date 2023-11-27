@@ -2,7 +2,7 @@ use serde::{Deserialize, Serialize};
 use tracing::warn;
 
 use crate::parser::{
-    helpers::object_id::build_object_id_from_pieces,
+    helpers::build_object_id_from_pieces,
     object_types::ObjectType,
     raws::{RawMetadata, RawObject},
     searchable::{clean_search_vec, Searchable},

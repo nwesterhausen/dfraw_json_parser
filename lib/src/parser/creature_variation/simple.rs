@@ -2,7 +2,7 @@ use serde::{Deserialize, Serialize};
 use tracing::debug;
 
 use crate::parser::{
-    creature::raw::Creature, creature_variation::raw::CreatureVariation, raws::RawObject,
+    creature::Creature, creature_variation::raw::CreatureVariation, raws::RawObject,
 };
 
 use super::tokens::CVTag;

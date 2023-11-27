@@ -3,9 +3,9 @@ use tracing::warn;
 
 use crate::parser::{
     body_size::BodySize,
+    helpers::parse_min_max_range,
     milkable::Milkable,
     names::{Name, SingPlurName},
-    ranges::parse_min_max_range,
     searchable::Searchable,
     serializer_helper,
     tile::Tile,

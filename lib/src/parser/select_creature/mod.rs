@@ -1,1 +1,3 @@
-pub mod raw;
+mod raw;
+
+pub use raw::SelectCreature;

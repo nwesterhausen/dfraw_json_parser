@@ -2,7 +2,7 @@ use itertools::Itertools;
 use tracing::{info, warn};
 
 use crate::parser::{
-    creature::raw::Creature,
+    creature::Creature,
     helpers::{clone_raw_object_box, clone_raw_vector::with_purge},
     object_types::ObjectType,
     raws::RawObject,

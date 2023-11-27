@@ -1,4 +1,4 @@
-use crate::parser::{material::tokens::MaterialProperty, serializer_helper};
+use crate::parser::{material::PropertyToken, serializer_helper};
 use serde::{Deserialize, Serialize};
 use tracing::warn;
 
@@ -70,65 +70,65 @@ impl MaterialMechanics {
             && self.shear.is_empty()
             && self.bending.is_empty()
     }
-    pub fn parse_tag(&mut self, key: &MaterialProperty, value: &str) {
+    pub fn parse_tag(&mut self, key: &PropertyToken, value: &str) {
         match key {
-            MaterialProperty::ImpactYield => {
+            PropertyToken::ImpactYield => {
                 self.impact.set_yield(value.parse::<i32>().unwrap_or(0));
             }
-            MaterialProperty::ImpactFracture => {
+            PropertyToken::ImpactFracture => {
                 self.impact.set_fracture(value.parse::<i32>().unwrap_or(0));
             }
-            MaterialProperty::ImpactElasticity => self
+            PropertyToken::ImpactElasticity => self
                 .impact
                 .set_elasticity(value.parse::<i32>().unwrap_or(0)),
-            MaterialProperty::CompressiveYield => self
+            PropertyToken::CompressiveYield => self
                 .compressive
                 .set_yield(value.parse::<i32>().unwrap_or(0)),
-            MaterialProperty::CompressiveFracture => self
+            PropertyToken::CompressiveFracture => self
                 .compressive
                 .set_fracture(value.parse::<i32>().unwrap_or(0)),
-            MaterialProperty::CompressiveElasticity => self
+            PropertyToken::CompressiveElasticity => self
                 .compressive
                 .set_elasticity(value.parse::<i32>().unwrap_or(0)),
-            MaterialProperty::TensileYield => {
+            PropertyToken::TensileYield => {
                 self.tensile.set_yield(value.parse::<i32>().unwrap_or(0));
             }
-            MaterialProperty::TensileFracture => {
+            PropertyToken::TensileFracture => {
                 self.tensile.set_fracture(value.parse::<i32>().unwrap_or(0));
             }
-            MaterialProperty::TensileElasticity => self
+            PropertyToken::TensileElasticity => self
                 .tensile
                 .set_elasticity(value.parse::<i32>().unwrap_or(0)),
-            MaterialProperty::TorsionYield => {
+            PropertyToken::TorsionYield => {
                 self.torsion.set_yield(value.parse::<i32>().unwrap_or(0));
             }
-            MaterialProperty::TorsionFracture => {
+            PropertyToken::TorsionFracture => {
                 self.torsion.set_fracture(value.parse::<i32>().unwrap_or(0));
             }
-            MaterialProperty::TorsionElasticity => self
+            PropertyToken::TorsionElasticity => self
                 .torsion
                 .set_elasticity(value.parse::<i32>().unwrap_or(0)),
-            MaterialProperty::ShearYield => self.shear.set_yield(value.parse::<i32>().unwrap_or(0)),
-            MaterialProperty::ShearFracture => {
+            PropertyToken::ShearYield => self.shear.set_yield(value.parse::<i32>().unwrap_or(0)),
+            PropertyToken::ShearFracture => {
                 self.shear.set_fracture(value.parse::<i32>().unwrap_or(0));
             }
-            MaterialProperty::ShearElasticity => {
+            PropertyToken::ShearElasticity => {
                 self.shear.set_elasticity(value.parse::<i32>().unwrap_or(0));
             }
-            MaterialProperty::BendingYield => {
+            PropertyToken::BendingYield => {
                 self.bending.set_yield(value.parse::<i32>().unwrap_or(0));
             }
-            MaterialProperty::BendingFracture => {
+            PropertyToken::BendingFracture => {
                 self.bending.set_fracture(value.parse::<i32>().unwrap_or(0));
             }
-            MaterialProperty::BendingElasticity => self
+            PropertyToken::BendingElasticity => self
                 .bending
                 .set_elasticity(value.parse::<i32>().unwrap_or(0)),
 
-            MaterialProperty::MaxEdge => {
+            PropertyToken::MaxEdge => {
                 self.max_edge = value.parse::<i32>().unwrap_or(0);
             }
-            MaterialProperty::SolidDensity => {
+            PropertyToken::SolidDensity => {
                 self.solid_density = value.parse::<i32>().unwrap_or(0);
             }
 

@@ -1,2 +1,5 @@
-pub mod phf_map;
-pub mod tokens;
+mod phf_map;
+mod tokens;
+
+pub use phf_map::BIOME_TOKENS as TOKEN_MAP;
+pub use tokens::Biome as Token;

@@ -2,18 +2,14 @@ use std::path::Path;
 
 use crate::{
     options::ParserOptions,
-    parser::{
-        module_info_file::ModuleInfoFile, object_types::ObjectType,
-        raw_locations::RawModuleLocation, raws::RawMetadata,
-    },
+    parser::{ModuleInfoFile, ObjectType, RawMetadata, RawModuleLocation},
 };
 
 mod reader;
 mod xml_creature;
 mod xml_entity;
 
-#[allow(clippy::module_name_repetitions)]
-pub use reader::parse_legends_export;
+pub use reader::parse_legends_export as parse;
 
 fn legends_metadata(
     filepath: &Path,

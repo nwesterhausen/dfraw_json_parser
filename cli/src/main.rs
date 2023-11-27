@@ -1,7 +1,4 @@
-use dfraw_json_parser::{
-    options::ParserOptions,
-    parser::{object_types::ObjectType, raw_locations::RawModuleLocation},
-};
+use dfraw_json_parser::{ObjectType, ParserOptions, RawModuleLocation};
 
 use std::path::{Path, PathBuf};
 use tracing::Level;

@@ -1,10 +1,4 @@
-use std::path::Path;
-
-use crate::{options::ParserOptions, parser::module_info_file::ModuleInfoFile};
-
 pub mod biome;
-pub mod body_size;
-pub mod color;
 pub mod creature;
 pub mod creature_caste;
 pub mod creature_effect;
@@ -14,37 +8,51 @@ pub mod graphics;
 pub mod helpers;
 pub mod inorganic;
 pub mod material;
-pub mod material_mechanics;
 pub mod material_template;
-pub mod milkable;
-pub mod module_info_file;
-pub mod names;
-pub mod object_types;
 pub mod plant;
 pub mod plant_growth;
 pub mod position;
-pub mod ranges;
-pub mod raw_locations;
-pub mod raws;
-mod reader;
-mod refs;
-pub mod searchable;
 pub mod seed_material;
 pub mod select_creature;
-pub mod serializer_helper;
 pub mod shrub;
 pub mod syndrome;
-pub mod temperature;
-pub mod tile;
 pub mod tree;
 
-pub fn parse_info_file_from_file_path<P: AsRef<Path>>(raw_file_path: &P) -> ModuleInfoFile {
-    ModuleInfoFile::parse(&raw_file_path.as_ref())
-}
+mod body_size;
+mod color;
+mod material_mechanics;
+mod milkable;
+mod module_info_file;
+mod names;
+mod object_types;
+mod raw_locations;
+mod raws;
+mod reader;
+mod refs;
+mod searchable;
+pub(crate) mod serializer_helper;
+mod temperature;
+mod tile;
 
-pub fn parse_raws_from_single_file<P: AsRef<Path>>(
-    entry_path: &P,
-    options: &ParserOptions,
-) -> Vec<Box<dyn raws::RawObject>> {
-    reader::parse_file::parse_raw_file(entry_path, options)
-}
+pub use body_size::BodySize;
+pub use color::Color;
+pub use material_mechanics::MaterialMechanics;
+pub use material_mechanics::MechanicalProperties;
+pub use milkable::Milkable;
+pub use module_info_file::ModuleInfoFile;
+pub use names::*;
+pub use object_types::ObjectType;
+pub use raw_locations::RawModuleLocation;
+pub use raws::RawMetadata;
+pub use raws::RawObject;
+pub use raws::RawObjectToAny;
+pub use reader::parse_raw_file;
+pub use reader::parse_raw_file_with_info;
+pub use reader::read_raw_file_type;
+pub use reader::PARSABLE_OBJECT_TYPES;
+pub use refs::*;
+pub use searchable::clean_search_vec;
+pub use searchable::get_search_string;
+pub use searchable::Searchable;
+pub use temperature::Temperatures;
+pub use tile::Tile;
