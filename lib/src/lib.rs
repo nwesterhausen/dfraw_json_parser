@@ -76,28 +76,26 @@ mod options;
 mod parser;
 
 #[cfg(feature = "tauri")]
-/// This module contains functions for interacting with the Tauri application.
+/// # Tauri Support
 ///
-/// This will provide the same library functions but also allows for sending progress updates to the Tauri application.
+/// This has functions for interacting with the Tauri application.
 ///
-/// The main functions in this module are:
+/// This provides the same library functions but also allows for sending progress updates to the Tauri application.
+///
+/// The main functions:
+///
 /// - `parse`: Parses the raws in the provided location path, and returns a vector of boxed dynamic raw objects.
 /// - `parse_to_json`: Parses the raws in the provided location path, and returns a vector of JSON strings.
-/// - `parse_info_modules_to_json`: Parses the information modules using the provided options, and returns a vector of JSON strings.
-/// - `parse_with_tauri_emit`: Parses the raws in the provided location path, and returns a vector of boxed dynamic raw objects.
-/// - `parse_with_tauri_emit_to_json_vec`: Parses the raws in the provided location path, and returns a vector of JSON strings.
-///
-/// These functions are used in the context of a JSON parser for Dwarf Fortress raw files.
 mod tauri_lib;
 
-/// This module contains utility functions for file operations and directory traversal.
+/// This has utility functions for file operations and directory traversal.
 ///
-/// The functions in this module provide functionality for working with directories, files, and paths.
+/// The functions provide functionality for working with directories, files, and paths.
 /// It includes functions for getting subdirectories of a given directory, retrieving the name of the parent directory,
 /// validating game directories, writing raw objects and string vectors to files, and converting raw objects to JSON strings.
-/// These utility functions are used in the context of a JSON parser for Dwarf Fortress raw files.
 ///
-/// The main functions in this module are:
+/// The main functions:
+///
 /// - `subdirectories`: Retrieves a vector of subdirectories for a given directory.
 /// - `get_parent_dir_name`: Retrieves the name of the parent directory for a given path.
 /// - `path_from_game_directory`: Validates and returns a `PathBuf` for a given game directory path.
@@ -105,10 +103,9 @@ mod tauri_lib;
 /// - `write_json_string_vec_to_file`: Writes a vector of strings to a file, with each string on a separate line.
 /// - `options_has_valid_paths`: Validates the paths in the `ParserOptions` struct.
 /// - `raws_to_string`: Converts a vector of raw objects to a JSON string representation.
-///
-/// These utility functions are used in the context of a JSON parser for Dwarf Fortress raw files.
 pub mod util;
 
+/// Option struct for passing to any parse function.
 pub use options::ParserOptions;
 pub use parser::*;
 
@@ -135,10 +132,8 @@ pub fn parse(options: &ParserOptions) -> Vec<Box<dyn RawObject>> {
 
     let mut results: Vec<Box<dyn RawObject>> = Vec::new();
 
-    // No job is specified, instead it is inferred from the options
-    // First we can check if any locations are specified
+    // Locations can only contain the predefined locations.
     if !options.locations_to_parse.is_empty() {
-        // Parse all locations that are specified.
         let target_path = Path::new(&options.dwarf_fortress_directory);
 
         // Build paths for each location
@@ -168,9 +163,8 @@ pub fn parse(options: &ParserOptions) -> Vec<Box<dyn RawObject>> {
         }
     }
 
-    // Next we can check if any raw modules are specified
     if !options.raw_modules_to_parse.is_empty() {
-        // Parse all raw modules that are specified.
+        // Loop through over module and parse it.
         for raw_module in &options.raw_modules_to_parse {
             let target_path = Path::new(&raw_module);
 
@@ -332,12 +326,12 @@ pub fn parse_to_json(options: &ParserOptions) -> Vec<String> {
 
 #[cfg(feature = "tauri")]
 /// Parse a directory of raws, and return a JSON string of the parsed raws. While parsing, this will
-/// emit tauri events to the supplied window. The event is titled `PROGRESS` and it uses the `ProgressPayload`
-/// payload for the payload.
+/// emit tauri events to the supplied window. The event has title `PROGRESS` and uses the `ProgressPayload`
+/// object for the payload.
 ///
 /// Set the `options` appropriately for the job you want to perform.
 ///
-/// The payload supplies the current progress as a float and the name of the current folder being parsed.
+/// The payload supplies the current progress as a float and the name of the current folder to parse.
 ///
 /// Properties:
 ///
@@ -366,7 +360,7 @@ pub fn parse_with_tauri_emit(
 ///
 /// Returns:
 ///
-/// A vector of strings is being returned.
+/// A vector of JSON strings representing the parsed results.
 pub fn parse_with_tauri_emit_to_json_vec(
     options: &ParserOptions,
     window: tauri::Window,
@@ -375,8 +369,6 @@ pub fn parse_with_tauri_emit_to_json_vec(
 }
 
 /// Parses the raws in the provided location path, and returns a vector of boxed dynamic raw objects.
-///
-/// This is meant to be a private function, because the main entry point should be `parse`.
 ///
 /// # Arguments
 ///
@@ -417,9 +409,7 @@ fn parse_location<P: AsRef<Path>>(
 ///
 /// Arguments:
 ///
-/// * `location_path`: The `location_path` parameter is the path to the directory where the module info
-/// files are located. It can be any type that can be converted to a `Path`, such as a `String` or
-/// `&str`.
+/// * `location_path`: the path to the directory where the module info files are.
 ///
 /// Returns:
 ///
@@ -472,11 +462,8 @@ fn parse_module_info_file_direct<P: AsRef<Path>>(
 ///
 /// Arguments:
 ///
-/// * `module_path`: The `module_path` parameter is the path to the module directory that contains the
-/// raw files to be parsed.
-/// * `options`: The `options` parameter is of type `ParserOptions`, which is a struct that contains
-/// various options for the parser. It is passed to the `parse_raws_from_single_file` function to
-/// control the parsing behavior.
+/// * `module_path`: the path to the module directory that contains the raw files to parse.
+/// * `options`: The parsing options which determine what and how to parse the raw files.
 ///
 /// Returns:
 ///
@@ -540,7 +527,7 @@ fn parse_module<P: AsRef<Path>>(
         parse_graphics = false;
     }
 
-    // Exit early if nothing to parse
+    // Guard against having nothing to parse.
     if !parse_graphics && !parse_objects {
         return Vec::new();
     }

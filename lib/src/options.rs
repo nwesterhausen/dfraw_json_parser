@@ -4,7 +4,40 @@ use serde::{Deserialize, Serialize};
 
 use crate::parser::{ObjectType, RawModuleLocation};
 
-/// Option struct for passing to any parse function.
+/// # Parsing Options
+///
+/// Specify what to parse and where to parse it from.
+///
+/// ## Parsing `info.txt` vs the raw files
+///
+/// There are two main parsing functions: `parse` and `parse_module_info_files`.
+///
+/// Both use the same options struct, but they use it in different ways.
+///
+/// When calling `parse`, the `ParserOptions` struct is used to specify what raws to parse and where to parse them from.
+/// Any specified `raw_modules_to_parse` will not be parsed in the `parse` function, and the only items parsed in the
+/// `parse_module_info_files` function are the `module_info_files_to_parse`.
+///
+/// ## Example
+///
+/// ```rust
+/// use std::path::PathBuf;
+/// use df_raws::{ParserOptions, RawObject};
+///
+/// // Create a basic options struct by specifying the path to the dwarf fortress directory.
+/// let mut options = ParserOptions::new("path/to/dwarf_fortress");
+/// // Add a single raw file to parse
+/// options.add_raw_file_to_parse("path/to/dwarf_fortress/data/vanilla/vanilla_creatures/objects/creature_standard.txt");
+/// // Add a single raw module to parse (all raw files in the module will be parsed)
+/// options.add_raw_module_to_parse("path/to/dwarf_fortress/data/vanilla/vanilla_creatures");
+/// // Add a single module info file to parse ()
+/// options.add_module_info_file_to_parse("path/to/dwarf_fortress/data/vanilla/vanilla_creatures/info.txt");
+/// options.add_legends_export_to_parse("path/to/dwarf_fortress/legends_plus_export.xml");
+/// options.set_raws_to_parse(vec![ObjectType::Creature, ObjectType::Plant]);
+/// options.set_locations_to_parse(vec![RawModuleLocation::InstalledMods]);
+/// options.attach_metadata_to_raws();
+///
+///
 #[allow(clippy::module_name_repetitions)]
 #[allow(clippy::struct_excessive_bools)]
 #[derive(Debug, Clone, Serialize, Deserialize)]
