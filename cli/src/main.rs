@@ -24,7 +24,7 @@ The following options are supported:
 
     -P, --pretty        Pretty-print the parsed raws
         This is only used when saving the parsed raws to a file.
-    
+
     -M, --metadata      Attach metadata to the parsed raws
         This includes the raws' file paths and other information about the
         raws' source.
@@ -34,7 +34,7 @@ The following options are supported:
 
     -r, --raw PATH      Parse a raw file
         This can be included multiple times to parse multiple raw files
-        directly. 
+        directly.
 
     -l, --legends PATH  Parse a legends export
         This can be included multiple times to parse multiple legends
@@ -272,7 +272,12 @@ pub fn main() -> Result<(), lexopt::Error> {
     };
 
     // Parse the raws
-    let raws = dfraw_json_parser::parse(&options);
+    let result = dfraw_json_parser::parse(&options).map_err(|e| {
+        lexopt::Error::Custom(Box::new(std::io::Error::new(
+            std::io::ErrorKind::Other,
+            format!("Failed to parse raws: {e:?}"),
+        )))
+    })?;
 
     // Print a summary of the parsed raws
     if args.print_summary {
@@ -280,7 +285,11 @@ pub fn main() -> Result<(), lexopt::Error> {
     }
 
     // Save the parsed raws to a file
-    dfraw_json_parser::util::write_raw_vec_to_file(&raws, &args.output_path, args.pretty_print);
+    dfraw_json_parser::util::write_raw_vec_to_file(
+        &result.raws,
+        &args.output_path,
+        args.pretty_print,
+    );
 
     Ok(())
 }
