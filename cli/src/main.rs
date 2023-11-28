@@ -7,7 +7,6 @@ use tracing_subscriber::FmtSubscriber;
 const LONG_HELP: &str = "Usage: dfraw-json-parser [OPTIONS] <dwarf-fortress-path>
 
 Default behavior:
-    - Parse the vanilla raws
     - Parse all object types
     - Print a summary of the parsed raws
     - Save the parsed raws to 'parsed-raws.json'
@@ -62,22 +61,45 @@ The following options are supported:
     --mods              Parse the raws from all mods
     --installed         Parse the raws from installed mods
 
+    --skip-info-files   Don't write the parsed 'info.txt' files to the output file.
+        This is useful if you only want the raws.
+
+    --only-info-files   Don't write raws to the output file.
+        This is useful if you only want the 'info.txt' file data
+
     -h, --help              Print this help message
     -V, --version           Print the version number";
 
 #[derive(Debug)]
+#[allow(clippy::struct_excessive_bools)]
+/// The CLI arguments
 struct Args {
+    /// The log level to use for the logger
     pub log_level: Level,
+    /// The locations to parse raws from
     pub locations: Vec<RawModuleLocation>,
+    /// The object types to parse
     pub object_types: Vec<ObjectType>,
+    /// Specific legends exports to parse (if any)
     pub legends_exports: Vec<PathBuf>,
+    /// Whether or not to print a summary of the parsed raws
     pub print_summary: bool,
+    /// Whether or not to attach metadata to the parsed raws
     pub attach_metadata: bool,
+    /// Whether or not to format the parsed raws in the output file
     pub pretty_print: bool,
+    /// The path to save the parsed raws to
     pub output_path: PathBuf,
+    /// The path to the Dwarf Fortress directory
     pub df_path: PathBuf,
+    /// Specific raw files to parse (if any)
     pub raw_file_paths: Vec<PathBuf>,
+    /// Specific raw modules to parse (if any)
     pub raw_module_paths: Vec<PathBuf>,
+    /// Whether or not to skip writing the parsed 'info.txt' files to the output file
+    pub skip_info_files: bool,
+    /// Whether or not to skip writing the parsed raws to the output file
+    pub skip_raws: bool,
 }
 
 impl std::default::Default for Args {
@@ -90,6 +112,8 @@ impl std::default::Default for Args {
             print_summary: false,
             attach_metadata: false,
             pretty_print: false,
+            skip_info_files: false,
+            skip_raws: false,
             output_path: PathBuf::from("parsed-raws.json"),
             df_path: PathBuf::new(),
             raw_file_paths: Vec::new(),
@@ -185,6 +209,13 @@ fn parse_args() -> Result<Args, lexopt::Error> {
                 std::process::exit(0);
             }
 
+            Long("skip-info-files") => {
+                args.skip_info_files = true;
+            }
+            Long("skip-raws") => {
+                args.skip_raws = true;
+            }
+
             Value(val) if df_path.is_none() => {
                 df_path = Some(PathBuf::from(val));
             }
@@ -221,8 +252,6 @@ fn parse_args() -> Result<Args, lexopt::Error> {
         *path = to_absolute_path(path, "legends export")?;
     }
 
-    // println!("cli.rs::parse_args: parsed arguments: {args:#?}");
-
     Ok(args)
 }
 
@@ -232,6 +261,101 @@ fn to_absolute_path(path: &Path, descriptor: &str) -> Result<PathBuf, lexopt::Er
             std::io::ErrorKind::NotFound,
             format!("Unable to find {} path {}", descriptor, path.display()),
         )))))
+}
+
+fn write_output_file<P: AsRef<Path>>(
+    output_path: &P,
+    parse_results: &dfraw_json_parser::ParseResult,
+    pretty_print: bool,
+    skip_info_files: bool,
+    skip_raws: bool,
+) -> Result<(), lexopt::Error> {
+    // Save the parsed raws to a file
+    let file = match std::fs::File::create(output_path) {
+        Ok(file) => file,
+        Err(e) => {
+            return Err(lexopt::Error::Custom(Box::new(std::io::Error::new(
+                std::io::ErrorKind::Other,
+                format!("Failed to create output file: {e:?}"),
+            ))))
+        }
+    };
+
+    tracing::info!("Opened {} for writing", output_path.as_ref().display());
+
+    if skip_info_files && skip_raws {
+        tracing::info!("Specified --skip-info-files and --skip-raws, so not writing anything to the output file");
+        return Ok(());
+    }
+
+    if pretty_print {
+        if skip_info_files {
+            serde_json::to_writer_pretty(file, &parse_results.raws).map_err(|e| {
+                lexopt::Error::Custom(Box::new(std::io::Error::new(
+                    std::io::ErrorKind::Other,
+                    format!("Failed to write output file: {e:?}"),
+                )))
+            })?;
+        } else if skip_raws {
+            serde_json::to_writer_pretty(file, &parse_results.info_files).map_err(|e| {
+                lexopt::Error::Custom(Box::new(std::io::Error::new(
+                    std::io::ErrorKind::Other,
+                    format!("Failed to write output file: {e:?}"),
+                )))
+            })?;
+        } else {
+            serde_json::to_writer_pretty(file, &parse_results).map_err(|e| {
+                lexopt::Error::Custom(Box::new(std::io::Error::new(
+                    std::io::ErrorKind::Other,
+                    format!("Failed to write output file: {e:?}"),
+                )))
+            })?;
+        }
+    } else if skip_info_files {
+        serde_json::to_writer(file, &parse_results.raws).map_err(|e| {
+            lexopt::Error::Custom(Box::new(std::io::Error::new(
+                std::io::ErrorKind::Other,
+                format!("Failed to write output file: {e:?}"),
+            )))
+        })?;
+    } else if skip_raws {
+        serde_json::to_writer(file, &parse_results.info_files).map_err(|e| {
+            lexopt::Error::Custom(Box::new(std::io::Error::new(
+                std::io::ErrorKind::Other,
+                format!("Failed to write output file: {e:?}"),
+            )))
+        })?;
+    } else {
+        serde_json::to_writer(file, &parse_results).map_err(|e| {
+            lexopt::Error::Custom(Box::new(std::io::Error::new(
+                std::io::ErrorKind::Other,
+                format!("Failed to write output file: {e:?}"),
+            )))
+        })?;
+    }
+
+    if skip_info_files {
+        tracing::info!(
+            "Wrote {} parsed raws to {}",
+            parse_results.raws.len(),
+            output_path.as_ref().display(),
+        );
+    } else if skip_raws {
+        tracing::info!(
+            "Wrote {} parsed 'info.txt' files to {}",
+            parse_results.info_files.len(),
+            output_path.as_ref().display(),
+        );
+    } else {
+        tracing::info!(
+            "Wrote {} parsed raws and {} parsed 'info.txt' files to {}",
+            parse_results.raws.len(),
+            parse_results.info_files.len(),
+            output_path.as_ref().display(),
+        );
+    }
+
+    Ok(())
 }
 
 /// The main function for the CLI
@@ -281,15 +405,14 @@ pub fn main() -> Result<(), lexopt::Error> {
 
     // Print a summary of the parsed raws
     if args.print_summary {
-        println!("Summary not implemented yet..");
+        tracing::error!("Summary not implemented yet..");
     }
 
-    // Save the parsed raws to a file
-    dfraw_json_parser::util::write_raw_vec_to_file(
-        &result.raws,
+    write_output_file(
         &args.output_path,
+        &result,
         args.pretty_print,
-    );
-
-    Ok(())
+        args.skip_info_files,
+        args.skip_raws,
+    )
 }

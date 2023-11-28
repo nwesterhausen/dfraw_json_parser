@@ -9,7 +9,7 @@ use crate::{
     RawObject,
 };
 use std::path::{Path, PathBuf};
-use tracing::{debug, info, warn};
+use tracing::{debug, info};
 use walkdir::DirEntry;
 
 #[cfg(feature = "tauri")]
@@ -28,16 +28,19 @@ use walkdir::DirEntry;
 ///
 /// A (large) JSON string with details on all raws in the game path.
 #[allow(clippy::too_many_lines)]
-pub fn parse(
+pub(crate) fn parse(
     options: &crate::options::ParserOptions,
     progress_helper: &mut ProgressHelper,
 ) -> Result<crate::ParseResult, crate::ParserError> {
+    // Guard against invalid paths
     let options = util::validate_options(options)?;
 
     let mut results = ParseResult {
         raws: Vec::new(),
         info_files: Vec::new(),
     };
+
+    progress_helper.update_current_task("Parsing raws.");
 
     // Locations can only contain the predefined locations.
     if !options.locations_to_parse.is_empty() {
@@ -54,6 +57,7 @@ pub fn parse(
             .locations_to_parse
             .contains(&RawModuleLocation::Vanilla)
         {
+            progress_helper.update_current_location("Vanilla");
             info!("Dispatching parse for vanilla raws");
             results
                 .raws
@@ -63,6 +67,7 @@ pub fn parse(
             .locations_to_parse
             .contains(&RawModuleLocation::InstalledMods)
         {
+            progress_helper.update_current_location("Installed Mods");
             info!("Dispatching parse for installed mods");
             results.raws.extend(parse_location(
                 &installed_mods_path,
@@ -74,6 +79,7 @@ pub fn parse(
             .locations_to_parse
             .contains(&RawModuleLocation::Mods)
         {
+            progress_helper.update_current_location("Workshop Mods");
             info!("Dispatching parse for workshop/downloaded mods");
             results.raws.extend(parse_location(
                 &workshop_mods_path,
@@ -91,6 +97,13 @@ pub fn parse(
             // Check for info.txt
             let info_txt_path = target_path.join("info.txt");
             if info_txt_path.exists() {
+                progress_helper.update_current_module(
+                    target_path
+                        .file_name()
+                        .unwrap_or_default()
+                        .to_str()
+                        .unwrap_or_default(),
+                );
                 info!(
                     "Dispatching parse for module {:?}",
                     target_path.file_name().unwrap_or_default()
@@ -107,16 +120,16 @@ pub fn parse(
         // Parse all raw files that are specified.
         for raw_file in &options.raw_files_to_parse {
             let target_path = Path::new(&raw_file);
-            info!(
-                "Dispatching parse for raw file {:?}",
-                target_path.file_name().unwrap_or_default()
-            );
             progress_helper.update_current_task(
                 format!(
                     "Parsing raw file {:?}",
                     target_path.file_name().unwrap_or_default()
                 )
                 .as_str(),
+            );
+            info!(
+                "Dispatching parse for raw file {:?}",
+                target_path.file_name().unwrap_or_default()
             );
             results
                 .raws
@@ -129,12 +142,6 @@ pub fn parse(
         // Parse all legends exports that are specified.
         for legends_export in &options.legends_exports_to_parse {
             let target_path = Path::new(&legends_export);
-
-            info!(
-                "Dispatching parse for legends export {:?}",
-                target_path.file_name().unwrap_or_default()
-            );
-
             progress_helper.update_current_task(
                 format!(
                     "Parsing legends export {:?}",
@@ -142,24 +149,28 @@ pub fn parse(
                 )
                 .as_str(),
             );
-
+            info!(
+                "Dispatching parse for legends export {:?}",
+                target_path.file_name().unwrap_or_default()
+            );
             results
                 .raws
                 .extend(legends_export::parse(&target_path, &options)?);
         }
     }
 
-    // Absorb select_creature
+    progress_helper.update_current_task("Processing 'SELECT_CREATURE' tokens.");
     absorb_select_creature(&mut results.raws);
     // Apply copy_tags_from
     if !options.skip_apply_copy_tags_from {
+        progress_helper.update_current_task("Processing 'COPY_TAGS_FROM' tokens.");
         apply_copy_tags_from(&mut results.raws);
     }
 
-    // Parse the info modules
-    progress_helper.update_current_task("Parsing 'info.txt' files");
+    progress_helper.update_current_task("Parsing module info files.");
     results.info_files = crate::parse_module_info_files(&options)?;
 
+    progress_helper.send_final("Parsing completed.");
     Ok(results)
 }
 
@@ -177,6 +188,10 @@ pub fn parse(
 /// # Returns
 ///
 /// A vector of boxed dynamic raw objects.
+///
+/// # Errors
+///
+/// This function will return an error if the location path is not a directory.
 fn parse_location<P: AsRef<Path>>(
     location_path: &P,
     options: &crate::options::ParserOptions,
@@ -201,7 +216,14 @@ fn parse_location<P: AsRef<Path>>(
 
     // Loop over each module and parse it
     for raw_module in raw_modules_in_location {
-        results.extend(parse_module(&raw_module.path(), options, progress_helper)?);
+        match parse_module(&raw_module.path(), options, progress_helper) {
+            Ok(module_results) => {
+                results.extend(module_results);
+            }
+            Err(e) => {
+                debug!("Skipping parsing module: {:?}", e);
+            }
+        }
     }
 
     Ok(results)
@@ -224,11 +246,6 @@ fn parse_module<P: AsRef<Path>>(
             }
         };
 
-    info!(
-        "parse_module: Parsing raws for {} v{}",
-        module_info_file.get_identifier(),
-        module_info_file.get_version(),
-    );
     progress_helper.update_current_module(
         format!(
             "{} v{}",
@@ -246,7 +263,7 @@ fn parse_module<P: AsRef<Path>>(
     let mut parse_graphics = true;
 
     if !objects_path.exists() {
-        warn!(
+        debug!(
             "parse_module: No objects directory found in {:?}",
             module_path.as_ref().file_name().unwrap_or_default(),
         );
@@ -254,7 +271,7 @@ fn parse_module<P: AsRef<Path>>(
     }
 
     if parse_objects && !objects_path.is_dir() {
-        warn!(
+        debug!(
             "parse_module: Objects directory in {:?} is not a directory",
             module_path.as_ref().file_name().unwrap_or_default(),
         );
@@ -270,7 +287,7 @@ fn parse_module<P: AsRef<Path>>(
     }
 
     if parse_graphics && !graphics_path.is_dir() {
-        warn!(
+        debug!(
             "parse_module: Graphics directory in {:?} is not a directory",
             module_path.as_ref().file_name().unwrap_or_default(),
         );
@@ -301,8 +318,15 @@ fn parse_module<P: AsRef<Path>>(
                 {
                     progress_helper.add_steps(1);
                     progress_helper.send_update(file_name_str);
-                    results.extend(parser::parse_raw_file(&file_path, options)?);
-                    progress_helper.add_to_running_total(results.len());
+                    match parser::parse_raw_file(&file_path, options) {
+                        Ok(mut objects_results) => {
+                            progress_helper.add_to_running_total(objects_results.len());
+                            results.append(&mut objects_results);
+                        }
+                        Err(e) => {
+                            debug!("Skipping parsing objects file: {:?}", e);
+                        }
+                    }
                 }
             }
         }
@@ -325,8 +349,15 @@ fn parse_module<P: AsRef<Path>>(
                 {
                     progress_helper.add_steps(1);
                     progress_helper.send_update(file_name_str);
-                    results.extend(parser::parse_raw_file(&file_path, options)?);
-                    progress_helper.add_to_running_total(results.len());
+                    match parser::parse_raw_file(&file_path, options) {
+                        Ok(mut graphics_results) => {
+                            progress_helper.add_to_running_total(graphics_results.len());
+                            results.append(&mut graphics_results);
+                        }
+                        Err(e) => {
+                            debug!("Skipping parsing graphics file: {:?}", e);
+                        }
+                    }
                 }
             }
         }

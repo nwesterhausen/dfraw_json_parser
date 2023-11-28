@@ -78,6 +78,7 @@ mod parser;
 
 pub use errors::ParserError;
 
+#[derive(serde::Serialize, serde::Deserialize)]
 pub struct ParseResult {
     pub raws: Vec<Box<dyn RawObject>>,
     pub info_files: Vec<ModuleInfoFile>,
@@ -330,6 +331,7 @@ fn parse_module_info_file_in_module<P: AsRef<Path>>(
 }
 
 #[cfg(feature = "tauri")]
+#[allow(clippy::too_many_lines)]
 /// Parse a directory of raws, and return a JSON string of the parsed raws. While parsing, this will
 /// emit tauri events to the supplied window. The event has title `PROGRESS` and uses the `ProgressPayload`
 /// object for the payload.
@@ -358,7 +360,8 @@ pub fn parse_with_tauri_emit(
     options: &ParserOptions,
     window: tauri::Window,
 ) -> Result<ParseResult, ParserError> {
-    tauri_lib::parse(options, window)
+    let mut progress_helper = tauri_lib::ProgressHelper::with_tauri_window(window);
+    tauri_lib::parse(options, &mut progress_helper)
 }
 
 /// Parses the raws in the provided location path, and returns a vector of boxed dynamic raw objects.
@@ -440,7 +443,7 @@ fn parse_module_info_files_at_location<P: AsRef<Path>>(
             |raw_module| match parse_module_info_file_in_module(&raw_module.path()) {
                 Ok(info_file) => Some(info_file),
                 Err(e) => {
-                    warn!("Skipping parsing module info file: {:?}", e);
+                    debug!("Skipping parsing module info file: {:?}", e);
                     None
                 }
             },
@@ -464,6 +467,7 @@ fn parse_module_info_file_direct<P: AsRef<Path>>(
     parser::ModuleInfoFile::parse(module_info_file_path)
 }
 
+#[allow(clippy::too_many_lines)]
 /// The `parse_module` function parses raw files from a module directory and returns a vector of parsed
 /// objects.
 ///
@@ -475,6 +479,10 @@ fn parse_module_info_file_direct<P: AsRef<Path>>(
 /// Returns:
 ///
 /// The function `parse_module` returns a vector of boxed dynamic objects (`Vec<Box<dyn RawObject>>`).
+///
+/// # Errors
+///
+/// * `ParserError::Io` - If we can't read the raws from the Dwarf Fortress directory (various reasons)
 fn parse_module<P: AsRef<Path>>(
     module_path: &P,
     options: &ParserOptions,
@@ -505,7 +513,7 @@ fn parse_module<P: AsRef<Path>>(
     }
 
     if parse_objects && !objects_path.is_dir() {
-        warn!(
+        debug!(
             "Ignoring objects directory in {:?} because it is not a directory",
             module_path.as_ref().file_name().unwrap_or_default(),
         );
@@ -513,7 +521,7 @@ fn parse_module<P: AsRef<Path>>(
     }
 
     if !graphics_path.exists() {
-        warn!(
+        debug!(
             "Ignoring graphics directory in {:?} because it does not exist",
             module_path.as_ref().file_name().unwrap_or_default(),
         );
@@ -521,7 +529,7 @@ fn parse_module<P: AsRef<Path>>(
     }
 
     if parse_graphics && !graphics_path.is_dir() {
-        warn!(
+        debug!(
             "Ignoring graphics directory in {:?} because it is not a directory",
             module_path.as_ref().file_name().unwrap_or_default(),
         );
@@ -555,7 +563,14 @@ fn parse_module<P: AsRef<Path>>(
                     .extension()
                     .map_or(false, |ext| ext.eq_ignore_ascii_case("txt"))
                 {
-                    results.extend(parser::parse_raw_file(&file_path, options)?);
+                    match parser::parse_raw_file(&file_path, options) {
+                        Ok(mut objects) => {
+                            results.append(&mut objects);
+                        }
+                        Err(e) => {
+                            debug!("Skipping parsing objects: {:?}", e);
+                        }
+                    }
                 }
             }
         }
@@ -581,7 +596,14 @@ fn parse_module<P: AsRef<Path>>(
                     .extension()
                     .map_or(false, |ext| ext.eq_ignore_ascii_case("txt"))
                 {
-                    results.extend(parser::parse_raw_file(&file_path, options)?);
+                    match parser::parse_raw_file(&file_path, options) {
+                        Ok(mut graphics) => {
+                            results.append(&mut graphics);
+                        }
+                        Err(e) => {
+                            debug!("Skipping parsing graphics: {:?}", e);
+                        }
+                    }
                 }
             }
         }
