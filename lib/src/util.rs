@@ -8,8 +8,8 @@ use tracing::{error, info, warn};
 use walkdir::WalkDir;
 
 use crate::{
-    options::ParserOptions,
     parser::{creature::Creature, select_creature::SelectCreature, ObjectType, RawObject},
+    ParserError, ParserOptions,
 };
 
 #[tracing::instrument]
@@ -30,19 +30,37 @@ use crate::{
 /// Returns:
 ///
 /// A vector of all subdirectories as `walkdir::DirEntry`
-pub fn subdirectories(directory: PathBuf) -> Option<Vec<walkdir::DirEntry>> {
-    if !(directory.exists() && directory.is_dir()) {
-        return None;
-    }
-    Some(
-        WalkDir::new(directory)
-            .max_depth(1)
-            .min_depth(1)
-            .into_iter()
-            .filter_map(std::result::Result::ok)
-            .filter(|e| e.file_type().is_dir())
-            .collect(),
-    )
+pub fn subdirectories(directory: PathBuf) -> Result<Vec<walkdir::DirEntry>, ParserError> {
+    let root_directory = match directory.canonicalize() {
+        Ok(p) => p,
+        Err(e) => {
+            error!(
+                "subdirectories: Unable to canonicalize directory {:?} \n{:?}",
+                directory, e
+            );
+            return Err(ParserError::Io { source: e });
+        }
+    };
+
+    Ok(WalkDir::new(root_directory)
+        .max_depth(1)
+        .min_depth(1)
+        .into_iter()
+        .filter_map(|e| match e {
+            Ok(entry) => {
+                if entry.path().is_dir() {
+                    Some(entry)
+                } else {
+                    error!("subdirectories: Entry is not a directory {:?}", entry);
+                    None
+                }
+            }
+            Err(e) => {
+                error!("subdirectories: Unable to read directory entry \n{:?}", e);
+                None
+            }
+        })
+        .collect())
 }
 
 /// If the parent directory of the given path exists, return the name of the parent directory, otherwise
@@ -266,7 +284,7 @@ pub fn write_json_string_vec_to_file<P: AsRef<Path>>(strings_vec: &Vec<String>, 
 /// Returns:
 ///
 /// An `Option<ParserOptions>` struct. None if options were invalid.
-pub fn validate_options(options: &ParserOptions) -> Option<ParserOptions> {
+pub fn validate_options(options: &ParserOptions) -> Result<ParserOptions, ParserError> {
     // Copy the options into a new struct, before we validate the paths
     let mut validated_options = ParserOptions {
         attach_metadata_to_raws: options.attach_metadata_to_raws,
@@ -286,28 +304,25 @@ pub fn validate_options(options: &ParserOptions) -> Option<ParserOptions> {
         let target_path = match target_path.canonicalize() {
             Ok(p) => p,
             Err(e) => {
-                error!(
-                    "options_validator: Unable to canonicalize Dwarf Fortress path!\n{:?}\n{:?}",
+                return Err(ParserError::InvalidOptions(format!(
+                    "Unable to canonicalize Dwarf Fortress path!\n{:?}\n{:?}",
                     target_path, e
-                );
-                return None;
+                )))
             }
         };
 
         if !target_path.exists() {
-            error!(
-                "options_validator: Provided Dwarf Fortress path for doesn't exist!\n{}",
+            return Err(ParserError::InvalidOptions(format!(
+                "Provided Dwarf Fortress path for doesn't exist!\n{}",
                 target_path.display()
-            );
-            return None;
+            )));
         }
 
         if !target_path.is_dir() {
-            error!(
-                "options_validator: Dwarf Fortress path needs to be a directory!\n{}",
+            return Err(ParserError::InvalidOptions(format!(
+                "Dwarf Fortress path needs to be a directory!\n{}",
                 target_path.display()
-            );
-            return None;
+            )));
         }
 
         validated_options.dwarf_fortress_directory = target_path.clone();
@@ -317,19 +332,19 @@ pub fn validate_options(options: &ParserOptions) -> Option<ParserOptions> {
     for raw_file_path in &options.raw_files_to_parse {
         if !raw_file_path.exists() {
             warn!(
-                "options_validator: Provided raw file path doesn't exist!\n{}",
+                "options_validator: Discarding non-existent raw file:\n{}",
                 raw_file_path.display()
             );
         } else if !raw_file_path.is_file() {
             warn!(
-                "options_validator: Provided raw file path needs to be a file!\n{}",
+                "options_validator: Discarding raw file because it isn't a file:\n{}",
                 raw_file_path.display()
             );
         } else {
             // Add the canonicalized path to the raw file
             let raw_file_path = raw_file_path.canonicalize().unwrap_or_else(|e| {
-                error!(
-                    "options_validator: Unable to canonicalize raw file path!\n{:?}",
+                warn!(
+                    "options_validator: Discarding raw file that cannot be canonicalized:\n{:?}",
                     e
                 );
                 raw_file_path.clone()
@@ -341,20 +356,20 @@ pub fn validate_options(options: &ParserOptions) -> Option<ParserOptions> {
     // Validate any raw module paths
     for raw_module_path in &options.raw_modules_to_parse {
         if !raw_module_path.exists() {
-            error!(
-                "options_validator: Provided raw module path doesn't exist!\n{}",
+            warn!(
+                "options_validator: Discarding non-existent raw module directory:\n{}",
                 raw_module_path.display()
             );
         } else if !raw_module_path.is_dir() {
-            error!(
-                "options_validator: Provided raw module path needs to be a directory!\n{}",
+            warn!(
+                "options_validator: Discarding raw module directory because it isn't a directory:\n{}",
                 raw_module_path.display()
             );
         } else {
             // Add the canonicalized path to the module
             let raw_module_path = raw_module_path.canonicalize().unwrap_or_else(|e| {
-                error!(
-                    "options_validator: Unable to canonicalize raw module path!\n{:?}",
+                warn!(
+                    "options_validator: Discarding raw module directory path that cannot be canonicalized:\n{:?}",
                     e
                 );
                 raw_module_path.clone()
@@ -366,20 +381,20 @@ pub fn validate_options(options: &ParserOptions) -> Option<ParserOptions> {
     // Validate any legends export paths
     for legends_export_path in &options.legends_exports_to_parse {
         if !legends_export_path.exists() {
-            error!(
-                "options_validator: Provided legends export path doesn't exist!\n{}",
+            warn!(
+                "options_validator: Discarding non-existent legends export:\n{}",
                 legends_export_path.display()
             );
         } else if !legends_export_path.is_file() {
-            error!(
-                "options_validator: Provided legends export path needs to be a file!\n{}",
+            warn!(
+                "options_validator: Discarding legends export because it isn't a file:\n{}",
                 legends_export_path.display()
             );
         } else {
             // Add the canonicalized path to the legends export
             let legends_export_path = legends_export_path.canonicalize().unwrap_or_else(|e| {
-                error!(
-                    "options_validator: Unable to canonicalize legends export path!\n{:?}",
+                warn!(
+                    "options_validator: Discarding legends export path that cannot be canonicalized\n{:?}",
                     e
                 );
                 legends_export_path.clone()
@@ -393,20 +408,20 @@ pub fn validate_options(options: &ParserOptions) -> Option<ParserOptions> {
     // Validate any module info file paths
     for module_info_file_path in &options.module_info_files_to_parse {
         if !module_info_file_path.exists() {
-            error!(
-                "options_validator: Provided module info file path doesn't exist!\n{}",
+            warn!(
+                "options_validator: Discarding non-existent module info file:\n{}",
                 module_info_file_path.display()
             );
         } else if !module_info_file_path.is_file() {
-            error!(
-                "options_validator: Provided module info file path needs to be a file!\n{}",
+            warn!(
+                "options_validator: Discarding module info file because it isn't a file:\n{}",
                 module_info_file_path.display()
             );
         } else {
             // Add the canonicalized path to the module info file
             let module_info_file_path = module_info_file_path.canonicalize().unwrap_or_else(|e| {
-                error!(
-                    "options_validator: Unable to canonicalize module info file path!\n{:?}",
+                warn!(
+                    "options_validator: Discarding module info file path that cannot be canonicalized\n{:?}",
                     e
                 );
                 module_info_file_path.clone()
@@ -417,7 +432,7 @@ pub fn validate_options(options: &ParserOptions) -> Option<ParserOptions> {
         }
     }
 
-    Some(validated_options)
+    Ok(validated_options)
 }
 
 /// The function `raws_to_string` converts a vector of raw objects into a JSON string representation.
@@ -492,7 +507,7 @@ pub fn get_only_select_creatures_from_raws(all_raws: &[Box<dyn RawObject>]) -> V
 /// Returns:
 ///
 /// An `Option<File>`. None if the file doesn't exist or isn't a file.
-pub fn try_get_file<P: AsRef<Path>>(file_path: &P) -> Option<File> {
+pub fn try_get_file<P: AsRef<Path>>(file_path: &P) -> Result<File, ParserError> {
     let caller = "File Exists Validator";
     // Validate file exists
     if !file_path.as_ref().exists() {
@@ -501,7 +516,16 @@ pub fn try_get_file<P: AsRef<Path>>(file_path: &P) -> Option<File> {
             caller,
             file_path.as_ref().display()
         );
-        return None;
+        return Err(ParserError::Io {
+            source: std::io::Error::new(
+                std::io::ErrorKind::NotFound,
+                format!(
+                    "{} - Path doesn't exist {}",
+                    caller,
+                    file_path.as_ref().display()
+                ),
+            ),
+        });
     }
     if !file_path.as_ref().is_file() {
         error!(
@@ -509,18 +533,29 @@ pub fn try_get_file<P: AsRef<Path>>(file_path: &P) -> Option<File> {
             caller,
             file_path.as_ref().display(),
         );
-        return None;
+        return Err(ParserError::Io {
+            source: std::io::Error::new(
+                std::io::ErrorKind::InvalidInput,
+                format!(
+                    "{} - Path does not point to a file {}",
+                    caller,
+                    file_path.as_ref().display()
+                ),
+            ),
+        });
     }
 
     // Open the file
-    let Ok(file) = File::open(file_path) else {
-        error!(
-            "{} - Unable to open file {}",
-            caller,
-            file_path.as_ref().display()
-        );
-        return None;
-    };
-
-    Some(file)
+    match File::open(file_path) {
+        Ok(file) => Ok(file),
+        Err(e) => {
+            error!(
+                "{} - Unable to open file {} \n{:?}",
+                caller,
+                file_path.as_ref().display(),
+                e
+            );
+            Err(ParserError::Io { source: e })
+        }
+    }
 }

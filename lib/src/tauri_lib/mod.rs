@@ -27,41 +27,14 @@ pub use structs::ProgressPayload;
 pub fn parse(
     options: &crate::options::ParserOptions,
     window: tauri::Window,
-) -> Vec<Box<dyn crate::parser::RawObject>> {
+) -> Result<crate::ParseResult, crate::ParserError> {
     // setup progress helper
     let mut progress_helper = structs::ProgressHelper::with_tauri_window(window);
     progress_helper.update_current_task("Parsing raws.");
 
-    let result = with_progress::parse(options, &mut progress_helper);
+    let result = with_progress::parse(options, &mut progress_helper)?;
+
     progress_helper.send_final("Parsing completed.");
 
-    result
-}
-
-#[cfg(feature = "tauri")]
-/// The function `parse_to_json_vec` takes in options and a window, sets up a progress helper, parses
-/// raws in a Dwarf Fortress directory, and returns a vector of strings.
-///
-/// Arguments:
-///
-/// * `options`: A reference to a `ParserOptions` struct from the `crate::options` module.
-/// * `window`: The `window` parameter is of type `tauri::Window` and represents the Tauri window
-/// object. It is used to interact with the Tauri window and perform operations such as displaying
-/// progress updates.
-///
-/// Returns:
-///
-/// a vector of JSON strings.
-pub fn parse_to_json_vec(
-    options: &crate::options::ParserOptions,
-    window: tauri::Window,
-) -> Vec<String> {
-    // setup progress helper
-    let mut progress_helper = structs::ProgressHelper::with_tauri_window(window);
-    progress_helper.update_current_task("Parsing all raws in dwarf fortress directory.");
-
-    let result = with_progress::parse_to_json_vec(options, &mut progress_helper);
-    progress_helper.send_final("Parsing completed.");
-
-    result
+    Ok(result)
 }

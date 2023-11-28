@@ -6,11 +6,12 @@ use std::{
 use encoding_rs_io::DecodeReaderBytesBuilder;
 use serde::{Deserialize, Serialize};
 use slug::slugify;
-use tracing::{error, trace, debug};
+use tracing::{debug, error, trace, warn};
 
 use crate::{
-    parser::{NON_DIGIT_RE, RAW_TOKEN_RE, DF_ENCODING, RawModuleLocation},
+    parser::{RawModuleLocation, DF_ENCODING, NON_DIGIT_RE, RAW_TOKEN_RE},
     util::{get_parent_dir_name, try_get_file},
+    ParserError,
 };
 
 use super::steam_data::SteamData;
@@ -57,15 +58,10 @@ impl InfoFile {
     pub fn empty() -> Self {
         InfoFile::default()
     }
-    pub fn from_raw_file_path<P: AsRef<Path>>(full_path: &P) -> Self {
+    pub fn from_raw_file_path<P: AsRef<Path>>(full_path: &P) -> Result<Self, ParserError> {
         // Validate that the passed file exists
-        if try_get_file(full_path).is_none() {
-            error!(
-                "raw_file_path::from_raw_file_path: Unable to validate raw exists {}",
-                full_path.as_ref().display()
-            );
-            return InfoFile::empty();
-        }
+        let _ = try_get_file(full_path)?;
+
         // Take the full path for the raw file and navigate up to the parent directory
         // e.g from `data/vanilla/vanilla_creatures/objects/creature_standard.txt` to `data/vanilla/vanilla_creatures`
         // Then run parse on `data/vanilla/vanilla_creatures/info.txt`
@@ -81,17 +77,11 @@ impl InfoFile {
         Self::parse(&info_file_path)
     }
     #[allow(clippy::too_many_lines)]
-    pub fn parse<P: AsRef<Path>>(info_file_path: &P) -> Self {
+    pub fn parse<P: AsRef<Path>>(info_file_path: &P) -> Result<Self, ParserError> {
         let parent_dir = get_parent_dir_name(info_file_path);
         let location = RawModuleLocation::from_info_text_file_path(info_file_path);
 
-        let Some(file) = try_get_file(info_file_path) else {
-            error!(
-                "ModuleInfoFile::parse: Unable to open file {}",
-                info_file_path.as_ref().display()
-            );
-            return InfoFile::empty();
-        };
+        let file = try_get_file(info_file_path)?;
 
         let decoding_reader = DecodeReaderBytesBuilder::new()
             .encoding(Some(*DF_ENCODING))
@@ -105,8 +95,7 @@ impl InfoFile {
             if line.is_err() {
                 error!(
                     "ModuleInfoFile::parse: Error processing {:?}:{}",
-                    parent_dir,
-                    index
+                    parent_dir, index
                 );
                 continue;
             }
@@ -146,10 +135,10 @@ impl InfoFile {
                     "NUMERIC_VERSION" => match captured_value.parse() {
                         Ok(n) => info_file_data.numeric_version = n,
                         Err(_e) => {
-                            debug!(
-                                "ModuleInfoFile::parse: 'NUMERIC_VERSION' should be integer '{}' from {}",
+                            warn!(
+                                "ModuleInfoFile::parse: 'NUMERIC_VERSION' should be integer '{}' in {}",
                                 captured_value,
-                                info_file_data.get_identifier()
+                                info_file_path.as_ref().display()
                             );
                             // match on \D to replace any non-digit characters with empty string
                             let digits_only =
@@ -159,7 +148,6 @@ impl InfoFile {
                                 Err(_e) => {
                                     debug!(
                                         "ModuleInfoFile::parse: Unable to parse any numbers from {} for NUMERIC_VERSION",
-                                        
                                         captured_value
                                     );
                                 }
@@ -169,11 +157,10 @@ impl InfoFile {
                     "EARLIEST_COMPATIBLE_NUMERIC_VERSION" => match captured_value.parse() {
                         Ok(n) => info_file_data.earliest_compatible_numeric_version = n,
                         Err(_e) => {
-                            debug!(
-                                "ModuleInfoFile::parse: 'EARLIEST_COMPATIBLE_NUMERIC_VERSION' should be integer '{}' from {}",
-                                
+                            warn!(
+                                "ModuleInfoFile::parse: 'EARLIEST_COMPATIBLE_NUMERIC_VERSION' should be integer '{}' in {:?}",
                                 captured_value,
-                                info_file_data.get_identifier()
+                                info_file_path.as_ref().display()
                             );
                             // match on \D to replace any non-digit characters with empty string
                             let digits_only =
@@ -183,7 +170,6 @@ impl InfoFile {
                                 Err(_e) => {
                                     debug!(
                                         "ModuleInfoFile::parse: Unable to parse any numbers from {} for EARLIEST_COMPATIBLE_NUMERIC_VERSION",
-                                        
                                         captured_value
                                     );
                                 }
@@ -192,7 +178,6 @@ impl InfoFile {
                     },
                     "DISPLAYED_VERSION" => {
                         info_file_data.displayed_version = String::from(captured_value);
-                     
                     }
                     "EARLIEST_COMPATIBLE_DISPLAYED_VERSION" => {
                         info_file_data.earliest_compatible_displayed_version =
@@ -228,7 +213,9 @@ impl InfoFile {
                             .push(String::from(captured_value));
                     }
                     "STEAM_TITLE" => {
-                        info_file_data.steam_data.set_title(&String::from(captured_value));
+                        info_file_data
+                            .steam_data
+                            .set_title(&String::from(captured_value));
                     }
                     "STEAM_DESCRIPTION" => {
                         info_file_data
@@ -236,7 +223,9 @@ impl InfoFile {
                             .set_description(&String::from(captured_value));
                     }
                     "STEAM_TAG" => {
-                        info_file_data.steam_data.add_tag(&String::from(captured_value));
+                        info_file_data
+                            .steam_data
+                            .add_tag(&String::from(captured_value));
                     }
                     "STEAM_KEY_VALUE_TAG" => {
                         info_file_data
@@ -248,7 +237,7 @@ impl InfoFile {
                             .steam_data
                             .add_metadata(&String::from(captured_value));
                     }
-                        "STEAM_CHANGELOG" => {
+                    "STEAM_CHANGELOG" => {
                         info_file_data
                             .steam_data
                             .set_changelog(&String::from(captured_value));
@@ -256,10 +245,10 @@ impl InfoFile {
                     "STEAM_FILE_ID" => match captured_value.parse() {
                         Ok(n) => info_file_data.steam_data.set_file_id(n),
                         Err(_e) => {
-                            debug!(
-                                "ModuleInfoFile::parse: 'STEAM_FILE_ID' should be integer {}",
-                                
-                                parent_dir
+                            warn!(
+                                "ModuleInfoFile::parse: 'STEAM_FILE_ID' should be integer, was {} in {}",
+                                captured_value,
+                                info_file_path.as_ref().display()
                             );
                             // match on \D to replace any non-digit characters with empty string
                             let digits_only =
@@ -294,7 +283,7 @@ impl InfoFile {
             );
         }
 
-        info_file_data
+        Ok(info_file_data)
     }
 
     pub fn get_identifier(&self) -> String {

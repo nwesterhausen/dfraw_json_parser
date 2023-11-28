@@ -20,6 +20,7 @@ use crate::{
         {RawMetadata, RawObject},
     },
     util::try_get_file,
+    ParserError,
 };
 
 use super::header::read_raw_file_type;
@@ -27,8 +28,18 @@ use super::header::read_raw_file_type;
 pub fn parse_raw_file<P: AsRef<Path>>(
     raw_file_path: &P,
     options: &ParserOptions,
-) -> Vec<Box<dyn RawObject>> {
-    let mod_info_file = ModuleInfoFile::from_raw_file_path(raw_file_path);
+) -> Result<Vec<Box<dyn RawObject>>, ParserError> {
+    let mod_info_file = match ModuleInfoFile::from_raw_file_path(raw_file_path) {
+        Ok(m) => m,
+        Err(e) => {
+            error!(
+                "parse_raw_file: Unable to get module info file for {}\n{:?}",
+                raw_file_path.as_ref().display(),
+                e
+            );
+            ModuleInfoFile::empty()
+        }
+    };
 
     parse_raw_file_with_info(raw_file_path, &mod_info_file, options)
 }
@@ -38,16 +49,10 @@ pub fn parse_raw_file_with_info<P: AsRef<Path>>(
     raw_file_path: &P,
     mod_info_file: &ModuleInfoFile,
     options: &ParserOptions,
-) -> Vec<Box<dyn RawObject>> {
+) -> Result<Vec<Box<dyn RawObject>>, ParserError> {
     let mut created_raws: Vec<Box<dyn RawObject>> = Vec::new();
 
-    let Some(file) = try_get_file(raw_file_path) else {
-        error!(
-            "parse_raw_file_with_info: Unable to open file {}",
-            raw_file_path.as_ref().display()
-        );
-        return created_raws;
-    };
+    let file = try_get_file(raw_file_path)?;
 
     let decoding_reader = DecodeReaderBytesBuilder::new()
         .encoding(Some(*DF_ENCODING))
@@ -69,7 +74,7 @@ pub fn parse_raw_file_with_info<P: AsRef<Path>>(
     let mut temp_tile_page = TilePage::empty();
 
     // Metadata
-    let object_type = read_raw_file_type(raw_file_path);
+    let object_type = read_raw_file_type(raw_file_path)?;
     let mut raw_metadata = RawMetadata::new(
         mod_info_file,
         &object_type,
@@ -84,7 +89,7 @@ pub fn parse_raw_file_with_info<P: AsRef<Path>>(
             "parse_raw_file_with_info: Quitting early because object type {:?} is not included in options!",
             object_type
         );
-        return created_raws;
+        return Ok(Vec::new());
     }
 
     // If the type of object is not in our known_list, we should quit here
@@ -93,7 +98,7 @@ pub fn parse_raw_file_with_info<P: AsRef<Path>>(
             "parse_raw_file_with_info: Quitting early because object type {:?} is not parsable!",
             object_type
         );
-        return created_raws;
+        return Ok(Vec::new());
     }
 
     for (index, line) in reader.lines().enumerate() {
@@ -154,7 +159,10 @@ pub fn parse_raw_file_with_info<P: AsRef<Path>>(
                             captured_value.to_uppercase(),
                             raw_filename
                         );
-                        return created_raws;
+                        return Err(ParserError::InvalidRawFile(format!(
+                            "Unknown object type: {}",
+                            captured_value.to_uppercase()
+                        )));
                     }
                     // Check of object_type matches the captured_value as ObjectType.
                     // If it doesn't, we should log this as an error.
@@ -168,7 +176,11 @@ pub fn parse_raw_file_with_info<P: AsRef<Path>>(
                             object_type,
                             captured_value.to_uppercase()
                         );
-                        return created_raws;
+                        return Err(ParserError::InvalidRawFile(format!(
+                            "Object type mismatch: {} != {}",
+                            object_type,
+                            captured_value.to_uppercase()
+                        )));
                     }
                 }
                 "CREATURE" => {
@@ -404,5 +416,5 @@ pub fn parse_raw_file_with_info<P: AsRef<Path>>(
         raw_filename
     );
 
-    created_raws
+    Ok(created_raws)
 }
