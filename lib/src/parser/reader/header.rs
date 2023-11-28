@@ -1,5 +1,5 @@
 use encoding_rs_io::DecodeReaderBytesBuilder;
-use tracing::{error, trace, warn};
+use tracing::{error, trace};
 
 use std::io::{BufRead, BufReader};
 use std::path::Path;
@@ -7,6 +7,7 @@ use std::path::Path;
 use crate::parser::object_types::{ObjectType, OBJECT_TOKEN_MAP};
 use crate::parser::{DF_ENCODING, RAW_TOKEN_RE};
 use crate::util::try_get_file;
+use crate::ParserError;
 
 /// It reads a file, line by line, and checks the first line for the filename, reads lines until it encounters the
 /// \[OBJECT:(type)] tag in the file.
@@ -20,15 +21,9 @@ use crate::util::try_get_file;
 ///
 /// `RawObjectKind` for the type of \[OBJECT\] tag encountered, and `RawObjectKind::None` if it is unsupported.
 #[allow(clippy::too_many_lines)]
-pub fn read_raw_file_type<P: AsRef<Path>>(input_path: &P) -> ObjectType {
+pub fn read_raw_file_type<P: AsRef<Path>>(input_path: &P) -> Result<ObjectType, ParserError> {
     // Open the file
-    let Some(file) = try_get_file(input_path) else {
-        error!(
-            "read_raw_file_type: Unable to open file {}",
-            input_path.as_ref().display()
-        );
-        return ObjectType::Unknown;
-    };
+    let file = try_get_file(input_path)?;
 
     // Setup a file reader for the encoding used by DF
     let decoding_reader = DecodeReaderBytesBuilder::new()
@@ -93,10 +88,10 @@ pub fn read_raw_file_type<P: AsRef<Path>>(input_path: &P) -> ObjectType {
                         raw_filename,
                         captured_value
                     );
-                    return OBJECT_TOKEN_MAP
+                    return Ok(OBJECT_TOKEN_MAP
                         .get(captured_value)
                         .cloned()
-                        .unwrap_or_default();
+                        .unwrap_or_default());
                 }
                 &_ => (),
             }
@@ -104,9 +99,7 @@ pub fn read_raw_file_type<P: AsRef<Path>>(input_path: &P) -> ObjectType {
     }
 
     // Reading through the entire file and not finding an \[OBJECT\] tag means the raw file is invalid
-    warn!(
-        "read_raw_file_type: no [OBJECT] tag in {}",
-        input_path.as_ref().display()
-    );
-    ObjectType::Unknown
+    Err(ParserError::InvalidRawFile(
+        "No [OBJECT] tag found".to_string(),
+    ))
 }

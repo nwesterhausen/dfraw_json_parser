@@ -67,13 +67,21 @@ for the steam workshop if it is a mod downloaded from the steam workshop.
 
 use parser::helpers::{absorb_select_creature, apply_copy_tags_from};
 use std::path::{Path, PathBuf};
-use tracing::{debug, error, info, warn};
+use tracing::{debug, info, warn};
 use util::validate_options;
 use walkdir::{DirEntry, WalkDir};
 
+mod errors;
 mod legends_export;
 mod options;
 mod parser;
+
+pub use errors::ParserError;
+
+pub struct ParseResult {
+    pub raws: Vec<Box<dyn RawObject>>,
+    pub info_files: Vec<ModuleInfoFile>,
+}
 
 #[cfg(feature = "tauri")]
 /// # Tauri Support
@@ -123,14 +131,14 @@ pub use tauri_lib::ProgressPayload;
 /// # Returns
 ///
 /// A vector of boxed dynamic raw objects.
-pub fn parse(options: &ParserOptions) -> Vec<Box<dyn RawObject>> {
+pub fn parse(options: &ParserOptions) -> Result<ParseResult, ParserError> {
     // Guard against invalid paths
-    let Some(options) = validate_options(options) else {
-        error!("Some paths were invalid. Provided options:\n{:#?}", options);
-        return Vec::new();
-    };
+    let options = validate_options(options)?;
 
-    let mut results: Vec<Box<dyn RawObject>> = Vec::new();
+    let mut results = ParseResult {
+        raws: Vec::new(),
+        info_files: Vec::new(),
+    };
 
     // Locations can only contain the predefined locations.
     if !options.locations_to_parse.is_empty() {
@@ -147,19 +155,28 @@ pub fn parse(options: &ParserOptions) -> Vec<Box<dyn RawObject>> {
             .locations_to_parse
             .contains(&RawModuleLocation::Vanilla)
         {
-            results.extend(parse_location(&vanilla_path, &options));
+            info!("Dispatching parse for vanilla raws");
+            results
+                .raws
+                .extend(parse_location(&vanilla_path, &options)?);
         }
         if options
             .locations_to_parse
             .contains(&RawModuleLocation::InstalledMods)
         {
-            results.extend(parse_location(&installed_mods_path, &options));
+            info!("Dispatching parse for installed mods");
+            results
+                .raws
+                .extend(parse_location(&installed_mods_path, &options)?);
         }
         if options
             .locations_to_parse
             .contains(&RawModuleLocation::Mods)
         {
-            results.extend(parse_location(&workshop_mods_path, &options));
+            info!("Dispatching parse for workshop/downloaded mods");
+            results
+                .raws
+                .extend(parse_location(&workshop_mods_path, &options)?);
         }
     }
 
@@ -170,25 +187,13 @@ pub fn parse(options: &ParserOptions) -> Vec<Box<dyn RawObject>> {
 
             // Check for info.txt
             let info_txt_path = target_path.join("info.txt");
-            if !info_txt_path.exists() {
-                let dir_name = target_path.file_name().unwrap_or_default();
-                let dir_name_str = dir_name.to_str().unwrap_or("");
-
-                if !(dir_name_str.eq("mod_upload")
-                    || dir_name_str.eq("examples and notes")
-                    || dir_name_str.eq("interaction examples"))
-                {
-                    error!(
-                        "No info.txt as expected in {:?}. Is this DF 50.xx? Provided options:\n{:#?}",
-                        target_path.file_name().unwrap_or_default(),
-                        options
-                    );
-                }
-
-                return Vec::new();
+            if info_txt_path.exists() {
+                info!(
+                    "Dispatching parse for module {:?}",
+                    target_path.file_name().unwrap_or_default()
+                );
+                results.raws.extend(parse_module(&target_path, &options)?);
             }
-
-            results.extend(parse_module(&target_path, &options));
         }
     }
 
@@ -201,7 +206,9 @@ pub fn parse(options: &ParserOptions) -> Vec<Box<dyn RawObject>> {
                 "Dispatching parse for raw file {:?}",
                 target_path.file_name().unwrap_or_default()
             );
-            results.extend(parser::parse_raw_file(&target_path, &options));
+            results
+                .raws
+                .extend(parser::parse_raw_file(&target_path, &options)?);
         }
     }
 
@@ -211,18 +218,23 @@ pub fn parse(options: &ParserOptions) -> Vec<Box<dyn RawObject>> {
         for legends_export in &options.legends_exports_to_parse {
             let target_path = Path::new(&legends_export);
 
-            results.extend(legends_export::parse(&target_path, &options));
+            results
+                .raws
+                .extend(legends_export::parse(&target_path, &options)?);
         }
     }
 
     // Absorb select_creature
-    absorb_select_creature(&mut results);
+    absorb_select_creature(&mut results.raws);
     // Apply copy_tags_from
     if !options.skip_apply_copy_tags_from {
-        apply_copy_tags_from(&mut results);
+        apply_copy_tags_from(&mut results.raws);
     }
 
-    results
+    // Parse the info modules
+    results.info_files = parse_module_info_files(&options)?;
+
+    Ok(results)
 }
 
 /// The function `parse_module_info_files` parses module information files based on the provided options.
@@ -235,13 +247,7 @@ pub fn parse(options: &ParserOptions) -> Vec<Box<dyn RawObject>> {
 /// Returns:
 ///
 /// The function `parse_module_info_files` returns a `Vec<ModuleInfoFile>`.
-pub fn parse_module_info_files(options: &ParserOptions) -> Vec<ModuleInfoFile> {
-    // Guard against invalid paths
-    let Some(options) = validate_options(options) else {
-        error!("Some paths were invalid. Provided options:\n{:#?}", options);
-        return Vec::new();
-    };
-
+fn parse_module_info_files(options: &ParserOptions) -> Result<Vec<ModuleInfoFile>, ParserError> {
     let mut results = Vec::new();
 
     if !options.locations_to_parse.is_empty() {
@@ -258,19 +264,19 @@ pub fn parse_module_info_files(options: &ParserOptions) -> Vec<ModuleInfoFile> {
             .locations_to_parse
             .contains(&RawModuleLocation::Vanilla)
         {
-            results.extend(parse_module_info_files_at_location(&vanilla_path));
+            results.extend(parse_module_info_files_at_location(&vanilla_path)?);
         }
         if options
             .locations_to_parse
             .contains(&RawModuleLocation::InstalledMods)
         {
-            results.extend(parse_module_info_files_at_location(&installed_mods_path));
+            results.extend(parse_module_info_files_at_location(&installed_mods_path)?);
         }
         if options
             .locations_to_parse
             .contains(&RawModuleLocation::Mods)
         {
-            results.extend(parse_module_info_files_at_location(&workshop_mods_path));
+            results.extend(parse_module_info_files_at_location(&workshop_mods_path)?);
         }
     }
 
@@ -278,9 +284,7 @@ pub fn parse_module_info_files(options: &ParserOptions) -> Vec<ModuleInfoFile> {
     if !options.raw_modules_to_parse.is_empty() {
         // Parse all raw modules that are specified.
         for raw_module_path in options.raw_modules_to_parse.as_slice() {
-            if let Some(info_file) = parse_module_info_file_in_module(raw_module_path) {
-                results.push(info_file);
-            }
+            results.push(parse_module_info_file_in_module(raw_module_path)?);
         }
     }
 
@@ -288,40 +292,32 @@ pub fn parse_module_info_files(options: &ParserOptions) -> Vec<ModuleInfoFile> {
     if !options.module_info_files_to_parse.is_empty() {
         // Parse all module info files that are specified.
         for module_info_file_path in options.module_info_files_to_parse.as_slice() {
-            if let Some(info_file) = parse_module_info_file_direct(module_info_file_path) {
-                results.push(info_file);
-            }
+            results.push(parse_module_info_file_direct(module_info_file_path)?);
         }
     }
 
-    results
+    Ok(results)
 }
 
-fn parse_module_info_file_in_module<P: AsRef<Path>>(module_path: &P) -> Option<ModuleInfoFile> {
+/// Parse the `info.txt` file at the `module_path` provided. Returns a `ModuleInfoFile` if successful.
+///
+/// Arguments:
+///
+/// * `module_path`: A reference to a path that points to the module directory.
+///
+/// Returns:
+///
+/// A `ModuleInfoFile` or `ParserError`
+///
+/// ## Errors
+///
+/// * `ParserError::Io` - If the `info.txt` file cannot be read, doesn't exist, or is an invalid `info.txt` file
+fn parse_module_info_file_in_module<P: AsRef<Path>>(
+    module_path: &P,
+) -> Result<ModuleInfoFile, ParserError> {
     let module_path: PathBuf = module_path.as_ref().to_path_buf();
     let module_info_file_path = module_path.join("info.txt");
-    if let Some(info_file) = parse_module_info_file_direct(&module_info_file_path) {
-        return Some(info_file);
-    }
-    None
-}
-
-/// Parses the input data to JSON format based on the provided options.
-///
-/// # Arguments
-///
-/// * `options` - A reference to the parser options.
-///
-/// # Returns
-///
-/// A vector of strings, where each string represents a JSON object.
-pub fn parse_to_json(options: &ParserOptions) -> Vec<String> {
-    let results = parse(options);
-    let mut json_results = Vec::new();
-    for result in results {
-        json_results.push(serde_json::to_string(&result).unwrap_or_default());
-    }
-    json_results
+    parse_module_info_file_direct(&module_info_file_path)
 }
 
 #[cfg(feature = "tauri")]
@@ -344,28 +340,8 @@ pub fn parse_to_json(options: &ParserOptions) -> Vec<String> {
 pub fn parse_with_tauri_emit(
     options: &ParserOptions,
     window: tauri::Window,
-) -> Vec<Box<dyn RawObject>> {
+) -> Result<ParseResult, ParserError> {
     tauri_lib::parse(options, window)
-}
-
-#[cfg(feature = "tauri")]
-/// The function `parse_with_tauri_emit_to_json_vec` takes in `options` and `window` as parameters and
-/// returns a vector of strings.
-///
-/// Arguments:
-///
-/// * `options`: A reference to a `ParserOptions` struct, which contains options for parsing.
-/// * `window`: The `window` parameter is of type `tauri::Window`. It represents the window object of
-/// the Tauri application.
-///
-/// Returns:
-///
-/// A vector of JSON strings representing the parsed results.
-pub fn parse_with_tauri_emit_to_json_vec(
-    options: &ParserOptions,
-    window: tauri::Window,
-) -> Vec<String> {
-    tauri_lib::parse_to_json_vec(options, window)
 }
 
 /// Parses the raws in the provided location path, and returns a vector of boxed dynamic raw objects.
@@ -381,7 +357,7 @@ pub fn parse_with_tauri_emit_to_json_vec(
 fn parse_location<P: AsRef<Path>>(
     location_path: &P,
     options: &ParserOptions,
-) -> Vec<Box<dyn RawObject>> {
+) -> Result<Vec<Box<dyn RawObject>>, ParserError> {
     let mut results: Vec<Box<dyn RawObject>> = Vec::new();
     let location_path: PathBuf = location_path.as_ref().to_path_buf();
     // Get a list of all subdirectories in the location
@@ -396,11 +372,10 @@ fn parse_location<P: AsRef<Path>>(
 
     // Loop over each module and parse it
     for raw_module in raw_modules_in_location {
-        let module = parse_module(&raw_module.path(), options);
-        results.extend(module);
+        results.extend(parse_module(&raw_module.path(), options)?);
     }
 
-    results
+    Ok(results)
 }
 
 /// The function `parse_module_info_files_at_location` takes a location path as input, retrieves a list
@@ -414,8 +389,11 @@ fn parse_location<P: AsRef<Path>>(
 /// Returns:
 ///
 /// The function `parse_module_info_files_at_location` returns a vector of `ModuleInfoFile` objects.
-fn parse_module_info_files_at_location<P: AsRef<Path>>(location_path: &P) -> Vec<ModuleInfoFile> {
+fn parse_module_info_files_at_location<P: AsRef<Path>>(
+    location_path: &P,
+) -> Result<Vec<ModuleInfoFile>, ParserError> {
     let location_path: PathBuf = location_path.as_ref().to_path_buf();
+
     // Get a list of all subdirectories in the location
     let raw_modules_in_location: Vec<DirEntry> =
         util::subdirectories(location_path.clone()).unwrap_or_default();
@@ -426,10 +404,18 @@ fn parse_module_info_files_at_location<P: AsRef<Path>>(location_path: &P) -> Vec
         location_path.file_name().unwrap_or_default(),
     );
 
-    raw_modules_in_location
+    Ok(raw_modules_in_location
         .iter()
-        .filter_map(|raw_module| parse_module_info_file_in_module(&raw_module.path()))
-        .collect::<Vec<ModuleInfoFile>>()
+        .filter_map(
+            |raw_module| match parse_module_info_file_in_module(&raw_module.path()) {
+                Ok(info_file) => Some(info_file),
+                Err(e) => {
+                    warn!("Skipping parsing module info file: {:?}", e);
+                    None
+                }
+            },
+        )
+        .collect::<Vec<ModuleInfoFile>>())
 }
 
 /// The function `parse_module_info_file_direct` parses a module info file and returns a
@@ -444,17 +430,8 @@ fn parse_module_info_files_at_location<P: AsRef<Path>>(location_path: &P) -> Vec
 /// The function `parse_module_info_file_direct` returns a `ModuleInfoFile` object.
 fn parse_module_info_file_direct<P: AsRef<Path>>(
     module_info_file_path: &P,
-) -> Option<ModuleInfoFile> {
-    // Check if the file exists
-    if !module_info_file_path.as_ref().exists() {
-        error!(
-            "parse_module_info_file_direct: File does not exist:\n{:?}",
-            module_info_file_path.as_ref(),
-        );
-        return None;
-    }
-    // Get information from the module info file
-    Some(parser::ModuleInfoFile::parse(module_info_file_path))
+) -> Result<ModuleInfoFile, ParserError> {
+    parser::ModuleInfoFile::parse(module_info_file_path)
 }
 
 /// The `parse_module` function parses raw files from a module directory and returns a vector of parsed
@@ -471,33 +448,29 @@ fn parse_module_info_file_direct<P: AsRef<Path>>(
 fn parse_module<P: AsRef<Path>>(
     module_path: &P,
     options: &ParserOptions,
-) -> Vec<Box<dyn RawObject>> {
+) -> Result<Vec<Box<dyn RawObject>>, ParserError> {
     // Get information from the module info file
     let module_info_file_path = module_path.as_ref().join("info.txt");
-    let Some(module_info_file) = parse_module_info_file_direct(&module_info_file_path) else {
-        error!(
-            "parse_module: Failed to parse module info file:\n{:?}",
-            module_info_file_path,
-        );
-        return Vec::new();
+    let module_info_file: ModuleInfoFile;
+    match parse_module_info_file_direct(&module_info_file_path) {
+        Ok(info_file) => {
+            module_info_file = info_file;
+        }
+        Err(e) => {
+            return Err(e);
+        }
     };
-
-    info!(
-        "Parsing raws for {} v{}",
-        module_info_file.get_identifier(),
-        module_info_file.get_version(),
-    );
 
     // Get a list of all raw files in the module
     let objects_path = module_path.as_ref().join("objects");
     let graphics_path = module_path.as_ref().join("graphics");
 
     let mut parse_objects = true;
-    let mut parse_graphics = true;
+    let mut parse_graphics = true && options.raws_to_parse.contains(&ObjectType::Graphics);
 
     if !objects_path.exists() {
         debug!(
-            "No objects directory found in {:?}",
+            "Ignoring objects directory in {:?} because it does not exist",
             module_path.as_ref().file_name().unwrap_or_default(),
         );
         parse_objects = false;
@@ -505,15 +478,15 @@ fn parse_module<P: AsRef<Path>>(
 
     if parse_objects && !objects_path.is_dir() {
         warn!(
-            "Objects directory in {:?} is not a directory",
+            "Ignoring objects directory in {:?} because it is not a directory",
             module_path.as_ref().file_name().unwrap_or_default(),
         );
         parse_objects = false;
     }
 
     if !graphics_path.exists() {
-        debug!(
-            "No graphics directory found in {:?}",
+        warn!(
+            "Ignoring graphics directory in {:?} because it does not exist",
             module_path.as_ref().file_name().unwrap_or_default(),
         );
         parse_graphics = false;
@@ -521,7 +494,7 @@ fn parse_module<P: AsRef<Path>>(
 
     if parse_graphics && !graphics_path.is_dir() {
         warn!(
-            "Graphics directory in {:?} is not a directory",
+            "Ignoring graphics directory in {:?} because it is not a directory",
             module_path.as_ref().file_name().unwrap_or_default(),
         );
         parse_graphics = false;
@@ -529,13 +502,18 @@ fn parse_module<P: AsRef<Path>>(
 
     // Guard against having nothing to parse.
     if !parse_graphics && !parse_objects {
-        return Vec::new();
+        return Ok(Vec::new());
     }
 
-    let mut results = Vec::new();
+    let mut results: Vec<Box<dyn RawObject>> = Vec::new();
 
     // Parse the objects
     if parse_objects {
+        info!(
+            "Parsing objects for {} v{}",
+            module_info_file.get_identifier(),
+            module_info_file.get_version(),
+        );
         for entry in WalkDir::new(objects_path)
             .into_iter()
             .filter_map(std::result::Result::ok)
@@ -549,7 +527,7 @@ fn parse_module<P: AsRef<Path>>(
                     .extension()
                     .map_or(false, |ext| ext.eq_ignore_ascii_case("txt"))
                 {
-                    results.extend(parser::parse_raw_file(&file_path, options));
+                    results.extend(parser::parse_raw_file(&file_path, options)?);
                 }
             }
         }
@@ -557,6 +535,11 @@ fn parse_module<P: AsRef<Path>>(
 
     // Parse the graphics
     if parse_graphics {
+        info!(
+            "Parsing graphics for {} v{}",
+            module_info_file.get_identifier(),
+            module_info_file.get_version(),
+        );
         for entry in WalkDir::new(graphics_path)
             .into_iter()
             .filter_map(std::result::Result::ok)
@@ -570,33 +553,13 @@ fn parse_module<P: AsRef<Path>>(
                     .extension()
                     .map_or(false, |ext| ext.eq_ignore_ascii_case("txt"))
                 {
-                    results.extend(parser::parse_raw_file(&file_path, options));
+                    results.extend(parser::parse_raw_file(&file_path, options)?);
                 }
             }
         }
     }
 
-    results
-}
-
-/// The function `parse_info_modules_to_json` takes a `ParserOptions` object as input, parses the
-/// information modules using the options, and returns a vector of JSON strings representing the parsed
-/// results.
-///
-/// Arguments:
-///
-/// * `options`: A reference to a `ParserOptions` struct.
-///
-/// Returns:
-///
-/// The function `parse_info_modules_to_json` returns a vector of strings.
-pub fn parse_info_modules_to_json(options: &ParserOptions) -> Vec<String> {
-    let results = parse_module_info_files(options);
-    let mut json_results = Vec::new();
-    for result in results {
-        json_results.push(serde_json::to_string(&result).unwrap_or_default());
-    }
-    json_results
+    Ok(results)
 }
 
 /// The function `build_search_string` takes a `raw_object` that implements the `Searchable` trait and

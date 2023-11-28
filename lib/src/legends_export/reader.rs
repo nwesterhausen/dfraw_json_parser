@@ -6,6 +6,7 @@ use tracing::{error, info};
 
 use crate::options::ParserOptions;
 use crate::parser::ObjectType;
+use crate::ParserError;
 use crate::{parser::RawObject, util::try_get_file};
 
 use super::legends_metadata;
@@ -44,25 +45,14 @@ enum Parent {
 pub fn parse_legends_export<P: AsRef<Path>>(
     input_path: &P,
     options: &ParserOptions,
-) -> Vec<Box<dyn RawObject>> {
-    let mut results = Vec::new();
-    let Some(mut file) = try_get_file(input_path) else {
-        error!(
-            "parse_legends_export: Unable to open file {}",
-            input_path.as_ref().display()
-        );
-        return results;
-    };
+) -> Result<Vec<Box<dyn RawObject>>, ParserError> {
+    let mut results: Vec<Box<dyn RawObject>> = Vec::new();
+    let mut file = try_get_file(&input_path.as_ref())?;
 
     // Read the file into a str for parsing
     let mut file_str = String::new();
-    let Ok(_) = file.read_to_string(&mut file_str) else {
-        error!(
-            "parse_legends_export: Unable to read file {}",
-            input_path.as_ref().display()
-        );
-        return results;
-    };
+    file.read_to_string(&mut file_str)
+        .map_err(|e| ParserError::Io { source: e })?;
 
     info!(
         "parse_legends_export: Parsing file {}",
@@ -188,5 +178,5 @@ pub fn parse_legends_export<P: AsRef<Path>>(
     //     results.push(Box::new(entity.into_entity(&legend_metadata)));
     // }
 
-    results
+    Ok(results)
 }
