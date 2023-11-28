@@ -336,6 +336,17 @@ impl InfoFile {
         String::from(&self.displayed_version)
     }
     /// Returns the directory the `InfoFile` was parsed from
+    ///
+    /// # Example
+    ///
+    /// ```rust
+    /// use std::path::Path;
+    /// use dfraw_json_parser::{ModuleInfoFile, RawModuleLocation};
+    ///
+    /// let mut info_file = ModuleInfoFile::new("vanilla_creatures", RawModuleLocation::Vanilla, "vanilla_creatures");
+    ///
+    /// assert_eq!(info_file.get_parent_directory(), "vanilla_creatures");
+    /// ```
     pub fn get_parent_directory(&self) -> String {
         String::from(&self.parent_directory)
     }
@@ -351,12 +362,12 @@ impl InfoFile {
     /// use std::path::Path;
     /// use dfraw_json_parser::{ModuleInfoFile, RawModuleLocation};
     ///
-    /// let info_file = InfoFile::new("vanilla_creatures", RawModuleLocation::Vanilla, "vanilla_creatures");
-    /// assert_eq!(info_file.get_module_name(), "vanilla_creatures");
+    /// let mut info_file = ModuleInfoFile::new("vanilla_creatures", RawModuleLocation::Vanilla, "vanilla_creatures");
+    ///
     /// info_file.set_module_name("vanilla_creatures_2");
-    /// assert_eq!(info_file.get_module_name(), "vanilla_creatures_2");
+    /// assert_eq!(info_file.get_name(), "vanilla_creatures_2");
     /// ```
-    pub(crate) fn set_module_name(&mut self, arg: &str) {
+    pub fn set_module_name(&mut self, arg: &str) {
         self.name = String::from(arg);
     }
 }
