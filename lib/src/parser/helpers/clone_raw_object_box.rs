@@ -6,10 +6,9 @@ use crate::parser::{
     graphics::{Graphic, TilePage},
     inorganic::Inorganic,
     material_template::MaterialTemplate,
-    object_types::ObjectType,
     plant::Plant,
-    raws::RawObject,
     select_creature::SelectCreature,
+    ObjectType, RawObject,
 };
 
 #[allow(clippy::borrowed_box)]

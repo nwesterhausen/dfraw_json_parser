@@ -5,6 +5,7 @@ use serde::{Deserialize, Serialize};
 #[ts(export)]
 #[derive(Serialize, Deserialize, Debug, Clone, Default)]
 #[serde(rename_all = "camelCase")]
+/// The temperature properties of a material
 pub struct Temperatures {
     /// This determines how long it takes the material to heat up or cool down.
     /// A material with a high specific heat capacity will hold more heat and affect its surroundings more

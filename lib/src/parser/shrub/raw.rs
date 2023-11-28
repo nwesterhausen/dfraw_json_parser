@@ -1,9 +1,9 @@
 use serde::{Deserialize, Serialize};
 use tracing::{error, warn};
 
-use crate::parser::color::Color;
 use crate::parser::seed_material::SeedMaterial;
 use crate::parser::serializer_helper;
+use crate::parser::Color;
 
 use super::phf_table::SHRUB_TOKENS;
 use super::tokens::{SeasonToken, ShrubToken};

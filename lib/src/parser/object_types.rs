@@ -2,7 +2,7 @@ use std::fmt::{Debug, Display};
 
 use serde::{Deserialize, Serialize};
 
-pub static OBJECT_TOKENS: phf::Map<&'static str, ObjectType> = phf::phf_map! {
+pub static OBJECT_TOKEN_MAP: phf::Map<&'static str, ObjectType> = phf::phf_map! {
     "CREATURE" => ObjectType::Creature,
     "INORGANIC" => ObjectType::Inorganic,
     "PLANT" => ObjectType::Plant,

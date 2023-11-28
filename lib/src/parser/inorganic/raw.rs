@@ -2,11 +2,8 @@ use serde::{Deserialize, Serialize};
 use slug::slugify;
 
 use crate::parser::{
-    material::Material,
-    object_types::ObjectType,
-    raws::{RawMetadata, RawObject},
-    searchable::{clean_search_vec, Searchable},
-    serializer_helper,
+    clean_search_vec, material::Material, serializer_helper, ObjectType, RawMetadata, RawObject,
+    Searchable,
 };
 
 use super::{

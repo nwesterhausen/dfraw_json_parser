@@ -14,12 +14,10 @@ use crate::{
         inorganic::Inorganic,
         material_template::MaterialTemplate,
         module_info_file::ModuleInfoFile,
-        object_types::{ObjectType, OBJECT_TOKENS},
         plant::Plant,
-        raws::{RawMetadata, RawObject},
-        reader::parsable_types::PARSABLE_OBJECT_TYPES,
-        refs::{DF_ENCODING, RAW_TOKEN_RE},
         select_creature::SelectCreature,
+        DF_ENCODING, PARSABLE_OBJECT_TYPES, RAW_TOKEN_RE, {ObjectType, OBJECT_TOKEN_MAP},
+        {RawMetadata, RawObject},
     },
     util::try_get_file,
 };
@@ -148,7 +146,7 @@ pub fn parse_raw_file_with_info<P: AsRef<Path>>(
 
             match captured_key {
                 "OBJECT" => {
-                    if !OBJECT_TOKENS.contains_key(captured_value) {
+                    if !OBJECT_TOKEN_MAP.contains_key(captured_value) {
                         // We don't know what this object is, so we can't parse it.
                         // We should log this as an error.
                         error!(
@@ -161,7 +159,7 @@ pub fn parse_raw_file_with_info<P: AsRef<Path>>(
                     // Check of object_type matches the captured_value as ObjectType.
                     // If it doesn't, we should log this as an error.
                     if &object_type
-                        != OBJECT_TOKENS
+                        != OBJECT_TOKEN_MAP
                             .get(captured_value)
                             .unwrap_or(&ObjectType::Unknown)
                     {

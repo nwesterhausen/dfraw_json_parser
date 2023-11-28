@@ -50,35 +50,36 @@ pub enum SyndromeToken {
     /// specified multiple times per syndrome, in which case creatures with at least one matching class will be considered immune
     /// (unless overridden by SYN_AFFECTED_CREATURE).
     ImmuneClass,
-    /// If this is included, only the specified creature (and, if SYN_AFFECTED_CLASS is included, also creatures which pass this check as explained above)
-    /// will be able to contract the syndrome. This token can be used multiple times per syndrome. If used alongside SYN_IMMUNE_CLASS, the specified
+    /// If this is included, only the specified creature (and, if `SYN_AFFECTED_CLASS` is included, also creatures which pass this check as explained above)
+    /// will be able to contract the syndrome. This token can be used multiple times per syndrome. If used alongside `SYN_IMMUNE_CLASS`, the specified
     /// creature will be able to contract the syndrome regardless of this class check.
     ///
-    /// DWARF:FEMALE is an example of a valid <creature>:<caste> combination;
-    /// "ALL" can be used in place of a specific caste so as to indicate that this applies to all castes of the specified creature.
+    /// `DWARF:FEMALE` is an example of a valid `creature:caste` combination.
+    ///
+    /// `ALL` can be used in place of a specific caste so as to indicate that this applies to all castes of the specified creature.
     AffectedCreature,
-    /// If this is included, the specified creature will be unable to contract the syndrome (even if it matches SYN_AFFECTED_CLASS).
-    /// It can be specified multiple times per syndrome. As above, "ALL" can be used in place of a specific caste.
+    /// If this is included, the specified creature will be unable to contract the syndrome (even if it matches `SYN_AFFECTED_CLASS`).
+    /// It can be specified multiple times per syndrome. As above, `ALL` can be used in place of a specific caste.
     ImmuneCreature,
     /// Syndrome concentration is essentially a quantity which impacts the severity of the syndrome's relevant effects. The higher the syndrome's concentration,
-    /// the greater its severity. When a syndrome is contracted, the value specified in <amount> is its initial concentration level.
+    /// the greater its severity. When a syndrome is contracted, the value specified in `amount` is its initial concentration level.
     ///
-    /// As described above, if a creature is exposed to a syndrome with a particular SYN_IDENTIFIER when already possessing an active syndrome with the same identifier,
-    /// then this later syndrome isn't contracted, instead contributing to the original syndrome's concentration as indicated by its SYN_CONCENTRATION_ADDED token, if present.
-    /// The syndrome in question will increase the original syndrome's concentration by <amount> whenever the creature is exposed to it, until its specified <max> concentration
+    /// As described above, if a creature is exposed to a syndrome with a particular `SYN_IDENTIFIER` when already possessing an active syndrome with the same identifier,
+    /// then this later syndrome isn't contracted, instead contributing to the original syndrome's concentration as indicated by its `SYN_CONCENTRATION_ADDED` token, if present.
+    /// The syndrome in question will increase the original syndrome's concentration by `amount` whenever the creature is exposed to it, until its specified `max` concentration
     /// is reached by the original syndrome, causing subsequent exposure to this particular syndrome to do nothing (that is, until the original syndrome ends, at which point
-    /// a new one may be contracted normally). Should the creature be exposed to a different syndrome with the same identifier and a higher <max> value, the concentration will
+    /// a new one may be contracted normally). Should the creature be exposed to a different syndrome with the same identifier and a higher `max` value, the concentration will
     /// of course increase further.
     ///
-    /// Example: SYN_CONCENTRATION_ADDED:amount:max
+    /// Example: `SYN_CONCENTRATION_ADDED:amount:max`
     ConcentrationAdded,
     /// Prevents creatures from being admitted to hospital for problems arising directly as a result of the syndrome's effects, no matter how bad they get.
     NoHospital,
     /// This token can be included to give a syndrome an identifier which can be shared between multiple syndromes. Only one identifier may be specified per syndrome.
     ///
-    /// Syndrome identifiers can be used in conjunction with the SYNDROME_DILUTION_FACTOR creature token to alter a creature’s innate resistance to the relevant
+    /// Syndrome identifiers can be used in conjunction with the `SYNDROME_DILUTION_FACTOR` creature token to alter a creature’s innate resistance to the relevant
     /// effects of any syndromes that possess the specified identifier. For example, every alcoholic beverage in unmodded games comes with its own copy of an intoxicating
-    /// syndrome, each of which has a [SYN_IDENTIFIER:INEBRIATION] token. All dwarves have [SYNDROME_DILUTION_FACTOR:INEBRIATION:150], which decreases the severity of
+    /// syndrome, each of which has a `[SYN_IDENTIFIER:INEBRIATION]` token. All dwarves have `[SYNDROME_DILUTION_FACTOR:INEBRIATION:150]`, which decreases the severity of
     /// any effects derived from a syndrome with the INEBRIATION identifier, thus enabling them to better handle all forms of alcohol.
     Identifier,
     /// Unknown as default.

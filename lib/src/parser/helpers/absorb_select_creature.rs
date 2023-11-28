@@ -2,8 +2,8 @@ use tracing::info;
 
 use crate::{
     parser::{
-        creature::Creature, helpers::clone_raw_vector::with_purge, object_types::ObjectType,
-        raws::RawObject, select_creature::SelectCreature,
+        creature::Creature, helpers::clone_raw_vector::with_purge, select_creature::SelectCreature,
+        ObjectType, RawObject,
     },
     util::get_only_select_creatures_from_raws,
 };

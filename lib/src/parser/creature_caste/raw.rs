@@ -2,13 +2,9 @@ use serde::{Deserialize, Serialize};
 use tracing::warn;
 
 use crate::parser::{
-    body_size::BodySize,
     helpers::parse_min_max_range,
-    milkable::Milkable,
     names::{Name, SingPlurName},
-    searchable::Searchable,
-    serializer_helper,
-    tile::Tile,
+    serializer_helper, BodySize, Milkable, Searchable, Tile,
 };
 
 use super::{phf_table::CASTE_TOKENS, tokens::CasteTag};

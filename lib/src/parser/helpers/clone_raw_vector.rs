@@ -1,6 +1,6 @@
 use tracing::{debug, trace};
 
-use crate::parser::raws::RawObject;
+use crate::parser::RawObject;
 
 use super::clone_raw_object_box::clone_raw_object_box;
 

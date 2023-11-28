@@ -7,6 +7,7 @@ use super::color::Color;
 #[allow(clippy::module_name_repetitions)]
 #[derive(Serialize, Deserialize, Debug, Clone, Default)]
 #[serde(rename_all = "camelCase")]
+/// Representation of a character tile (literally a single character) that is used in DF Classic
 pub struct Tile {
     character: String,
     #[serde(skip_serializing_if = "String::is_empty")]

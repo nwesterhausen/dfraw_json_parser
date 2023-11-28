@@ -4,8 +4,8 @@ use tracing::{error, trace, warn};
 use std::io::{BufRead, BufReader};
 use std::path::Path;
 
-use crate::parser::object_types::{ObjectType, OBJECT_TOKENS};
-use crate::parser::refs::{DF_ENCODING, RAW_TOKEN_RE};
+use crate::parser::object_types::{ObjectType, OBJECT_TOKEN_MAP};
+use crate::parser::{DF_ENCODING, RAW_TOKEN_RE};
 use crate::util::try_get_file;
 
 /// It reads a file, line by line, and checks the first line for the filename, reads lines until it encounters the
@@ -93,7 +93,7 @@ pub fn read_raw_file_type<P: AsRef<Path>>(input_path: &P) -> ObjectType {
                         raw_filename,
                         captured_value
                     );
-                    return OBJECT_TOKENS
+                    return OBJECT_TOKEN_MAP
                         .get(captured_value)
                         .cloned()
                         .unwrap_or_default();

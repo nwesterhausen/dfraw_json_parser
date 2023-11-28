@@ -4,11 +4,8 @@ use serde::{Deserialize, Serialize};
 use tracing::warn;
 
 use crate::parser::{
-    helpers::build_object_id_from_pieces,
-    object_types::ObjectType,
-    raws::{RawMetadata, RawObject},
-    searchable::{clean_search_vec, Searchable},
-    serializer_helper,
+    clean_search_vec, helpers::build_object_id_from_pieces, object_types::ObjectType,
+    serializer_helper, RawMetadata, RawObject, Searchable,
 };
 
 use super::{dimensions::Dimensions, phf_table::TILE_PAGE_TAGS, tokens::TilePageTag};

@@ -22,19 +22,23 @@ use crate::parser::{ObjectType, RawModuleLocation};
 ///
 /// ```rust
 /// use std::path::PathBuf;
-/// use df_raws::{ParserOptions, RawObject};
+/// use dfraw_json_parser::{ParserOptions, RawObject, ObjectType, RawModuleLocation};
 ///
 /// // Create a basic options struct by specifying the path to the dwarf fortress directory.
 /// let mut options = ParserOptions::new("path/to/dwarf_fortress");
 /// // Add a single raw file to parse
-/// options.add_raw_file_to_parse("path/to/dwarf_fortress/data/vanilla/vanilla_creatures/objects/creature_standard.txt");
+/// options.add_raw_file_to_parse(&String::from("path/to/dwarf_fortress/data/vanilla/vanilla_creatures/objects/creature_standard.txt"));
 /// // Add a single raw module to parse (all raw files in the module will be parsed)
-/// options.add_raw_module_to_parse("path/to/dwarf_fortress/data/vanilla/vanilla_creatures");
+/// options.add_raw_module_to_parse(&String::from("path/to/dwarf_fortress/data/vanilla/vanilla_creatures"));
 /// // Add a single module info file to parse ()
-/// options.add_module_info_file_to_parse("path/to/dwarf_fortress/data/vanilla/vanilla_creatures/info.txt");
-/// options.add_legends_export_to_parse("path/to/dwarf_fortress/legends_plus_export.xml");
+/// options.add_module_info_file_to_parse(&String::from("path/to/dwarf_fortress/data/vanilla/vanilla_creatures/info.txt"));
+/// // Include the creatures that are exported from the world with legends_plus (dfhack exportlegends option)
+/// options.add_legends_export_to_parse(&String::from("path/to/dwarf_fortress/legends_plus_export.xml"));
+/// // Only parse Creature and Plant raws
 /// options.set_raws_to_parse(vec![ObjectType::Creature, ObjectType::Plant]);
+/// // Include the raws from the installed mods folder
 /// options.set_locations_to_parse(vec![RawModuleLocation::InstalledMods]);
+/// // For the result, attach metadata to the raws
 /// options.attach_metadata_to_raws();
 ///
 ///
@@ -73,7 +77,7 @@ pub struct ParserOptions {
     ///
     /// (i.e. only the specific raw files, modules, or legends_plus exports specified will be parsed)
     ///
-    /// Default: [Vanilla]
+    /// Default: Vanilla
     pub locations_to_parse: Vec<RawModuleLocation>,
     /// The path to the dwarf fortress directory. If no locations are specified, then this is not used.
     ///
