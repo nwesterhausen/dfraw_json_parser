@@ -131,6 +131,15 @@ pub use tauri_lib::ProgressPayload;
 /// # Returns
 ///
 /// A vector of boxed dynamic raw objects.
+///
+/// # Errors
+///
+/// * `ParserError::Io` - If we can't read the raws from the Dwarf Fortress directory (various reasons)
+/// * `ParserError::InvalidPath` - If the path to the Dwarf Fortress directory is invalid
+///
+/// Other errors which are returned from the called functions within this function are not propagated, because the
+/// only "full" blocker is if the Dwarf Fortress directory is invalid.
+///
 pub fn parse(options: &ParserOptions) -> Result<ParseResult, ParserError> {
     // Guard against invalid paths
     let options = validate_options(options)?;
@@ -337,6 +346,14 @@ fn parse_module_info_file_in_module<P: AsRef<Path>>(
 /// Returns:
 ///
 /// A JSON string with details on all raws in the game path.
+///
+/// # Errors
+///
+/// * `ParserError::Io` - If we can't read the raws from the Dwarf Fortress directory (various reasons)
+/// * `ParserError::InvalidPath` - If the path to the Dwarf Fortress directory is invalid
+///
+/// Other errors which are returned from the called functions within this function are not propagated, because the
+/// only "full" blocker is if the Dwarf Fortress directory is invalid.
 pub fn parse_with_tauri_emit(
     options: &ParserOptions,
     window: tauri::Window,
@@ -354,6 +371,10 @@ pub fn parse_with_tauri_emit(
 /// # Returns
 ///
 /// A vector of boxed dynamic raw objects.
+///
+/// # Errors
+///
+/// * `ParserError::Io` - If we can't read the raws from the Dwarf Fortress directory (various reasons)
 fn parse_location<P: AsRef<Path>>(
     location_path: &P,
     options: &ParserOptions,
@@ -382,21 +403,24 @@ fn parse_location<P: AsRef<Path>>(
 /// of subdirectories at that location, and parses each subdirectory's "info.txt" file into a
 /// `ModuleInfoFile` struct, returning a vector of these structs.
 ///
-/// Arguments:
+/// # Arguments:
 ///
 /// * `location_path`: the path to the directory where the module info files are.
 ///
-/// Returns:
+/// # Returns:
 ///
 /// The function `parse_module_info_files_at_location` returns a vector of `ModuleInfoFile` objects.
+///
+/// # Errors
+///
+/// * `ParserError::Io` - If we can't read the `info.txt` file properly
 fn parse_module_info_files_at_location<P: AsRef<Path>>(
     location_path: &P,
 ) -> Result<Vec<ModuleInfoFile>, ParserError> {
     let location_path: PathBuf = location_path.as_ref().to_path_buf();
 
     // Get a list of all subdirectories in the location
-    let raw_modules_in_location: Vec<DirEntry> =
-        util::subdirectories(location_path.clone()).unwrap_or_default();
+    let raw_modules_in_location: Vec<DirEntry> = util::subdirectories(location_path.clone())?;
 
     info!(
         "Found {} raw modules in {:?}",
@@ -451,22 +475,20 @@ fn parse_module<P: AsRef<Path>>(
 ) -> Result<Vec<Box<dyn RawObject>>, ParserError> {
     // Get information from the module info file
     let module_info_file_path = module_path.as_ref().join("info.txt");
-    let module_info_file: ModuleInfoFile;
-    match parse_module_info_file_direct(&module_info_file_path) {
-        Ok(info_file) => {
-            module_info_file = info_file;
-        }
-        Err(e) => {
-            return Err(e);
-        }
-    };
+    let module_info_file: ModuleInfoFile =
+        match parse_module_info_file_direct(&module_info_file_path) {
+            Ok(info_file) => info_file,
+            Err(e) => {
+                return Err(e);
+            }
+        };
 
     // Get a list of all raw files in the module
     let objects_path = module_path.as_ref().join("objects");
     let graphics_path = module_path.as_ref().join("graphics");
 
     let mut parse_objects = true;
-    let mut parse_graphics = true && options.raws_to_parse.contains(&ObjectType::Graphics);
+    let mut parse_graphics = options.raws_to_parse.contains(&ObjectType::Graphics);
 
     if !objects_path.exists() {
         debug!(

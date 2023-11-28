@@ -216,13 +216,13 @@ fn parse_module<P: AsRef<Path>>(
 ) -> Result<Vec<Box<dyn RawObject>>, ParserError> {
     // Get information from the module info file
     let module_info_file_path = module_path.as_ref().join("info.txt");
-    let module_info_file: ModuleInfoFile;
-    match crate::parse_module_info_file_direct(&module_info_file_path) {
-        Ok(info_file) => {
-            module_info_file = info_file;
-        }
-        Err(e) => {return Err(e);},
-    };
+    let module_info_file: ModuleInfoFile =
+        match crate::parse_module_info_file_direct(&module_info_file_path) {
+            Ok(info_file) => info_file,
+            Err(e) => {
+                return Err(e);
+            }
+        };
 
     info!(
         "parse_module: Parsing raws for {} v{}",
