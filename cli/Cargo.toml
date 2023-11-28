@@ -18,6 +18,7 @@ chrono = "0.4"
 lexopt = "0.3"
 tracing = "0.1.40"
 tracing-subscriber = "0.3.18"
+serde_json = "1.0"
 
 [dependencies.fern]
 version = "0.6.2"

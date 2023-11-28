@@ -1,6 +1,5 @@
 use tracing::debug;
 
-#[cfg(feature = "tauri")]
 #[derive(Clone, serde::Serialize)]
 #[serde(rename_all = "camelCase")]
 #[derive(ts_rs::TS)]
