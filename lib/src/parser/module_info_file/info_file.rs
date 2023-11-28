@@ -46,6 +46,7 @@ pub struct InfoFile {
 }
 
 impl InfoFile {
+    /// Creates a new `InfoFile` with the passed identifier, location, and parent directory
     pub fn new(id: &str, location: RawModuleLocation, parent_directory: &str) -> Self {
         InfoFile {
             identifier: String::from(id),
@@ -55,9 +56,24 @@ impl InfoFile {
             ..Default::default()
         }
     }
+    /// Creates a new empty `InfoFile`
     pub fn empty() -> Self {
         InfoFile::default()
     }
+    /// Creates a new `InfoFile` from the passed `info.txt` file path
+    ///
+    /// # Arguments
+    ///
+    /// * `full_path` - The full path to the `info.txt` file
+    ///
+    /// # Returns
+    ///
+    /// * `Result<InfoFile, ParserError>` - The parsed `InfoFile` or an error
+    ///
+    /// # Errors
+    ///
+    /// * `ParserError::FileNotFound` - If the passed file path does not exist
+    /// * `ParserError::IOError` - If there is an error reading the file
     pub fn from_raw_file_path<P: AsRef<Path>>(full_path: &P) -> Result<Self, ParserError> {
         // Validate that the passed file exists
         let _ = try_get_file(full_path)?;
@@ -77,6 +93,20 @@ impl InfoFile {
         Self::parse(&info_file_path)
     }
     #[allow(clippy::too_many_lines)]
+    /// Parses the `info.txt` file at the passed path
+    ///
+    /// # Arguments
+    ///
+    /// * `info_file_path` - The path to the `info.txt` file
+    ///
+    /// # Returns
+    ///
+    /// * `Result<InfoFile, ParserError>` - The parsed `InfoFile` or an error
+    ///
+    /// # Errors
+    ///
+    /// * `ParserError::FileNotFound` - If the passed file path does not exist
+    /// * `ParserError::IOError` - If there is an error reading the file
     pub fn parse<P: AsRef<Path>>(info_file_path: &P) -> Result<Self, ParserError> {
         let parent_dir = get_parent_dir_name(info_file_path);
         let location = RawModuleLocation::from_info_text_file_path(info_file_path);
@@ -285,26 +315,47 @@ impl InfoFile {
 
         Ok(info_file_data)
     }
-
+    /// Returns the identifier for the `InfoFile`
     pub fn get_identifier(&self) -> String {
         String::from(&self.identifier)
     }
+    /// Returns the location the `InfoFile` was parsed from
     pub fn get_location(&self) -> RawModuleLocation {
         self.location
     }
+    /// Returns the description for the `InfoFile`
     pub fn get_description(&self) -> String {
         String::from(&self.description)
     }
+    /// Returns the name for the `InfoFile`
     pub fn get_name(&self) -> String {
         String::from(&self.name)
     }
+    /// Returns the displayed version for the `InfoFile`
     pub fn get_version(&self) -> String {
         String::from(&self.displayed_version)
     }
+    /// Returns the directory the `InfoFile` was parsed from
     pub fn get_parent_directory(&self) -> String {
         String::from(&self.parent_directory)
     }
-
+    /// Set the name of the module the `InfoFile` was parsed in
+    ///
+    /// # Arguments
+    ///
+    /// * `arg` - The name of the module
+    ///
+    /// # Example
+    ///
+    /// ```rust
+    /// use std::path::Path;
+    /// use dfraw_json_parser::{ModuleInfoFile, RawModuleLocation};
+    ///
+    /// let info_file = InfoFile::new("vanilla_creatures", RawModuleLocation::Vanilla, "vanilla_creatures");
+    /// assert_eq!(info_file.get_module_name(), "vanilla_creatures");
+    /// info_file.set_module_name("vanilla_creatures_2");
+    /// assert_eq!(info_file.get_module_name(), "vanilla_creatures_2");
+    /// ```
     pub(crate) fn set_module_name(&mut self, arg: &str) {
         self.name = String::from(arg);
     }

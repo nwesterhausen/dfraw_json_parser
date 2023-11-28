@@ -305,8 +305,7 @@ pub fn validate_options(options: &ParserOptions) -> Result<ParserOptions, Parser
             Ok(p) => p,
             Err(e) => {
                 return Err(ParserError::InvalidOptions(format!(
-                    "Unable to canonicalize Dwarf Fortress path!\n{:?}\n{:?}",
-                    target_path, e
+                    "Unable to canonicalize Dwarf Fortress path!\n{target_path:?}\n{e:?}"
                 )))
             }
         };
@@ -507,6 +506,10 @@ pub fn get_only_select_creatures_from_raws(all_raws: &[Box<dyn RawObject>]) -> V
 /// Returns:
 ///
 /// An `Option<File>`. None if the file doesn't exist or isn't a file.
+///
+/// # Errors
+///
+/// * `ParserError::Io` if the file cannot be opened or doesn't exist
 pub fn try_get_file<P: AsRef<Path>>(file_path: &P) -> Result<File, ParserError> {
     let caller = "File Exists Validator";
     // Validate file exists

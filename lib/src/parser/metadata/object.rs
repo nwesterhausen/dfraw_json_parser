@@ -2,10 +2,11 @@ use std::any::Any;
 
 use crate::{ObjectType, RawMetadata, Searchable};
 
+#[allow(clippy::module_name_repetitions)]
+#[typetag::serde(tag = "type")]
 /// The `RawObject` trait is implemented by all raw objects. This trait is used
 /// to provide a common interface for all raw objects, so that they can be
 /// stored in a single vector. It also provides a common interface for parsing.
-#[typetag::serde(tag = "type")]
 pub trait RawObject: RawObjectToAny + Send + Sync + Searchable {
     /// Get the metadata for the raw.
     fn get_metadata(&self) -> &RawMetadata;
