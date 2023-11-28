@@ -3,8 +3,7 @@ use tracing::{debug, warn};
 
 use crate::parser::{
     creature_effect::TOKEN_MAP as CREATURE_EFFECT_TOKENS,
-    searchable::{clean_search_vec, Searchable},
-    serializer_helper,
+    serializer_helper, {clean_search_vec, Searchable},
 };
 
 use super::{phf_table::SYNDROME_TOKEN, tokens::SyndromeToken};

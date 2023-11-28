@@ -9,21 +9,18 @@ use slug::slugify;
 use tracing::{error, trace, debug};
 
 use crate::{
-    parser::refs::NON_DIGIT_RE,
+    parser::{NON_DIGIT_RE, RAW_TOKEN_RE, DF_ENCODING, RawModuleLocation},
     util::{get_parent_dir_name, try_get_file},
 };
 
-use super::{
-    raw_locations::RawModuleLocation,
-    refs::{DF_ENCODING, RAW_TOKEN_RE},
-};
+use super::steam_data::SteamData;
 
-// Struct for info about a raw module
 #[derive(Serialize, Deserialize, Default)]
 #[serde(rename_all = "camelCase")]
 #[derive(ts_rs::TS)]
-#[ts(export)]
-pub struct ModuleInfoFile {
+#[ts(export, rename = "ModuleInfoFile")]
+/// Represents the `info.txt` file for a raw module
+pub struct InfoFile {
     identifier: String,
     object_id: String,
     location: RawModuleLocation,
@@ -43,33 +40,22 @@ pub struct ModuleInfoFile {
     requires_ids_before: Vec<String>,
     #[serde(skip_serializing_if = "Vec::is_empty")]
     requires_ids_after: Vec<String>,
-    #[serde(skip_serializing_if = "String::is_empty")]
-    steam_title: String,
-    #[serde(skip_serializing_if = "String::is_empty")]
-    steam_description: String,
-    #[serde(skip_serializing_if = "Vec::is_empty")]
-    steam_tags: Vec<String>,
-    #[serde(skip_serializing_if = "Vec::is_empty")]
-    steam_key_value_tags: Vec<String>,
-    #[serde(skip_serializing_if = "Vec::is_empty")]
-    steam_metadata: Vec<String>,
-    #[serde(skip_serializing_if = "String::is_empty")]
-    steam_changelog: String,
-    steam_file_id: u64,
+    #[serde(skip_serializing_if = "SteamData::is_empty")]
+    steam_data: SteamData,
 }
 
-impl ModuleInfoFile {
+impl InfoFile {
     pub fn new(id: &str, location: RawModuleLocation, parent_directory: &str) -> Self {
-        ModuleInfoFile {
+        InfoFile {
             identifier: String::from(id),
             location,
             parent_directory: String::from(parent_directory),
             object_id: format!("{}-{}-{}", location, "MODULE", slugify(id)),
-            ..ModuleInfoFile::default()
+            ..Default::default()
         }
     }
     pub fn empty() -> Self {
-        ModuleInfoFile::default()
+        InfoFile::default()
     }
     pub fn from_raw_file_path<P: AsRef<Path>>(full_path: &P) -> Self {
         // Validate that the passed file exists
@@ -78,7 +64,7 @@ impl ModuleInfoFile {
                 "raw_file_path::from_raw_file_path: Unable to validate raw exists {}",
                 full_path.as_ref().display()
             );
-            return ModuleInfoFile::empty();
+            return InfoFile::empty();
         }
         // Take the full path for the raw file and navigate up to the parent directory
         // e.g from `data/vanilla/vanilla_creatures/objects/creature_standard.txt` to `data/vanilla/vanilla_creatures`
@@ -95,7 +81,7 @@ impl ModuleInfoFile {
         Self::parse(&info_file_path)
     }
     #[allow(clippy::too_many_lines)]
-    pub fn parse<P: AsRef<Path>>(info_file_path: &P) -> ModuleInfoFile {
+    pub fn parse<P: AsRef<Path>>(info_file_path: &P) -> Self {
         let parent_dir = get_parent_dir_name(info_file_path);
         let location = RawModuleLocation::from_info_text_file_path(info_file_path);
 
@@ -104,7 +90,7 @@ impl ModuleInfoFile {
                 "ModuleInfoFile::parse: Unable to open file {}",
                 info_file_path.as_ref().display()
             );
-            return ModuleInfoFile::empty();
+            return InfoFile::empty();
         };
 
         let decoding_reader = DecodeReaderBytesBuilder::new()
@@ -113,7 +99,7 @@ impl ModuleInfoFile {
         let reader = BufReader::new(decoding_reader);
 
         // info.txt details
-        let mut info_file_data: ModuleInfoFile = ModuleInfoFile::new("", location, &parent_dir);
+        let mut info_file_data: InfoFile = InfoFile::new("", location, &parent_dir);
 
         for (index, line) in reader.lines().enumerate() {
             if line.is_err() {
@@ -155,7 +141,7 @@ impl ModuleInfoFile {
                     // SECTION FOR MATCHING info.txt DATA
                     "ID" => {
                         // the [ID:identifier] tag should be the top of the info.txt file
-                        info_file_data = ModuleInfoFile::new(captured_value, location, &parent_dir);
+                        info_file_data = InfoFile::new(captured_value, location, &parent_dir);
                     }
                     "NUMERIC_VERSION" => match captured_value.parse() {
                         Ok(n) => info_file_data.numeric_version = n,
@@ -242,29 +228,33 @@ impl ModuleInfoFile {
                             .push(String::from(captured_value));
                     }
                     "STEAM_TITLE" => {
-                        info_file_data.steam_title = String::from(captured_value);
+                        info_file_data.steam_data.set_title(&String::from(captured_value));
                     }
                     "STEAM_DESCRIPTION" => {
-                        info_file_data.steam_description = String::from(captured_value);
+                        info_file_data
+                            .steam_data
+                            .set_description(&String::from(captured_value));
                     }
                     "STEAM_TAG" => {
-                        info_file_data.steam_tags.push(String::from(captured_value));
+                        info_file_data.steam_data.add_tag(&String::from(captured_value));
                     }
                     "STEAM_KEY_VALUE_TAG" => {
                         info_file_data
-                            .steam_key_value_tags
-                            .push(String::from(captured_value));
+                            .steam_data
+                            .add_key_value_tag(&String::from(captured_value));
                     }
                     "STEAM_METADATA" => {
                         info_file_data
-                            .steam_metadata
-                            .push(String::from(captured_value));
+                            .steam_data
+                            .add_metadata(&String::from(captured_value));
                     }
-                    "STEAM_CHANGELOG" => {
-                        info_file_data.steam_changelog = String::from(captured_value);
+                        "STEAM_CHANGELOG" => {
+                        info_file_data
+                            .steam_data
+                            .set_changelog(&String::from(captured_value));
                     }
                     "STEAM_FILE_ID" => match captured_value.parse() {
-                        Ok(n) => info_file_data.steam_file_id = n,
+                        Ok(n) => info_file_data.steam_data.set_file_id(n),
                         Err(_e) => {
                             debug!(
                                 "ModuleInfoFile::parse: 'STEAM_FILE_ID' should be integer {}",
@@ -275,7 +265,7 @@ impl ModuleInfoFile {
                             let digits_only =
                                 NON_DIGIT_RE.replace_all(captured_value, "").to_string();
                             match digits_only.parse() {
-                                Ok(n) => info_file_data.steam_file_id = n,
+                                Ok(n) => info_file_data.steam_data.set_file_id(n),
                                 Err(_e) => {
                                     debug!(
                                         "ModuleInfoFile::parse: Unable to parse any numbers from {} for STEAM_FILE_ID",

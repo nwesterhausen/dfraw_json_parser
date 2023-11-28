@@ -1,3 +1,4 @@
+use super::properties::Properties;
 use crate::parser::{material::PropertyToken, serializer_helper};
 use serde::{Deserialize, Serialize};
 use tracing::warn;
@@ -6,20 +7,22 @@ use tracing::warn;
 #[ts(export)]
 #[allow(clippy::module_name_repetitions)]
 #[derive(Serialize, Deserialize, Debug, Clone, Default)]
-#[serde(rename_all = "camelCase")]
-pub struct MaterialMechanics {
-    #[serde(skip_serializing_if = "MechanicalProperties::is_empty")]
-    impact: MechanicalProperties,
-    #[serde(skip_serializing_if = "MechanicalProperties::is_empty")]
-    compressive: MechanicalProperties,
-    #[serde(skip_serializing_if = "MechanicalProperties::is_empty")]
-    tensile: MechanicalProperties,
-    #[serde(skip_serializing_if = "MechanicalProperties::is_empty")]
-    torsion: MechanicalProperties,
-    #[serde(skip_serializing_if = "MechanicalProperties::is_empty")]
-    shear: MechanicalProperties,
-    #[serde(skip_serializing_if = "MechanicalProperties::is_empty")]
-    bending: MechanicalProperties,
+#[serde(rename_all = "camelCase", rename = "MaterialMechanics")]
+/// Represents the specific yield, fracture, and elasticity of a material for the various
+/// types of mechanical stress.
+pub struct Mechanics {
+    #[serde(skip_serializing_if = "Properties::is_empty")]
+    impact: Properties,
+    #[serde(skip_serializing_if = "Properties::is_empty")]
+    compressive: Properties,
+    #[serde(skip_serializing_if = "Properties::is_empty")]
+    tensile: Properties,
+    #[serde(skip_serializing_if = "Properties::is_empty")]
+    torsion: Properties,
+    #[serde(skip_serializing_if = "Properties::is_empty")]
+    shear: Properties,
+    #[serde(skip_serializing_if = "Properties::is_empty")]
+    bending: Properties,
 
     #[serde(skip_serializing_if = "serializer_helper::is_zero_i32")]
     max_edge: i32,
@@ -28,37 +31,7 @@ pub struct MaterialMechanics {
     solid_density: i32,
 }
 
-#[derive(ts_rs::TS)]
-#[ts(export)]
-#[allow(clippy::module_name_repetitions)]
-#[derive(Serialize, Deserialize, Debug, Clone, Default)]
-#[serde(rename_all = "camelCase")]
-pub struct MechanicalProperties {
-    #[serde(rename = "yield")]
-    yield_stress: i32,
-    fracture: i32,
-    elasticity: i32,
-}
-
-impl MechanicalProperties {
-    pub fn new() -> Self {
-        Self::default()
-    }
-    pub fn is_empty(&self) -> bool {
-        self.yield_stress == 0 && self.fracture == 0 && self.elasticity == 0
-    }
-    pub fn set_yield(&mut self, value: i32) {
-        self.yield_stress = value;
-    }
-    pub fn set_fracture(&mut self, value: i32) {
-        self.fracture = value;
-    }
-    pub fn set_elasticity(&mut self, value: i32) {
-        self.elasticity = value;
-    }
-}
-
-impl MaterialMechanics {
+impl Mechanics {
     pub fn new() -> Self {
         Self::default()
     }

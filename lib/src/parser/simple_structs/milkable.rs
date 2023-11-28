@@ -5,10 +5,12 @@ use serde::{Deserialize, Serialize};
 #[allow(clippy::module_name_repetitions)]
 #[derive(Serialize, Deserialize, Debug, Clone, Default)]
 #[serde(rename_all = "camelCase")]
+/// How often a creature can be milked and what material it produces
 pub struct Milkable {
     material: String,
     frequency: u32,
 }
+
 impl Milkable {
     pub fn from_value(value: &str) -> Self {
         let split = value.split(':').collect::<Vec<&str>>();

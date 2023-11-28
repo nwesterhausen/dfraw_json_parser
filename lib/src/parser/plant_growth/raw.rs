@@ -1,9 +1,7 @@
 use serde::{Deserialize, Serialize};
 use tracing::{error, warn};
 
-use crate::parser::searchable::clean_search_vec;
-use crate::parser::serializer_helper;
-use crate::parser::{names::SingPlurName, searchable::Searchable};
+use crate::parser::{clean_search_vec, serializer_helper, Searchable, SingPlurName};
 
 use super::{
     phf_table::{GROWTH_TOKENS, PLANT_PART_TOKENS},

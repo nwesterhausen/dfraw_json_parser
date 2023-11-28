@@ -483,6 +483,15 @@ pub fn get_only_select_creatures_from_raws(all_raws: &[Box<dyn RawObject>]) -> V
         .collect::<Vec<SelectCreature>>()
 }
 
+/// `try_get_file` attempts to open a file at the given path and returns a `File` if successful.
+///
+/// Arguments:
+///
+/// * `file_path`: A path to the file to open.
+///
+/// Returns:
+///
+/// An `Option<File>`. None if the file doesn't exist or isn't a file.
 pub fn try_get_file<P: AsRef<Path>>(file_path: &P) -> Option<File> {
     let caller = "File Exists Validator";
     // Validate file exists

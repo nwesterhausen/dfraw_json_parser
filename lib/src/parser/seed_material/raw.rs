@@ -1,7 +1,7 @@
 use serde::{Deserialize, Serialize};
 use tracing::warn;
 
-use crate::parser::{color::Color, names::SingPlurName};
+use crate::parser::{Color, SingPlurName};
 
 #[derive(ts_rs::TS)]
 #[ts(export)]

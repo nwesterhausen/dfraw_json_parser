@@ -2,10 +2,7 @@ use serde::{Deserialize, Serialize};
 use slug::slugify;
 
 use crate::parser::{
-    material::Material,
-    object_types::ObjectType,
-    raws::{RawMetadata, RawObject},
-    searchable::{clean_search_vec, Searchable},
+    clean_search_vec, material::Material, ObjectType, RawMetadata, RawObject, Searchable,
 };
 
 #[derive(ts_rs::TS)]

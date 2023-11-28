@@ -2,10 +2,7 @@ use serde::{Deserialize, Serialize};
 
 use crate::parser::{
     helpers::build_object_id_from_pieces,
-    object_types::ObjectType,
-    raws::{RawMetadata, RawObject},
-    searchable::{clean_search_vec, Searchable},
-    serializer_helper,
+    serializer_helper, ObjectType, {clean_search_vec, Searchable}, {RawMetadata, RawObject},
 };
 
 #[derive(ts_rs::TS)]

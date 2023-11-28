@@ -1,4 +1,4 @@
-use super::raws::RawMetadata;
+use crate::RawMetadata;
 
 /// This is only used for serialize
 #[allow(clippy::trivially_copy_pass_by_ref)]

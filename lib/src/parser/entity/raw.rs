@@ -2,13 +2,10 @@ use serde::{Deserialize, Serialize};
 use tracing::warn;
 
 use crate::parser::{
-    color::Color,
+    clean_search_vec,
     helpers::build_object_id_from_pieces,
-    object_types::ObjectType,
     position::{Position, TOKEN_MAP as POSITION_TOKEN_MAP},
-    raws::{RawMetadata, RawObject},
-    searchable::{clean_search_vec, Searchable},
-    serializer_helper,
+    serializer_helper, Color, ObjectType, RawMetadata, RawObject, Searchable,
 };
 
 use super::{phf_table::ENTITY_TOKENS, tokens::EntityToken};
