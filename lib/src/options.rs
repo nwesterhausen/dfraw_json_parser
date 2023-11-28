@@ -40,7 +40,7 @@ use crate::parser::{ObjectType, RawModuleLocation};
 /// options.set_locations_to_parse(vec![RawModuleLocation::InstalledMods]);
 /// // For the result, attach metadata to the raws
 /// options.attach_metadata_to_raws();
-///
+///```
 ///
 #[allow(clippy::module_name_repetitions)]
 #[allow(clippy::struct_excessive_bools)]
@@ -247,7 +247,7 @@ impl ParserOptions {
 
     /// Optionally specify one or more raw modules to parse directly. These should be the module
     /// directories, not the info.txt file.
-    ///     
+    ///
     /// (e.g. `vanilla_creatures` in `data/vanilla/`)
     ///
     /// Note that these will be parsed in addition to the raws in the specified locations in the other
