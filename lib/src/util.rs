@@ -4,7 +4,7 @@ use std::{
     path::{Path, PathBuf},
 };
 
-use tracing::{error, info, warn};
+use tracing::{debug, error, info, warn};
 use walkdir::WalkDir;
 
 use crate::{
@@ -51,7 +51,7 @@ pub fn subdirectories(directory: PathBuf) -> Result<Vec<walkdir::DirEntry>, Pars
                 if entry.path().is_dir() {
                     Some(entry)
                 } else {
-                    error!("subdirectories: Entry is not a directory {:?}", entry);
+                    debug!("subdirectories: Entry is not a directory {:?}", entry);
                     None
                 }
             }
@@ -511,37 +511,32 @@ pub fn get_only_select_creatures_from_raws(all_raws: &[Box<dyn RawObject>]) -> V
 ///
 /// * `ParserError::Io` if the file cannot be opened or doesn't exist
 pub fn try_get_file<P: AsRef<Path>>(file_path: &P) -> Result<File, ParserError> {
-    let caller = "File Exists Validator";
     // Validate file exists
     if !file_path.as_ref().exists() {
-        error!(
-            "{} - Path doesn't exist {}",
-            caller,
+        debug!(
+            "try_get_file: Path doesn't exist:\n{}",
             file_path.as_ref().display()
         );
         return Err(ParserError::Io {
             source: std::io::Error::new(
                 std::io::ErrorKind::NotFound,
                 format!(
-                    "{} - Path doesn't exist {}",
-                    caller,
+                    "try_get_file: Path doesn't exist {}",
                     file_path.as_ref().display()
                 ),
             ),
         });
     }
     if !file_path.as_ref().is_file() {
-        error!(
-            "{} - Path does not point to a file {}",
-            caller,
+        debug!(
+            "try_get_file: Path does not point to a file:\n{}",
             file_path.as_ref().display(),
         );
         return Err(ParserError::Io {
             source: std::io::Error::new(
                 std::io::ErrorKind::InvalidInput,
                 format!(
-                    "{} - Path does not point to a file {}",
-                    caller,
+                    "try_get_file: Path does not point to a file {}",
                     file_path.as_ref().display()
                 ),
             ),
@@ -552,9 +547,8 @@ pub fn try_get_file<P: AsRef<Path>>(file_path: &P) -> Result<File, ParserError> 
     match File::open(file_path) {
         Ok(file) => Ok(file),
         Err(e) => {
-            error!(
-                "{} - Unable to open file {} \n{:?}",
-                caller,
+            debug!(
+                "try_get_file: Unable to open file {}\n{:?}",
                 file_path.as_ref().display(),
                 e
             );

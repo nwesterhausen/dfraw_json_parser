@@ -382,8 +382,7 @@ fn parse_location<P: AsRef<Path>>(
     let mut results: Vec<Box<dyn RawObject>> = Vec::new();
     let location_path: PathBuf = location_path.as_ref().to_path_buf();
     // Get a list of all subdirectories in the location
-    let raw_modules_in_location: Vec<DirEntry> =
-        util::subdirectories(location_path).unwrap_or_default();
+    let raw_modules_in_location: Vec<DirEntry> = util::subdirectories(location_path)?;
 
     info!(
         "Found {} raw modules in {:?}",
@@ -393,7 +392,14 @@ fn parse_location<P: AsRef<Path>>(
 
     // Loop over each module and parse it
     for raw_module in raw_modules_in_location {
-        results.extend(parse_module(&raw_module.path(), options)?);
+        match parse_module(&raw_module.path(), options) {
+            Ok(module_results) => {
+                results.extend(module_results);
+            }
+            Err(e) => {
+                debug!("Skipping parsing module: {:?}", e);
+            }
+        }
     }
 
     Ok(results)
