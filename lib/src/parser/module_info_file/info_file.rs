@@ -16,7 +16,7 @@ use crate::{
 
 use super::steam_data::SteamData;
 
-#[derive(Serialize, Deserialize, Default)]
+#[derive(Serialize, Deserialize, Default, Clone, Debug)]
 #[serde(rename_all = "camelCase")]
 #[derive(ts_rs::TS)]
 #[ts(export, rename = "ModuleInfoFile")]
@@ -334,6 +334,10 @@ impl InfoFile {
     /// Returns the displayed version for the `InfoFile`
     pub fn get_version(&self) -> String {
         String::from(&self.displayed_version)
+    }
+    /// Returns the module's object id
+    pub fn get_object_id(&self) -> String {
+        String::from(&self.object_id)
     }
     /// Returns the directory the `InfoFile` was parsed from
     ///

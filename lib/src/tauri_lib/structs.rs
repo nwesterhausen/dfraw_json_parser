@@ -1,6 +1,6 @@
 use tracing::debug;
 
-#[derive(Clone, serde::Serialize)]
+#[derive(Default, Clone, serde::Serialize)]
 #[serde(rename_all = "camelCase")]
 #[derive(ts_rs::TS)]
 #[ts(export)]

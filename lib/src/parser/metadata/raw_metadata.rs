@@ -32,6 +32,8 @@ use crate::{ModuleInfoFile, ObjectType, RawModuleLocation};
 /// be hidden or not when exporting. By default, it is set to `true`, meaning that the raw metadata will
 /// be hidden unless specified in the `ParsingOptions` struct.
 pub struct Metadata {
+    // The object_id of the raw module
+    module_object_id: String,
     // The name of the raw module the raw is from.
     module_name: String,
     // The version of the raw module the raw is from.
@@ -67,6 +69,7 @@ impl Metadata {
             raw_identifier: String::from(raw_identifier),
             object_type: object_type.clone(),
             raw_module_location: module_info.get_location(),
+            module_object_id: module_info.get_object_id(),
             hidden: !attach_metadata_to_raws,
         }
     }
@@ -97,5 +100,9 @@ impl Metadata {
     /// Get the location of the owning raw module.
     pub fn get_location(&self) -> &RawModuleLocation {
         &self.raw_module_location
+    }
+    /// Get the `object_id` of the owning raw module.
+    pub fn get_module_object_id(&self) -> &str {
+        &self.module_object_id
     }
 }
