@@ -1,21 +1,9 @@
 use serde::{Deserialize, Serialize};
 use tracing::{error, warn};
 
-<<<<<<< HEAD:lib/src/parser/shrub/raw.rs
-<<<<<<< HEAD:lib/src/parser/shrub/raw.rs
 use crate::parser::seed_material::SeedMaterial;
 use crate::parser::serializer_helper;
 use crate::parser::Color;
-=======
-use crate::parser::color::Color;
-use crate::parser::helpers::serializer_helper;
-use crate::parser::seed_material::SeedMaterial;
->>>>>>> 2b37a6f (refactor: expose 1 level down):src/parser/shrub/raw.rs
-=======
-use crate::parser::color::Color;
-use crate::parser::helpers::serializer_helper;
-use crate::parser::seed_material::SeedMaterial;
->>>>>>> c2812957821240fff30b78553e73f23e904207e2:src/parser/shrub/raw.rs
 
 use super::phf_table::SHRUB_TOKENS;
 use super::tokens::{SeasonToken, ShrubToken};

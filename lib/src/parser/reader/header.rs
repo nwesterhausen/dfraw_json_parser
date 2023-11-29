@@ -4,23 +4,10 @@ use tracing::{error, trace};
 use std::io::{BufRead, BufReader};
 use std::path::Path;
 
-<<<<<<< HEAD:lib/src/parser/reader/header.rs
-<<<<<<< HEAD:lib/src/parser/reader/header.rs
-<<<<<<< HEAD:lib/src/parser/reader/header.rs
 use crate::parser::object_types::{ObjectType, OBJECT_TOKEN_MAP};
 use crate::parser::{DF_ENCODING, RAW_TOKEN_RE};
 use crate::util::try_get_file;
 use crate::ParserError;
-=======
-use crate::parser::object_type::{ObjectType, OBJECT_TOKENS};
-use crate::parser::refs::{DF_ENCODING, RAW_TOKEN_RE};
->>>>>>> 2b37a6f (refactor: expose 1 level down):src/parser/reader/header.rs
-=======
-use crate::{ObjectType, DF_ENCODING, OBJECT_TOKENS, RAW_TOKEN_RE};
->>>>>>> 6f58260 (docs: add doc comments):src/parser/reader/header.rs
-=======
-use crate::{ObjectType, DF_ENCODING, OBJECT_TOKENS, RAW_TOKEN_RE};
->>>>>>> c2812957821240fff30b78553e73f23e904207e2:src/parser/reader/header.rs
 
 /// It reads a file, line by line, and checks the first line for the filename, reads lines until it encounters the
 /// \[OBJECT:(type)] tag in the file.

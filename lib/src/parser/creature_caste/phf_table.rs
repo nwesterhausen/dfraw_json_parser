@@ -1,6 +1,5 @@
 use super::tokens::CasteTag;
 
-/// This is a PHF map of all the caste tokens that are used in the raws.
 pub static CASTE_TOKENS: phf::Map<&'static str, CasteTag> = phf::phf_map! {
     "DIURNAL" => CasteTag::ActiveDiurnal,
     "CREPUSCULAR" => CasteTag::ActiveCrepuscular,

@@ -4,12 +4,7 @@ use tracing::{info, warn};
 use crate::parser::{
     creature::Creature,
     helpers::{clone_raw_object_box, clone_raw_vector::with_purge},
-<<<<<<< HEAD:lib/src/parser/helpers/apply_copy_from.rs
     ObjectType, RawObject,
-=======
-    object_type::ObjectType,
-    raws::RawObject,
->>>>>>> 2b37a6f (refactor: expose 1 level down):src/parser/helpers/apply_copy_from.rs
 };
 
 #[allow(clippy::too_many_lines)]

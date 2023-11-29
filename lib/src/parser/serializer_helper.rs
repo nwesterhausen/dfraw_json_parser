@@ -112,7 +112,7 @@ pub fn is_true(boolean: &bool) -> bool {
 }
 /// This is only used for serialize
 #[allow(clippy::trivially_copy_pass_by_ref)]
-pub fn is_metadata_hidden(metadata: &Metadata) -> bool {
+pub fn is_metadata_hidden(metadata: &RawMetadata) -> bool {
     metadata.is_hidden()
 }
 

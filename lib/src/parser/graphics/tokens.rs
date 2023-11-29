@@ -1,12 +1,12 @@
 use serde::{Deserialize, Serialize};
 use tracing::warn;
 
-use crate::parser::graphic::phf_table::CONDITION_TAGS;
+use super::phf_table::CONDITION_TAGS;
 
 #[derive(ts_rs::TS)]
 #[ts(export)]
 #[derive(Serialize, Deserialize, Debug, PartialEq, Eq, Clone, Copy, Default)]
-pub enum GraphicCondition {
+pub enum Condition {
     None,
     Condition,
     #[default]
@@ -155,7 +155,7 @@ pub enum PlantGraphicTemplate {
 #[derive(ts_rs::TS)]
 #[ts(export)]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, Default)]
-pub enum GraphicGrowthTag {
+pub enum GrowthTag {
     Fruit,
     Growth1,
     Growth2,
@@ -322,7 +322,7 @@ impl ColorModification {
     }
 }
 
-impl GraphicCondition {
+impl Condition {
     pub fn from_token(token: &str) -> Option<Self> {
         CONDITION_TAGS.get(token).copied()
     }

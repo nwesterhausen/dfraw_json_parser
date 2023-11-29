@@ -1,15 +1,7 @@
 use serde::{Deserialize, Serialize};
 use tracing::{error, warn};
 
-<<<<<<< HEAD:lib/src/parser/tree/raw.rs
-<<<<<<< HEAD:lib/src/parser/tree/raw.rs
 use crate::parser::{serializer_helper, Color, Name};
-=======
-use crate::parser::{color::Color, helpers::serializer_helper, names::Name};
->>>>>>> 2b37a6f (refactor: expose 1 level down):src/parser/tree/raw.rs
-=======
-use crate::parser::{color::Color, helpers::serializer_helper, names::Name};
->>>>>>> c2812957821240fff30b78553e73f23e904207e2:src/parser/tree/raw.rs
 
 use super::{
     phf_table::TREE_TOKENS,
@@ -20,7 +12,6 @@ use super::{
 #[ts(export)]
 #[derive(Serialize, Deserialize, Debug, Clone, Default)]
 #[serde(rename_all = "camelCase")]
-/// This struct represents a tree in the raws.
 pub struct Tree {
     /// Tree will yield logs made of that material. Instead, if it's `[TREE:NONE]`, no logs will result.
     /// Materials are typically found in other raws..
@@ -125,15 +116,6 @@ pub struct Tree {
 }
 
 impl Tree {
-    /// Create a new `Tree` struct out of a material.
-    ///
-    /// Arguments:
-    ///
-    /// * `material`: A string slice that holds the value of the `material` field.
-    ///
-    /// Returns:
-    ///
-    /// A new `Tree` struct.
     pub fn new(material: &str) -> Self {
         Self {
             material: material.to_string(),
@@ -149,12 +131,6 @@ impl Tree {
         }
     }
     #[allow(clippy::too_many_lines)]
-    /// Parse a tag for the `Tree` struct and incorporate it into the struct.
-    ///
-    /// Arguments:
-    ///
-    /// * `key`: A string slice that holds the key of the tag.
-    /// * `value`: A string slice that holds the value of the tag.
     pub fn parse_tag(&mut self, key: &str, value: &str) {
         let Some(tag) = TREE_TOKENS.get(key) else {
             warn!(

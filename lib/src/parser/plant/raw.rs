@@ -1,19 +1,19 @@
 use serde::{Deserialize, Serialize};
 use slug::slugify;
+use tracing::{debug, warn};
 
 use crate::parser::{
-    biome::{Biome, BIOME_TOKENS},
+    biome,
     helpers::parse_min_max_range,
-    helpers::serializer_helper,
-    material::{Material, MATERIAL_PROPERTY_TOKENS, MATERIAL_USAGE_TOKENS},
-    metadata::Metadata,
-    names::Name,
-    object_type::ObjectType,
-    plant_growth::{GrowthTag, GrowthType, PlantGrowth, GROWTH_TOKENS, GROWTH_TYPE_TOKENS},
-    raws::RawObject,
-    searchable::{clean_search_vec, Searchable},
-    shrub::{Shrub, SHRUB_TOKENS},
-    tree::{Tree, TREE_TOKENS},
+    material::{Material, PROPERTY_TOKEN_MAP, USAGE_TOKEN_MAP},
+    plant_growth::{
+        PlantGrowth, Token as GrowthToken, TypeToken as GrowthTypeToken,
+        TOKEN_MAP as GROWTH_TOKEN_MAP, TYPE_TOKEN_MAP as GROWTH_TYPE_TOKEN_MAP,
+    },
+    serializer_helper,
+    shrub::{Shrub, TOKEN_MAP as SHRUB_TOKEN_MAP},
+    tree::{Tree, TOKEN_MAP as TREE_TOKEN_MAP},
+    Name, ObjectType, {clean_search_vec, Searchable}, {RawMetadata, RawObject},
 };
 
 use super::{phf_table::PLANT_TOKENS, tokens::PlantTag};
@@ -25,8 +25,8 @@ use super::{phf_table::PLANT_TOKENS, tokens::PlantTag};
 #[serde(rename_all = "camelCase")]
 pub struct Plant {
     /// Common Raw file Things
-    #[serde(skip_serializing_if = "Metadata::is_hidden")]
-    metadata: Metadata,
+    #[serde(skip_serializing_if = "RawMetadata::is_hidden")]
+    metadata: RawMetadata,
     identifier: String,
     object_id: String,
 
@@ -46,7 +46,7 @@ pub struct Plant {
     frequency: u16,
     /// List of biomes this plant can grow in
     #[serde(skip_serializing_if = "Vec::is_empty")]
-    biomes: Vec<Biome>,
+    biomes: Vec<biome::Token>,
 
     /// Growth Tokens define the growths of the plant (leaves, fruit, etc.)
     #[serde(skip_serializing_if = "Vec::is_empty")]
@@ -69,7 +69,7 @@ impl Plant {
             ..Plant::default()
         }
     }
-    pub fn new(identifier: &str, metadata: &Metadata) -> Plant {
+    pub fn new(identifier: &str, metadata: &RawMetadata) -> Plant {
         Plant {
             identifier: String::from(identifier),
             metadata: metadata.clone(),
@@ -83,14 +83,14 @@ impl Plant {
             ..Plant::default()
         }
     }
-    pub fn get_biomes(&self) -> Vec<Biome> {
+    pub fn get_biomes(&self) -> Vec<biome::Token> {
         self.biomes.clone()
     }
 }
 
 #[typetag::serde]
 impl RawObject for Plant {
-    fn get_metadata(&self) -> &Metadata {
+    fn get_metadata(&self) -> &RawMetadata {
         &self.metadata
     }
     fn get_identifier(&self) -> &str {
@@ -108,7 +108,7 @@ impl RawObject for Plant {
     }
     #[allow(clippy::too_many_lines)]
     fn parse_tag(&mut self, key: &str, value: &str) {
-        if (MATERIAL_PROPERTY_TOKENS.contains_key(key) || MATERIAL_USAGE_TOKENS.contains_key(key))
+        if (PROPERTY_TOKEN_MAP.contains_key(key) || USAGE_TOKEN_MAP.contains_key(key))
             && !key.eq("USE_MATERIAL_TEMPLATE")
         {
             // have our latest material parse the tag
@@ -119,7 +119,7 @@ impl RawObject for Plant {
             return;
         }
 
-        if TREE_TOKENS.contains_key(key) {
+        if TREE_TOKEN_MAP.contains_key(key) {
             if self.tree_details.is_none() {
                 self.tree_details = Some(Tree::new(value));
             }
@@ -128,13 +128,13 @@ impl RawObject for Plant {
             return;
         }
 
-        if GROWTH_TOKENS.contains_key(key) {
-            let token = GROWTH_TOKENS.get(key).unwrap_or(&GrowthTag::Unknown);
-            if token == &GrowthTag::Growth {
+        if GROWTH_TOKEN_MAP.contains_key(key) {
+            let token = GROWTH_TOKEN_MAP.get(key).unwrap_or(&GrowthToken::Unknown);
+            if token == &GrowthToken::Growth {
                 // If we are defining a new growth, we need to create a new PlantGrowth
-                let growth_type = GROWTH_TYPE_TOKENS
+                let growth_type = GROWTH_TYPE_TOKEN_MAP
                     .get(value)
-                    .unwrap_or(&GrowthType::None)
+                    .unwrap_or(&GrowthTypeToken::None)
                     .clone();
                 let growth = PlantGrowth::new(growth_type);
                 self.growths.push(growth);
@@ -148,7 +148,7 @@ impl RawObject for Plant {
             return;
         }
 
-        if SHRUB_TOKENS.contains_key(key) {
+        if SHRUB_TOKEN_MAP.contains_key(key) {
             if self.shrub_details.is_none() {
                 self.shrub_details = Some(Shrub::new());
             }
@@ -160,12 +160,12 @@ impl RawObject for Plant {
         }
 
         if !PLANT_TOKENS.contains_key(key) {
-            log::debug!("PlantParsing: Unknown tag {} with value {}", key, value);
+            debug!("PlantParsing: Unknown tag {} with value {}", key, value);
             return;
         }
 
         let Some(tag) = PLANT_TOKENS.get(key) else {
-            log::warn!(
+            warn!(
                 "PlantParsing: called `Option::unwrap()` on a `None` value for presumed plant tag: {}",
                 key
             );
@@ -189,8 +189,8 @@ impl RawObject for Plant {
                 self.pref_strings.push(String::from(value));
             }
             PlantTag::Biome => {
-                let Some(biome) = BIOME_TOKENS.get(value) else {
-                    log::warn!(
+                let Some(biome) = biome::TOKEN_MAP.get(value) else {
+                    warn!(
                         "PlantParsing: called `Option::unwrap()` on a `None` value for presumed biome: {}",
                         value
                     );

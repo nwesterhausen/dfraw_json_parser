@@ -1,27 +1,16 @@
 use serde::{Deserialize, Serialize};
+use tracing::{debug, trace, warn};
 
 use crate::parser::{
-    biome::{Biome, BIOME_TOKENS},
-    creature_caste::{Caste, CASTE_TOKENS},
-    creature_variation::CreatureVariationRequirements,
-    helpers::build_object_id_from_pieces,
-    helpers::parse_min_max_range,
-    helpers::serializer_helper,
-    metadata::Metadata,
-    names::{Name, SingPlurName},
-    object_type::ObjectType,
-    raws::RawObject,
-    searchable::{clean_search_vec, Searchable},
-    select_creature::SelectCreature,
-    tile::Tile,
+    biome, clean_search_vec, creature_caste::Caste, creature_caste::TOKEN_MAP as CASTE_TOKENS,
+    creature_variation::Requirements as CreatureVariationRequirements,
+    helpers::build_object_id_from_pieces, helpers::parse_min_max_range, object_types::ObjectType,
+    select_creature::SelectCreature, serializer_helper, Name, RawMetadata, RawObject, Searchable,
+    SingPlurName, Tile,
 };
 
 use super::{phf_table::CREATURE_TOKENS, tokens::CreatureTag};
 
-#[derive(ts_rs::TS)]
-#[ts(export)]
-#[derive(Serialize, Deserialize, Debug, Clone, Default)]
-#[serde(rename_all = "camelCase")]
 /// The `Creature` struct represents a creature in a Dwarf Fortress, with the properties
 /// that can be set in the raws. Not all the raws are represented here, only the ones that
 /// are currently supported by the library.
@@ -32,60 +21,49 @@ use super::{phf_table::CREATURE_TOKENS, tokens::CreatureTag};
 /// based on the properties of the creature they are applied to. But right now the application
 /// of those changes is not applied, in order to preserve the original creature. So instead,
 /// they are saved and can be applied later (at the consumer's discretion).
+#[derive(ts_rs::TS)]
+#[ts(export)]
+#[derive(Serialize, Deserialize, Debug, Clone, Default)]
+#[serde(rename_all = "camelCase")]
 pub struct Creature {
     #[serde(skip_serializing_if = "serializer_helper::is_metadata_hidden")]
-    /// Provide information about the raws the `Creature` is found in.
-    metadata: Metadata,
-    /// The identifier of the creature. This is used to uniquely identify the creature.
+    metadata: RawMetadata,
     identifier: String,
-    #[serde(skip_serializing_if = "Vec::is_empty")]
-    /// A vector of `Caste` objects that belong to this creature.
     castes: Vec<Caste>,
     #[serde(skip_serializing_if = "Vec::is_empty")]
-    /// A vector of `CreatureTag` objects that belong to this creature.
     tags: Vec<CreatureTag>,
     #[serde(skip_serializing_if = "Vec::is_empty")]
-    /// A vector of `Biome` objects where the creature can be found.
-    biomes: Vec<Biome>,
+    biomes: Vec<biome::Token>,
     #[serde(skip_serializing_if = "Vec::is_empty")]
-    /// A vector of strings describing what Dwarves like about the `Creature`.
     pref_strings: Vec<String>,
     #[serde(skip_serializing_if = "Tile::is_default")]
-    /// The `Tile` object that describes how to draw the creature on screen.
     tile: Tile,
+    // integers
     #[serde(skip_serializing_if = "serializer_helper::is_default_frequency")]
-    /// How often the creature appears in the world. Defaults to 50 if not specified.
-    frequency: u16,
+    frequency: u16, //Defaults to 50 if not specified
+    // [min, max] ranges
+    /// Default [1, 1]
     #[serde(skip_serializing_if = "serializer_helper::min_max_is_ones")]
-    /// The size of groups the creature appears in. Defaults to `[1, 1]`` if not specified.
     cluster_number: [u16; 2],
+    /// Default [1, 1]
     #[serde(skip_serializing_if = "serializer_helper::min_max_is_ones")]
-    /// The total population that the creature will spawn into the world with.
-    /// Defaults to `[1, 1]`` if not specified.
     population_number: [u16; 2],
+    /// Default [0, 0] (aboveground)
     #[serde(skip_serializing_if = "serializer_helper::min_max_is_zeroes")]
-    /// The underground depth where the `Creature` is found. Default `[0, 0]` (aboveground)
     underground_depth: [u16; 2],
+    // strings
     #[serde(skip_serializing_if = "SingPlurName::is_empty")]
-    /// The name of the creature when it is a baby. Can be overridden at the caste level.
     general_baby_name: SingPlurName,
     #[serde(skip_serializing_if = "SingPlurName::is_empty")]
-    /// The name of the creature when it is a child. Can be overridden at the caste level.
     general_child_name: SingPlurName,
-    /// The general name of the creature.
     name: Name,
+    // Special tokens
     #[serde(skip_serializing_if = "String::is_empty")]
-    /// The name of another `Creature` to copy tags from.
     copy_tags_from: String,
     #[serde(skip_serializing_if = "Vec::is_empty")]
-    /// A vector of strings that represent the `CREATURE_VARIATION` raws that should be applied
     apply_creature_variation: Vec<String>,
-    /// The object ID of the creature. This is used to uniquely identify the creature even if
-    /// there are multiple versions of the creature in the raws.
     object_id: String,
     #[serde(skip_serializing_if = "Vec::is_empty")]
-    /// A vector of `SelectCreature` objects that represent the `SELECT_CREATURE` raws that should
-    /// be applied to this creature.
     select_creature_variation: Vec<SelectCreature>,
 }
 
@@ -117,7 +95,7 @@ impl Creature {
     /// Returns:
     ///
     /// a `Creature` object.
-    pub fn new(identifier: &str, metadata: &Metadata) -> Self {
+    pub fn new(identifier: &str, metadata: &RawMetadata) -> Self {
         Creature {
             identifier: String::from(identifier),
             metadata: metadata.clone(),
@@ -337,32 +315,96 @@ impl Creature {
         self.castes.as_slice()
     }
 
-    /// Check if the creature has the given tag.
-    ///
-    /// Arguments:
-    ///
-    /// * `tag`: A reference to the `CreatureTag` to check for.
-    ///
-    /// Returns:
-    ///
-    /// Returns true if the creature has the given tag, and false otherwise.
-    pub fn has_tag(&self, tag: &CreatureTag) -> bool {
-        self.tags.contains(tag)
+    pub fn does_not_exist(&self) -> bool {
+        self.tags.contains(&CreatureTag::DoesNotExist)
+    }
+    pub fn get_biomes(&self) -> Vec<biome::Token> {
+        self.biomes.clone()
     }
 
-    /// Get the `Creature`'s biome information.
-    ///
-    /// Returns:
-    ///
-    /// A vector of `Biome` objects.
-    pub fn get_biomes(&self) -> Vec<Biome> {
-        self.biomes.clone()
+    pub fn set_name(&mut self, name: Name) {
+        self.name = name;
+    }
+    pub fn parse_tags_from_xml(&mut self, xml_tags: &[String]) {
+        for tag in xml_tags {
+            if tag.contains("has_male") {
+                self.add_caste("MALE");
+            } else if tag.contains("has_female") {
+                self.add_caste("FEMALE");
+            } else if tag.starts_with("biome_") {
+                // Parse the biome from "biome_pool_temperate_freshwater" or "biome_savanna_temperate"
+                let biome = tag
+                    .split('_')
+                    .skip(1)
+                    .collect::<Vec<&str>>()
+                    .join("_")
+                    .to_uppercase();
+                if let Some(biome) = biome::TOKEN_MAP.get(&biome) {
+                    self.biomes.push(biome.clone());
+                } else {
+                    warn!(
+                        "Creature::parse_tags_from_xml: ({}) Unknown biome '{}'",
+                        self.identifier, biome
+                    );
+                }
+            } else if tag.starts_with("has_any_") {
+                // Remove the "has_any_" prefix and parse the caste tag
+                let mut caste_tag = tag
+                    .split('_')
+                    .skip(2)
+                    .collect::<Vec<&str>>()
+                    .join("_")
+                    .to_uppercase();
+                // Handle some edge cases
+                if caste_tag.ends_with("INTELLIGENT_LEARNS") {
+                    caste_tag = String::from("CAN_LEARN");
+                } else if caste_tag.ends_with("INTELLIGENT_SPEAKS") {
+                    caste_tag = String::from("CAN_SPEAK");
+                } else if caste_tag.ends_with("CAN_SWIM") {
+                    caste_tag = String::from("SWIMS_INNATE");
+                } else if caste_tag.ends_with("FLY_RACE_GAIT") {
+                    caste_tag = String::from("FLIER");
+                }
+                // Parse the tag
+                if let Some(_caste_tag) = CASTE_TOKENS.get(&caste_tag) {
+                    self.select_caste("ALL");
+                    if let Some(caste) = self.castes.last_mut() {
+                        caste.parse_tag(caste_tag.as_str(), "");
+                    } else {
+                        debug!(
+                            "Creature::parse_tags_from_xml: ({}) No castes found to apply tag {}",
+                            self.identifier, caste_tag
+                        );
+                    }
+                } else {
+                    // Try parsing the tag as a creature tag
+                    if let Some(tag) = CREATURE_TOKENS.get(&caste_tag) {
+                        self.tags.push(tag.clone());
+                    } else {
+                        warn!(
+                            "Creature::parse_tags_from_xml: ({}) Unknown tag {}",
+                            self.identifier, caste_tag
+                        );
+                    }
+                }
+            } else {
+                // Try to parse the tag
+                if let Some(tag) = CREATURE_TOKENS.get(&tag.to_uppercase()) {
+                    self.tags.push(tag.clone());
+                } else {
+                    warn!(
+                        "Creature::parse_tags_from_xml: ({}) Unknown tag {}",
+                        self.identifier, tag
+                    );
+                }
+            }
+        }
     }
 }
 
 #[typetag::serde]
 impl RawObject for Creature {
-    fn get_metadata(&self) -> &Metadata {
+    fn get_metadata(&self) -> &RawMetadata {
         &self.metadata
     }
     fn get_identifier(&self) -> &str {
@@ -383,12 +425,12 @@ impl RawObject for Creature {
             return;
         }
         if !CREATURE_TOKENS.contains_key(key) {
-            log::trace!("CreatureParsing: Unknown tag {} with value {}", key, value);
+            trace!("CreatureParsing: Unknown tag {} with value {}", key, value);
             return;
         }
 
         let Some(tag) = CREATURE_TOKENS.get(key) else {
-            log::warn!(
+            warn!(
                 "Creature::parse_tag: called `Option::unwrap()` on a `None` value for presumed creature tag: {}",
                 key
             );
@@ -397,8 +439,8 @@ impl RawObject for Creature {
 
         match tag {
             CreatureTag::Biome => {
-                let Some(biome) = BIOME_TOKENS.get(value) else {
-                    log::warn!(
+                let Some(biome) = biome::TOKEN_MAP.get(value) else {
+                    warn!(
                         "CreatureParsing: called `Option::unwrap()` on a `None` value for presumed biome: {}",
                         value
                     );
@@ -476,12 +518,12 @@ impl CreatureVariationRequirements for Creature {
             return;
         }
         if !CREATURE_TOKENS.contains_key(key) {
-            log::debug!("CreatureParsing: Unknown tag {} with value {}", key, value);
+            debug!("CreatureParsing: Unknown tag {} with value {}", key, value);
             return;
         }
 
         let Some(tag) = CREATURE_TOKENS.get(key) else {
-            log::warn!(
+            warn!(
                 "CreatureParsing: called `Option::unwrap()` on a `None` value for presumed creature tag: {}",
                 key
             );
@@ -490,8 +532,8 @@ impl CreatureVariationRequirements for Creature {
 
         match tag {
             CreatureTag::Biome => {
-                let Some(biome) = BIOME_TOKENS.get(value) else {
-                    log::warn!(
+                let Some(biome) = biome::TOKEN_MAP.get(value) else {
+                    warn!(
                         "CreatureParsing: called `Option::unwrap()` on a `None` value for presumed biome: {}",
                         value
                     );

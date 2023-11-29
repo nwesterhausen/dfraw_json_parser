@@ -3,7 +3,6 @@ use serde::{Deserialize, Serialize};
 #[derive(ts_rs::TS)]
 #[ts(export)]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, Default)]
-/// This enum represents the raw tokens that describe a tree.
 pub enum TreeToken {
     Tree,
     TrunkName,
@@ -58,7 +57,6 @@ pub enum TreeToken {
 #[derive(ts_rs::TS)]
 #[ts(export)]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, Default)]
-/// This enum represents the placement of twigs on a tree.
 pub enum TwigPlacement {
     SideBranches,
     AboveBranches,

@@ -4,22 +4,11 @@ use serde::{Deserialize, Serialize};
 use tracing::warn;
 
 use crate::parser::{
-<<<<<<<< HEAD:lib/src/parser/graphics/tile_page.rs
-<<<<<<< HEAD:lib/src/parser/graphics/tile_page.rs
     clean_search_vec, helpers::build_object_id_from_pieces, object_types::ObjectType,
     serializer_helper, RawMetadata, RawObject, Searchable,
-=======
-========
-    graphic::{dimensions::Dimensions, phf_table::TILE_PAGE_TAGS, tokens::TilePageTag},
->>>>>>>> 6f58260 (docs: add doc comments):src/parser/graphic/tile_page.rs
-    helpers::build_object_id_from_pieces,
-    helpers::serializer_helper,
-    metadata::Metadata,
-    object_type::ObjectType,
-    raws::RawObject,
-    searchable::{clean_search_vec, Searchable},
->>>>>>> 2b37a6f (refactor: expose 1 level down):src/parser/graphics/tile_page.rs
 };
+
+use super::{dimensions::Dimensions, phf_table::TILE_PAGE_TAGS, tokens::TilePageTag};
 
 #[derive(ts_rs::TS)]
 #[ts(export)]
@@ -28,7 +17,7 @@ use crate::parser::{
 #[serde(rename_all = "camelCase")]
 pub struct TilePage {
     #[serde(skip_serializing_if = "serializer_helper::is_metadata_hidden")]
-    metadata: Metadata,
+    metadata: RawMetadata,
     identifier: String,
     object_id: String,
 
@@ -41,7 +30,7 @@ impl TilePage {
     pub fn empty() -> Self {
         Self::default()
     }
-    pub fn new(identifier: &str, metadata: &Metadata) -> Self {
+    pub fn new(identifier: &str, metadata: &RawMetadata) -> Self {
         Self {
             identifier: String::from(identifier),
             metadata: metadata.clone(),
@@ -53,7 +42,7 @@ impl TilePage {
 
 #[typetag::serde]
 impl RawObject for TilePage {
-    fn get_metadata(&self) -> &Metadata {
+    fn get_metadata(&self) -> &RawMetadata {
         &self.metadata
     }
     fn get_identifier(&self) -> &str {

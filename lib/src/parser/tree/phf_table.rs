@@ -1,7 +1,7 @@
-use super::tokens::TreeToken;
+use phf::phf_map;
 
-/// The perfect hash function table for the `Tree` raw tokens.
-pub static TREE_TOKENS: phf::Map<&'static str, TreeToken> = phf::phf_map! {
+use super::tokens::TreeToken;
+pub static TREE_TOKENS: phf::Map<&'static str, TreeToken> = phf_map! {
     "TREE" => TreeToken::Tree,
     "TRUNK_NAME" => TreeToken::TrunkName,
     "MAX_TRUNK_HEIGHT" => TreeToken::MaxTrunkHeight,

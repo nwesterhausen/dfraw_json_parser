@@ -2,24 +2,8 @@ use serde::{Deserialize, Serialize};
 use tracing::{debug, warn};
 
 use crate::parser::{
-<<<<<<< HEAD:lib/src/parser/syndrome/raw.rs
-<<<<<<< HEAD:lib/src/parser/syndrome/raw.rs
-<<<<<<< HEAD:lib/src/parser/syndrome/raw.rs
     creature_effect::TOKEN_MAP as CREATURE_EFFECT_TOKENS,
     serializer_helper, {clean_search_vec, Searchable},
-=======
-    creature_effect::EFFECT_TOKENS,
-=======
-    creature_effect::CREATURE_EFFECT_TOKENS,
->>>>>>> 6f58260 (docs: add doc comments):src/parser/syndrome/raw.rs
-    helpers::serializer_helper,
-    searchable::{clean_search_vec, Searchable},
->>>>>>> 2b37a6f (refactor: expose 1 level down):src/parser/syndrome/raw.rs
-=======
-    creature_effect::CREATURE_EFFECT_TOKENS,
-    helpers::serializer_helper,
-    searchable::{clean_search_vec, Searchable},
->>>>>>> c2812957821240fff30b78553e73f23e904207e2:src/parser/syndrome/raw.rs
 };
 
 use super::{phf_table::SYNDROME_TOKEN, tokens::SyndromeToken};

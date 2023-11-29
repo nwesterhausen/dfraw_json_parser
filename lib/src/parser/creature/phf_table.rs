@@ -1,6 +1,4 @@
 use super::tokens::CreatureTag;
-
-/// This is a PHF map of all the creature tokens that are used in the raws.
 pub static CREATURE_TOKENS: phf::Map<&'static str, CreatureTag> = phf::phf_map! {
     "ARTIFICIAL_HIVEABLE" => CreatureTag::ArtificialHiveable,
     "DOES_NOT_EXIST" => CreatureTag::DoesNotExist,

@@ -2,23 +2,8 @@ use serde::{Deserialize, Serialize};
 use slug::slugify;
 
 use crate::parser::{
-<<<<<<< HEAD:lib/src/parser/inorganic/raw.rs
-<<<<<<< HEAD:lib/src/parser/inorganic/raw.rs
     clean_search_vec, material::Material, serializer_helper, ObjectType, RawMetadata, RawObject,
     Searchable,
-=======
-=======
->>>>>>> c2812957821240fff30b78553e73f23e904207e2:src/parser/inorganic/raw.rs
-    helpers::serializer_helper,
-    material::Material,
-    metadata::Metadata,
-    object_type::ObjectType,
-    raws::RawObject,
-    searchable::{clean_search_vec, Searchable},
-<<<<<<< HEAD:lib/src/parser/inorganic/raw.rs
->>>>>>> 2b37a6f (refactor: expose 1 level down):src/parser/inorganic/raw.rs
-=======
->>>>>>> c2812957821240fff30b78553e73f23e904207e2:src/parser/inorganic/raw.rs
 };
 
 use super::{
@@ -33,7 +18,7 @@ use super::{
 pub struct Inorganic {
     identifier: String,
     #[serde(skip_serializing_if = "serializer_helper::is_metadata_hidden")]
-    metadata: Metadata,
+    metadata: RawMetadata,
     object_id: String,
     material: Material,
 
@@ -59,7 +44,7 @@ impl Inorganic {
     pub fn empty() -> Inorganic {
         Inorganic::default()
     }
-    pub fn new(identifier: &str, metadata: &Metadata) -> Inorganic {
+    pub fn new(identifier: &str, metadata: &RawMetadata) -> Inorganic {
         Inorganic {
             identifier: String::from(identifier),
             metadata: metadata.clone(),
@@ -82,7 +67,7 @@ impl RawObject for Inorganic {
     fn get_name(&self) -> &str {
         &self.identifier
     }
-    fn get_metadata(&self) -> &Metadata {
+    fn get_metadata(&self) -> &RawMetadata {
         &self.metadata
     }
     fn is_empty(&self) -> bool {

@@ -1,9 +1,9 @@
 use serde::{Deserialize, Serialize};
 use tracing::warn;
 
-use crate::parser::helpers::serializer_helper;
+use crate::parser::serializer_helper;
 
-use crate::parser::graphic::GraphicType;
+use super::tokens::GraphicType;
 
 #[derive(ts_rs::TS)]
 #[ts(export)]

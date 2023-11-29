@@ -2,30 +2,17 @@ use serde::{Deserialize, Serialize};
 use tracing::warn;
 
 use crate::parser::{
-<<<<<<< HEAD:lib/src/parser/material/raw.rs
     clean_search_vec,
     creature_effect::TOKEN_MAP as CREATURE_EFFECT_TOKENS,
     material::phf_table::MATERIAL_PROPERTY_TOKENS,
     serializer_helper,
     syndrome::{Syndrome, TOKEN_MAP as SYNDROME_TOKEN_MAP},
     Color, MaterialMechanics, Searchable, StateName, Temperatures, Tile,
-=======
-    color::Color,
-    creature_effect::CREATURE_EFFECT_TOKENS,
-    helpers::serializer_helper,
-    material::phf_table::MATERIAL_PROPERTY_TOKENS,
-    material_mechanics::MaterialMechanics,
-    names::StateName,
-    searchable::{clean_search_vec, Searchable},
-    syndrome::{Syndrome, SYNDROME_TOKEN},
-    temperature::Temperatures,
-    tile::Tile,
->>>>>>> 2b37a6f (refactor: expose 1 level down):src/parser/material/raw.rs
 };
 
 use super::{
     phf_table::{FUEL_TYPE_TOKENS, MATERIAL_TYPE_TOKENS, MATERIAL_USAGE_TOKENS},
-    tokens::{FuelType, Property, Type, Usage},
+    tokens::{FuelType, MaterialProperty, MaterialType, MaterialUsage},
 };
 
 #[derive(ts_rs::TS)]
@@ -35,8 +22,8 @@ use super::{
 #[serde(rename_all = "camelCase")]
 pub struct Material {
     /// The type of the material is also the trigger to start tracking a material
-    #[serde(skip_serializing_if = "Type::is_default")]
-    material_type: Type,
+    #[serde(skip_serializing_if = "MaterialType::is_default")]
+    material_type: MaterialType,
     /// The material might have a name, but its more likely that there is only an identifier to
     /// refer to another creature/plant/reaction, which are listed elsewhere.
     /// If there is no name provided, then it is a special hardcoded case, e.g. magma or green glass.
@@ -66,7 +53,7 @@ pub struct Material {
 
     /// Usage tags
     #[serde(skip_serializing_if = "Vec::is_empty")]
-    usage: Vec<Usage>,
+    usage: Vec<MaterialUsage>,
 
     #[serde(skip_serializing_if = "serializer_helper::is_one")]
     value: u32,
@@ -180,7 +167,7 @@ impl Material {
         // If there are more than one parts, we can use a match and drill down further.
         // Use the phf_table to get the type of the material and then match from there.
         match material_type {
-            Type::Inorganic | Type::Stone | Type::Metal => {
+            MaterialType::Inorganic | MaterialType::Stone | MaterialType::Metal => {
                 let material_name = split.next().unwrap_or_default();
                 Material {
                     material_type: material_type.clone(),
@@ -188,7 +175,7 @@ impl Material {
                     ..Material::new()
                 }
             }
-            Type::Coal => {
+            MaterialType::Coal => {
                 let material_key = split.next().unwrap_or_default();
                 let Some(fuel_type) = FUEL_TYPE_TOKENS.get(material_key) else {
                     warn!(
@@ -206,7 +193,7 @@ impl Material {
                     ..Material::new()
                 }
             }
-            Type::LocalCreatureMaterial | Type::LocalPlantMaterial => {
+            MaterialType::LocalCreatureMaterial | MaterialType::LocalPlantMaterial => {
                 let material_name = split.next().unwrap_or_default();
                 Material {
                     material_type: material_type.clone(),
@@ -215,7 +202,7 @@ impl Material {
                     ..Material::new()
                 }
             }
-            Type::CreatureMaterial => {
+            MaterialType::CreatureMaterial => {
                 let creature_identifier = split.next().unwrap_or_default();
                 let material_name = split.next().unwrap_or_default();
                 Material {
@@ -225,7 +212,7 @@ impl Material {
                     ..Material::new()
                 }
             }
-            Type::PlantMaterial => {
+            MaterialType::PlantMaterial => {
                 let plant_identifier = split.next().unwrap_or_default();
                 let material_name = split.next().unwrap_or_default();
                 Material {
@@ -235,7 +222,7 @@ impl Material {
                     ..Material::new()
                 }
             }
-            Type::GetMaterialFromReagent => {
+            MaterialType::GetMaterialFromReagent => {
                 let reagent_identifier = split.next().unwrap_or_default();
                 let reaction_product_identifier = split.next().unwrap_or_default();
                 Material {
@@ -268,95 +255,95 @@ impl Material {
             };
 
             match tag {
-                Property::MaterialValue => {
+                MaterialProperty::MaterialValue => {
                     self.value = value.parse::<u32>().unwrap_or(1);
                 }
-                Property::StateNameAdjective => {
+                MaterialProperty::StateNameAdjective => {
                     self.state_names.add_from_value(value);
                     self.state_adjectives.add_from_value(value);
                 }
                 // Names and Adjectives
-                Property::StateName => self.state_names.add_from_value(value),
-                Property::StateAdjective => self.state_adjectives.add_from_value(value),
-                Property::StateColor => self.state_colors.add_from_value(value),
-                Property::BasicColor => self.color = Color::from_value(value),
+                MaterialProperty::StateName => self.state_names.add_from_value(value),
+                MaterialProperty::StateAdjective => self.state_adjectives.add_from_value(value),
+                MaterialProperty::StateColor => self.state_colors.add_from_value(value),
+                MaterialProperty::BasicColor => self.color = Color::from_value(value),
                 // Temperatures
-                Property::SpecificHeat => self
+                MaterialProperty::SpecificHeat => self
                     .temperatures
-                    .set_specific_heat(value.parse::<u32>().unwrap_or(0)),
-                Property::IgnitionPoint => self
+                    .update_specific_heat(value.parse::<u32>().unwrap_or(0)),
+                MaterialProperty::IgnitionPoint => self
                     .temperatures
-                    .set_ignition_point(value.parse::<u32>().unwrap_or(0)),
-                Property::MeltingPoint => self
+                    .update_ignition_point(value.parse::<u32>().unwrap_or(0)),
+                MaterialProperty::MeltingPoint => self
                     .temperatures
-                    .set_melting_point(value.parse::<u32>().unwrap_or(0)),
-                Property::BoilingPoint => self
+                    .update_melting_point(value.parse::<u32>().unwrap_or(0)),
+                MaterialProperty::BoilingPoint => self
                     .temperatures
-                    .set_boiling_point(value.parse::<u32>().unwrap_or(0)),
-                Property::HeatDamagePoint => self
+                    .update_boiling_point(value.parse::<u32>().unwrap_or(0)),
+                MaterialProperty::HeatDamagePoint => self
                     .temperatures
-                    .set_heat_damage_point(value.parse::<u32>().unwrap_or(0)),
-                Property::ColdDamagePoint => self
+                    .update_heat_damage_point(value.parse::<u32>().unwrap_or(0)),
+                MaterialProperty::ColdDamagePoint => self
                     .temperatures
-                    .set_cold_damage_point(value.parse::<u32>().unwrap_or(0)),
-                Property::MaterialFixedTemperature => self
+                    .update_cold_damage_point(value.parse::<u32>().unwrap_or(0)),
+                MaterialProperty::MaterialFixedTemperature => self
                     .temperatures
-                    .set_material_fixed_temperature(value.parse::<u32>().unwrap_or(0)),
+                    .update_material_fixed_temperature(value.parse::<u32>().unwrap_or(0)),
                 // Syndrome
-                Property::Syndrome => {
+                MaterialProperty::Syndrome => {
                     let syndrome = Syndrome::new();
                     self.syndromes.push(syndrome);
                 }
                 // Material Mechanics..
-                Property::ImpactYield
-                | Property::ImpactFracture
-                | Property::ImpactElasticity
-                | Property::CompressiveYield
-                | Property::CompressiveFracture
-                | Property::CompressiveElasticity
-                | Property::TensileYield
-                | Property::TensileFracture
-                | Property::TensileElasticity
-                | Property::TorsionYield
-                | Property::TorsionFracture
-                | Property::TorsionElasticity
-                | Property::ShearYield
-                | Property::ShearFracture
-                | Property::ShearElasticity
-                | Property::BendingYield
-                | Property::BendingFracture
-                | Property::BendingElasticity
-                | Property::MaxEdge
-                | Property::SolidDensity => {
+                MaterialProperty::ImpactYield
+                | MaterialProperty::ImpactFracture
+                | MaterialProperty::ImpactElasticity
+                | MaterialProperty::CompressiveYield
+                | MaterialProperty::CompressiveFracture
+                | MaterialProperty::CompressiveElasticity
+                | MaterialProperty::TensileYield
+                | MaterialProperty::TensileFracture
+                | MaterialProperty::TensileElasticity
+                | MaterialProperty::TorsionYield
+                | MaterialProperty::TorsionFracture
+                | MaterialProperty::TorsionElasticity
+                | MaterialProperty::ShearYield
+                | MaterialProperty::ShearFracture
+                | MaterialProperty::ShearElasticity
+                | MaterialProperty::BendingYield
+                | MaterialProperty::BendingFracture
+                | MaterialProperty::BendingElasticity
+                | MaterialProperty::MaxEdge
+                | MaterialProperty::SolidDensity => {
                     self.mechanical_properties.parse_tag(tag, value);
                 }
                 // Liquid and Gas
-                Property::LiquidDensity => {
+                MaterialProperty::LiquidDensity => {
                     self.liquid_density = value.parse::<i32>().unwrap_or(0);
                 }
-                Property::MolarMass => {
+                MaterialProperty::MolarMass => {
                     self.molar_mass = value.parse::<i32>().unwrap_or(0);
                 }
                 // Template
-                Property::UseMaterialTemplate => {
+                MaterialProperty::UseMaterialTemplate => {
                     self.template_identifier = String::from(value);
                 }
                 // Colors
-                Property::BuildColor => self.build_color = Color::from_value(value),
-                Property::DisplayColor => self.display_color = Color::from_value(value),
+                MaterialProperty::BuildColor => self.build_color = Color::from_value(value),
+                MaterialProperty::DisplayColor => self.display_color = Color::from_value(value),
 
-                Property::Tile => {
+                MaterialProperty::Tile => {
                     self.tile.set_character(value);
                 }
-                Property::TileColor => {
+                MaterialProperty::TileColor => {
                     self.tile.set_color(value);
                 }
 
-                Property::MaterialReactionProduct => {
+                MaterialProperty::MaterialReactionProduct => {
                     self.reaction_product_identifier = String::from(value);
                 }
 
-                Property::ItemSymbol => {
+                MaterialProperty::ItemSymbol => {
                     self.item_symbol = String::from(value);
                 }
 
@@ -382,21 +369,10 @@ impl Material {
         }
 
         // Materials can have syndromes attached and syndromes have creature effects attached.
-<<<<<<< HEAD:lib/src/parser/material/raw.rs
-<<<<<<< HEAD:lib/src/parser/material/raw.rs
         if SYNDROME_TOKEN_MAP.contains_key(key)
             || CREATURE_EFFECT_TOKENS.contains_key(key)
             || key == "CE"
         {
-=======
-        if SYNDROME_TOKEN.contains_key(key) || EFFECT_TOKENS.contains_key(key) || key == "CE" {
->>>>>>> 2b37a6f (refactor: expose 1 level down):src/parser/material/raw.rs
-=======
-        if SYNDROME_TOKEN.contains_key(key)
-            || CREATURE_EFFECT_TOKENS.contains_key(key)
-            || key == "CE"
-        {
->>>>>>> 6f58260 (docs: add doc comments):src/parser/material/raw.rs
             // We need to add the tag to the last syndrome added (all syndromes start with SYNDROME key)
             if let Some(syndrome) = self.syndromes.last_mut() {
                 syndrome.parse_tag(key, value);
