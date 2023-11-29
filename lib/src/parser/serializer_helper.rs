@@ -1,8 +1,4 @@
-<<<<<<<< HEAD:lib/src/parser/serializer_helper.rs
 use crate::RawMetadata;
-========
-use crate::parser::metadata::Metadata;
->>>>>>>> 2b37a6f (refactor: expose 1 level down):lib/src/parser/helpers/serializer_helper.rs
 
 /// This is only used for serialize
 #[allow(clippy::trivially_copy_pass_by_ref)]
