@@ -5,7 +5,44 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## v0.15.1 (2023-11-29)
+
+### Chore
+
+ - <csr-id-afa8e0e1d327654b1cfca2bad6d1cfad2deabe2b/> bump versions
+ - <csr-id-54ed44dc4a5e5e4121e62cd28d85b6394730a0cc/> update bindings
+
+### Bug Fixes
+
+ - <csr-id-f7097e9cd45f2be1275d2c758b48026a6be1588f/> add supporting fields
+
+### Commit Statistics
+
+<csr-read-only-do-not-edit/>
+
+ - 3 commits contributed to the release.
+ - 3 commits were understood as [conventional](https://www.conventionalcommits.org).
+ - 0 issues like '(#ID)' were seen in commit messages
+
+### Commit Details
+
+<csr-read-only-do-not-edit/>
+
+<details><summary>view details</summary>
+
+ * **Uncategorized**
+    - Bump versions ([`afa8e0e`](https://github.com/nwesterhausen/dfraw_json_parser/commit/afa8e0e1d327654b1cfca2bad6d1cfad2deabe2b))
+    - Update bindings ([`54ed44d`](https://github.com/nwesterhausen/dfraw_json_parser/commit/54ed44dc4a5e5e4121e62cd28d85b6394730a0cc))
+    - Add supporting fields ([`f7097e9`](https://github.com/nwesterhausen/dfraw_json_parser/commit/f7097e9cd45f2be1275d2c758b48026a6be1588f))
+</details>
+
 ## v0.15.0 (2023-11-29)
+
+<csr-id-550c0b756c7a4c15ddc466b2ed84decc4ae8801f/>
+<csr-id-d6f0009171df92df08b99b617c7755065c9ca40b/>
+<csr-id-65288c71f553aedef24ec9cf80cfd65601044f73/>
+<csr-id-29c5ba10963b956830c8bf533ddd2d4e1bec0942/>
+<csr-id-bd013b63d53420088773f96c096a0df55655bc59/>
 
 ### Changed
 
@@ -44,7 +81,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 <csr-read-only-do-not-edit/>
 
- - 13 commits contributed to the release.
+ - 14 commits contributed to the release.
  - 13 commits were understood as [conventional](https://www.conventionalcommits.org).
  - 0 issues like '(#ID)' were seen in commit messages
 
@@ -55,6 +92,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 <details><summary>view details</summary>
 
  * **Uncategorized**
+    - Release dfraw_json_parser v0.15.0, dfraw_json_parser-cli v1.0.0 ([`81b3060`](https://github.com/nwesterhausen/dfraw_json_parser/commit/81b3060c7a4a8a397c58021592efee578372e73b))
     - Bump package versions ([`550c0b7`](https://github.com/nwesterhausen/dfraw_json_parser/commit/550c0b756c7a4c15ddc466b2ed84decc4ae8801f))
     - Failing doctest ([`7104a38`](https://github.com/nwesterhausen/dfraw_json_parser/commit/7104a38bf34c169fb53ce79b2d6d9c5dbc4e10e7))
     - Improve error handling ([`cad7df6`](https://github.com/nwesterhausen/dfraw_json_parser/commit/cad7df65d139b392b6b7c47609240c4f7da109db))
@@ -73,6 +111,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## v0.14.0 (2023-10-24)
 
 <csr-id-b80a528d92b4e6764b21036878b37433c879aaf2/>
+<csr-id-04e94f04e8e3831bade62a15059a3ed7077b54ec/>
+
+
 <csr-id-04e94f04e8e3831bade62a15059a3ed7077b54ec/>
 
 ### Chore
@@ -279,6 +320,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## v0.13.0 (2023-09-18)
 
 <csr-id-1a1950a5b43bb0474355ce2f7e29a78bdffd081e/>
+<csr-id-c1ff0a07d29ae8213e3070ffc3d78c674f766832/>
+<csr-id-946b03da912a6028cdec964373b0a34f0af55317/>
+<csr-id-5c07ce1c3df8ba57c87d2e4dcae6f808ff49e319/>
+<csr-id-238e76e7008f7a90b2fe10cb2f7122d5b06b2ef4/>
+<csr-id-03501d4430066100dfeac48740851eba34be0f01/>
+<csr-id-891a33a87ab43f793aafc6477e83ce976f9e0a6e/>
+<csr-id-de14e788e06faa5d35092219aabb8b5a4370dd44/>
+<csr-id-7bb7703c8f4ac0c60b6d6f696ac6fe1ea32b1eab/>
+<csr-id-04e94f04e8e3831bade62a15059a3ed7077b54ec/>
+
+
 <csr-id-c1ff0a07d29ae8213e3070ffc3d78c674f766832/>
 <csr-id-946b03da912a6028cdec964373b0a34f0af55317/>
 <csr-id-5c07ce1c3df8ba57c87d2e4dcae6f808ff49e319/>
@@ -545,6 +597,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 <csr-id-edf44ef452e9952e7ebd7e49a09af69e9ffebf4b/>
 
+
+<csr-id-edf44ef452e9952e7ebd7e49a09af69e9ffebf4b/>
+
 ### New Features
 
  - <csr-id-648c92071d54b52b0e8fbc5a3dfb2ed680a0c7e2/> ✨ handle some plant graphics
@@ -574,6 +629,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## v0.10.0 (2023-01-17)
 
 <csr-id-d8f6f90df5667470625152ed476b6fa4945de12c/>
+<csr-id-9aaabf7317998f58325feccfddb49c0c9d4a531e/>
+<csr-id-3e363ff91a2f87f4be26593c6cfc6e9e37882494/>
+<csr-id-bac89e814c58315b6629755d25f06ec8d24e4ce2/>
+<csr-id-d1a86054f8995bdb12350ab84f8bf1cdfc9e88f5/>
+<csr-id-2f7e6995b52c09be2cc051ba40c0a71b6a67af2f/>
+<csr-id-417a67917caa8b7f5e1c410da56fa76cac33d4e3/>
+<csr-id-74fca046ff2fe3e26df372d4ed481773301d05b9/>
+<csr-id-15d15708f68bb3ff7d7a61c40742e316c985a46f/>
+<csr-id-d5648c59538e93ad0f9c96e5ce9a6a2e33a41740/>
+<csr-id-8f246a2cb0410202ea54bd581c45ff48306a6f57/>
+<csr-id-a4ff82d5790c6b3b07676eae32b2fbeadb587643/>
+
+
 <csr-id-9aaabf7317998f58325feccfddb49c0c9d4a531e/>
 <csr-id-3e363ff91a2f87f4be26593c6cfc6e9e37882494/>
 <csr-id-bac89e814c58315b6629755d25f06ec8d24e4ce2/>
@@ -713,6 +781,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 <csr-id-9669a1cd9d2be7518d989a26fbd4dc656edd4c9b/>
 
 
+<csr-id-48d50ad26512c5a35b8c3d136a49da3b4f1cc95b/>
+<csr-id-9669a1cd9d2be7518d989a26fbd4dc656edd4c9b/>
+
+
 <csr-id-9669a1cd9d2be7518d989a26fbd4dc656edd4c9b/>
 
 ### New Features
@@ -788,6 +860,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## v0.7.2 (2022-12-28)
 
 <csr-id-6ed8d209706a530c35d0cd284df72d7c04d3efe6/>
+<csr-id-5e6dde45b3489ad93660372f654fa637a4379d98/>
+<csr-id-a6f00156cddc9b0c42b5f0a19883d5382c19d160/>
+<csr-id-5a9740e01528680c3f6543673fbd722913ac57c2/>
+<csr-id-7932e59c509f1da93e8f431fbbef9a164de144d1/>
+<csr-id-bb5de4483e6c0b5bfb15a0a5e2defdd067bd6c9d/>
+<csr-id-a8301caede5aa2090b769c05e19a699267e07b07/>
+<csr-id-8d79e7bc493584248b8adbc98ae4f178f517a6a6/>
+<csr-id-59e2dff2d583cd8c5c55411688a6c8f4ddcf361a/>
+
+
 <csr-id-5e6dde45b3489ad93660372f654fa637a4379d98/>
 <csr-id-a6f00156cddc9b0c42b5f0a19883d5382c19d160/>
 <csr-id-5a9740e01528680c3f6543673fbd722913ac57c2/>
