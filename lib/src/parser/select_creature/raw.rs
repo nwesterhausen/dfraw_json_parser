@@ -3,14 +3,20 @@ use serde::{Deserialize, Serialize};
 use crate::parser::{
     helpers::build_object_id_from_pieces,
 <<<<<<< HEAD:lib/src/parser/select_creature/raw.rs
+<<<<<<< HEAD:lib/src/parser/select_creature/raw.rs
     serializer_helper, ObjectType, {clean_search_vec, Searchable}, {RawMetadata, RawObject},
 =======
+=======
+>>>>>>> c2812957821240fff30b78553e73f23e904207e2:src/parser/select_creature/raw.rs
     helpers::serializer_helper,
     metadata::Metadata,
     object_type::ObjectType,
     raws::RawObject,
     searchable::{clean_search_vec, Searchable},
+<<<<<<< HEAD:lib/src/parser/select_creature/raw.rs
 >>>>>>> 2b37a6f (refactor: expose 1 level down):src/parser/select_creature/raw.rs
+=======
+>>>>>>> c2812957821240fff30b78553e73f23e904207e2:src/parser/select_creature/raw.rs
 };
 
 #[derive(ts_rs::TS)]

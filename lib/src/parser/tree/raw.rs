@@ -2,10 +2,14 @@ use serde::{Deserialize, Serialize};
 use tracing::{error, warn};
 
 <<<<<<< HEAD:lib/src/parser/tree/raw.rs
+<<<<<<< HEAD:lib/src/parser/tree/raw.rs
 use crate::parser::{serializer_helper, Color, Name};
 =======
 use crate::parser::{color::Color, helpers::serializer_helper, names::Name};
 >>>>>>> 2b37a6f (refactor: expose 1 level down):src/parser/tree/raw.rs
+=======
+use crate::parser::{color::Color, helpers::serializer_helper, names::Name};
+>>>>>>> c2812957821240fff30b78553e73f23e904207e2:src/parser/tree/raw.rs
 
 use super::{
     phf_table::TREE_TOKENS,

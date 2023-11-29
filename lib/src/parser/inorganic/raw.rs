@@ -3,16 +3,22 @@ use slug::slugify;
 
 use crate::parser::{
 <<<<<<< HEAD:lib/src/parser/inorganic/raw.rs
+<<<<<<< HEAD:lib/src/parser/inorganic/raw.rs
     clean_search_vec, material::Material, serializer_helper, ObjectType, RawMetadata, RawObject,
     Searchable,
 =======
+=======
+>>>>>>> c2812957821240fff30b78553e73f23e904207e2:src/parser/inorganic/raw.rs
     helpers::serializer_helper,
     material::Material,
     metadata::Metadata,
     object_type::ObjectType,
     raws::RawObject,
     searchable::{clean_search_vec, Searchable},
+<<<<<<< HEAD:lib/src/parser/inorganic/raw.rs
 >>>>>>> 2b37a6f (refactor: expose 1 level down):src/parser/inorganic/raw.rs
+=======
+>>>>>>> c2812957821240fff30b78553e73f23e904207e2:src/parser/inorganic/raw.rs
 };
 
 use super::{

@@ -3,11 +3,20 @@ use std::fmt::{Debug, Display};
 use serde::{Deserialize, Serialize};
 
 <<<<<<< HEAD
+<<<<<<< HEAD
 pub static OBJECT_TOKEN_MAP: phf::Map<&'static str, ObjectType> = phf::phf_map! {
 =======
 /// A PHF map of the string literal object tokens to the `ObjectType` enum.
 pub static OBJECT_TOKENS: phf::Map<&'static str, ObjectType> = phf::phf_map! {
 >>>>>>> 6f58260 (docs: add doc comments)
+=======
+<<<<<<<< HEAD:lib/src/parser/object_types.rs
+pub static OBJECT_TOKEN_MAP: phf::Map<&'static str, ObjectType> = phf::phf_map! {
+========
+/// A PHF map of the string literal object tokens to the `ObjectType` enum.
+pub static OBJECT_TOKENS: phf::Map<&'static str, ObjectType> = phf::phf_map! {
+>>>>>>>> c2812957821240fff30b78553e73f23e904207e2:src/parser/object_type.rs
+>>>>>>> c2812957821240fff30b78553e73f23e904207e2
     "CREATURE" => ObjectType::Creature,
     "INORGANIC" => ObjectType::Inorganic,
     "PLANT" => ObjectType::Plant,

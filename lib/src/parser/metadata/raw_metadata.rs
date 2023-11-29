@@ -1,4 +1,5 @@
 <<<<<<< HEAD:lib/src/parser/metadata/raw_metadata.rs
+<<<<<<< HEAD:lib/src/parser/metadata/raw_metadata.rs
 use std::path::Path;
 
 use serde::{Deserialize, Serialize};
@@ -108,6 +109,10 @@ impl Metadata {
 =======
 use std::any::Any;
 
+=======
+use std::any::Any;
+
+>>>>>>> c2812957821240fff30b78553e73f23e904207e2:src/parser/raws.rs
 use crate::parser::{metadata::Metadata, object_type::ObjectType, searchable::Searchable};
 
 /// The `RawObject` trait is implemented by all raw objects. This trait is used
@@ -155,6 +160,9 @@ pub trait RawObjectToAny: 'static {
 impl<T: 'static> RawObjectToAny for T {
     fn as_any(&self) -> &dyn Any {
         self
+<<<<<<< HEAD:lib/src/parser/metadata/raw_metadata.rs
 >>>>>>> 2b37a6f (refactor: expose 1 level down):src/parser/raws.rs
+=======
+>>>>>>> c2812957821240fff30b78553e73f23e904207e2:src/parser/raws.rs
     }
 }

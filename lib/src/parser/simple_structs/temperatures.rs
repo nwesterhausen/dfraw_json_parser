@@ -6,12 +6,18 @@ use serde::{Deserialize, Serialize};
 #[derive(Serialize, Deserialize, Debug, Clone, Default)]
 #[serde(rename_all = "camelCase")]
 <<<<<<< HEAD:lib/src/parser/simple_structs/temperatures.rs
+<<<<<<< HEAD:lib/src/parser/simple_structs/temperatures.rs
 /// The temperature properties of a material
 =======
 /// This struct describes the temperatures of a material. The way temperatures are defined in the raws
 /// is by many individual tokens, each of which describes a different temperature-related property. This
 /// struct is used to group all of those tokens together.
 >>>>>>> 6f58260 (docs: add doc comments):src/parser/temperature.rs
+=======
+/// This struct describes the temperatures of a material. The way temperatures are defined in the raws
+/// is by many individual tokens, each of which describes a different temperature-related property. This
+/// struct is used to group all of those tokens together.
+>>>>>>> c2812957821240fff30b78553e73f23e904207e2:src/parser/temperature.rs
 pub struct Temperatures {
     /// This determines how long it takes the material to heat up or cool down.
     /// A material with a high specific heat capacity will hold more heat and affect its surroundings more

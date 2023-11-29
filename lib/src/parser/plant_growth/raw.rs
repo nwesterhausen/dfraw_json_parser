@@ -2,8 +2,11 @@ use serde::{Deserialize, Serialize};
 use tracing::{error, warn};
 
 <<<<<<< HEAD:lib/src/parser/plant_growth/raw.rs
+<<<<<<< HEAD:lib/src/parser/plant_growth/raw.rs
 use crate::parser::{clean_search_vec, serializer_helper, Searchable, SingPlurName};
 =======
+=======
+>>>>>>> c2812957821240fff30b78553e73f23e904207e2:src/parser/plant_growth/raw.rs
 use crate::parser::helpers::serializer_helper;
 use crate::parser::searchable::clean_search_vec;
 use crate::parser::{names::SingPlurName, searchable::Searchable};

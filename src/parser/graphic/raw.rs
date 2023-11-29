@@ -2,24 +2,33 @@ use serde::{Deserialize, Serialize};
 use tracing::warn;
 
 use crate::parser::{
+<<<<<<< HEAD
 <<<<<<<< HEAD:lib/src/parser/graphics/raw.rs
 <<<<<<< HEAD:lib/src/parser/graphics/raw.rs
     clean_search_vec, helpers::build_object_id_from_pieces, object_types::ObjectType,
     serializer_helper, RawMetadata, RawObject, Searchable,
 =======
 ========
+=======
+>>>>>>> c2812957821240fff30b78553e73f23e904207e2
     graphic::{
         CustomGraphicExtension, GraphicType, SpriteGraphic, SpriteLayer, CUSTOM_GRAPHIC_TAGS,
         GROWTH_TAGS, PLANT_GRAPHIC_TEMPLATES,
     },
+<<<<<<< HEAD
 >>>>>>>> 6f58260 (docs: add doc comments):src/parser/graphic/raw.rs
+=======
+>>>>>>> c2812957821240fff30b78553e73f23e904207e2
     helpers::build_object_id_from_pieces,
     helpers::serializer_helper,
     metadata::Metadata,
     object_type::ObjectType,
     raws::RawObject,
     searchable::{clean_search_vec, Searchable},
+<<<<<<< HEAD
 >>>>>>> 2b37a6f (refactor: expose 1 level down):src/parser/graphics/raw.rs
+=======
+>>>>>>> c2812957821240fff30b78553e73f23e904207e2
 };
 
 #[derive(ts_rs::TS)]

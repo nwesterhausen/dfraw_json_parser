@@ -3,8 +3,11 @@ use slug::slugify;
 
 use crate::parser::{
 <<<<<<< HEAD:lib/src/parser/material_template/raw.rs
+<<<<<<< HEAD:lib/src/parser/material_template/raw.rs
     clean_search_vec, material::Material, ObjectType, RawMetadata, RawObject, Searchable,
 =======
+=======
+>>>>>>> c2812957821240fff30b78553e73f23e904207e2:src/parser/material_template/raw.rs
     material::Material,
     metadata::Metadata,
     object_type::ObjectType,

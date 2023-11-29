@@ -542,6 +542,7 @@ impl SpriteGraphic {
                 if let Some(condition) = GraphicCondition::from_token(v) {
                     condition
                 } else {
+<<<<<<< HEAD
 <<<<<<<< HEAD:lib/src/parser/graphics/sprite_graphic.rs
                     warn!("Failed to parse {} as secondary_condition in {}", v, token);
                     Condition::None
@@ -549,15 +550,22 @@ impl SpriteGraphic {
                     log::warn!("Failed to parse {} as secondary_condition in {}", v, token);
                     GraphicCondition::None
 >>>>>>>> 6f58260 (docs: add doc comments):src/parser/graphic/sprite_graphic.rs
+=======
+                    log::warn!("Failed to parse {} as secondary_condition in {}", v, token);
+                    GraphicCondition::None
+>>>>>>> c2812957821240fff30b78553e73f23e904207e2
                 }
             }
             _ => GraphicCondition::None,
         };
 
+<<<<<<< HEAD
 <<<<<<<< HEAD:lib/src/parser/graphics/sprite_graphic.rs
         if primary_condition == Condition::None {
             warn!(
 ========
+=======
+>>>>>>> c2812957821240fff30b78553e73f23e904207e2
         if primary_condition == GraphicCondition::None {
             log::warn!(
 >>>>>>>> 6f58260 (docs: add doc comments):src/parser/graphic/sprite_graphic.rs
@@ -653,6 +661,7 @@ impl SpriteGraphic {
             _ => ColorModification::AsIs,
         };
 
+<<<<<<< HEAD
 <<<<<<<< HEAD:lib/src/parser/graphics/sprite_graphic.rs
         let primary_condition = if let Some(parsed_condition) = Condition::from_token(condition) {
             parsed_condition
@@ -665,6 +674,8 @@ impl SpriteGraphic {
             Condition::None
         };
 ========
+=======
+>>>>>>> c2812957821240fff30b78553e73f23e904207e2
         let primary_condition =
             if let Some(parsed_condition) = GraphicCondition::from_token(condition) {
                 parsed_condition
@@ -676,7 +687,10 @@ impl SpriteGraphic {
                 );
                 GraphicCondition::None
             };
+<<<<<<< HEAD
 >>>>>>>> 6f58260 (docs: add doc comments):src/parser/graphic/sprite_graphic.rs
+=======
+>>>>>>> c2812957821240fff30b78553e73f23e904207e2
 
         let secondary_condition = match split.get(5) {
             Some(v) => {
@@ -694,10 +708,13 @@ impl SpriteGraphic {
             _ => GraphicCondition::None,
         };
 
+<<<<<<< HEAD
 <<<<<<<< HEAD:lib/src/parser/graphics/sprite_graphic.rs
         if primary_condition == Condition::None {
             warn!(
 ========
+=======
+>>>>>>> c2812957821240fff30b78553e73f23e904207e2
         if primary_condition == GraphicCondition::None {
             log::warn!(
 >>>>>>>> 6f58260 (docs: add doc comments):src/parser/graphic/sprite_graphic.rs
