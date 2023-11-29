@@ -1,6 +1,6 @@
 [package]
 name = "dfraw_json_parser"
-version = "0.15.0"
+version = "0.15.0-alpha"
 edition = "2021"
 readme = "README.md"
 authors = ["Nicholas Westerhausen <nick@westmail.cc>"]
@@ -33,7 +33,7 @@ tracing = "0.1.40"
 typetag = "0.2"
 walkdir = "2"
 # Tauri feature dependency needs tauri lib
-tauri = { version = "1.5", optional = true }
+tauri = { version = "2.0.0-alpha", optional = true }
 xmlparser = "0.13.6"
 quick-xml = "0.31.0"
 thiserror = "1.0.50"
