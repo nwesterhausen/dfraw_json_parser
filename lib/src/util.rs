@@ -95,7 +95,7 @@ pub fn get_parent_dir_name<P: AsRef<Path>>(full_path: &P) -> String {
 ///
 /// Returns:
 ///
-/// A Result<PathBuf, String>
+/// `Result<PathBuf, String>`
 ///
 /// # Errors
 ///
