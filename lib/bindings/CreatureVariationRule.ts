@@ -2,7 +2,7 @@
 
 export type CreatureVariationRule =
   | "Unknown"
-  | { RemoveTag: { tag: string } }
+  | { RemoveTag: { tag: string; value: string | null } }
   | { NewTag: { tag: string; value: string | null } }
   | { AddTag: { tag: string; value: string | null } }
   | {
@@ -31,6 +31,7 @@ export type CreatureVariationRule =
   | {
       ConditionalRemoveTag: {
         tag: string;
+        value: string | null;
         argument_index: number;
         argument_requirement: string;
       };

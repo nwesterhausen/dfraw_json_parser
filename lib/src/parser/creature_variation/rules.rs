@@ -9,6 +9,7 @@ pub enum CreatureVariationRule {
     Unknown,
     RemoveTag {
         tag: String,
+        value: Option<String>,
     },
     NewTag {
         tag: String,
@@ -37,6 +38,7 @@ pub enum CreatureVariationRule {
     },
     ConditionalRemoveTag {
         tag: String,
+        value: Option<String>,
         argument_index: usize,
         argument_requirement: String,
     },
@@ -50,13 +52,17 @@ pub enum CreatureVariationRule {
 }
 
 impl CreatureVariationRule {
+    #[allow(clippy::too_many_lines)]
     pub fn replace_args(&mut self, args: &[&str]) {
         // We simply replace all instances of `!ARGn` with the corresponding argument.
         match self {
-            CreatureVariationRule::RemoveTag { tag } => {
+            CreatureVariationRule::RemoveTag { tag, value } => {
                 // Only have the tag to replace.
                 *self = CreatureVariationRule::RemoveTag {
                     tag: replace_args_in_string(tag, args),
+                    value: value
+                        .as_mut()
+                        .map(|value| replace_args_in_string(value, args)),
                 };
             }
             CreatureVariationRule::NewTag { tag, value }
@@ -64,7 +70,9 @@ impl CreatureVariationRule {
                 // Have both the tag and the value to replace.
                 *self = CreatureVariationRule::NewTag {
                     tag: replace_args_in_string(tag, args),
-                    value: value.as_ref().map(|s| replace_args_in_string(s, args)),
+                    value: value
+                        .as_mut()
+                        .map(|value| replace_args_in_string(value, args)),
                 };
             }
             CreatureVariationRule::ConvertTag {
@@ -75,14 +83,17 @@ impl CreatureVariationRule {
                 // Have the tag, target, and replacement to replace.
                 *self = CreatureVariationRule::ConvertTag {
                     tag: replace_args_in_string(tag, args),
-                    target: target.as_ref().map(|s| replace_args_in_string(s, args)),
+                    target: target
+                        .as_mut()
+                        .map(|value| replace_args_in_string(value, args)),
                     replacement: replacement
-                        .as_ref()
-                        .map(|s| replace_args_in_string(s, args)),
+                        .as_mut()
+                        .map(|value| replace_args_in_string(value, args)),
                 };
             }
             CreatureVariationRule::ConditionalRemoveTag {
                 tag,
+                value,
                 argument_requirement,
                 argument_index,
             } => {
@@ -90,6 +101,9 @@ impl CreatureVariationRule {
                 *self =
                     CreatureVariationRule::ConditionalRemoveTag {
                         tag: replace_args_in_string(tag, args),
+                        value: value
+                            .as_mut()
+                            .map(|value| replace_args_in_string(value, args)),
                         argument_requirement: String::from(VARIATION_ARGUMENT_RE.replace_all(
                             argument_requirement.as_str(),
                             |caps: &regex::Captures| argument_as_string(caps, args),
@@ -113,7 +127,9 @@ impl CreatureVariationRule {
                 *self =
                     CreatureVariationRule::ConditionalNewTag {
                         tag: replace_args_in_string(tag, args),
-                        value: value.as_ref().map(|s| replace_args_in_string(s, args)),
+                        value: value
+                            .as_mut()
+                            .map(|value| replace_args_in_string(value, args)),
                         argument_requirement: String::from(VARIATION_ARGUMENT_RE.replace_all(
                             argument_requirement.as_str(),
                             |caps: &regex::Captures| argument_as_string(caps, args),
@@ -132,10 +148,12 @@ impl CreatureVariationRule {
                 *self =
                     CreatureVariationRule::ConditionalConvertTag {
                         tag: replace_args_in_string(tag, args),
-                        target: target.as_ref().map(|s| replace_args_in_string(s, args)),
+                        target: target
+                            .as_mut()
+                            .map(|value| replace_args_in_string(value, args)),
                         replacement: replacement
-                            .as_ref()
-                            .map(|s| replace_args_in_string(s, args)),
+                            .as_mut()
+                            .map(|value| replace_args_in_string(value, args)),
                         argument_requirement: String::from(VARIATION_ARGUMENT_RE.replace_all(
                             argument_requirement.as_str(),
                             |caps: &regex::Captures| argument_as_string(caps, args),
@@ -149,7 +167,7 @@ impl CreatureVariationRule {
     pub fn apply(&mut self, creature: &mut Creature, args: &[&str]) {
         self.replace_args(args);
         match self {
-            CreatureVariationRule::RemoveTag { tag } => {
+            CreatureVariationRule::RemoveTag { tag, .. } => {
                 remove_tag(creature, tag);
             }
             CreatureVariationRule::NewTag { tag, value }
@@ -193,6 +211,7 @@ impl CreatureVariationRule {
                 tag,
                 argument_index,
                 argument_requirement,
+                ..
             } => {
                 // Guard against out of bounds arguments.
                 if args.len() < *argument_index {
