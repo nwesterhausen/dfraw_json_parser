@@ -7,9 +7,10 @@
 # - cargo
 # - pnpm
 
+rm -rf lib/bindings
+
 # Running `test --all-features` will also generate bindings via `ts-rs` however they are not
 # formatted nicely. So we then run prettier to format them.
-
 cargo test --all-features
 
 pnpx prettier --write lib/bindings/*.ts
