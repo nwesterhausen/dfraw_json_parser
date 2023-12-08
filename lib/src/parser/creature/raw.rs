@@ -9,7 +9,7 @@ use crate::parser::{
     SingPlurName, Tile,
 };
 
-use super::{phf_table::CREATURE_TOKENS, tokens::CreatureTag};
+use super::{phf_table::CREATURE_TOKENS, tokens::CreatureTag, Gait};
 
 /// The `Creature` struct represents a creature in a Dwarf Fortress, with the properties
 /// that can be set in the raws. Not all the raws are represented here, only the ones that
@@ -38,6 +38,8 @@ pub struct Creature {
     pref_strings: Vec<String>,
     #[serde(skip_serializing_if = "Tile::is_default")]
     tile: Tile,
+    #[serde(skip_serializing_if = "Vec::is_empty")]
+    gaits: Vec<Gait>,
     // integers
     #[serde(skip_serializing_if = "serializer_helper::is_default_frequency")]
     frequency: u16, //Defaults to 50 if not specified
@@ -496,6 +498,9 @@ impl RawObject for Creature {
             }
             CreatureTag::GlowTile => {
                 self.tile.set_glow_character(value);
+            }
+            CreatureTag::Gait => {
+                self.gaits.push(Gait::from_value(value));
             }
             _ => {
                 self.tags.push(tag.clone());

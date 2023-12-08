@@ -53,27 +53,45 @@ pub enum CreatureVariationRule {
 
 impl CreatureVariationRule {
     #[allow(clippy::too_many_lines)]
-    pub fn replace_args(&mut self, args: &[&str]) {
+    #[must_use]
+    /// Apply a set of arguments to the rule and get a rule that has the arguments applied.
+    /// This will replace all instances of `!ARGn` with the corresponding argument.
+    ///
+    /// This returns a new rule with the arguments applied because we don't want to mutate the
+    /// original rule (multiple creatures may use the same rule)
+    ///
+    /// ## Arguments
+    ///
+    /// * `args` - The arguments to apply to the rule.
+    ///
+    /// ## Returns
+    ///
+    /// * `CreatureVariationRule` - The rule with the arguments applied.
+    pub fn with_args(&self, args: &[&str]) -> Self {
+        // Short circuit if there are no arguments to replace.
+        if args.is_empty() {
+            return self.clone();
+        }
         // We simply replace all instances of `!ARGn` with the corresponding argument.
         match self {
             CreatureVariationRule::RemoveTag { tag, value } => {
                 // Only have the tag to replace.
-                *self = CreatureVariationRule::RemoveTag {
+                CreatureVariationRule::RemoveTag {
                     tag: replace_args_in_string(tag, args),
                     value: value
-                        .as_mut()
+                        .as_ref()
                         .map(|value| replace_args_in_string(value, args)),
-                };
+                }
             }
             CreatureVariationRule::NewTag { tag, value }
             | CreatureVariationRule::AddTag { tag, value } => {
                 // Have both the tag and the value to replace.
-                *self = CreatureVariationRule::NewTag {
+                CreatureVariationRule::NewTag {
                     tag: replace_args_in_string(tag, args),
                     value: value
-                        .as_mut()
+                        .as_ref()
                         .map(|value| replace_args_in_string(value, args)),
-                };
+                }
             }
             CreatureVariationRule::ConvertTag {
                 tag,
@@ -81,15 +99,15 @@ impl CreatureVariationRule {
                 replacement,
             } => {
                 // Have the tag, target, and replacement to replace.
-                *self = CreatureVariationRule::ConvertTag {
+                CreatureVariationRule::ConvertTag {
                     tag: replace_args_in_string(tag, args),
                     target: target
-                        .as_mut()
+                        .as_ref()
                         .map(|value| replace_args_in_string(value, args)),
                     replacement: replacement
-                        .as_mut()
+                        .as_ref()
                         .map(|value| replace_args_in_string(value, args)),
-                };
+                }
             }
             CreatureVariationRule::ConditionalRemoveTag {
                 tag,
@@ -98,18 +116,19 @@ impl CreatureVariationRule {
                 argument_index,
             } => {
                 // Have the tag and the argument requirement to replace.
-                *self =
-                    CreatureVariationRule::ConditionalRemoveTag {
-                        tag: replace_args_in_string(tag, args),
-                        value: value
-                            .as_mut()
-                            .map(|value| replace_args_in_string(value, args)),
-                        argument_requirement: String::from(VARIATION_ARGUMENT_RE.replace_all(
+                CreatureVariationRule::ConditionalRemoveTag {
+                    tag: replace_args_in_string(tag, args),
+                    value: value
+                        .as_ref()
+                        .map(|value| replace_args_in_string(value, args)),
+                    argument_requirement: String::from(
+                        VARIATION_ARGUMENT_RE.replace_all(
                             argument_requirement.as_str(),
                             |caps: &regex::Captures| argument_as_string(caps, args),
-                        )),
-                        argument_index: *argument_index,
-                    };
+                        ),
+                    ),
+                    argument_index: *argument_index,
+                }
             }
             CreatureVariationRule::ConditionalNewTag {
                 tag,
@@ -124,18 +143,19 @@ impl CreatureVariationRule {
                 argument_index,
             } => {
                 // Have the tag, value, and argument requirement to replace.
-                *self =
-                    CreatureVariationRule::ConditionalNewTag {
-                        tag: replace_args_in_string(tag, args),
-                        value: value
-                            .as_mut()
-                            .map(|value| replace_args_in_string(value, args)),
-                        argument_requirement: String::from(VARIATION_ARGUMENT_RE.replace_all(
+                CreatureVariationRule::ConditionalNewTag {
+                    tag: replace_args_in_string(tag, args),
+                    value: value
+                        .as_ref()
+                        .map(|value| replace_args_in_string(value, args)),
+                    argument_requirement: String::from(
+                        VARIATION_ARGUMENT_RE.replace_all(
                             argument_requirement.as_str(),
                             |caps: &regex::Captures| argument_as_string(caps, args),
-                        )),
-                        argument_index: *argument_index,
-                    };
+                        ),
+                    ),
+                    argument_index: *argument_index,
+                }
             }
             CreatureVariationRule::ConditionalConvertTag {
                 tag,
@@ -145,40 +165,43 @@ impl CreatureVariationRule {
                 argument_requirement,
             } => {
                 // Have the tag, target, replacement, and argument requirement to replace.
-                *self =
-                    CreatureVariationRule::ConditionalConvertTag {
-                        tag: replace_args_in_string(tag, args),
-                        target: target
-                            .as_mut()
-                            .map(|value| replace_args_in_string(value, args)),
-                        replacement: replacement
-                            .as_mut()
-                            .map(|value| replace_args_in_string(value, args)),
-                        argument_requirement: String::from(VARIATION_ARGUMENT_RE.replace_all(
+                CreatureVariationRule::ConditionalConvertTag {
+                    tag: replace_args_in_string(tag, args),
+                    target: target
+                        .as_ref()
+                        .map(|value| replace_args_in_string(value, args)),
+                    replacement: replacement
+                        .as_ref()
+                        .map(|value| replace_args_in_string(value, args)),
+                    argument_requirement: String::from(
+                        VARIATION_ARGUMENT_RE.replace_all(
                             argument_requirement.as_str(),
                             |caps: &regex::Captures| argument_as_string(caps, args),
-                        )),
-                        argument_index: *argument_index,
-                    };
+                        ),
+                    ),
+                    argument_index: *argument_index,
+                }
             }
-            CreatureVariationRule::Unknown => {}
+            CreatureVariationRule::Unknown => {
+                // Unknown rules don't have anything to replace.
+                CreatureVariationRule::Unknown
+            }
         }
     }
-    pub fn apply(&mut self, creature: &mut Creature, args: &[&str]) {
-        self.replace_args(args);
-        match self {
+    pub fn apply(&self, creature: &mut Creature, args: &[&str]) {
+        match self.with_args(args) {
             CreatureVariationRule::RemoveTag { tag, .. } => {
-                remove_tag(creature, tag);
+                remove_tag(creature, &tag);
             }
             CreatureVariationRule::NewTag { tag, value }
             | CreatureVariationRule::AddTag { tag, value } => {
-                apply_new_tag(creature, tag, value.as_deref());
+                apply_new_tag(creature, &tag, value.as_deref());
             }
             CreatureVariationRule::ConvertTag {
                 tag,
                 target,
                 replacement,
-            } => convert_tag(creature, tag, target.as_deref(), replacement.as_deref()),
+            } => convert_tag(creature, &tag, target.as_deref(), replacement.as_deref()),
             CreatureVariationRule::ConditionalNewTag {
                 tag,
                 value,
@@ -192,7 +215,7 @@ impl CreatureVariationRule {
                 argument_requirement,
             } => {
                 // Guard against out of bounds arguments.
-                if args.len() < *argument_index {
+                if args.len() < argument_index {
                     tracing::warn!(
                         "Creature Variation Argument index {} is out of bounds for {:?}",
                         argument_index,
@@ -201,9 +224,9 @@ impl CreatureVariationRule {
                     return;
                 }
                 // Check if the argument matches the requirement.
-                if let Some(argument_value) = args.get(*argument_index - 1) {
-                    if argument_value == argument_requirement {
-                        apply_new_tag(creature, tag, value.as_deref());
+                if let Some(argument_value) = args.get(argument_index - 1) {
+                    if argument_value == &argument_requirement {
+                        apply_new_tag(creature, &tag, value.as_deref());
                     }
                 }
             }
@@ -214,7 +237,7 @@ impl CreatureVariationRule {
                 ..
             } => {
                 // Guard against out of bounds arguments.
-                if args.len() < *argument_index {
+                if args.len() < argument_index {
                     tracing::warn!(
                         "Creature Variation Argument index {} is out of bounds for {:?}",
                         argument_index,
@@ -223,9 +246,9 @@ impl CreatureVariationRule {
                     return;
                 }
                 // Check if the argument matches the requirement.
-                if let Some(argument_value) = args.get(*argument_index - 1) {
-                    if argument_value == argument_requirement {
-                        remove_tag(creature, tag);
+                if let Some(argument_value) = args.get(argument_index - 1) {
+                    if argument_value == &argument_requirement {
+                        remove_tag(creature, &tag);
                     }
                 }
             }
@@ -237,7 +260,7 @@ impl CreatureVariationRule {
                 argument_requirement,
             } => {
                 // Guard against out of bounds arguments.
-                if args.len() < *argument_index {
+                if args.len() < argument_index {
                     tracing::warn!(
                         "Creature Variation Argument index {} is out of bounds for {:?}",
                         argument_index,
@@ -246,9 +269,9 @@ impl CreatureVariationRule {
                     return;
                 }
                 // Check if the argument matches the requirement.
-                if let Some(argument_value) = args.get(*argument_index - 1) {
-                    if argument_value == argument_requirement {
-                        convert_tag(creature, tag, target.as_deref(), replacement.as_deref());
+                if let Some(argument_value) = args.get(argument_index - 1) {
+                    if argument_value == &argument_requirement {
+                        convert_tag(creature, &tag, target.as_deref(), replacement.as_deref());
                     }
                 }
             }
