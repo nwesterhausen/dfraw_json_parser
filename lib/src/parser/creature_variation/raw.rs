@@ -41,7 +41,7 @@ impl CreatureVariationRaw {
     /// # Returns
     ///
     /// A new creature variation with the given identifier.
-    pub fn new(metadata: &RawMetadata, identifier: &str) -> Self {
+    pub fn new(identifier: &str, metadata: &RawMetadata) -> Self {
         Self {
             metadata: metadata.clone(),
             identifier: identifier.to_string(),
@@ -53,6 +53,30 @@ impl CreatureVariationRaw {
             rules: Vec::new(),
             argument_count: 0,
         }
+    }
+
+    pub fn empty() -> Self {
+        Self {
+            metadata: RawMetadata::default(),
+            identifier: String::new(),
+            object_id: String::new(),
+            rules: Vec::new(),
+            argument_count: 0,
+        }
+    }
+
+    pub fn get_rules(&self) -> &Vec<Rule> {
+        &self.rules
+    }
+
+    pub fn get_convert_rules(&self) -> Vec<&Rule> {
+        self.rules
+            .iter()
+            .filter(|r| match r {
+                Rule::ConvertTag { .. } | Rule::ConditionalConvertTag { .. } => true,
+                _ => false,
+            })
+            .collect()
     }
 }
 

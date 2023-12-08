@@ -117,6 +117,10 @@ impl Creature {
         &self.copy_tags_from
     }
 
+    pub fn get_variations_to_apply(&self) -> &[String] {
+        self.apply_creature_variation.as_slice()
+    }
+
     /// Adds a `SelectCreature` object to the internal `SelectCreature` vector.
     ///
     /// Arguments:
