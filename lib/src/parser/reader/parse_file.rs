@@ -6,6 +6,7 @@ use std::{
 use tracing::{debug, error, trace};
 
 use crate::{
+    creature_variation::CreatureVariation,
     options::ParserOptions,
     parser::{
         creature::Creature,
@@ -68,6 +69,7 @@ pub fn parse_raw_file_with_info<P: AsRef<Path>>(
     let mut temp_graphic = Graphic::empty();
     let mut temp_material_template = MaterialTemplate::empty();
     let mut temp_entity = Entity::empty();
+    let mut temp_creature_variation = CreatureVariation::empty();
 
     let mut last_parsed_type = ObjectType::Unknown;
     let mut last_graphic_type = GraphicTypeToken::Unknown;
@@ -217,6 +219,18 @@ pub fn parse_raw_file_with_info<P: AsRef<Path>>(
                         SelectCreature::new(captured_value, &raw_metadata.clone());
                     last_parsed_type = ObjectType::SelectCreature;
                 }
+                "CREATURE_VARIATION" => {
+                    if started && last_parsed_type == ObjectType::CreatureVariation {
+                        // We need to add the creature to the list.
+                        created_raws.push(Box::new(temp_creature_variation.clone()));
+                    } else {
+                        started = true;
+                    }
+                    // We haven't started a creature variation yet, so we need to start one.
+                    temp_creature_variation =
+                        CreatureVariation::new(captured_value, &raw_metadata.clone());
+                    last_parsed_type = ObjectType::CreatureVariation;
+                }
                 "CASTE" => {
                     if object_type != ObjectType::Creature
                         && object_type != ObjectType::Entity
@@ -338,6 +352,10 @@ pub fn parse_raw_file_with_info<P: AsRef<Path>>(
                                 // We have a creature, so we can add a tag to it.
                                 temp_select_creature.parse_tag(captured_key, captured_value);
                             }
+                            ObjectType::CreatureVariation => {
+                                // We have a creature variation, so we can add a tag to it.
+                                temp_creature_variation.parse_tag(captured_key, captured_value);
+                            }
                             ObjectType::Plant => {
                                 // We have a plant, so we can add a tag to it.
                                 temp_plant.parse_tag(captured_key, captured_value);
@@ -407,6 +425,9 @@ pub fn parse_raw_file_with_info<P: AsRef<Path>>(
         }
         if !temp_entity.is_empty() {
             created_raws.push(Box::new(temp_entity.clone()));
+        }
+        if !temp_creature_variation.is_empty() {
+            created_raws.push(Box::new(temp_creature_variation.clone()));
         }
     }
 

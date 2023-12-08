@@ -65,7 +65,7 @@ for the steam workshop if it is a mod downloaded from the steam workshop.
 #![warn(clippy::pedantic)]
 #![allow(clippy::must_use_candidate)]
 
-use parser::helpers::{absorb_select_creature, apply_copy_tags_from};
+use parser::helpers::{absorb_select_creature, apply_copy_tags_from, apply_creature_variations};
 use std::path::{Path, PathBuf};
 use tracing::{debug, info, warn};
 use util::validate_options;
@@ -239,6 +239,10 @@ pub fn parse(options: &ParserOptions) -> Result<ParseResult, ParserError> {
     // Apply copy_tags_from
     if !options.skip_apply_copy_tags_from {
         apply_copy_tags_from(&mut results.raws);
+    }
+    // Apply creature variations
+    if !options.skip_apply_creature_variations {
+        apply_creature_variations(&mut results.raws);
     }
 
     // Parse the info modules

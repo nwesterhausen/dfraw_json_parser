@@ -138,6 +138,7 @@ fn parse_args() -> Result<Args, lexopt::Error> {
         match arg {
             Short('c') | Long("creature") => {
                 args.object_types.push(ObjectType::Creature);
+                args.object_types.push(ObjectType::CreatureVariation);
             }
             Short('p') | Long("plant") => {
                 args.object_types.push(ObjectType::Plant);
@@ -232,6 +233,8 @@ fn parse_args() -> Result<Args, lexopt::Error> {
         args.object_types.push(ObjectType::Plant);
         args.object_types.push(ObjectType::Entity);
         args.object_types.push(ObjectType::Inorganic);
+        args.object_types.push(ObjectType::CreatureVariation);
+        args.object_types.push(ObjectType::MaterialTemplate);
     }
     // Include graphic types if requested
     if include_graphics {

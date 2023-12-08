@@ -1,14 +1,17 @@
 use tracing::warn;
 
-use crate::parser::{
-    creature::Creature,
-    entity::Entity,
-    graphics::{Graphic, TilePage},
-    inorganic::Inorganic,
-    material_template::MaterialTemplate,
-    plant::Plant,
-    select_creature::SelectCreature,
-    ObjectType, RawObject,
+use crate::{
+    creature_variation::CreatureVariation,
+    parser::{
+        creature::Creature,
+        entity::Entity,
+        graphics::{Graphic, TilePage},
+        inorganic::Inorganic,
+        material_template::MaterialTemplate,
+        plant::Plant,
+        select_creature::SelectCreature,
+        ObjectType, RawObject,
+    },
 };
 
 #[allow(clippy::borrowed_box)]
@@ -38,6 +41,14 @@ pub fn clone_raw_object_box(box_ref: &Box<dyn RawObject>) -> Box<dyn RawObject> 
                 .unwrap_or(&SelectCreature::empty())
                 .clone();
             Box::new(temp_select_creature)
+        }
+        ObjectType::CreatureVariation => {
+            let temp_creature_variation = box_ref
+                .as_any()
+                .downcast_ref::<CreatureVariation>()
+                .unwrap_or(&CreatureVariation::empty())
+                .clone();
+            Box::new(temp_creature_variation)
         }
         ObjectType::Plant => {
             let temp_plant = box_ref
