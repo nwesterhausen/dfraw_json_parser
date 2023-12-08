@@ -17,6 +17,7 @@ pub mod select_creature;
 pub mod shrub;
 pub mod syndrome;
 pub mod tree;
+pub mod unprocessed_raw;
 
 mod constants;
 mod material_mechanics;
