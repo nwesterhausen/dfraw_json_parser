@@ -1,20 +1,16 @@
-use tracing::warn;
+use tracing::{debug, warn};
 
-use crate::{
-    creature::Creature,
-    creature_variation::{CreatureVariation, Rule},
-    ObjectType, RawObject,
-};
+use crate::{creature::Creature, creature_variation::CreatureVariation, ObjectType, RawObject};
 
-pub fn apply_creature_variations(all_raws: &mut Vec<Box<dyn RawObject>>) {
-    let mut creature_variations: Vec<CreatureVariation> = all_raws
+pub fn apply_creature_variations(all_raws: &mut [Box<dyn RawObject>]) {
+    let creature_variations: Vec<CreatureVariation> = all_raws
         .iter()
         .filter(|r| r.get_type() == &ObjectType::CreatureVariation)
         .filter_map(|r| r.as_any().downcast_ref::<CreatureVariation>())
         .cloned()
         .collect();
 
-    let mut creatures: Vec<Creature> = all_raws
+    let creatures: Vec<Creature> = all_raws
         .iter()
         .filter(|r| r.get_type() == &ObjectType::Creature)
         .filter_map(|r| r.as_any().downcast_ref::<Creature>())
@@ -24,32 +20,58 @@ pub fn apply_creature_variations(all_raws: &mut Vec<Box<dyn RawObject>>) {
     let mut updated_creatures: Vec<Creature> = Vec::new();
 
     // Go through all creatures and if they have a variation, apply it.
-    for creature in creatures.iter_mut() {
+    for creature in creatures {
         // Check variations against known creature variations
-        for variation_id in creature.get_variations_to_apply() {
+        for variation in creature.get_variations_to_apply() {
+            // The variation comes back like this:
+            // "STANDARD_WALK_CRAWL_GAITS:6561:6115:5683:1755:7456:8567"
+            // We need to split it into the variation id and the args (if any)
+            let variation_parts: Vec<&str> = variation.split(':').collect();
+            let variation_identifier = *variation_parts.first().unwrap_or(&"");
+            let variation_args = variation_parts.get(1..).unwrap_or(&[]);
+
             let Some(creature_variation) = creature_variations
-                .iter_mut()
-                .find(|r| r.get_object_id() == variation_id)
+                .iter()
+                .find(|r| r.get_identifier() == variation_identifier)
             else {
                 warn!(
                     "Failed to find creature variation {} for {}",
-                    variation_id,
+                    variation,
                     creature.get_object_id()
                 );
                 continue;
             };
 
+            let mut updated_creature = creature.clone();
+            debug!(
+                "Applying variation {} to {}",
+                variation_identifier,
+                creature.get_identifier()
+            );
+
             // Apply variation to creature
+            for rule in creature_variation.get_rules() {
+                rule.apply(&mut updated_creature, variation_args);
+            }
+
+            updated_creatures.push(updated_creature);
         }
     }
-}
 
-fn apply_variation_to_creature(creature: &mut Creature, creature_variation: &CreatureVariation) {
-    // First filter all rules for convert rules to apply from bottom up
-    let convert_rules: Vec<&Rule> = creature_variation
-        .get_convert_rules()
-        .iter()
-        .rev()
-        .cloned()
-        .collect();
+    // Replace creatures with updated creatures
+    for updated_creature in updated_creatures {
+        let Some(index) = all_raws
+            .iter()
+            .position(|r| r.get_object_id() == updated_creature.get_object_id())
+        else {
+            warn!(
+                "Failed to find creature {} to replace with updated creature",
+                updated_creature.get_object_id()
+            );
+            continue;
+        };
+
+        #[allow(clippy::indexing_slicing)]
+        let _ = std::mem::replace(&mut all_raws[index], Box::new(updated_creature));
+    }
 }

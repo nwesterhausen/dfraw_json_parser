@@ -72,9 +72,11 @@ impl CreatureVariationRaw {
     pub fn get_convert_rules(&self) -> Vec<&Rule> {
         self.rules
             .iter()
-            .filter(|r| match r {
-                Rule::ConvertTag { .. } | Rule::ConditionalConvertTag { .. } => true,
-                _ => false,
+            .filter(|r| {
+                matches!(
+                    r,
+                    Rule::ConvertTag { .. } | Rule::ConditionalConvertTag { .. }
+                )
             })
             .collect()
     }
