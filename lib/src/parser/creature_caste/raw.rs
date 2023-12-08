@@ -7,7 +7,7 @@ use crate::parser::{
     serializer_helper, BodySize, Milkable, Searchable, Tile,
 };
 
-use super::{phf_table::CASTE_TOKENS, tokens::CasteTag};
+use super::{phf_table::CASTE_TOKENS, tokens::CasteTag, Gait};
 
 #[derive(ts_rs::TS)]
 #[ts(export)]
@@ -68,6 +68,9 @@ pub struct Caste {
     milkable: Milkable,
     #[serde(skip_serializing_if = "Tile::is_default")]
     tile: Tile,
+    /// The gaits by which the creature can move.
+    #[serde(skip_serializing_if = "Vec::is_empty")]
+    gaits: Vec<Gait>,
 }
 
 impl Caste {
@@ -127,6 +130,9 @@ impl Caste {
             CasteTag::CasteGlowColor => self.tile.set_glow_color(value),
             CasteTag::ChangeBodySizePercent => {
                 self.change_body_size_percentage = value.parse::<u32>().unwrap_or_default();
+            }
+            CasteTag::Gait => {
+                self.gaits.push(Gait::from_value(value));
             }
             _ => self.tags.push(tag.clone()),
         }
