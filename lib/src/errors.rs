@@ -15,4 +15,6 @@ pub enum ParserError {
         #[from]
         source: std::io::Error,
     },
+    #[error("Not yet implemented (TODO)")]
+    NotYetImplemented,
 }

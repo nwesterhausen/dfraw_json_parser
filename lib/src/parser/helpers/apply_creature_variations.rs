@@ -23,41 +23,13 @@ pub fn apply_creature_variations(all_raws: &mut [Box<dyn RawObject>]) {
     for creature in creatures {
         // Check variations against known creature variations
         for variation in creature.get_variations_to_apply() {
-            // The variation comes back like this:
-            // "STANDARD_WALK_CRAWL_GAITS:6561:6115:5683:1755:7456:8567"
-            // We need to split it into the variation id and the args (if any)
-            let variation_parts: Vec<&str> = variation.split(':').collect();
-            let variation_identifier = *variation_parts.first().unwrap_or(&"");
-            let variation_args = variation_parts.get(1..).unwrap_or(&[]);
-
-            let Some(creature_variation) = creature_variations
-                .iter()
-                .find(|r| r.get_identifier() == variation_identifier)
-            else {
-                warn!(
-                    "Failed to find creature variation {} for {}",
-                    variation,
-                    creature.get_object_id()
-                );
-                continue;
-            };
-
-            let mut updated_creature = creature.clone();
-            debug!(
-                "Applying variation {} to {}",
-                variation_identifier,
-                creature.get_identifier()
-            );
-
-            // Reset to `ALL` caste; some variations contain caste-specific rules but do not specify a caste
-            updated_creature.select_caste("ALL");
-
-            // Apply variation to creature
-            for rule in creature_variation.get_rules() {
-                rule.apply(&mut updated_creature, variation_args);
+            if let Some(updated_creature) = singularly_apply_creature_variation(
+                &creature,
+                variation,
+                creature_variations.as_slice(),
+            ) {
+                updated_creatures.push(updated_creature);
             }
-
-            updated_creatures.push(updated_creature);
         }
     }
 
@@ -77,4 +49,46 @@ pub fn apply_creature_variations(all_raws: &mut [Box<dyn RawObject>]) {
         #[allow(clippy::indexing_slicing)]
         let _ = std::mem::replace(&mut all_raws[index], Box::new(updated_creature));
     }
+}
+
+pub fn singularly_apply_creature_variation(
+    creature: &Creature,
+    variation: &str,
+    creature_variations: &[CreatureVariation],
+) -> Option<Creature> {
+    // The variation comes back like this:
+    // "STANDARD_WALK_CRAWL_GAITS:6561:6115:5683:1755:7456:8567"
+    // We need to split it into the variation id and the args (if any)
+    let variation_parts: Vec<&str> = variation.split(':').collect();
+    let variation_identifier = *variation_parts.first().unwrap_or(&"");
+    let variation_args = variation_parts.get(1..).unwrap_or(&[]);
+
+    let Some(creature_variation) = creature_variations
+        .iter()
+        .find(|r| r.get_identifier() == variation_identifier)
+    else {
+        warn!(
+            "Failed to find creature variation {} for {}",
+            variation,
+            creature.get_object_id()
+        );
+        return None;
+    };
+
+    let mut updated_creature = creature.clone();
+    debug!(
+        "Applying variation {} to {}",
+        variation_identifier,
+        creature.get_identifier()
+    );
+
+    // Reset to `ALL` caste; some variations contain caste-specific rules but do not specify a caste
+    updated_creature.select_caste("ALL");
+
+    // Apply variation to creature
+    for rule in creature_variation.get_rules() {
+        rule.apply(&mut updated_creature, variation_args);
+    }
+
+    Some(updated_creature)
 }
