@@ -49,6 +49,9 @@ pub fn apply_creature_variations(all_raws: &mut [Box<dyn RawObject>]) {
                 creature.get_identifier()
             );
 
+            // Reset to `ALL` caste; some variations contain caste-specific rules but do not specify a caste
+            updated_creature.select_caste("ALL");
+
             // Apply variation to creature
             for rule in creature_variation.get_rules() {
                 rule.apply(&mut updated_creature, variation_args);

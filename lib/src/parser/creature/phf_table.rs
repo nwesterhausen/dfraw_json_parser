@@ -43,5 +43,4 @@ pub static CREATURE_TOKENS: phf::Map<&'static str, CreatureTag> = phf::phf_map! 
     "OCCURS_AS_ENTITY_RACE" => CreatureTag::OccursAsEntityRace,
     "EQUIPMENT" => CreatureTag::Equipment,
     "EQUIPMENT_WAGON" => CreatureTag::EquipmentWagon,
-    "GAIT" => CreatureTag::Gait,
 };

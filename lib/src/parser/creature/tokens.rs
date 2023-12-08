@@ -40,7 +40,6 @@ pub enum CreatureTag {
     GlowTile,
     ChangeFrequencyPercent,
     ClusterNumber,
-    Gait,
     #[default]
     Unknown,
     // Tokens found in the legends xml exports but not in the raws
@@ -100,7 +99,6 @@ impl std::fmt::Display for CreatureTag {
             CreatureTag::OccursAsEntityRace => write!(f, "OccursAsEntityRace"),
             CreatureTag::Equipment => write!(f, "Equipment"),
             CreatureTag::EquipmentWagon => write!(f, "EquipmentWagon"),
-            CreatureTag::Gait => write!(f, "Gait"),
         }
     }
 }
