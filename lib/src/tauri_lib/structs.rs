@@ -89,6 +89,8 @@ impl ProgressHelper {
         &self,
         summary: &std::collections::HashMap<crate::ObjectType, usize>,
     ) {
+        use tauri::Manager;
+
         self.tauri_window
             .emit("SUMMARY", summary.clone())
             .unwrap_or_else(|e| debug!("Tauri window emit error {:?}", e));
