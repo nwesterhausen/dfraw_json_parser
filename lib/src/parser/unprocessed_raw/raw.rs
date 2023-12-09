@@ -37,10 +37,11 @@ pub struct UnprocessedRaw {
 
 impl UnprocessedRaw {
     /// Creates a new unprocessed raw object
-    pub fn new(raw_type: &ObjectType, metadata: &RawMetadata) -> Self {
+    pub fn new(raw_type: &ObjectType, metadata: &RawMetadata, identifier: &str) -> Self {
         Self {
             raw_type: raw_type.clone(),
             metadata: metadata.clone(),
+            identifier: identifier.to_string(),
             ..Default::default()
         }
     }
@@ -55,12 +56,18 @@ impl UnprocessedRaw {
         self.identifier.is_empty() && self.modifications.is_empty()
     }
 
+    /// Gets the identifier of the object
+    pub fn get_identifier(&self) -> &str {
+        &self.identifier
+    }
+
     /// Checks if the only modifications are
+    ///
     /// * `MainRawBody`
     /// * `AddToBeginning`
     /// * `AddToEnding`
     /// * `AddBeforeTag`
-    /// * `CopyTagsFrom`
+    /// * `ApplyCreatureVariation`
     ///
     /// This is used to determine if we can parse the raws into the object without having to do any
     /// parsing against other creatures (which may be the result of `resolve`ing the raws)
@@ -72,7 +79,7 @@ impl UnprocessedRaw {
                     | Modification::AddToBeginning { .. }
                     | Modification::AddToEnding { .. }
                     | Modification::AddBeforeTag { .. }
-                    | Modification::CopyTagsFrom { .. }
+                    | Modification::ApplyCreatureVariation { .. }
             )
         })
     }
@@ -250,7 +257,10 @@ impl UnprocessedRaw {
                         let key = split.next().unwrap_or("");
                         let value = split.collect::<Vec<&str>>().join(":");
 
-                        creature.parse_tag(key, &value);
+                        match key {
+                            "CASTE" | "SELECT_CASTE" => creature.select_caste(&value),
+                            _ => creature.parse_tag(key, &value),
+                        }
                     }
                 }
                 _ => {
@@ -270,6 +280,7 @@ impl UnprocessedRaw {
         for modification in &self.modifications {
             if let Modification::MainRawBody { raws } = modification {
                 collapsed_raws.extend(raws.clone());
+                debug!("collapsed {} base raws", raws.len());
             }
         }
 
@@ -282,6 +293,7 @@ impl UnprocessedRaw {
         for modification in &self.modifications {
             if let Modification::AddToEnding { raws } = modification {
                 add_to_ending.extend(raws.clone());
+                debug!("collapsed {} add to ending raws", raws.len());
             }
         }
 
@@ -294,6 +306,7 @@ impl UnprocessedRaw {
         for modification in &self.modifications {
             if let Modification::AddToBeginning { raws } = modification {
                 add_to_beginning.extend(raws.clone());
+                debug!("collapsed {} add to beginning raws", raws.len());
             }
         }
 
@@ -302,6 +315,14 @@ impl UnprocessedRaw {
             .retain(|m| !matches!(m, Modification::AddToBeginning { .. }));
 
         // Combine the raws into [add_to_beginning, raws, add_to_ending] (order matters)
+        debug!(
+            "collapsed {} total raws ({} base, {} add to beginning, {} add to ending)",
+            collapsed_raws.len() + add_to_beginning.len() + add_to_ending.len(),
+            collapsed_raws.len(),
+            add_to_beginning.len(),
+            add_to_ending.len()
+        );
+
         collapsed_raws.splice(0..0, add_to_beginning);
         collapsed_raws.extend(add_to_ending);
 
@@ -315,11 +336,25 @@ impl UnprocessedRaw {
                 // If we found the index, insert the raws before the tag (without replacing)
                 if let Some(index) = index {
                     collapsed_raws.splice(index..index, raws.clone());
+                    debug!(
+                        "collapsed {} add before tag raws, before tag {}",
+                        raws.len(),
+                        tag
+                    );
                 } else {
                     // If we didn't find the index, just add the raws to the end
                     collapsed_raws.extend(raws.clone());
+                    warn!(
+                        "resolve: Unable to find tag `{}` to add raws before. Adding raws to end instead.",
+                        tag
+                    );
                 }
             }
         }
+
+        // Add the collapsed raws back as a `MainRawBody` modification
+        self.modifications.push(Modification::MainRawBody {
+            raws: collapsed_raws,
+        });
     }
 }

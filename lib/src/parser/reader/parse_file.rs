@@ -67,15 +67,17 @@ pub struct FileParseResults {
 /// use dfraw_json_parser::{ObjectType, parse, ParserOptions, ParseResult};
 ///
 /// let mut options = ParserOptions::default();
-/// options.raws_to_parse = vec![ObjectType::Creature];
 ///
-/// let raw_file_path = PathBuf::from("./tests/data/creature_amphibians.txt");
-/// options.add_raw_file_to_parse(&raw_file_path);
+/// let amphibian_raw = PathBuf::from("./tests/data/creature_amphibians.txt");
+/// let c_variation_raw = PathBuf::from("./tests/data/c_variation_default.txt");
 ///
-/// let _: ParseResult = parse(&options).unwrap_or(ParseResult {
-///     raws: Vec::new(),
-///     info_files: Vec::new(),
-/// });
+/// options.add_raw_file_to_parse(&amphibian_raw);
+/// options.add_raw_file_to_parse(&c_variation_raw); // Required to resolve the `apply_creature_variation` tags
+///
+/// let results: ParseResult = parse(&options).unwrap();
+///
+/// // Should have parsed 3 amphibians and 32 creature variations (total of 35 raws)
+/// assert_eq!(results.raws.len(), 35);
 /// ```
 ///
 /// # Errors
@@ -279,7 +281,7 @@ pub fn parse_raw_file_with_info<P: AsRef<Path>>(
                     }
                     // We haven't started a creature yet, so we need to start one.
                     temp_unprocessed_raw =
-                        UnprocessedRaw::new(&ObjectType::Creature, &raw_metadata);
+                        UnprocessedRaw::new(&ObjectType::Creature, &raw_metadata, captured_value);
                     current_modification = Modification::MainRawBody { raws: Vec::new() };
                     last_parsed_type = ObjectType::Creature;
                 }

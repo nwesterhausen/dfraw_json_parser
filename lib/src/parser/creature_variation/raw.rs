@@ -10,7 +10,7 @@ use super::{Rule, Token, TOKEN_MAP};
 #[allow(clippy::module_name_repetitions)]
 #[derive(Serialize, Deserialize, Debug, Clone, Default)]
 #[serde(rename_all = "camelCase")]
-pub struct CreatureVariationRaw {
+pub struct CreatureVariation {
     /// Common Raw file Things
     #[serde(skip_serializing_if = "RawMetadata::is_hidden")]
     metadata: RawMetadata,
@@ -30,7 +30,7 @@ pub struct CreatureVariationRaw {
     argument_count: usize,
 }
 
-impl CreatureVariationRaw {
+impl CreatureVariation {
     /// Create a new creature variation with the given identifier.
     ///
     /// # Arguments
@@ -83,7 +83,7 @@ impl CreatureVariationRaw {
 }
 
 #[typetag::serde]
-impl RawObject for CreatureVariationRaw {
+impl RawObject for CreatureVariation {
     fn get_metadata(&self) -> &RawMetadata {
         &self.metadata
     }
@@ -309,7 +309,7 @@ impl RawObject for CreatureVariationRaw {
     }
 }
 
-impl Searchable for CreatureVariationRaw {
+impl Searchable for CreatureVariation {
     fn get_search_vec(&self) -> Vec<String> {
         let mut vec = Vec::new();
 
