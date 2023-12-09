@@ -5,7 +5,82 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## v0.15.1 (2023-12-09)
+## v0.16.0 (2023-12-09)
+
+### Chore
+
+ - <csr-id-0ce13b4e9a39ca158c98b66ad2637d9dd7ea42e4/> bump release
+
+### New Features
+
+ - <csr-id-b1fda6c6f90758ffe4c19641aa49d6c9729b15e6/> improve creature parsing
+   * refactor: CreatureVariation as object
+   
+   * chore: update bindings
+   
+   * feat: impl RawObject for CreatureVariation
+   
+   * chore(deps): update github/codeql-action action to v2.22.9
+   
+   * feat: apply_creature_variation in progress
+   
+   * feat: add parsing of gaits and add them to creatures
+   
+   * fix: gait is a caste tag
+   
+   * feat: add unprocessed raw type to facilitate creature parsing
+   
+   * wip: creature variation parsing for unprocessed_raw
+   
+   * feat: handle copy_tags_from and creature_variations properly
+   
+   * feat: add `log_summary` option
+   
+   * refactor: CreatureVariation as object
+   
+   * chore: update bindings
+   
+   * feat: impl RawObject for CreatureVariation
+   
+   * feat: apply_creature_variation in progress
+   
+   * feat: add parsing of gaits and add them to creatures
+   
+   * fix: gait is a caste tag
+   
+   * feat: add unprocessed raw type to facilitate creature parsing
+   
+   * wip: creature variation parsing for unprocessed_raw
+   
+   * feat: handle copy_tags_from and creature_variations properly
+   
+   * feat: add `log_summary` option
+   
+   ---------
+
+### Commit Statistics
+
+<csr-read-only-do-not-edit/>
+
+ - 4 commits contributed to the release.
+ - 9 days passed between releases.
+ - 2 commits were understood as [conventional](https://www.conventionalcommits.org).
+ - 0 issues like '(#ID)' were seen in commit messages
+
+### Commit Details
+
+<csr-read-only-do-not-edit/>
+
+<details><summary>view details</summary>
+
+ * **Uncategorized**
+    - Bump release ([`0ce13b4`](https://github.com/nwesterhausen/dfraw_json_parser/commit/0ce13b4e9a39ca158c98b66ad2637d9dd7ea42e4))
+    - Release dfraw_json_parser v0.15.1, dfraw_json_parser-cli v1.0.1 ([`84e6712`](https://github.com/nwesterhausen/dfraw_json_parser/commit/84e671284f0076d6192ca86a90093ab4dc3b5b7c))
+    - Release dfraw_json_parser v0.15.1, dfraw_json_parser-cli v1.0.1 ([`75c7772`](https://github.com/nwesterhausen/dfraw_json_parser/commit/75c7772fe4a0820067138494a2df363242b0a179))
+    - Improve creature parsing ([`b1fda6c`](https://github.com/nwesterhausen/dfraw_json_parser/commit/b1fda6c6f90758ffe4c19641aa49d6c9729b15e6))
+</details>
+
+## v0.15.1 (2023-11-29)
 
 <csr-id-afa8e0e1d327654b1cfca2bad6d1cfad2deabe2b/>
 <csr-id-54ed44dc4a5e5e4121e62cd28d85b6394730a0cc/>
@@ -48,9 +123,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 <csr-read-only-do-not-edit/>
 
- - 2 commits contributed to the release.
- - 9 days passed between releases.
- - 1 commit was understood as [conventional](https://www.conventionalcommits.org).
+ - 4 commits contributed to the release.
+ - 3 commits were understood as [conventional](https://www.conventionalcommits.org).
  - 0 issues like '(#ID)' were seen in commit messages
 
 ### Commit Details
@@ -60,8 +134,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 <details><summary>view details</summary>
 
  * **Uncategorized**
-    - Release dfraw_json_parser v0.15.1, dfraw_json_parser-cli v1.0.1 ([`75c7772`](https://github.com/nwesterhausen/dfraw_json_parser/commit/75c7772fe4a0820067138494a2df363242b0a179))
-    - Improve creature parsing ([`b1fda6c`](https://github.com/nwesterhausen/dfraw_json_parser/commit/b1fda6c6f90758ffe4c19641aa49d6c9729b15e6))
+    - Release dfraw_json_parser v0.15.1, dfraw_json_parser-cli v1.0.1 ([`230e276`](https://github.com/nwesterhausen/dfraw_json_parser/commit/230e276670526478228309dcc97c1d0dde54e250))
+    - Bump versions ([`afa8e0e`](https://github.com/nwesterhausen/dfraw_json_parser/commit/afa8e0e1d327654b1cfca2bad6d1cfad2deabe2b))
+    - Update bindings ([`54ed44d`](https://github.com/nwesterhausen/dfraw_json_parser/commit/54ed44dc4a5e5e4121e62cd28d85b6394730a0cc))
+    - Add supporting fields ([`f7097e9`](https://github.com/nwesterhausen/dfraw_json_parser/commit/f7097e9cd45f2be1275d2c758b48026a6be1588f))
 </details>
 
 ## v0.15.0 (2023-11-29)
@@ -356,7 +432,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 <csr-id-04e94f04e8e3831bade62a15059a3ed7077b54ec/>
 
 
-<csr-id-5c07ce1c3df8ba57c87d2e4dcae6f808ff49e319/>
 <csr-id-238e76e7008f7a90b2fe10cb2f7122d5b06b2ef4/>
 <csr-id-03501d4430066100dfeac48740851eba34be0f01/>
 <csr-id-891a33a87ab43f793aafc6477e83ce976f9e0a6e/>
@@ -617,8 +692,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 <csr-id-5a2f3fdee7fc81636dda87b67e1c187e29965f7e/>
 <csr-id-edf44ef452e9952e7ebd7e49a09af69e9ffebf4b/>
 
-
-
 ### New Features
 
  - <csr-id-648c92071d54b52b0e8fbc5a3dfb2ed680a0c7e2/> ✨ handle some plant graphics
@@ -661,7 +734,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 <csr-id-a4ff82d5790c6b3b07676eae32b2fbeadb587643/>
 
 
-<csr-id-bac89e814c58315b6629755d25f06ec8d24e4ce2/>
 <csr-id-d1a86054f8995bdb12350ab84f8bf1cdfc9e88f5/>
 <csr-id-2f7e6995b52c09be2cc051ba40c0a71b6a67af2f/>
 <csr-id-417a67917caa8b7f5e1c410da56fa76cac33d4e3/>
@@ -790,9 +862,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 <csr-id-9669a1cd9d2be7518d989a26fbd4dc656edd4c9b/>
 
 
-
-
-<csr-id-48d50ad26512c5a35b8c3d136a49da3b4f1cc95b/>
 <csr-id-9669a1cd9d2be7518d989a26fbd4dc656edd4c9b/>
 
 
@@ -881,7 +950,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 <csr-id-59e2dff2d583cd8c5c55411688a6c8f4ddcf361a/>
 
 
-<csr-id-5a9740e01528680c3f6543673fbd722913ac57c2/>
 <csr-id-7932e59c509f1da93e8f431fbbef9a164de144d1/>
 <csr-id-bb5de4483e6c0b5bfb15a0a5e2defdd067bd6c9d/>
 <csr-id-a8301caede5aa2090b769c05e19a699267e07b07/>
