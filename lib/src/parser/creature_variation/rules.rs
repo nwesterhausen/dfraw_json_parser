@@ -328,7 +328,7 @@ fn convert_tag(
 ) {
     if let Some(target) = target {
         if let Some(replacement) = replacement {
-            println!(
+            tracing::trace!(
                 "Converting tag {}:{} to {}:{} on creature {}",
                 tag,
                 target,
@@ -337,7 +337,7 @@ fn convert_tag(
                 creature.get_identifier()
             );
         } else {
-            println!(
+            tracing::trace!(
                 "Converting tag {}:{} to {} on creature {}",
                 tag,
                 target,
@@ -346,7 +346,7 @@ fn convert_tag(
             );
         }
     } else {
-        println!(
+        tracing::trace!(
             "Converting tag {} to {} on creature {}",
             tag,
             replacement.unwrap_or_default(),

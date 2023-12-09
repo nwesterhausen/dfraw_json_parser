@@ -68,10 +68,7 @@ for the steam workshop if it is a mod downloaded from the steam workshop.
 use parser::{
     creature::Creature, creature_variation::CreatureVariation, unprocessed_raw::UnprocessedRaw,
 };
-use std::{
-    any::TypeId,
-    path::{Path, PathBuf},
-};
+use std::path::{Path, PathBuf};
 use tracing::{debug, error, info, warn};
 use util::validate_options;
 use walkdir::{DirEntry, WalkDir};
@@ -125,6 +122,8 @@ pub use parser::*;
 
 #[cfg(feature = "tauri")]
 pub use tauri_lib::ProgressPayload;
+
+use crate::helpers::clone_raw_object_box;
 
 #[allow(clippy::too_many_lines)]
 /// Given the supplied `ParserOptions`, parse the raws and return a vector of boxed dynamic raw objects.
@@ -243,9 +242,6 @@ pub fn parse(options: &ParserOptions) -> Result<ParseResult, ParserError> {
         }
     }
 
-    // Print a summary of what we parsed (sum by ObjectType)
-    print_summary(&results.raws);
-
     // Resolve the unprocessed creatures
     // Prerequisites: build a list of creature variations
     let creature_variations: Vec<CreatureVariation> = results
@@ -253,18 +249,17 @@ pub fn parse(options: &ParserOptions) -> Result<ParseResult, ParserError> {
         .iter()
         .filter_map(|raw| {
             if raw.get_type() == &ObjectType::CreatureVariation {
-                if let Some(cv) = raw.as_any().downcast_ref::<CreatureVariation>().cloned() {
+                if let Some(cv) = raw
+                    .as_ref()
+                    .as_any()
+                    .downcast_ref::<CreatureVariation>()
+                    .cloned()
+                {
                     return Some(cv);
                 }
                 error!(
                     "Matched CreatureVariation but failed to downcast for {}",
                     raw.get_identifier()
-                );
-                error!(
-                    "raw.type_id(), CreatureVariation.type_id(), Box<CreatureVariation>\n{:?}\n{:?}\n{:?}",
-                    raw.as_any().type_id(),
-                    TypeId::of::<CreatureVariation>(),
-                    TypeId::of::<Box<CreatureVariation>>()
                 );
             }
             None
@@ -277,67 +272,91 @@ pub fn parse(options: &ParserOptions) -> Result<ParseResult, ParserError> {
         creature_variations.len()
     );
 
-    // First pass through to filter just to .is_simple_creature() and resolving them
-    // Second pass through will do entire parsing of the creature via `resolve` on each one
+    // Write the unprocessed raws to a file
+    // let _ = serde_json::to_writer_pretty(
+    //     std::fs::File::create("unprocessed_raws.json").unwrap(),
+    //     &unprocessed_raws,
+    // );
+
+    let mut simple_unprocessed: Vec<UnprocessedRaw> = Vec::new();
+    let mut complex_unprocessed: Vec<UnprocessedRaw> = Vec::new();
+
+    // Split the unprocessed raws into simple and complex
+    for unprocessed_raw in unprocessed_raws {
+        if unprocessed_raw.is_simple() {
+            simple_unprocessed.push(unprocessed_raw);
+        } else {
+            complex_unprocessed.push(unprocessed_raw);
+        }
+    }
 
     // Resolve the simple creatures first
-    let mut resolved_creatures: Vec<Creature> = unprocessed_raws
+    let resolved_simple_creatures: Vec<Creature> = simple_unprocessed
         .iter_mut()
-        .filter(|raw| raw.is_simple() && raw.raw_type() == ObjectType::Creature)
+        .filter(|raw| raw.raw_type() == ObjectType::Creature)
         .filter_map(|raw| {
             match raw.resolve(creature_variations.as_slice(), results.raws.as_slice()) {
-                Ok(raw_object) => return raw_object.as_any().downcast_ref::<Creature>().cloned(),
+                Ok(c) => Some(c),
                 Err(e) => {
-                    warn!("Failed to resolve creature: {:?}", e);
+                    error!(
+                        "Unable to resolve simple creature {}: {:?}",
+                        raw.get_identifier(),
+                        e
+                    );
                     None
                 }
             }
         })
+        .map(|c| clone_raw_object_box(&c))
+        .filter_map(|c| {
+            if let Some(creature) = c.as_ref().as_any().downcast_ref::<Creature>() {
+                Some(creature.clone())
+            } else {
+                error!("Downcast failed for simple creature {}", c.get_identifier());
+                None
+            }
+        })
         .collect();
 
-    info!("Resolved {} simple creatures", resolved_creatures.len());
+    info!(
+        "Resolved {} simple creatures",
+        resolved_simple_creatures.len()
+    );
 
     results.raws.extend(
-        resolved_creatures
+        resolved_simple_creatures
             .iter()
             .map(|c| Box::new(c.clone()) as Box<dyn RawObject>),
     );
-    resolved_creatures = Vec::new();
 
-    // Now we can do the second pass through the unprocessed creatures
-    // This will resolve the creatures that are not simple creatures
-    for raw in &mut unprocessed_raws {
-        if raw.raw_type() == ObjectType::Creature && !raw.is_simple() {
-            match raw.resolve(creature_variations.as_slice(), results.raws.as_slice()) {
-                Ok(raw_object) => {
-                    if let Some(creature) = raw_object.as_any().downcast_ref::<Creature>() {
-                        resolved_creatures.push(creature.clone());
-                    }
+    // Now we can do the second pass through the unprocessed creatures, but add the complex creatures
+    // to the results.raws vector as they are resolved.
+    let mut resolved_complex_creatures = 0_usize;
+    for unprocessed_raw in &mut complex_unprocessed {
+        if unprocessed_raw.raw_type() == ObjectType::Creature {
+            match unprocessed_raw.resolve(creature_variations.as_slice(), results.raws.as_slice()) {
+                Ok(c) => {
+                    resolved_complex_creatures += 1;
+                    results.raws.push(clone_raw_object_box(&c));
                 }
                 Err(e) => {
-                    warn!("Failed to resolve creature: {:?}", e);
+                    error!(
+                        "Unable to resolve complex creature {}: {:?}",
+                        unprocessed_raw.get_identifier(),
+                        e
+                    );
                 }
             }
         }
     }
 
-    info!("Resolved {} complex creatures", resolved_creatures.len());
-
-    // Now we put the resolved creatures into the results
-    results.raws.extend(
-        resolved_creatures
-            .into_iter()
-            .map(|c| Box::new(c) as Box<dyn RawObject>),
-    );
-
-    // Write the unprocessed raws to a file
-    let _ = serde_json::to_writer_pretty(
-        std::fs::File::create("unprocessed_raws.json").unwrap(),
-        &unprocessed_raws,
-    );
+    info!("Resolved {resolved_complex_creatures} complex creatures");
 
     // Parse the info modules
     results.info_files = parse_module_info_files(&options)?;
+
+    // Print a summary of what we parsed (sum by ObjectType)
+    print_summary(&results.raws);
 
     Ok(results)
 }
@@ -357,7 +376,7 @@ fn print_summary(raws: &[Box<dyn RawObject>]) {
 
     info!("Summary of parsed raws:");
     for (object_type, count) in summary_vec {
-        info!("{}: {}", object_type, count);
+        info!("\t{count}\t{object_type}");
     }
     info!("Total: {}", raws.len());
 }
