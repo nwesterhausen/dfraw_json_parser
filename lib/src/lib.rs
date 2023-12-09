@@ -65,9 +65,14 @@ for the steam workshop if it is a mod downloaded from the steam workshop.
 #![warn(clippy::pedantic)]
 #![allow(clippy::must_use_candidate)]
 
-use parser::helpers::{absorb_select_creature, apply_copy_tags_from, apply_creature_variations};
-use std::path::{Path, PathBuf};
-use tracing::{debug, info, warn};
+use parser::{
+    creature::Creature, creature_variation::CreatureVariation, unprocessed_raw::UnprocessedRaw,
+};
+use std::{
+    any::TypeId,
+    path::{Path, PathBuf},
+};
+use tracing::{debug, error, info, warn};
 use util::validate_options;
 use walkdir::{DirEntry, WalkDir};
 
@@ -121,6 +126,7 @@ pub use parser::*;
 #[cfg(feature = "tauri")]
 pub use tauri_lib::ProgressPayload;
 
+#[allow(clippy::too_many_lines)]
 /// Given the supplied `ParserOptions`, parse the raws and return a vector of boxed dynamic raw objects.
 ///
 /// Note: This is unable to parse the info.txt file for a module. Use `parse_module_info_file` for that.
@@ -149,6 +155,7 @@ pub fn parse(options: &ParserOptions) -> Result<ParseResult, ParserError> {
         raws: Vec::new(),
         info_files: Vec::new(),
     };
+    let mut unprocessed_raws: Vec<UnprocessedRaw> = Vec::new();
 
     // Locations can only contain the predefined locations.
     if !options.locations_to_parse.is_empty() {
@@ -166,27 +173,27 @@ pub fn parse(options: &ParserOptions) -> Result<ParseResult, ParserError> {
             .contains(&RawModuleLocation::Vanilla)
         {
             info!("Dispatching parse for vanilla raws");
-            results
-                .raws
-                .extend(parse_location(&vanilla_path, &options)?);
+            let parsed_raws = parse_location(&vanilla_path, &options)?;
+            results.raws.extend(parsed_raws.parsed_raws);
+            unprocessed_raws.extend(parsed_raws.unprocessed_raws);
         }
         if options
             .locations_to_parse
             .contains(&RawModuleLocation::InstalledMods)
         {
             info!("Dispatching parse for installed mods");
-            results
-                .raws
-                .extend(parse_location(&installed_mods_path, &options)?);
+            let parsed_raws = parse_location(&installed_mods_path, &options)?;
+            results.raws.extend(parsed_raws.parsed_raws);
+            unprocessed_raws.extend(parsed_raws.unprocessed_raws);
         }
         if options
             .locations_to_parse
             .contains(&RawModuleLocation::Mods)
         {
             info!("Dispatching parse for workshop/downloaded mods");
-            results
-                .raws
-                .extend(parse_location(&workshop_mods_path, &options)?);
+            let parsed_raws = parse_location(&workshop_mods_path, &options)?;
+            results.raws.extend(parsed_raws.parsed_raws);
+            unprocessed_raws.extend(parsed_raws.unprocessed_raws);
         }
     }
 
@@ -202,7 +209,9 @@ pub fn parse(options: &ParserOptions) -> Result<ParseResult, ParserError> {
                     "Dispatching parse for module {:?}",
                     target_path.file_name().unwrap_or_default()
                 );
-                results.raws.extend(parse_module(&target_path, &options)?);
+                let parsed_raws = parse_module(&target_path, &options)?;
+                results.raws.extend(parsed_raws.parsed_raws);
+                unprocessed_raws.extend(parsed_raws.unprocessed_raws);
             }
         }
     }
@@ -216,9 +225,9 @@ pub fn parse(options: &ParserOptions) -> Result<ParseResult, ParserError> {
                 "Dispatching parse for raw file {:?}",
                 target_path.file_name().unwrap_or_default()
             );
-            results
-                .raws
-                .extend(parser::parse_raw_file(&target_path, &options)?);
+            let parsed_raws = parser::parse_raw_file(&target_path, &options)?;
+            results.raws.extend(parsed_raws.parsed_raws);
+            unprocessed_raws.extend(parsed_raws.unprocessed_raws);
         }
     }
 
@@ -234,21 +243,123 @@ pub fn parse(options: &ParserOptions) -> Result<ParseResult, ParserError> {
         }
     }
 
-    // Absorb select_creature
-    absorb_select_creature(&mut results.raws);
-    // Apply copy_tags_from
-    if !options.skip_apply_copy_tags_from {
-        apply_copy_tags_from(&mut results.raws);
+    // Print a summary of what we parsed (sum by ObjectType)
+    print_summary(&results.raws);
+
+    // Resolve the unprocessed creatures
+    // Prerequisites: build a list of creature variations
+    let creature_variations: Vec<CreatureVariation> = results
+        .raws
+        .iter()
+        .filter_map(|raw| {
+            if raw.get_type() == &ObjectType::CreatureVariation {
+                if let Some(cv) = raw.as_any().downcast_ref::<CreatureVariation>().cloned() {
+                    return Some(cv);
+                }
+                error!(
+                    "Matched CreatureVariation but failed to downcast for {}",
+                    raw.get_identifier()
+                );
+                error!(
+                    "raw.type_id(), CreatureVariation.type_id(), Box<CreatureVariation>\n{:?}\n{:?}\n{:?}",
+                    raw.as_any().type_id(),
+                    TypeId::of::<CreatureVariation>(),
+                    TypeId::of::<Box<CreatureVariation>>()
+                );
+            }
+            None
+        })
+        .collect();
+
+    info!(
+        "Resolving {} unprocessed creatures using {} creature variation definitions",
+        unprocessed_raws.len(),
+        creature_variations.len()
+    );
+
+    // First pass through to filter just to .is_simple_creature() and resolving them
+    // Second pass through will do entire parsing of the creature via `resolve` on each one
+
+    // Resolve the simple creatures first
+    let mut resolved_creatures: Vec<Creature> = unprocessed_raws
+        .iter_mut()
+        .filter(|raw| raw.is_simple() && raw.raw_type() == ObjectType::Creature)
+        .filter_map(|raw| {
+            match raw.resolve(creature_variations.as_slice(), results.raws.as_slice()) {
+                Ok(raw_object) => return raw_object.as_any().downcast_ref::<Creature>().cloned(),
+                Err(e) => {
+                    warn!("Failed to resolve creature: {:?}", e);
+                    None
+                }
+            }
+        })
+        .collect();
+
+    info!("Resolved {} simple creatures", resolved_creatures.len());
+
+    results.raws.extend(
+        resolved_creatures
+            .iter()
+            .map(|c| Box::new(c.clone()) as Box<dyn RawObject>),
+    );
+    resolved_creatures = Vec::new();
+
+    // Now we can do the second pass through the unprocessed creatures
+    // This will resolve the creatures that are not simple creatures
+    for raw in &mut unprocessed_raws {
+        if raw.raw_type() == ObjectType::Creature && !raw.is_simple() {
+            match raw.resolve(creature_variations.as_slice(), results.raws.as_slice()) {
+                Ok(raw_object) => {
+                    if let Some(creature) = raw_object.as_any().downcast_ref::<Creature>() {
+                        resolved_creatures.push(creature.clone());
+                    }
+                }
+                Err(e) => {
+                    warn!("Failed to resolve creature: {:?}", e);
+                }
+            }
+        }
     }
-    // Apply creature variations
-    if !options.skip_apply_creature_variations {
-        apply_creature_variations(&mut results.raws);
-    }
+
+    info!("Resolved {} complex creatures", resolved_creatures.len());
+
+    // Now we put the resolved creatures into the results
+    results.raws.extend(
+        resolved_creatures
+            .into_iter()
+            .map(|c| Box::new(c) as Box<dyn RawObject>),
+    );
+
+    // Write the unprocessed raws to a file
+    let _ = serde_json::to_writer_pretty(
+        std::fs::File::create("unprocessed_raws.json").unwrap(),
+        &unprocessed_raws,
+    );
 
     // Parse the info modules
     results.info_files = parse_module_info_files(&options)?;
 
     Ok(results)
+}
+
+/// Print a summary by sum of `ObjectType` from `get_type` and a total row.
+fn print_summary(raws: &[Box<dyn RawObject>]) {
+    let mut summary: std::collections::HashMap<ObjectType, usize> =
+        std::collections::HashMap::new();
+
+    for raw in raws {
+        let count = summary.entry(raw.get_type().clone()).or_insert(0);
+        *count += 1;
+    }
+
+    let mut summary_vec: Vec<(ObjectType, usize)> = summary.into_iter().collect();
+    summary_vec.sort_by(|a, b| a.0.cmp(&b.0));
+
+    info!("Summary of parsed raws:");
+    for (object_type, count) in summary_vec {
+        info!("{}: {}", object_type, count);
+    }
+    info!("Total: {}", raws.len());
 }
 
 /// The function `parse_module_info_files` parses module information files based on the provided options.
@@ -385,8 +496,10 @@ pub fn parse_with_tauri_emit(
 fn parse_location<P: AsRef<Path>>(
     location_path: &P,
     options: &ParserOptions,
-) -> Result<Vec<Box<dyn RawObject>>, ParserError> {
+) -> Result<FileParseResults, ParserError> {
     let mut results: Vec<Box<dyn RawObject>> = Vec::new();
+    let mut unprocessed_raws: Vec<UnprocessedRaw> = Vec::new();
+
     let location_path: PathBuf = location_path.as_ref().to_path_buf();
     // Get a list of all subdirectories in the location
     let raw_modules_in_location: Vec<DirEntry> = util::subdirectories(location_path)?;
@@ -401,7 +514,8 @@ fn parse_location<P: AsRef<Path>>(
     for raw_module in raw_modules_in_location {
         match parse_module(&raw_module.path(), options) {
             Ok(module_results) => {
-                results.extend(module_results);
+                results.extend(module_results.parsed_raws);
+                unprocessed_raws.extend(module_results.unprocessed_raws);
             }
             Err(e) => {
                 debug!("Skipping parsing module: {:?}", e);
@@ -409,7 +523,10 @@ fn parse_location<P: AsRef<Path>>(
         }
     }
 
-    Ok(results)
+    Ok(FileParseResults {
+        parsed_raws: results,
+        unprocessed_raws,
+    })
 }
 
 /// The function `parse_module_info_files_at_location` takes a location path as input, retrieves a list
@@ -490,7 +607,7 @@ fn parse_module_info_file_direct<P: AsRef<Path>>(
 fn parse_module<P: AsRef<Path>>(
     module_path: &P,
     options: &ParserOptions,
-) -> Result<Vec<Box<dyn RawObject>>, ParserError> {
+) -> Result<FileParseResults, ParserError> {
     // Get information from the module info file
     let module_info_file_path = module_path.as_ref().join("info.txt");
     let module_info_file: ModuleInfoFile =
@@ -542,10 +659,14 @@ fn parse_module<P: AsRef<Path>>(
 
     // Guard against having nothing to parse.
     if !parse_graphics && !parse_objects {
-        return Ok(Vec::new());
+        return Ok(FileParseResults {
+            parsed_raws: Vec::new(),
+            unprocessed_raws: Vec::new(),
+        });
     }
 
     let mut results: Vec<Box<dyn RawObject>> = Vec::new();
+    let mut unprocessed_raws: Vec<UnprocessedRaw> = Vec::new();
 
     // Parse the objects
     if parse_objects {
@@ -568,8 +689,9 @@ fn parse_module<P: AsRef<Path>>(
                     .map_or(false, |ext| ext.eq_ignore_ascii_case("txt"))
                 {
                     match parser::parse_raw_file(&file_path, options) {
-                        Ok(mut objects) => {
-                            results.append(&mut objects);
+                        Ok(mut file_parse_results) => {
+                            results.append(&mut file_parse_results.parsed_raws);
+                            unprocessed_raws.append(&mut file_parse_results.unprocessed_raws);
                         }
                         Err(e) => {
                             debug!("Skipping parsing objects: {:?}", e);
@@ -602,7 +724,8 @@ fn parse_module<P: AsRef<Path>>(
                 {
                     match parser::parse_raw_file(&file_path, options) {
                         Ok(mut graphics) => {
-                            results.append(&mut graphics);
+                            results.append(&mut graphics.parsed_raws);
+                            unprocessed_raws.append(&mut graphics.unprocessed_raws);
                         }
                         Err(e) => {
                             debug!("Skipping parsing graphics: {:?}", e);
@@ -613,7 +736,10 @@ fn parse_module<P: AsRef<Path>>(
         }
     }
 
-    Ok(results)
+    Ok(FileParseResults {
+        parsed_raws: results,
+        unprocessed_raws,
+    })
 }
 
 /// The function `build_search_string` takes a `raw_object` that implements the `Searchable` trait and

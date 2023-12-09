@@ -111,7 +111,15 @@ impl InfoFile {
         let parent_dir = get_parent_dir_name(info_file_path);
         let location = RawModuleLocation::from_info_text_file_path(info_file_path);
 
-        let file = try_get_file(info_file_path)?;
+        let file = match try_get_file(info_file_path) {
+            Ok(f) => f,
+            Err(e) => {
+                error!("ModuleInfoFile::parse: try_get_file error\n{:?}", e);
+                return Err(ParserError::NothingToParse(
+                    info_file_path.as_ref().display().to_string(),
+                ));
+            }
+        };
 
         let decoding_reader = DecodeReaderBytesBuilder::new()
             .encoding(Some(*DF_ENCODING))

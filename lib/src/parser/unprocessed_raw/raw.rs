@@ -37,9 +37,10 @@ pub struct UnprocessedRaw {
 
 impl UnprocessedRaw {
     /// Creates a new unprocessed raw object
-    pub fn new(raw_type: ObjectType) -> Self {
+    pub fn new(raw_type: &ObjectType, metadata: &RawMetadata) -> Self {
         Self {
-            raw_type,
+            raw_type: raw_type.clone(),
+            metadata: metadata.clone(),
             ..Default::default()
         }
     }
@@ -51,16 +52,29 @@ impl UnprocessedRaw {
 
     /// Check if there is nothing to parse
     pub fn is_empty(&self) -> bool {
-        self.modifications.is_empty()
+        self.identifier.is_empty() && self.modifications.is_empty()
     }
 
-    /// Checks if there is only one (or zero) modification to perform and that its a `MainRawBody` modification
+    /// Checks if the only modifications are
+    /// * `MainRawBody`
+    /// * `AddToBeginning`
+    /// * `AddToEnding`
+    /// * `AddBeforeTag`
+    /// * `CopyTagsFrom`
+    ///
+    /// This is used to determine if we can parse the raws into the object without having to do any
+    /// parsing against other creatures (which may be the result of `resolve`ing the raws)
     pub fn is_simple(&self) -> bool {
-        self.modifications.len() <= 1
-            && matches!(
-                self.modifications.first(),
-                Some(Modification::MainRawBody { .. })
+        self.modifications.iter().all(|m| {
+            matches!(
+                m,
+                Modification::MainRawBody { .. }
+                    | Modification::AddToBeginning { .. }
+                    | Modification::AddToEnding { .. }
+                    | Modification::AddBeforeTag { .. }
+                    | Modification::CopyTagsFrom { .. }
             )
+        })
     }
 
     /// Gets the modifications to apply to the object.
@@ -137,6 +151,7 @@ impl UnprocessedRaw {
         }
 
         // If we get here, we can't combine the modifications, so we just add it
+        debug!("Adding modification: {:?}", modification);
         self.modifications.push(modification);
     }
 

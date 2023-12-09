@@ -33,12 +33,15 @@ pub(crate) fn parse(
     progress_helper: &mut ProgressHelper,
 ) -> Result<crate::ParseResult, crate::ParserError> {
     // Guard against invalid paths
+
+    use crate::unprocessed_raw::UnprocessedRaw;
     let options = util::validate_options(options)?;
 
     let mut results = ParseResult {
         raws: Vec::new(),
         info_files: Vec::new(),
     };
+    let mut unprocessed_raws: Vec<UnprocessedRaw> = Vec::new();
 
     progress_helper.update_current_task("Parsing raws.");
 
@@ -131,9 +134,9 @@ pub(crate) fn parse(
                 "Dispatching parse for raw file {:?}",
                 target_path.file_name().unwrap_or_default()
             );
-            results
-                .raws
-                .extend(parser::parse_raw_file(&target_path, &options)?);
+            let parse_result = parser::parse_raw_file(&target_path, &options)?;
+            results.raws.extend(parse_result.parsed_raws);
+            unprocessed_raws.extend(parse_result.unprocessed_raws);
         }
     }
 
@@ -300,6 +303,7 @@ fn parse_module<P: AsRef<Path>>(
     }
 
     let mut results: Vec<Box<dyn RawObject>> = Vec::new();
+    let mut unprocessed_raws: Vec<crate::unprocessed_raw::UnprocessedRaw> = Vec::new();
 
     // Parse the objects
     if parse_objects {
@@ -320,8 +324,12 @@ fn parse_module<P: AsRef<Path>>(
                     progress_helper.send_update(file_name_str);
                     match parser::parse_raw_file(&file_path, options) {
                         Ok(mut objects_results) => {
-                            progress_helper.add_to_running_total(objects_results.len());
-                            results.append(&mut objects_results);
+                            progress_helper.add_to_running_total(
+                                objects_results.parsed_raws.len()
+                                    + objects_results.unprocessed_raws.len(),
+                            );
+                            results.append(&mut objects_results.parsed_raws);
+                            unprocessed_raws.append(&mut objects_results.unprocessed_raws);
                         }
                         Err(e) => {
                             debug!("Skipping parsing objects file: {:?}", e);
@@ -351,8 +359,9 @@ fn parse_module<P: AsRef<Path>>(
                     progress_helper.send_update(file_name_str);
                     match parser::parse_raw_file(&file_path, options) {
                         Ok(mut graphics_results) => {
-                            progress_helper.add_to_running_total(graphics_results.len());
-                            results.append(&mut graphics_results);
+                            progress_helper
+                                .add_to_running_total(graphics_results.parsed_raws.len());
+                            results.append(&mut graphics_results.parsed_raws);
                         }
                         Err(e) => {
                             debug!("Skipping parsing graphics file: {:?}", e);

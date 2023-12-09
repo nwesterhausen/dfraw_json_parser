@@ -3,7 +3,7 @@
     {
       "type": "CreatureVariationRaw",
       "identifier": "ANIMAL_PERSON",
-      "objectId": "c-variation-default-CreatureVariation-animal-person-vanilla-creatures50.08",
+      "objectId": "c-variation-default-CreatureVariation-animal-person-",
       "rules": [
         {
           "RemoveTag": {
@@ -633,7 +633,7 @@
     {
       "type": "CreatureVariationRaw",
       "identifier": "ANIMAL_PERSON_LEGLESS",
-      "objectId": "c-variation-default-CreatureVariation-animal-person-legless-vanilla-creatures50.08",
+      "objectId": "c-variation-default-CreatureVariation-animal-person-legless-",
       "rules": [
         {
           "RemoveTag": {
@@ -1230,7 +1230,7 @@
     {
       "type": "CreatureVariationRaw",
       "identifier": "PUNCH_ATTACK",
-      "objectId": "c-variation-default-CreatureVariation-punch-attack-vanilla-creatures50.08",
+      "objectId": "c-variation-default-CreatureVariation-punch-attack-",
       "rules": [
         {
           "AddTag": {
@@ -1280,7 +1280,7 @@
     {
       "type": "CreatureVariationRaw",
       "identifier": "KICK_ATTACK",
-      "objectId": "c-variation-default-CreatureVariation-kick-attack-vanilla-creatures50.08",
+      "objectId": "c-variation-default-CreatureVariation-kick-attack-",
       "rules": [
         {
           "AddTag": {
@@ -1336,7 +1336,7 @@
     {
       "type": "CreatureVariationRaw",
       "identifier": "KICK_HIGHVEL_ATTACK",
-      "objectId": "c-variation-default-CreatureVariation-kick-highvel-attack-vanilla-creatures50.08",
+      "objectId": "c-variation-default-CreatureVariation-kick-highvel-attack-",
       "rules": [
         {
           "AddTag": {
@@ -1398,7 +1398,7 @@
     {
       "type": "CreatureVariationRaw",
       "identifier": "TAIL_ATTACK",
-      "objectId": "c-variation-default-CreatureVariation-tail-attack-vanilla-creatures50.08",
+      "objectId": "c-variation-default-CreatureVariation-tail-attack-",
       "rules": [
         {
           "AddTag": {
@@ -1448,7 +1448,7 @@
     {
       "type": "CreatureVariationRaw",
       "identifier": "HOOF_ATTACK",
-      "objectId": "c-variation-default-CreatureVariation-hoof-attack-vanilla-creatures50.08",
+      "objectId": "c-variation-default-CreatureVariation-hoof-attack-",
       "rules": [
         {
           "AddTag": {
@@ -1504,7 +1504,7 @@
     {
       "type": "CreatureVariationRaw",
       "identifier": "NAIL_MATERIALS",
-      "objectId": "c-variation-default-CreatureVariation-nail-materials-vanilla-creatures50.08",
+      "objectId": "c-variation-default-CreatureVariation-nail-materials-",
       "rules": [
         {
           "AddTag": {
@@ -1530,7 +1530,7 @@
     {
       "type": "CreatureVariationRaw",
       "identifier": "NAIL_SCRATCH_ATTACK",
-      "objectId": "c-variation-default-CreatureVariation-nail-scratch-attack-vanilla-creatures50.08",
+      "objectId": "c-variation-default-CreatureVariation-nail-scratch-attack-",
       "rules": [
         {
           "AddTag": {
@@ -1586,7 +1586,7 @@
     {
       "type": "CreatureVariationRaw",
       "identifier": "CLAW_SCRATCH_ATTACK",
-      "objectId": "c-variation-default-CreatureVariation-claw-scratch-attack-vanilla-creatures50.08",
+      "objectId": "c-variation-default-CreatureVariation-claw-scratch-attack-",
       "rules": [
         {
           "AddTag": {
@@ -1642,7 +1642,7 @@
     {
       "type": "CreatureVariationRaw",
       "identifier": "TOOTH_BITE_ATTACK",
-      "objectId": "c-variation-default-CreatureVariation-tooth-bite-attack-vanilla-creatures50.08",
+      "objectId": "c-variation-default-CreatureVariation-tooth-bite-attack-",
       "rules": [
         {
           "AddTag": {
@@ -1704,7 +1704,7 @@
     {
       "type": "CreatureVariationRaw",
       "identifier": "TOOTH_BITE_VENOM_ATTACK",
-      "objectId": "c-variation-default-CreatureVariation-tooth-bite-venom-attack-vanilla-creatures50.08",
+      "objectId": "c-variation-default-CreatureVariation-tooth-bite-venom-attack-",
       "rules": [
         {
           "AddTag": {
@@ -1772,7 +1772,7 @@
     {
       "type": "CreatureVariationRaw",
       "identifier": "TAIL_STING_VENOM_ATTACK",
-      "objectId": "c-variation-default-CreatureVariation-tail-sting-venom-attack-vanilla-creatures50.08",
+      "objectId": "c-variation-default-CreatureVariation-tail-sting-venom-attack-",
       "rules": [
         {
           "AddTag": {
@@ -1834,7 +1834,7 @@
     {
       "type": "CreatureVariationRaw",
       "identifier": "MOUTH_BITE_ATTACK",
-      "objectId": "c-variation-default-CreatureVariation-mouth-bite-attack-vanilla-creatures50.08",
+      "objectId": "c-variation-default-CreatureVariation-mouth-bite-attack-",
       "rules": [
         {
           "AddTag": {
@@ -1884,7 +1884,7 @@
     {
       "type": "CreatureVariationRaw",
       "identifier": "MOUTH_SUCK_ATTACK",
-      "objectId": "c-variation-default-CreatureVariation-mouth-suck-attack-vanilla-creatures50.08",
+      "objectId": "c-variation-default-CreatureVariation-mouth-suck-attack-",
       "rules": [
         {
           "AddTag": {
@@ -1940,7 +1940,7 @@
     {
       "type": "CreatureVariationRaw",
       "identifier": "PROBOSCIS_SUCK_ATTACK",
-      "objectId": "c-variation-default-CreatureVariation-proboscis-suck-attack-vanilla-creatures50.08",
+      "objectId": "c-variation-default-CreatureVariation-proboscis-suck-attack-",
       "rules": [
         {
           "AddTag": {
@@ -2002,7 +2002,7 @@
     {
       "type": "CreatureVariationRaw",
       "identifier": "MOUTH_BITE_EDGE_ATTACK",
-      "objectId": "c-variation-default-CreatureVariation-mouth-bite-edge-attack-vanilla-creatures50.08",
+      "objectId": "c-variation-default-CreatureVariation-mouth-bite-edge-attack-",
       "rules": [
         {
           "AddTag": {
@@ -2058,7 +2058,7 @@
     {
       "type": "CreatureVariationRaw",
       "identifier": "MOUTH_BITE_VENOM_ATTACK",
-      "objectId": "c-variation-default-CreatureVariation-mouth-bite-venom-attack-vanilla-creatures50.08",
+      "objectId": "c-variation-default-CreatureVariation-mouth-bite-venom-attack-",
       "rules": [
         {
           "AddTag": {
@@ -2120,7 +2120,7 @@
     {
       "type": "CreatureVariationRaw",
       "identifier": "BEAK_BITE_ATTACK",
-      "objectId": "c-variation-default-CreatureVariation-beak-bite-attack-vanilla-creatures50.08",
+      "objectId": "c-variation-default-CreatureVariation-beak-bite-attack-",
       "rules": [
         {
           "AddTag": {
@@ -2182,7 +2182,7 @@
     {
       "type": "CreatureVariationRaw",
       "identifier": "TALON_SCRATCH_ATTACK",
-      "objectId": "c-variation-default-CreatureVariation-talon-scratch-attack-vanilla-creatures50.08",
+      "objectId": "c-variation-default-CreatureVariation-talon-scratch-attack-",
       "rules": [
         {
           "AddTag": {
@@ -2250,7 +2250,7 @@
     {
       "type": "CreatureVariationRaw",
       "identifier": "TUSK_STAB_ATTACK",
-      "objectId": "c-variation-default-CreatureVariation-tusk-stab-attack-vanilla-creatures50.08",
+      "objectId": "c-variation-default-CreatureVariation-tusk-stab-attack-",
       "rules": [
         {
           "AddTag": {
@@ -2306,7 +2306,7 @@
     {
       "type": "CreatureVariationRaw",
       "identifier": "PINCER_ATTACK",
-      "objectId": "c-variation-default-CreatureVariation-pincer-attack-vanilla-creatures50.08",
+      "objectId": "c-variation-default-CreatureVariation-pincer-attack-",
       "rules": [
         {
           "AddTag": {
@@ -2374,7 +2374,7 @@
     {
       "type": "CreatureVariationRaw",
       "identifier": "ARM_LOWER_SNATCH_ATTACK",
-      "objectId": "c-variation-default-CreatureVariation-arm-lower-snatch-attack-vanilla-creatures50.08",
+      "objectId": "c-variation-default-CreatureVariation-arm-lower-snatch-attack-",
       "rules": [
         {
           "AddTag": {
@@ -2436,7 +2436,7 @@
     {
       "type": "CreatureVariationRaw",
       "identifier": "GIANT",
-      "objectId": "c-variation-default-CreatureVariation-giant-vanilla-creatures50.08",
+      "objectId": "c-variation-default-CreatureVariation-giant-",
       "rules": [
         {
           "RemoveTag": {
@@ -2690,7 +2690,7 @@
     {
       "type": "CreatureVariationRaw",
       "identifier": "STANDARD_BIPED_GAITS",
-      "objectId": "c-variation-default-CreatureVariation-standard-biped-gaits-vanilla-creatures50.08",
+      "objectId": "c-variation-default-CreatureVariation-standard-biped-gaits-",
       "rules": [
         {
           "AddTag": {
@@ -2734,7 +2734,7 @@
     {
       "type": "CreatureVariationRaw",
       "identifier": "STANDARD_QUADRUPED_GAITS",
-      "objectId": "c-variation-default-CreatureVariation-standard-quadruped-gaits-vanilla-creatures50.08",
+      "objectId": "c-variation-default-CreatureVariation-standard-quadruped-gaits-",
       "rules": [
         {
           "AddTag": {
@@ -2778,7 +2778,7 @@
     {
       "type": "CreatureVariationRaw",
       "identifier": "STANDARD_WALKING_GAITS",
-      "objectId": "c-variation-default-CreatureVariation-standard-walking-gaits-vanilla-creatures50.08",
+      "objectId": "c-variation-default-CreatureVariation-standard-walking-gaits-",
       "rules": [
         {
           "AddTag": {
@@ -2822,7 +2822,7 @@
     {
       "type": "CreatureVariationRaw",
       "identifier": "STANDARD_CLIMBING_GAITS",
-      "objectId": "c-variation-default-CreatureVariation-standard-climbing-gaits-vanilla-creatures50.08",
+      "objectId": "c-variation-default-CreatureVariation-standard-climbing-gaits-",
       "rules": [
         {
           "AddTag": {
@@ -2866,7 +2866,7 @@
     {
       "type": "CreatureVariationRaw",
       "identifier": "STANDARD_SWIMMING_GAITS",
-      "objectId": "c-variation-default-CreatureVariation-standard-swimming-gaits-vanilla-creatures50.08",
+      "objectId": "c-variation-default-CreatureVariation-standard-swimming-gaits-",
       "rules": [
         {
           "AddTag": {
@@ -2910,7 +2910,7 @@
     {
       "type": "CreatureVariationRaw",
       "identifier": "STANDARD_CRAWLING_GAITS",
-      "objectId": "c-variation-default-CreatureVariation-standard-crawling-gaits-vanilla-creatures50.08",
+      "objectId": "c-variation-default-CreatureVariation-standard-crawling-gaits-",
       "rules": [
         {
           "AddTag": {
@@ -2954,7 +2954,7 @@
     {
       "type": "CreatureVariationRaw",
       "identifier": "STANDARD_FLYING_GAITS",
-      "objectId": "c-variation-default-CreatureVariation-standard-flying-gaits-vanilla-creatures50.08",
+      "objectId": "c-variation-default-CreatureVariation-standard-flying-gaits-",
       "rules": [
         {
           "AddTag": {
@@ -2998,7 +2998,7 @@
     {
       "type": "CreatureVariationRaw",
       "identifier": "STANDARD_WALK_CRAWL_GAITS",
-      "objectId": "c-variation-default-CreatureVariation-standard-walk-crawl-gaits-vanilla-creatures50.08",
+      "objectId": "c-variation-default-CreatureVariation-standard-walk-crawl-gaits-",
       "rules": [
         {
           "AddTag": {
@@ -3040,279 +3040,5 @@
       "argumentCount": 0
     }
   ],
-  "info_files": [
-    {
-      "identifier": "vanilla_bodies",
-      "objectId": "Vanilla-MODULE-vanilla-bodies",
-      "location": "Vanilla",
-      "parentDirectory": "vanilla_bodies",
-      "numericVersion": 5001,
-      "displayedVersion": "50.01",
-      "earliestCompatibleNumericVersion": 5001,
-      "earliestCompatibleDisplayedVersion": "50.01",
-      "author": "Bay 12 Games",
-      "name": "Vanilla Bodies",
-      "description": "These are the default Dwarf Fortress bodies for creatures, including randomly generated creatures and tissue templates."
-    },
-    {
-      "identifier": "vanilla_buildings",
-      "objectId": "Vanilla-MODULE-vanilla-buildings",
-      "location": "Vanilla",
-      "parentDirectory": "vanilla_buildings",
-      "numericVersion": 5001,
-      "displayedVersion": "50.01",
-      "earliestCompatibleNumericVersion": 5001,
-      "earliestCompatibleDisplayedVersion": "50.01",
-      "author": "Bay 12 Games",
-      "name": "Vanilla Buildings",
-      "description": "These are the default Dwarf Fortress buildings."
-    },
-    {
-      "identifier": "vanilla_buildings_graphics",
-      "objectId": "Vanilla-MODULE-vanilla-buildings-graphics",
-      "location": "Vanilla",
-      "parentDirectory": "vanilla_buildings_graphics",
-      "numericVersion": 5002,
-      "displayedVersion": "50.02",
-      "earliestCompatibleNumericVersion": 5001,
-      "earliestCompatibleDisplayedVersion": "50.01",
-      "author": "Bay 12 Games",
-      "name": "Vanilla Buildings Graphics",
-      "description": "These are the graphics for the default Dwarf Fortress buildings."
-    },
-    {
-      "identifier": "vanilla_creatures",
-      "objectId": "Vanilla-MODULE-vanilla-creatures",
-      "location": "Vanilla",
-      "parentDirectory": "vanilla_creatures",
-      "numericVersion": 5008,
-      "displayedVersion": "50.08",
-      "earliestCompatibleNumericVersion": 5001,
-      "earliestCompatibleDisplayedVersion": "50.01",
-      "author": "Bay 12 Games",
-      "name": "Vanilla Creatures",
-      "description": "These are the default Dwarf Fortress creatures."
-    },
-    {
-      "identifier": "vanilla_creatures_graphics",
-      "objectId": "Vanilla-MODULE-vanilla-creatures-graphics",
-      "location": "Vanilla",
-      "parentDirectory": "vanilla_creatures_graphics",
-      "numericVersion": 5008,
-      "displayedVersion": "50.08",
-      "earliestCompatibleNumericVersion": 5001,
-      "earliestCompatibleDisplayedVersion": "50.01",
-      "author": "Bay 12 Games",
-      "name": "Vanilla Creatures Graphics",
-      "description": "These are the images of the default Dwarf Fortress creatures.  Some parts, like the dwarf wielded equipment images, rely on the vanilla items or equivalents being present."
-    },
-    {
-      "identifier": "vanilla_descriptors",
-      "objectId": "Vanilla-MODULE-vanilla-descriptors",
-      "location": "Vanilla",
-      "parentDirectory": "vanilla_descriptors",
-      "numericVersion": 5001,
-      "displayedVersion": "50.01",
-      "earliestCompatibleNumericVersion": 5001,
-      "earliestCompatibleDisplayedVersion": "50.01",
-      "author": "Bay 12 Games",
-      "name": "Vanilla Descriptors",
-      "description": "The object definitions for shapes and colors."
-    },
-    {
-      "identifier": "vanilla_descriptors_graphics",
-      "objectId": "Vanilla-MODULE-vanilla-descriptors-graphics",
-      "location": "Vanilla",
-      "parentDirectory": "vanilla_descriptors_graphics",
-      "numericVersion": 5001,
-      "displayedVersion": "50.01",
-      "earliestCompatibleNumericVersion": 5001,
-      "earliestCompatibleDisplayedVersion": "50.01",
-      "author": "Bay 12 Games",
-      "name": "Vanilla Descriptors Graphics",
-      "description": "The graphics for shapes and colors.  Includes the palette which is linked to the defined colors."
-    },
-    {
-      "identifier": "vanilla_entities",
-      "objectId": "Vanilla-MODULE-vanilla-entities",
-      "location": "Vanilla",
-      "parentDirectory": "vanilla_entities",
-      "numericVersion": 5001,
-      "displayedVersion": "50.01",
-      "earliestCompatibleNumericVersion": 5001,
-      "earliestCompatibleDisplayedVersion": "50.01",
-      "author": "Bay 12 Games",
-      "name": "Vanilla Entities",
-      "description": "These are the default Dwarf Fortress civilizations."
-    },
-    {
-      "identifier": "vanilla_environment",
-      "objectId": "Vanilla-MODULE-vanilla-environment",
-      "location": "Vanilla",
-      "parentDirectory": "vanilla_environment",
-      "numericVersion": 5010,
-      "displayedVersion": "50.10",
-      "earliestCompatibleNumericVersion": 5001,
-      "earliestCompatibleDisplayedVersion": "50.01",
-      "author": "Bay 12 Games",
-      "name": "Vanilla Environment",
-      "description": "The default Dwarf Fortress graphics for walls, floors, fluids, and other environmental objects."
-    },
-    {
-      "identifier": "vanilla_interactions",
-      "objectId": "Vanilla-MODULE-vanilla-interactions",
-      "location": "Vanilla",
-      "parentDirectory": "vanilla_interactions",
-      "numericVersion": 5001,
-      "displayedVersion": "50.01",
-      "earliestCompatibleNumericVersion": 5001,
-      "earliestCompatibleDisplayedVersion": "50.01",
-      "author": "Bay 12 Games",
-      "name": "Vanilla Interactions",
-      "description": "These are the default Dwarf Fortress interactions, which allow creatures to do some unusual actions."
-    },
-    {
-      "identifier": "vanilla_interface",
-      "objectId": "Vanilla-MODULE-vanilla-interface",
-      "location": "Vanilla",
-      "parentDirectory": "vanilla_interface",
-      "numericVersion": 5010,
-      "displayedVersion": "50.10",
-      "earliestCompatibleNumericVersion": 5001,
-      "earliestCompatibleDisplayedVersion": "50.01",
-      "author": "Bay 12 Games",
-      "name": "Vanilla Interface",
-      "description": "The default Dwarf Fortress graphics for the interface buttons, icons, etc."
-    },
-    {
-      "identifier": "vanilla_items",
-      "objectId": "Vanilla-MODULE-vanilla-items",
-      "location": "Vanilla",
-      "parentDirectory": "vanilla_items",
-      "numericVersion": 5001,
-      "displayedVersion": "50.01",
-      "earliestCompatibleNumericVersion": 5001,
-      "earliestCompatibleDisplayedVersion": "50.01",
-      "author": "Bay 12 Games",
-      "name": "Vanilla Items",
-      "description": "These are the default Dwarf Fortress items."
-    },
-    {
-      "identifier": "vanilla_items_graphics",
-      "objectId": "Vanilla-MODULE-vanilla-items-graphics",
-      "location": "Vanilla",
-      "parentDirectory": "vanilla_items_graphics",
-      "numericVersion": 5002,
-      "displayedVersion": "50.02",
-      "earliestCompatibleNumericVersion": 5001,
-      "earliestCompatibleDisplayedVersion": "50.01",
-      "author": "Bay 12 Games",
-      "name": "Vanilla Items Graphics",
-      "description": "These are the graphics for the default Dwarf Fortress items."
-    },
-    {
-      "identifier": "vanilla_languages",
-      "objectId": "Vanilla-MODULE-vanilla-languages",
-      "location": "Vanilla",
-      "parentDirectory": "vanilla_languages",
-      "numericVersion": 5001,
-      "displayedVersion": "50.01",
-      "earliestCompatibleNumericVersion": 5001,
-      "earliestCompatibleDisplayedVersion": "50.01",
-      "author": "Bay 12 Games",
-      "name": "Vanilla Languages",
-      "description": "These are the default Dwarf Fortress words and their translations into the in-game languages."
-    },
-    {
-      "identifier": "vanilla_materials",
-      "objectId": "Vanilla-MODULE-vanilla-materials",
-      "location": "Vanilla",
-      "parentDirectory": "vanilla_materials",
-      "numericVersion": 5001,
-      "displayedVersion": "50.01",
-      "earliestCompatibleNumericVersion": 5001,
-      "earliestCompatibleDisplayedVersion": "50.01",
-      "author": "Bay 12 Games",
-      "name": "Vanilla Materials",
-      "description": "These are the default Dwarf Fortress materials."
-    },
-    {
-      "identifier": "vanilla_music",
-      "objectId": "Vanilla-MODULE-vanilla-music",
-      "location": "Vanilla",
-      "parentDirectory": "vanilla_music",
-      "numericVersion": 5004,
-      "displayedVersion": "50.04",
-      "earliestCompatibleNumericVersion": 5001,
-      "earliestCompatibleDisplayedVersion": "50.01",
-      "author": "Bay 12 Games",
-      "name": "Vanilla Music",
-      "description": "These are the triggers for the default Dwarf Fortress music and sound effects."
-    },
-    {
-      "identifier": "vanilla_plants",
-      "objectId": "Vanilla-MODULE-vanilla-plants",
-      "location": "Vanilla",
-      "parentDirectory": "vanilla_plants",
-      "numericVersion": 5009,
-      "displayedVersion": "50.09",
-      "earliestCompatibleNumericVersion": 5001,
-      "earliestCompatibleDisplayedVersion": "50.01",
-      "author": "Bay 12 Games",
-      "name": "Vanilla Plants",
-      "description": "These are the default Dwarf Fortress plants and fungi."
-    },
-    {
-      "identifier": "vanilla_plants_graphics",
-      "objectId": "Vanilla-MODULE-vanilla-plants-graphics",
-      "location": "Vanilla",
-      "parentDirectory": "vanilla_plants_graphics",
-      "numericVersion": 5009,
-      "displayedVersion": "50.09",
-      "earliestCompatibleNumericVersion": 5001,
-      "earliestCompatibleDisplayedVersion": "50.01",
-      "author": "Bay 12 Games",
-      "name": "Vanilla Plants Graphics",
-      "description": "These are the graphics for the default Dwarf Fortress plants and fungi."
-    },
-    {
-      "identifier": "vanilla_reactions",
-      "objectId": "Vanilla-MODULE-vanilla-reactions",
-      "location": "Vanilla",
-      "parentDirectory": "vanilla_reactions",
-      "numericVersion": 5001,
-      "displayedVersion": "50.01",
-      "earliestCompatibleNumericVersion": 5001,
-      "earliestCompatibleDisplayedVersion": "50.01",
-      "author": "Bay 12 Games",
-      "name": "Vanilla Reactions",
-      "description": "These are the default Dwarf Fortress reactions, which are various task-like activities."
-    },
-    {
-      "identifier": "vanilla_text",
-      "objectId": "Vanilla-MODULE-vanilla-text",
-      "location": "Vanilla",
-      "parentDirectory": "vanilla_text",
-      "numericVersion": 5001,
-      "displayedVersion": "50.01",
-      "earliestCompatibleNumericVersion": 5001,
-      "earliestCompatibleDisplayedVersion": "50.01",
-      "author": "Bay 12 Games",
-      "name": "Vanilla Text",
-      "description": "Various text strings used by the game."
-    },
-    {
-      "identifier": "vanilla_world_map",
-      "objectId": "Vanilla-MODULE-vanilla-world-map",
-      "location": "Vanilla",
-      "parentDirectory": "vanilla_world_map",
-      "numericVersion": 5001,
-      "displayedVersion": "50.01",
-      "earliestCompatibleNumericVersion": 5001,
-      "earliestCompatibleDisplayedVersion": "50.01",
-      "author": "Bay 12 Games",
-      "name": "Vanilla World Map",
-      "description": "The default Dwarf Fortress graphics for the world map."
-    }
-  ]
+  "info_files": []
 }

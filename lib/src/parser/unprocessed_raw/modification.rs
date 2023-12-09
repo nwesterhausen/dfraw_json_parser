@@ -55,3 +55,15 @@ pub enum Modification {
         raws: Vec<String>,
     },
 }
+
+impl Modification {
+    pub(crate) fn add_raw(&mut self, format: String) {
+        match self {
+            Modification::AddToEnding { raws }
+            | Modification::AddToBeginning { raws }
+            | Modification::AddBeforeTag { raws, .. }
+            | Modification::MainRawBody { raws } => raws.push(format),
+            _ => {}
+        }
+    }
+}
