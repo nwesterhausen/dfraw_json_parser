@@ -1,5 +1,7 @@
 use std::{
+    collections::HashMap,
     fs::File,
+    hash::BuildHasher,
     io::{BufWriter, Write},
     path::{Path, PathBuf},
 };
@@ -289,8 +291,7 @@ pub fn validate_options(options: &ParserOptions) -> Result<ParserOptions, Parser
     let mut validated_options = ParserOptions {
         attach_metadata_to_raws: options.attach_metadata_to_raws,
         locations_to_parse: options.locations_to_parse.clone(),
-        raws_to_parse: options.raws_to_parse.clone(),
-        serialize_result_to_json: options.serialize_result_to_json,
+        object_types_to_parse: options.object_types_to_parse.clone(),
         skip_apply_copy_tags_from: options.skip_apply_copy_tags_from,
         skip_apply_creature_variations: options.skip_apply_creature_variations,
         ..Default::default()
@@ -555,4 +556,44 @@ pub fn try_get_file<P: AsRef<Path>>(file_path: &P) -> Result<File, ParserError> 
             Err(ParserError::Io { source: e })
         }
     }
+}
+
+/// Create a summary of the parsed raws.
+///
+/// Summarizes the parsed raws by object type.
+///
+/// Arguments:
+///
+/// * `raws`: A slice of boxed objects that implement the `RawObject` trait.
+///
+/// Returns:
+///
+/// A `HashMap<ObjectType, usize>` where the key is the object type and the value is the number of
+/// objects of that type.
+pub fn summarize_raws(raws: &[Box<dyn RawObject>]) -> HashMap<ObjectType, usize> {
+    let mut summary: std::collections::HashMap<ObjectType, usize> =
+        std::collections::HashMap::new();
+
+    for raw in raws {
+        let count = summary.entry(raw.get_type().clone()).or_insert(0);
+        *count += 1;
+    }
+
+    summary
+}
+
+/// Logs a summary of the parsed raws to the console via `tracing::info!`
+///
+/// Arguments:
+///
+/// * `summary`: A `HashMap<ObjectType, usize>` where the key is the object type and the value is the number of
+/// objects of that type.
+pub fn log_summary<S: BuildHasher>(summary: &HashMap<ObjectType, usize, S>) {
+    let total = summary.values().sum::<usize>();
+
+    info!("Summary of parsed raws:");
+    for (object_type, count) in summary {
+        info!("\t{count}\t{object_type}");
+    }
+    info!("Total: {total}");
 }

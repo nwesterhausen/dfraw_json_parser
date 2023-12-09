@@ -94,11 +94,6 @@ pub enum ObjectType {
     SelectCreature,
     CreatureCaste,
 }
-impl ObjectType {
-    pub(crate) fn cmp(&self, b: &ObjectType) -> std::cmp::Ordering {
-        self.to_string().cmp(&b.to_string())
-    }
-}
 
 impl Display for ObjectType {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {

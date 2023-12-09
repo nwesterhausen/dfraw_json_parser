@@ -395,16 +395,32 @@ pub fn main() -> Result<(), lexopt::Error> {
     tracing::subscriber::set_global_default(subscriber).expect("setting default subscriber failed");
 
     // Build ParserOptions for the parser
-    let options = ParserOptions {
-        locations_to_parse: args.locations,
-        raws_to_parse: args.object_types,
-        attach_metadata_to_raws: args.attach_metadata,
-        raw_files_to_parse: args.raw_file_paths,
-        raw_modules_to_parse: args.raw_module_paths,
-        legends_exports_to_parse: args.legends_exports,
-        dwarf_fortress_directory: args.df_path,
-        ..Default::default()
-    };
+    let mut options = ParserOptions::new(args.df_path);
+
+    // Set locations to parse
+    options.set_locations_to_parse(args.locations);
+
+    // Set object types to parse
+    options.set_object_types_to_parse(args.object_types);
+
+    // Set raw files to parse
+    options.set_raw_files_to_parse(args.raw_file_paths);
+
+    // Set raw modules to parse
+    options.set_raw_modules_to_parse(args.raw_module_paths);
+
+    // Set legends exports to parse
+    options.set_legends_exports_to_parse(args.legends_exports);
+
+    // Set whether or not to attach metadata to the parsed raws
+    if args.attach_metadata {
+        options.attach_metadata_to_raws();
+    }
+
+    // Set whether to include the summary in the log or not
+    if args.print_summary {
+        options.log_summary();
+    }
 
     // Parse the raws
     let result = dfraw_json_parser::parse(&options).map_err(|e| {
