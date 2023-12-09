@@ -65,13 +65,11 @@ pub fn singularly_apply_creature_variation(
 
     let Some(creature_variation) = creature_variations
         .iter()
-        .find(|r| r.get_identifier() == variation_identifier)
+        .find(|r| r.get_identifier().to_uppercase() == variation_identifier.to_uppercase())
+        .cloned()
     else {
-        warn!(
-            "Failed to find creature variation {} for {}",
-            variation,
-            creature.get_object_id()
-        );
+        warn!("Failed to find creature variation {}", variation_identifier);
+        debug!("args: {:?}", variation_args);
         return None;
     };
 

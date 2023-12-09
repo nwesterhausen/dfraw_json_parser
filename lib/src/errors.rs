@@ -17,4 +17,6 @@ pub enum ParserError {
     },
     #[error("Not yet implemented (TODO)")]
     NotYetImplemented,
+    #[error("Target for parsing cannot be opened: {0}")]
+    NothingToParse(String),
 }

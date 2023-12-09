@@ -1,0 +1,132 @@
+[
+  {
+    "rawType": "Creature",
+    "modifications": [
+      {
+        "applyCreatureVariation": {
+          "identifier": "STANDARD_WALK_CRAWL_GAITS:9000:8900:8825:8775:9500:9900"
+        }
+      },
+      {
+        "applyCreatureVariation": {
+          "identifier": "STANDARD_CRAWLING_GAITS:9000:8900:8825:8775:9500:9900"
+        }
+      },
+      {
+        "applyCreatureVariation": {
+          "identifier": "STANDARD_SWIMMING_GAITS:9000:8900:8825:8775:9500:9900"
+        }
+      }
+    ],
+    "metadata": {
+      "moduleObjectId": "Unknown-MODULE-creature-amphibians-txt",
+      "moduleName": "",
+      "moduleVersion": "",
+      "rawFilePath": "\\\\?\\G:\\repos\\dfraw_json_parser\\lib\\tests\\data\\creature_amphibians.txt",
+      "rawIdentifier": "creature_amphibians",
+      "objectType": "Creature",
+      "rawModuleLocation": "Unknown"
+    },
+    "identifier": ""
+  },
+  {
+    "rawType": "Creature",
+    "modifications": [
+      {
+        "copyTagsFrom": {
+          "identifier": "TOAD"
+        }
+      },
+      {
+        "applyCreatureVariation": {
+          "identifier": "ANIMAL_PERSON"
+        }
+      },
+      {
+        "applyCreatureVariation": {
+          "identifier": "PUNCH_ATTACK"
+        }
+      },
+      {
+        "applyCreatureVariation": {
+          "identifier": "KICK_ATTACK"
+        }
+      },
+      {
+        "applyCreatureVariation": {
+          "identifier": "MOUTH_BITE_ATTACK"
+        }
+      },
+      {
+        "applyCreatureVariation": {
+          "identifier": "STANDARD_BIPED_GAITS:900:711:521:293:1900:2900"
+        }
+      },
+      {
+        "applyCreatureVariation": {
+          "identifier": "STANDARD_CLIMBING_GAITS:2990:2257:1525:731:4300:6100"
+        }
+      },
+      {
+        "applyCreatureVariation": {
+          "identifier": "STANDARD_SWIMMING_GAITS:2990:2257:1525:731:4300:6100"
+        }
+      },
+      {
+        "applyCreatureVariation": {
+          "identifier": "STANDARD_CRAWLING_GAITS:2990:2257:1525:731:4300:6100"
+        }
+      }
+    ],
+    "metadata": {
+      "moduleObjectId": "Unknown-MODULE-creature-amphibians-txt",
+      "moduleName": "",
+      "moduleVersion": "",
+      "rawFilePath": "\\\\?\\G:\\repos\\dfraw_json_parser\\lib\\tests\\data\\creature_amphibians.txt",
+      "rawIdentifier": "creature_amphibians",
+      "objectType": "Creature",
+      "rawModuleLocation": "Unknown"
+    },
+    "identifier": ""
+  },
+  {
+    "rawType": "Creature",
+    "modifications": [
+      {
+        "copyTagsFrom": {
+          "identifier": "TOAD"
+        }
+      },
+      {
+        "applyCreatureVariation": {
+          "identifier": "GIANT"
+        }
+      },
+      {
+        "applyCreatureVariation": {
+          "identifier": "STANDARD_WALK_CRAWL_GAITS:3512:2634:1756:878:4900:6900"
+        }
+      },
+      {
+        "applyCreatureVariation": {
+          "identifier": "STANDARD_CRAWLING_GAITS:9000:8900:8825:8775:9500:9900"
+        }
+      },
+      {
+        "applyCreatureVariation": {
+          "identifier": "STANDARD_SWIMMING_GAITS:9000:8900:8825:8775:9500:9900"
+        }
+      }
+    ],
+    "metadata": {
+      "moduleObjectId": "Unknown-MODULE-creature-amphibians-txt",
+      "moduleName": "",
+      "moduleVersion": "",
+      "rawFilePath": "\\\\?\\G:\\repos\\dfraw_json_parser\\lib\\tests\\data\\creature_amphibians.txt",
+      "rawIdentifier": "creature_amphibians",
+      "objectType": "Creature",
+      "rawModuleLocation": "Unknown"
+    },
+    "identifier": ""
+  }
+]

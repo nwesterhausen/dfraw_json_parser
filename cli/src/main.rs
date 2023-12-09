@@ -243,7 +243,15 @@ fn parse_args() -> Result<Args, lexopt::Error> {
     }
 
     // For all paths, resolve them to absolute paths
-    args.df_path = to_absolute_path(&df_path.unwrap_or_default(), "dwarf fortress path")?;
+
+    // We only need the DF path if we're parsing raws from the one of the defined locations
+    if args.locations.is_empty() {
+        // If we don't need the DF path, we can just set it to an empty path
+        args.df_path = PathBuf::new();
+    } else {
+        // If we do need the DF path, we need to make sure it was specified
+        args.df_path = to_absolute_path(&df_path.unwrap_or_default(), "dwarf fortress path")?;
+    }
 
     for path in &mut args.raw_file_paths {
         *path = to_absolute_path(path, "raw file")?;

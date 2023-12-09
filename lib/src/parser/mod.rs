@@ -56,6 +56,8 @@ pub use object_types::ObjectType;
 pub use object_types::OBJECT_TOKEN_MAP;
 /// Standard location options for raw files in the DF Directory
 pub use raw_locations::RawModuleLocation;
+/// The results of parsing a raw file
+pub use reader::FileParseResults;
 /// List of the only object types that can be parsed right now
 pub use reader::PARSABLE_OBJECT_TYPES;
 pub use simple_structs::*;
