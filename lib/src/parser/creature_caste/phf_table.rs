@@ -150,4 +150,5 @@ pub static CASTE_TOKENS: phf::Map<&'static str, CasteTag> = phf::phf_map! {
     "CANNOT_BREATHE_AIR" => CasteTag::CannotBreatheAir,
     "CURIOUS_BEAST" => CasteTag::CuriousBeast,
     "UTTERANCES" => CasteTag::Utterances,
+    "GAIT" => CasteTag::Gait,
 };

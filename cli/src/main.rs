@@ -138,6 +138,7 @@ fn parse_args() -> Result<Args, lexopt::Error> {
         match arg {
             Short('c') | Long("creature") => {
                 args.object_types.push(ObjectType::Creature);
+                args.object_types.push(ObjectType::CreatureVariation);
             }
             Short('p') | Long("plant") => {
                 args.object_types.push(ObjectType::Plant);
@@ -232,6 +233,8 @@ fn parse_args() -> Result<Args, lexopt::Error> {
         args.object_types.push(ObjectType::Plant);
         args.object_types.push(ObjectType::Entity);
         args.object_types.push(ObjectType::Inorganic);
+        args.object_types.push(ObjectType::CreatureVariation);
+        args.object_types.push(ObjectType::MaterialTemplate);
     }
     // Include graphic types if requested
     if include_graphics {
@@ -240,7 +243,15 @@ fn parse_args() -> Result<Args, lexopt::Error> {
     }
 
     // For all paths, resolve them to absolute paths
-    args.df_path = to_absolute_path(&df_path.unwrap_or_default(), "dwarf fortress path")?;
+
+    // We only need the DF path if we're parsing raws from the one of the defined locations
+    if args.locations.is_empty() {
+        // If we don't need the DF path, we can just set it to an empty path
+        args.df_path = PathBuf::new();
+    } else {
+        // If we do need the DF path, we need to make sure it was specified
+        args.df_path = to_absolute_path(&df_path.unwrap_or_default(), "dwarf fortress path")?;
+    }
 
     for path in &mut args.raw_file_paths {
         *path = to_absolute_path(path, "raw file")?;
@@ -384,16 +395,32 @@ pub fn main() -> Result<(), lexopt::Error> {
     tracing::subscriber::set_global_default(subscriber).expect("setting default subscriber failed");
 
     // Build ParserOptions for the parser
-    let options = ParserOptions {
-        locations_to_parse: args.locations,
-        raws_to_parse: args.object_types,
-        attach_metadata_to_raws: args.attach_metadata,
-        raw_files_to_parse: args.raw_file_paths,
-        raw_modules_to_parse: args.raw_module_paths,
-        legends_exports_to_parse: args.legends_exports,
-        dwarf_fortress_directory: args.df_path,
-        ..Default::default()
-    };
+    let mut options = ParserOptions::new(args.df_path);
+
+    // Set locations to parse
+    options.set_locations_to_parse(args.locations);
+
+    // Set object types to parse
+    options.set_object_types_to_parse(args.object_types);
+
+    // Set raw files to parse
+    options.set_raw_files_to_parse(args.raw_file_paths);
+
+    // Set raw modules to parse
+    options.set_raw_modules_to_parse(args.raw_module_paths);
+
+    // Set legends exports to parse
+    options.set_legends_exports_to_parse(args.legends_exports);
+
+    // Set whether or not to attach metadata to the parsed raws
+    if args.attach_metadata {
+        options.attach_metadata_to_raws();
+    }
+
+    // Set whether to include the summary in the log or not
+    if args.print_summary {
+        options.log_summary();
+    }
 
     // Parse the raws
     let result = dfraw_json_parser::parse(&options).map_err(|e| {

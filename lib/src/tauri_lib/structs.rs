@@ -84,4 +84,13 @@ impl ProgressHelper {
             debug!("Tauri window emit error {:?}", e);
         };
     }
+
+    pub(crate) fn send_summary(
+        &self,
+        summary: &std::collections::HashMap<crate::ObjectType, usize>,
+    ) {
+        self.tauri_window
+            .emit("SUMMARY", summary.clone())
+            .unwrap_or_else(|e| debug!("Tauri window emit error {:?}", e));
+    }
 }

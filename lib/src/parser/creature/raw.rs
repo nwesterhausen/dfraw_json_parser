@@ -26,43 +26,94 @@ use super::{phf_table::CREATURE_TOKENS, tokens::CreatureTag};
 #[derive(Serialize, Deserialize, Debug, Clone, Default)]
 #[serde(rename_all = "camelCase")]
 pub struct Creature {
+    /// The `metadata` field is of type `RawMetadata` and is used to provide additional information
+    /// about the raws the `Creature` is found in.
     #[serde(skip_serializing_if = "serializer_helper::is_metadata_hidden")]
     metadata: RawMetadata,
+    /// The `identifier` field is a string that represents the identifier of the creature. It is used
+    /// to uniquely identify the creature (however it is not guaranteed to be unique across object types
+    /// or all raws parsed, *especially* if you are parsing multiple versions of the same raws).
     identifier: String,
+    /// The `castes` field is a vector of `Caste` objects. Each `Caste` object represents a caste of the
+    /// creature. For example, a creature may have a `MALE` and `FEMALE` caste. Each `Caste` object has
+    /// its own properties, such as `name`, `description`, `body`, `flags`, etc.
+    ///
+    /// A lot of the properties of the `Creature` object are actually properties of a special `Caste`, `ALL`.
     castes: Vec<Caste>,
+    /// Any tags that are not parsed into their own fields are stored in the `tags` field.
     #[serde(skip_serializing_if = "Vec::is_empty")]
     tags: Vec<CreatureTag>,
+    /// The biomes that this creature can be found in.
     #[serde(skip_serializing_if = "Vec::is_empty")]
     biomes: Vec<biome::Token>,
+    /// Pref strings are things that make dwarves (or others?) like or dislike the creature.
     #[serde(skip_serializing_if = "Vec::is_empty")]
     pref_strings: Vec<String>,
+    /// The tile that represents the creature in the game (classic mode)
     #[serde(skip_serializing_if = "Tile::is_default")]
     tile: Tile,
-    // integers
+    /// Determines the chances of a creature appearing within its environment, with higher values resulting in more frequent appearance.
+    ///
+    /// Also affects the chance of a creature being brought in a caravan for trading. The game effectively considers all creatures that
+    /// can possibly appear and uses the FREQUENCY value as a weight - for example, if there are three creatures with frequencies 10/25/50,
+    /// the creature with `[FREQUENCY:50]` will appear approximately 58.8% of the time.
+    ///
+    /// Defaults to 50 if not specified.
+    ///
+    /// Minimum value is 0, maximum value is 100.
+    ///
+    /// Note: not to be confused with [POP_RATIO].
     #[serde(skip_serializing_if = "serializer_helper::is_default_frequency")]
-    frequency: u16, //Defaults to 50 if not specified
-    // [min, max] ranges
-    /// Default [1, 1]
+    frequency: u16,
+    /// The minimum/maximum numbers of how many creatures per spawned cluster. Vermin fish with this token in combination with
+    /// temperate ocean and river biome tokens will perform seasonal migrations.
+    ///
+    /// Defaults to [1,1] if not specified.
     #[serde(skip_serializing_if = "serializer_helper::min_max_is_ones")]
     cluster_number: [u16; 2],
-    /// Default [1, 1]
+    /// The minimum/maximum numbers of how many of these creatures are present in each world map tile of the appropriate region.
+    ///
+    /// Defaults to [1,1] if not specified.
     #[serde(skip_serializing_if = "serializer_helper::min_max_is_ones")]
     population_number: [u16; 2],
+    /// Depth that the creature appears underground. Numbers can be from 0 to 5. 0 is actually 'above ground' and can be used if the
+    /// creature is to appear both above and below ground. Values from 1-3 are the respective cavern levels, 4 is the magma sea and
+    /// 5 is the HFS.
+    ///
+    /// A single argument may be used instead of min and max.
+    ///
+    /// Civilizations that can use underground plants or animals will only export (via the embark screen or caravans) things that are available at depth 1.
+    ///
     /// Default [0, 0] (aboveground)
     #[serde(skip_serializing_if = "serializer_helper::min_max_is_zeroes")]
     underground_depth: [u16; 2],
-    // strings
+    /// Like `[BABYNAME]`, but applied regardless of caste.
     #[serde(skip_serializing_if = "SingPlurName::is_empty")]
     general_baby_name: SingPlurName,
+    /// Like `[CHILDNAME]`, but applied regardless of caste.
     #[serde(skip_serializing_if = "SingPlurName::is_empty")]
     general_child_name: SingPlurName,
+    /// The generic name for any creature of this type - will be used when distinctions between caste are unimportant. For names for specific castes,
+    /// use `[CASTE_NAME]` instead. If left undefined, the creature will be labeled as "nothing" by the game.
     name: Name,
-    // Special tokens
+
+    /// Copies another specified creature. This will override any definitions made before it; essentially, it makes this creature identical to the other one,
+    /// which can then be modified. Often used in combination with `[APPLY_CREATURE_VARIATION]` to import standard variations from a file.
+    ///
+    /// The vanilla giant animals and animal peoples are examples of this token combination.
     #[serde(skip_serializing_if = "String::is_empty")]
     copy_tags_from: String,
+    /// Applies the specified creature variation.
+    ///
+    /// These are stored "in the raw", i.e. how they appear in the raws. They are not handled until the end of the parsing process.
     #[serde(skip_serializing_if = "Vec::is_empty")]
     apply_creature_variation: Vec<String>,
+    /// A generated field that is used to uniquely identify this object. It is generated from the `metadata`, `identifier`, and `ObjectType`.
+    ///
+    /// This field is always serialized.
     object_id: String,
+    /// Various SELECT_CREATURE modifications. This needs fixed.
+    /// TODO: This needs fixed.
     #[serde(skip_serializing_if = "Vec::is_empty")]
     select_creature_variation: Vec<SelectCreature>,
 }
@@ -115,6 +166,10 @@ impl Creature {
     /// The private field `copy_tags_from`.
     pub fn get_copy_tags_from(&self) -> &str {
         &self.copy_tags_from
+    }
+
+    pub fn get_variations_to_apply(&self) -> &[String] {
+        self.apply_creature_variation.as_slice()
     }
 
     /// Adds a `SelectCreature` object to the internal `SelectCreature` vector.

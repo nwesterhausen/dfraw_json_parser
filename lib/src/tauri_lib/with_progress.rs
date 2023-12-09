@@ -4,9 +4,8 @@ extern crate tauri;
 use super::structs::ProgressHelper;
 
 use crate::{
-    helpers::{absorb_select_creature, apply_copy_tags_from},
-    legends_export, parser, util, ModuleInfoFile, ParseResult, ParserError, RawModuleLocation,
-    RawObject,
+    legends_export, parser, util, ModuleInfoFile, ParseResult, ParserError, ParserOptions,
+    RawModuleLocation, RawObject,
 };
 use std::path::{Path, PathBuf};
 use tracing::{debug, info};
@@ -33,12 +32,15 @@ pub(crate) fn parse(
     progress_helper: &mut ProgressHelper,
 ) -> Result<crate::ParseResult, crate::ParserError> {
     // Guard against invalid paths
+
+    use crate::{creature_variation::CreatureVariation, unprocessed_raw::UnprocessedRaw};
     let options = util::validate_options(options)?;
 
     let mut results = ParseResult {
         raws: Vec::new(),
         info_files: Vec::new(),
     };
+    let mut unprocessed_raws: Vec<UnprocessedRaw> = Vec::new();
 
     progress_helper.update_current_task("Parsing raws.");
 
@@ -59,9 +61,9 @@ pub(crate) fn parse(
         {
             progress_helper.update_current_location("Vanilla");
             info!("Dispatching parse for vanilla raws");
-            results
-                .raws
-                .extend(parse_location(&vanilla_path, &options, progress_helper)?);
+            let parsed_raws = parse_location(&vanilla_path, &options, progress_helper)?;
+            results.raws.extend(parsed_raws.parsed_raws);
+            unprocessed_raws.extend(parsed_raws.unprocessed_raws);
         }
         if options
             .locations_to_parse
@@ -69,11 +71,9 @@ pub(crate) fn parse(
         {
             progress_helper.update_current_location("Installed Mods");
             info!("Dispatching parse for installed mods");
-            results.raws.extend(parse_location(
-                &installed_mods_path,
-                &options,
-                progress_helper,
-            )?);
+            let parsed_raws = parse_location(&installed_mods_path, &options, progress_helper)?;
+            results.raws.extend(parsed_raws.parsed_raws);
+            unprocessed_raws.extend(parsed_raws.unprocessed_raws);
         }
         if options
             .locations_to_parse
@@ -81,11 +81,9 @@ pub(crate) fn parse(
         {
             progress_helper.update_current_location("Workshop Mods");
             info!("Dispatching parse for workshop/downloaded mods");
-            results.raws.extend(parse_location(
-                &workshop_mods_path,
-                &options,
-                progress_helper,
-            )?);
+            let parsed_raws = parse_location(&workshop_mods_path, &options, progress_helper)?;
+            results.raws.extend(parsed_raws.parsed_raws);
+            unprocessed_raws.extend(parsed_raws.unprocessed_raws);
         }
     }
 
@@ -108,9 +106,9 @@ pub(crate) fn parse(
                     "Dispatching parse for module {:?}",
                     target_path.file_name().unwrap_or_default()
                 );
-                results
-                    .raws
-                    .extend(parse_module(&target_path, &options, progress_helper)?);
+                let parsed_raws = parse_module(&target_path, &options, progress_helper)?;
+                results.raws.extend(parsed_raws.parsed_raws);
+                unprocessed_raws.extend(parsed_raws.unprocessed_raws);
             }
         }
     }
@@ -131,9 +129,9 @@ pub(crate) fn parse(
                 "Dispatching parse for raw file {:?}",
                 target_path.file_name().unwrap_or_default()
             );
-            results
-                .raws
-                .extend(parser::parse_raw_file(&target_path, &options)?);
+            let parse_result = parser::parse_raw_file(&target_path, &options)?;
+            results.raws.extend(parse_result.parsed_raws);
+            unprocessed_raws.extend(parse_result.unprocessed_raws);
         }
     }
 
@@ -159,12 +157,126 @@ pub(crate) fn parse(
         }
     }
 
-    progress_helper.update_current_task("Processing 'SELECT_CREATURE' tokens.");
-    absorb_select_creature(&mut results.raws);
-    // Apply copy_tags_from
-    if !options.skip_apply_copy_tags_from {
-        progress_helper.update_current_task("Processing 'COPY_TAGS_FROM' tokens.");
-        apply_copy_tags_from(&mut results.raws);
+    progress_helper.update_current_task("Resolving creature raws.");
+
+    // Resolve the unprocessed creatures
+    // Prerequisites: build a list of creature variations
+    let creature_variations: Vec<CreatureVariation> = results
+        .raws
+        .iter()
+        .filter_map(|raw| {
+            if raw.get_type() == &crate::ObjectType::CreatureVariation {
+                if let Some(cv) = raw
+                    .as_ref()
+                    .as_any()
+                    .downcast_ref::<CreatureVariation>()
+                    .cloned()
+                {
+                    return Some(cv);
+                }
+                tracing::error!(
+                    "Matched CreatureVariation but failed to downcast for {}",
+                    raw.get_identifier()
+                );
+            }
+            None
+        })
+        .collect();
+
+    info!(
+        "Resolving {} unprocessed creatures using {} creature variation definitions",
+        unprocessed_raws.len(),
+        creature_variations.len()
+    );
+
+    // Write the unprocessed raws to a file
+    // let _ = serde_json::to_writer_pretty(
+    //     std::fs::File::create("unprocessed_raws.json").unwrap(),
+    //     &unprocessed_raws,
+    // );
+
+    let mut simple_unprocessed: Vec<UnprocessedRaw> = Vec::new();
+    let mut complex_unprocessed: Vec<UnprocessedRaw> = Vec::new();
+
+    // Split the unprocessed raws into simple and complex
+    for unprocessed_raw in unprocessed_raws {
+        if unprocessed_raw.is_simple() {
+            simple_unprocessed.push(unprocessed_raw);
+        } else {
+            complex_unprocessed.push(unprocessed_raw);
+        }
+    }
+
+    // Resolve the simple creatures first
+    let resolved_simple_creatures: Vec<crate::creature::Creature> = simple_unprocessed
+        .iter_mut()
+        .filter(|raw| raw.raw_type() == crate::ObjectType::Creature)
+        .filter_map(|raw| {
+            match raw.resolve(creature_variations.as_slice(), results.raws.as_slice()) {
+                Ok(c) => Some(c),
+                Err(e) => {
+                    tracing::error!(
+                        "Unable to resolve simple creature {}: {:?}",
+                        raw.get_identifier(),
+                        e
+                    );
+                    None
+                }
+            }
+        })
+        .map(|c| crate::helpers::clone_raw_object_box(&c))
+        .filter_map(|c| {
+            if let Some(creature) = c
+                .as_ref()
+                .as_any()
+                .downcast_ref::<crate::creature::Creature>()
+            {
+                Some(creature.clone())
+            } else {
+                tracing::error!("Downcast failed for simple creature {}", c.get_identifier());
+                None
+            }
+        })
+        .collect();
+
+    info!(
+        "Resolved {} simple creatures",
+        resolved_simple_creatures.len()
+    );
+
+    results.raws.extend(
+        resolved_simple_creatures
+            .iter()
+            .map(|c| Box::new(c.clone()) as Box<dyn RawObject>),
+    );
+
+    // Now we can do the second pass through the unprocessed creatures, but add the complex creatures
+    // to the results.raws vector as they are resolved.
+    let mut resolved_complex_creatures = 0_usize;
+    for unprocessed_raw in &mut complex_unprocessed {
+        if unprocessed_raw.raw_type() == crate::ObjectType::Creature {
+            match unprocessed_raw.resolve(creature_variations.as_slice(), results.raws.as_slice()) {
+                Ok(c) => {
+                    resolved_complex_creatures += 1;
+                    results.raws.push(crate::helpers::clone_raw_object_box(&c));
+                }
+                Err(e) => {
+                    tracing::error!(
+                        "Unable to resolve complex creature {}: {:?}",
+                        unprocessed_raw.get_identifier(),
+                        e
+                    );
+                }
+            }
+        }
+    }
+
+    info!("Resolved {resolved_complex_creatures} complex creatures");
+
+    if options.log_summary {
+        let summary = crate::util::summarize_raws(&results.raws);
+        progress_helper.send_summary(&summary);
+        crate::util::log_summary(&summary);
     }
 
     progress_helper.update_current_task("Parsing module info files.");
@@ -196,8 +308,9 @@ fn parse_location<P: AsRef<Path>>(
     location_path: &P,
     options: &crate::options::ParserOptions,
     progress_helper: &mut ProgressHelper,
-) -> Result<Vec<Box<dyn RawObject>>, ParserError> {
+) -> Result<crate::FileParseResults, ParserError> {
     let mut results: Vec<Box<dyn RawObject>> = Vec::new();
+    let mut unprocessed_raws: Vec<crate::unprocessed_raw::UnprocessedRaw> = Vec::new();
     let location_path: PathBuf = location_path.as_ref().to_path_buf();
 
     progress_helper.update_current_location(format!("{:?}", &location_path).as_str());
@@ -218,7 +331,8 @@ fn parse_location<P: AsRef<Path>>(
     for raw_module in raw_modules_in_location {
         match parse_module(&raw_module.path(), options, progress_helper) {
             Ok(module_results) => {
-                results.extend(module_results);
+                results.extend(module_results.parsed_raws);
+                unprocessed_raws.extend(module_results.unprocessed_raws);
             }
             Err(e) => {
                 debug!("Skipping parsing module: {:?}", e);
@@ -226,16 +340,19 @@ fn parse_location<P: AsRef<Path>>(
         }
     }
 
-    Ok(results)
+    Ok(crate::FileParseResults {
+        parsed_raws: results,
+        unprocessed_raws,
+    })
 }
 
 #[cfg(feature = "tauri")]
 #[allow(clippy::too_many_lines)]
 fn parse_module<P: AsRef<Path>>(
     module_path: &P,
-    options: &crate::options::ParserOptions,
+    options: &ParserOptions,
     progress_helper: &mut ProgressHelper,
-) -> Result<Vec<Box<dyn RawObject>>, ParserError> {
+) -> Result<crate::FileParseResults, ParserError> {
     // Get information from the module info file
     let module_info_file_path = module_path.as_ref().join("info.txt");
     let module_info_file: ModuleInfoFile =
@@ -296,10 +413,14 @@ fn parse_module<P: AsRef<Path>>(
 
     // Exit early if nothing to parse
     if !parse_graphics && !parse_objects {
-        return Ok(Vec::new());
+        return Ok(crate::FileParseResults {
+            parsed_raws: vec![],
+            unprocessed_raws: vec![],
+        });
     }
 
     let mut results: Vec<Box<dyn RawObject>> = Vec::new();
+    let mut unprocessed_raws: Vec<crate::unprocessed_raw::UnprocessedRaw> = Vec::new();
 
     // Parse the objects
     if parse_objects {
@@ -320,8 +441,12 @@ fn parse_module<P: AsRef<Path>>(
                     progress_helper.send_update(file_name_str);
                     match parser::parse_raw_file(&file_path, options) {
                         Ok(mut objects_results) => {
-                            progress_helper.add_to_running_total(objects_results.len());
-                            results.append(&mut objects_results);
+                            progress_helper.add_to_running_total(
+                                objects_results.parsed_raws.len()
+                                    + objects_results.unprocessed_raws.len(),
+                            );
+                            results.append(&mut objects_results.parsed_raws);
+                            unprocessed_raws.append(&mut objects_results.unprocessed_raws);
                         }
                         Err(e) => {
                             debug!("Skipping parsing objects file: {:?}", e);
@@ -351,8 +476,9 @@ fn parse_module<P: AsRef<Path>>(
                     progress_helper.send_update(file_name_str);
                     match parser::parse_raw_file(&file_path, options) {
                         Ok(mut graphics_results) => {
-                            progress_helper.add_to_running_total(graphics_results.len());
-                            results.append(&mut graphics_results);
+                            progress_helper
+                                .add_to_running_total(graphics_results.parsed_raws.len());
+                            results.append(&mut graphics_results.parsed_raws);
                         }
                         Err(e) => {
                             debug!("Skipping parsing graphics file: {:?}", e);
@@ -363,5 +489,8 @@ fn parse_module<P: AsRef<Path>>(
         }
     }
 
-    Ok(results)
+    Ok(crate::FileParseResults {
+        parsed_raws: results,
+        unprocessed_raws,
+    })
 }

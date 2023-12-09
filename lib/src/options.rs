@@ -24,27 +24,23 @@ use crate::parser::{ObjectType, RawModuleLocation};
 /// use std::path::PathBuf;
 /// use dfraw_json_parser::{ParserOptions, RawObject, ObjectType, RawModuleLocation};
 ///
-/// // Create a basic options struct by specifying the path to the dwarf fortress directory.
 /// let mut options = ParserOptions::new("path/to/dwarf_fortress");
-/// // Add a single raw file to parse
-/// options.add_raw_file_to_parse(&String::from("path/to/dwarf_fortress/data/vanilla/vanilla_creatures/objects/creature_standard.txt"));
-/// // Add a single raw module to parse (all raw files in the module will be parsed)
-/// options.add_raw_module_to_parse(&String::from("path/to/dwarf_fortress/data/vanilla/vanilla_creatures"));
-/// // Add a single module info file to parse ()
-/// options.add_module_info_file_to_parse(&String::from("path/to/dwarf_fortress/data/vanilla/vanilla_creatures/info.txt"));
-/// // Include the creatures that are exported from the world with legends_plus (dfhack exportlegends option)
-/// options.add_legends_export_to_parse(&String::from("path/to/dwarf_fortress/legends_plus_export.xml"));
-/// // Only parse Creature and Plant raws
-/// options.set_raws_to_parse(vec![ObjectType::Creature, ObjectType::Plant]);
-/// // Include the raws from the installed mods folder
-/// options.set_locations_to_parse(vec![RawModuleLocation::InstalledMods]);
-/// // For the result, attach metadata to the raws
+/// options.add_location_to_parse(RawModuleLocation::Vanilla);
+/// // Clear the default object types
+/// options.set_object_types_to_parse(vec![]);
+/// // Add back in the ones we want
+/// options.add_object_type_to_parse(ObjectType::Creature);
+/// options.add_object_type_to_parse(ObjectType::CreatureVariation);
+/// // Include the metadata with the parsed raws
 /// options.attach_metadata_to_raws();
+///
+/// // Parse the raws and info.txt files (not parsing here because the path is invalid)
+/// // let parsed_raws = dfraw_json_parser::parse(&options);
 ///```
 ///
 #[allow(clippy::module_name_repetitions)]
 #[allow(clippy::struct_excessive_bools)]
-#[derive(Debug, Clone, Serialize, Deserialize)]
+#[derive(Debug, Clone, Serialize, Deserialize, PartialEq, Eq, Hash)]
 #[serde(rename_all = "camelCase")]
 #[derive(ts_rs::TS)]
 #[ts(export)]
@@ -69,28 +65,23 @@ pub struct ParserOptions {
     ///
     /// Default: false.
     pub skip_apply_creature_variations: bool,
-    /// What kind of raws to parse. If this is left empty, all raws will be parsed.
+    /// What types of raws to parse. If this is left empty, all parsable raws will be parsed.
     ///
-    /// Default: [ Creature, Plant, Inorganic, MaterialTemplate, Graphics, TilePage ]
-    pub raws_to_parse: Vec<ObjectType>,
+    /// Default: [Creature, CreatureVariation, Entity, Plant, Inorganic, MaterialTemplate, Graphics, TilePage]
+    pub object_types_to_parse: Vec<ObjectType>,
     /// What locations to parse raws from. If this is left empty, no locations will be parsed.
     ///
-    /// (i.e. only the specific raw files, modules, or legends_plus exports specified will be parsed)
+    /// Setting locations to parse requires a valid `dwarf_fortress_directory` to be set.
     ///
-    /// Default: Vanilla
+    /// Default: None
     pub locations_to_parse: Vec<RawModuleLocation>,
     /// The path to the dwarf fortress directory. If no locations are specified, then this is not used.
     ///
-    /// If specific raw files, modules or legends_plus exports are specified, then this is not used when
-    /// parsing those.
+    /// This is not used when parsing specific raws, modules, info files, or legends exports as specified by
+    /// `raw_files_to_parse`, `raw_modules_to_parse`, `module_info_files_to_parse`, or `legends_exports_to_parse`.
+    ///
+    /// Default: ""
     pub dwarf_fortress_directory: PathBuf,
-    /// Whether to serialize the result to json. If true, the result will be serialized to json before
-    /// being returned.
-    ///
-    /// (This means the result will be a `Vec` of `String` instead of a `Vec` of `Box<dyn RawObject>`.)
-    ///
-    /// Default: false
-    pub serialize_result_to_json: bool,
     /// Optionally specify one or more legends_plus exports to parse in addition to the raws.
     /// These exports include information about generated creatures which are not included in the
     /// raws.
@@ -127,6 +118,12 @@ pub struct ParserOptions {
     /// Note that if you are calling the `parse` function, this will be ignored. This is only used
     /// when calling the `parse_module_info_files` function.
     pub module_info_files_to_parse: Vec<PathBuf>,
+    /// Include a summary of what was parsed in the log.
+    ///
+    /// If running with `tauri`, this will emit a `PARSE_SUMMARY` event with the summary as well.
+    ///
+    /// Default: false
+    pub log_summary: bool,
 }
 
 impl Default for ParserOptions {
@@ -135,16 +132,18 @@ impl Default for ParserOptions {
             attach_metadata_to_raws: false,
             skip_apply_copy_tags_from: false,
             skip_apply_creature_variations: false,
-            serialize_result_to_json: false,
-            raws_to_parse: vec![
+            log_summary: false,
+            object_types_to_parse: vec![
                 ObjectType::Creature,
+                ObjectType::CreatureVariation,
+                ObjectType::Entity,
                 ObjectType::Plant,
                 ObjectType::Inorganic,
                 ObjectType::MaterialTemplate,
                 ObjectType::Graphics,
                 ObjectType::TilePage,
             ],
-            locations_to_parse: vec![RawModuleLocation::Vanilla],
+            locations_to_parse: vec![],
             dwarf_fortress_directory: PathBuf::from(""),
             legends_exports_to_parse: Vec::new(),
             raw_files_to_parse: Vec::new(),
@@ -193,31 +192,111 @@ impl ParserOptions {
 
     /// Sets what kind of raws to parse.
     /// The default value will parse all the raws that are currently supported:
+    ///
     /// * `ObjectType::Creature`
+    /// * `ObjectType::CreatureVariation`
+    /// * `ObjectType::Entity`
     /// * `ObjectType::Plant`
     /// * `ObjectType::Inorganic`
     /// * `ObjectType::MaterialTemplate`
-    pub fn set_raws_to_parse(&mut self, raws_to_parse: Vec<ObjectType>) {
-        self.raws_to_parse = raws_to_parse;
+    /// * `ObjectType::Graphics`
+    /// * `ObjectType::TilePage`
+    ///
+    /// Note: This will overwrite any previously set raws (e.g. those set by `add_raw_to_parse`). It
+    /// also will discard the default set of target object types.
+    pub fn set_object_types_to_parse(&mut self, raws_to_parse: Vec<ObjectType>) {
+        self.object_types_to_parse = raws_to_parse;
+    }
+
+    /// Add a single object type to parse.
+    ///
+    /// Note: This is in addition to the default value or the value set by `set_raws_to_parse`.
+    pub fn add_object_type_to_parse(&mut self, raw_to_parse: ObjectType) {
+        // If it's already in the list, don't add it again.
+        if self.object_types_to_parse.contains(&raw_to_parse) {
+            return;
+        }
+
+        self.object_types_to_parse.push(raw_to_parse);
+    }
+
+    /// Include graphics and tile pages in the parse.
+    ///
+    /// This is a convenience function that is equivalent to:
+    ///
+    /// ```rust
+    /// use dfraw_json_parser::{ParserOptions, ObjectType};
+    ///
+    /// let mut options = ParserOptions::new("path/to/dwarf_fortress");
+    /// options.add_object_type_to_parse(ObjectType::Graphics);
+    /// options.add_object_type_to_parse(ObjectType::TilePage);
+    ///
+    /// let mut options2 = ParserOptions::new("path/to/dwarf_fortress");
+    /// options2.include_graphics();
+    ///
+    /// assert_eq!(options, options2);
+    /// ```
+    ///
+    /// Note: This is in addition to the default value or the value set by `set_raws_to_parse`.
+    pub fn include_graphics(&mut self) {
+        self.add_object_type_to_parse(ObjectType::Graphics);
+        self.add_object_type_to_parse(ObjectType::TilePage);
     }
 
     /// Sets what locations to parse raws from.
+    ///
     /// * `RawModuleLocation::Vanilla` will parse the vanilla raws.
     /// * `RawModuleLocation::InstalledMods` will parse the installed mods folder.
     /// * `RawModuleLocation::Mods` will parse the downloaded mods folder.
     ///
-    /// If left unset, only `RawModuleLocation::Vanilla` will be parsed.
+    /// If left unset, no locations will be parsed.
+    ///
+    /// Note: This will overwrite any previously set locations (e.g. those set by `add_location_to_parse`).
     pub fn set_locations_to_parse(&mut self, locations_to_parse: Vec<RawModuleLocation>) {
         self.locations_to_parse = locations_to_parse;
     }
 
-    /// Whether to serialize the result to json. If true, the result will be serialized to json before
+    /// Sets what raw files to parse directly. These should be the raw files
+    /// themselves, not the containing directory.
     ///
-    /// (This means the result will be a `Vec` of `String` instead of a `Vec` of `Box<dyn RawObject>`.)
+    /// (e.g. `creature_standard.txt` in `data/vanilla/vanilla_creatures/objects/`)
     ///
-    /// Default: false
-    pub fn serialize_result_to_json(&mut self) {
-        self.serialize_result_to_json = true;
+    /// Note: this will overwrite any previously set raws (e.g. those set by `add_raw_file_to_parse`).
+    pub fn set_raw_files_to_parse(&mut self, raw_files_to_parse: Vec<PathBuf>) {
+        self.raw_files_to_parse = raw_files_to_parse;
+    }
+
+    /// Sets what raw modules to parse directly. These should be the module
+    /// directories, not the info.txt file.
+    ///
+    /// (e.g. `vanilla_creatures` in `data/vanilla/`)
+    ///
+    /// Note: this will overwrite any previously set modules (e.g. those set by `add_raw_module_to_parse`).
+    pub fn set_raw_modules_to_parse(&mut self, raw_modules_to_parse: Vec<PathBuf>) {
+        self.raw_modules_to_parse = raw_modules_to_parse;
+    }
+
+    /// Sets what module info files to parse directly. These should be the info.txt
+    /// files themselves, not the containing directory.
+    ///
+    /// (e.g. `info.txt` in `data/vanilla/vanilla_creatures/`)
+    ///
+    /// Note: this will overwrite any previously set info files (e.g. those set by `add_module_info_file_to_parse`).
+    pub fn set_module_info_files_to_parse(&mut self, module_info_files_to_parse: Vec<PathBuf>) {
+        self.module_info_files_to_parse = module_info_files_to_parse;
+    }
+
+    /// Set what legends-plus exports to parse in addition to the raws. These exports include
+    /// information about generated creatures which are not included in the raws.
+    ///
+    /// These should be the legends-plus exports themselves, not the containing directory. When
+    /// exported from legends mode, the file is dumped in the root directory of the game.
+    ///
+    /// (e.g. `region12-000005-01-01-legends_plus.xml` in the Dwarf Fortress directory)
+    ///
+    /// Note: this will overwrite any previously set legends exports (e.g. those set by `add_legends_export_to_parse`).
+    pub fn set_legends_exports_to_parse(&mut self, legends_exports_to_parse: Vec<PathBuf>) {
+        self.legends_exports_to_parse = legends_exports_to_parse;
     }
 
     /// Optionally specify one or more `legends_plus` exports to parse in addition to the raws.
@@ -272,5 +351,25 @@ impl ParserOptions {
     pub fn add_module_info_file_to_parse<P: AsRef<Path>>(&mut self, module_info_file_to_parse: &P) {
         self.module_info_files_to_parse
             .push(module_info_file_to_parse.as_ref().to_path_buf());
+    }
+
+    /// Include a summary of what was parsed in the log.
+    ///
+    /// If running with `tauri`, this will emit a `PARSE_SUMMARY` event with the summary as well.
+    ///
+    /// Default: false
+    pub fn log_summary(&mut self) {
+        self.log_summary = true;
+    }
+
+    /// Add a location to parse raws from.
+    ///
+    /// * `RawModuleLocation::Vanilla` will parse the vanilla raws.
+    /// * `RawModuleLocation::InstalledMods` will parse the installed mods folder.
+    /// * `RawModuleLocation::Mods` will parse the downloaded mods folder.
+    ///
+    /// Parsing locations requires a valid `dwarf_fortress_directory` to be set.
+    pub fn add_location_to_parse(&mut self, location_to_parse: RawModuleLocation) {
+        self.locations_to_parse.push(location_to_parse);
     }
 }
