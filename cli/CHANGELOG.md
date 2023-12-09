@@ -28,48 +28,26 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
  - <csr-id-b1fda6c6f90758ffe4c19641aa49d6c9729b15e6/> improve creature parsing
    * refactor: CreatureVariation as object
-   
-   * chore: update bindings
-   
-   * feat: impl RawObject for CreatureVariation
-   
-   * chore(deps): update github/codeql-action action to v2.22.9
-   
-   * feat: apply_creature_variation in progress
-   
-   * feat: add parsing of gaits and add them to creatures
-   
-   * fix: gait is a caste tag
-   
-   * feat: add unprocessed raw type to facilitate creature parsing
-   
-   * wip: creature variation parsing for unprocessed_raw
-   
-   * feat: handle copy_tags_from and creature_variations properly
-   
-   * feat: add `log_summary` option
-   
-   * refactor: CreatureVariation as object
-   
-   * chore: update bindings
-   
-   * feat: impl RawObject for CreatureVariation
-   
-   * feat: apply_creature_variation in progress
-   
-   * feat: add parsing of gaits and add them to creatures
-   
-   * fix: gait is a caste tag
-   
-   * feat: add unprocessed raw type to facilitate creature parsing
-   
-   * wip: creature variation parsing for unprocessed_raw
-   
-   * feat: handle copy_tags_from and creature_variations properly
-   
-   * feat: add `log_summary` option
-   
-   ---------
+* chore: update bindings
+* feat: impl RawObject for CreatureVariation
+* chore(deps): update github/codeql-action action to v2.22.9
+* feat: apply_creature_variation in progress
+* feat: add parsing of gaits and add them to creatures
+* fix: gait is a caste tag
+* feat: add unprocessed raw type to facilitate creature parsing
+* wip: creature variation parsing for unprocessed_raw
+* feat: handle copy_tags_from and creature_variations properly
+* feat: add `log_summary` option
+* refactor: CreatureVariation as object
+* chore: update bindings
+* feat: impl RawObject for CreatureVariation
+* feat: apply_creature_variation in progress
+* feat: add parsing of gaits and add them to creatures
+* fix: gait is a caste tag
+* feat: add unprocessed raw type to facilitate creature parsing
+* wip: creature variation parsing for unprocessed_raw
+* feat: handle copy_tags_from and creature_variations properly
+* feat: add `log_summary` option
 
 ### Documentation
 
@@ -90,7 +68,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 <csr-read-only-do-not-edit/>
 
- - 1 commit contributed to the release.
+ - 2 commits contributed to the release.
  - 9 days passed between releases.
  - 1 commit was understood as [conventional](https://www.conventionalcommits.org).
  - 0 issues like '(#ID)' were seen in commit messages
@@ -102,6 +80,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 <details><summary>view details</summary>
 
  * **Uncategorized**
+    - Release dfraw_json_parser v0.15.1, dfraw_json_parser-cli v1.0.1 ([`75c7772`](https://github.com/nwesterhausen/dfraw_json_parser/commit/75c7772fe4a0820067138494a2df363242b0a179))
     - Improve creature parsing ([`b1fda6c`](https://github.com/nwesterhausen/dfraw_json_parser/commit/b1fda6c6f90758ffe4c19641aa49d6c9729b15e6))
 </details>
 
