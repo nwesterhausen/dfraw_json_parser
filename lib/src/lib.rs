@@ -123,7 +123,10 @@ pub use parser::*;
 #[cfg(feature = "tauri")]
 pub use tauri_lib::ProgressPayload;
 
-use crate::helpers::clone_raw_object_box;
+use crate::{
+    helpers::clone_raw_object_box,
+    util::{log_summary, summarize_raws},
+};
 
 #[allow(clippy::too_many_lines)]
 /// Given the supplied `ParserOptions`, parse the raws and return a vector of boxed dynamic raw objects.
@@ -356,29 +359,12 @@ pub fn parse(options: &ParserOptions) -> Result<ParseResult, ParserError> {
     results.info_files = parse_module_info_files(&options)?;
 
     // Print a summary of what we parsed (sum by ObjectType)
-    print_summary(&results.raws);
+    if options.log_summary {
+        let summary = summarize_raws(results.raws.as_slice());
+        log_summary(&summary);
+    }
 
     Ok(results)
-}
-
-/// Print a summary by sum of `ObjectType` from `get_type` and a total row.
-fn print_summary(raws: &[Box<dyn RawObject>]) {
-    let mut summary: std::collections::HashMap<ObjectType, usize> =
-        std::collections::HashMap::new();
-
-    for raw in raws {
-        let count = summary.entry(raw.get_type().clone()).or_insert(0);
-        *count += 1;
-    }
-
-    let mut summary_vec: Vec<(ObjectType, usize)> = summary.into_iter().collect();
-    summary_vec.sort_by(|a, b| a.0.cmp(&b.0));
-
-    info!("Summary of parsed raws:");
-    for (object_type, count) in summary_vec {
-        info!("\t{count}\t{object_type}");
-    }
-    info!("Total: {}", raws.len());
 }
 
 /// The function `parse_module_info_files` parses module information files based on the provided options.
@@ -642,7 +628,9 @@ fn parse_module<P: AsRef<Path>>(
     let graphics_path = module_path.as_ref().join("graphics");
 
     let mut parse_objects = true;
-    let mut parse_graphics = options.raws_to_parse.contains(&ObjectType::Graphics);
+    let mut parse_graphics = options
+        .object_types_to_parse
+        .contains(&ObjectType::Graphics);
 
     if !objects_path.exists() {
         debug!(
