@@ -5,12 +5,62 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## v0.15.1 (2023-11-29)
+## v0.15.1 (2023-12-09)
+
+<csr-id-afa8e0e1d327654b1cfca2bad6d1cfad2deabe2b/>
+<csr-id-54ed44dc4a5e5e4121e62cd28d85b6394730a0cc/>
 
 ### Chore
 
  - <csr-id-afa8e0e1d327654b1cfca2bad6d1cfad2deabe2b/> bump versions
  - <csr-id-54ed44dc4a5e5e4121e62cd28d85b6394730a0cc/> update bindings
+
+### New Features
+
+ - <csr-id-b1fda6c6f90758ffe4c19641aa49d6c9729b15e6/> improve creature parsing
+   * refactor: CreatureVariation as object
+   
+   * chore: update bindings
+   
+   * feat: impl RawObject for CreatureVariation
+   
+   * chore(deps): update github/codeql-action action to v2.22.9
+   
+   * feat: apply_creature_variation in progress
+   
+   * feat: add parsing of gaits and add them to creatures
+   
+   * fix: gait is a caste tag
+   
+   * feat: add unprocessed raw type to facilitate creature parsing
+   
+   * wip: creature variation parsing for unprocessed_raw
+   
+   * feat: handle copy_tags_from and creature_variations properly
+   
+   * feat: add `log_summary` option
+   
+   * refactor: CreatureVariation as object
+   
+   * chore: update bindings
+   
+   * feat: impl RawObject for CreatureVariation
+   
+   * feat: apply_creature_variation in progress
+   
+   * feat: add parsing of gaits and add them to creatures
+   
+   * fix: gait is a caste tag
+   
+   * feat: add unprocessed raw type to facilitate creature parsing
+   
+   * wip: creature variation parsing for unprocessed_raw
+   
+   * feat: handle copy_tags_from and creature_variations properly
+   
+   * feat: add `log_summary` option
+   
+   ---------
 
 ### Bug Fixes
 
@@ -20,8 +70,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 <csr-read-only-do-not-edit/>
 
- - 3 commits contributed to the release.
- - 3 commits were understood as [conventional](https://www.conventionalcommits.org).
+ - 1 commit contributed to the release.
+ - 9 days passed between releases.
+ - 1 commit was understood as [conventional](https://www.conventionalcommits.org).
  - 0 issues like '(#ID)' were seen in commit messages
 
 ### Commit Details
@@ -31,9 +82,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 <details><summary>view details</summary>
 
  * **Uncategorized**
-    - Bump versions ([`afa8e0e`](https://github.com/nwesterhausen/dfraw_json_parser/commit/afa8e0e1d327654b1cfca2bad6d1cfad2deabe2b))
-    - Update bindings ([`54ed44d`](https://github.com/nwesterhausen/dfraw_json_parser/commit/54ed44dc4a5e5e4121e62cd28d85b6394730a0cc))
-    - Add supporting fields ([`f7097e9`](https://github.com/nwesterhausen/dfraw_json_parser/commit/f7097e9cd45f2be1275d2c758b48026a6be1588f))
+    - Improve creature parsing ([`b1fda6c`](https://github.com/nwesterhausen/dfraw_json_parser/commit/b1fda6c6f90758ffe4c19641aa49d6c9729b15e6))
 </details>
 
 ## v0.15.0 (2023-11-29)
@@ -114,7 +163,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 <csr-id-04e94f04e8e3831bade62a15059a3ed7077b54ec/>
 
 
-<csr-id-04e94f04e8e3831bade62a15059a3ed7077b54ec/>
 
 ### Chore
 
@@ -331,7 +379,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 <csr-id-04e94f04e8e3831bade62a15059a3ed7077b54ec/>
 
 
-<csr-id-c1ff0a07d29ae8213e3070ffc3d78c674f766832/>
 <csr-id-946b03da912a6028cdec964373b0a34f0af55317/>
 <csr-id-5c07ce1c3df8ba57c87d2e4dcae6f808ff49e319/>
 <csr-id-238e76e7008f7a90b2fe10cb2f7122d5b06b2ef4/>
@@ -595,7 +642,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 <csr-id-edf44ef452e9952e7ebd7e49a09af69e9ffebf4b/>
 
 
-<csr-id-edf44ef452e9952e7ebd7e49a09af69e9ffebf4b/>
 
 
 <csr-id-edf44ef452e9952e7ebd7e49a09af69e9ffebf4b/>
@@ -642,7 +688,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 <csr-id-a4ff82d5790c6b3b07676eae32b2fbeadb587643/>
 
 
-<csr-id-9aaabf7317998f58325feccfddb49c0c9d4a531e/>
 <csr-id-3e363ff91a2f87f4be26593c6cfc6e9e37882494/>
 <csr-id-bac89e814c58315b6629755d25f06ec8d24e4ce2/>
 <csr-id-d1a86054f8995bdb12350ab84f8bf1cdfc9e88f5/>
@@ -749,8 +794,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 <csr-id-b5ac4440b1189f0c7ef8fdaeca97d36d334a3100/>
 
-
-
 ### Refactor
 
  - <csr-id-b5ac4440b1189f0c7ef8fdaeca97d36d334a3100/> 🔥 refactor typings for consistency
@@ -759,8 +802,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## v0.8.1 (2023-01-09)
 
 <csr-id-e87e4363aea2a138d7e1deb7c7a47f8c262ef9ff/>
-
-
 
 ### Chore
 
@@ -777,7 +818,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 <csr-id-9669a1cd9d2be7518d989a26fbd4dc656edd4c9b/>
 
 
-<csr-id-48d50ad26512c5a35b8c3d136a49da3b4f1cc95b/>
 <csr-id-9669a1cd9d2be7518d989a26fbd4dc656edd4c9b/>
 
 
@@ -870,7 +910,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 <csr-id-59e2dff2d583cd8c5c55411688a6c8f4ddcf361a/>
 
 
-<csr-id-5e6dde45b3489ad93660372f654fa637a4379d98/>
 <csr-id-a6f00156cddc9b0c42b5f0a19883d5382c19d160/>
 <csr-id-5a9740e01528680c3f6543673fbd722913ac57c2/>
 <csr-id-7932e59c509f1da93e8f431fbbef9a164de144d1/>
@@ -949,8 +988,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 <csr-id-373da1570664724774cddd13d34ae50c05a47dd8/>
 
-
-
 ### Chore
 
  - <csr-id-373da1570664724774cddd13d34ae50c05a47dd8/> 🔖 bump version
@@ -969,8 +1006,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## v0.3.0 (2022-12-13)
 
 <csr-id-0c7aebb62c9b8cae212207bddcae6edbece83995/>
-
-
 
 ### Chore
 
