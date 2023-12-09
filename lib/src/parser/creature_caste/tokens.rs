@@ -155,4 +155,5 @@ pub enum CasteTag {
     CuriousBeast,
     CannotBreatheAir,
     Utterances,
+    Gait,
 }
