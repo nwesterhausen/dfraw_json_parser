@@ -1,42 +1,40 @@
 #[cfg(feature = "tauri")]
-extern crate tauri;
-#[cfg(feature = "tauri")]
 use super::ProgressHelper;
 
 use crate::{
-    legends_export, parser, util, ModuleInfoFile, ParseResult, ParserError, ParserOptions,
+    creature_variation::CreatureVariation, legends_export, parser, tauri_lib::ProgressTask,
+    unprocessed_raw::UnprocessedRaw, util, ModuleInfoFile, ParseResult, ParserError, ParserOptions,
     RawModuleLocation, RawObject,
 };
 use std::path::{Path, PathBuf};
 use tracing::{debug, info};
 use walkdir::DirEntry;
 
-#[cfg(feature = "tauri")]
 /// Parse a directory of raws, and return a JSON string of the parsed raws. While parsing, this will
 /// emit tauri events to the supplied window. The event is titled `PROGRESS` and it uses the `ProgressPayload`
 /// payload for the payload.
 ///
 /// The payload supplies the current progress as a float and the name of the current folder being parsed.
 ///
-/// Properties:
+/// # Parameters
 ///
 /// * `df_game_path`: The path to the Dwarf Fortress install directory
 /// * `window`: A `tauri::Window` to emit `PROGRESS` events to.
 ///
-/// Returns:
+/// # Returns
 ///
-/// A (large) JSON string with details on all raws in the game path.
+/// A parsing result or a parser error.
+///
+/// # Errors
+///
+/// This function will return an error if the Dwarf Fortress directory is invalid, or if the raws cannot be parsed.
+#[cfg(feature = "tauri")]
 #[allow(clippy::too_many_lines)]
 pub(crate) fn parse(
     options: &crate::options::ParserOptions,
     progress_helper: &mut ProgressHelper,
 ) -> Result<crate::ParseResult, crate::ParserError> {
-    // Guard against invalid paths
-
-    use crate::{
-        creature_variation::CreatureVariation, tauri_lib::ProgressTask,
-        unprocessed_raw::UnprocessedRaw,
-    };
+    // Guard against invalid paths (validate the options)
     let options = util::validate_options(options)?;
 
     let mut results = ParseResult {
