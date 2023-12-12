@@ -1,7 +1,7 @@
 #[cfg(feature = "tauri")]
 extern crate tauri;
 #[cfg(feature = "tauri")]
-use super::structs::ProgressHelper;
+use super::ProgressHelper;
 
 use crate::{
     legends_export, parser, util, ModuleInfoFile, ParseResult, ParserError, ParserOptions,
@@ -33,7 +33,10 @@ pub(crate) fn parse(
 ) -> Result<crate::ParseResult, crate::ParserError> {
     // Guard against invalid paths
 
-    use crate::{creature_variation::CreatureVariation, unprocessed_raw::UnprocessedRaw};
+    use crate::{
+        creature_variation::CreatureVariation, tauri_lib::ProgressTask,
+        unprocessed_raw::UnprocessedRaw,
+    };
     let options = util::validate_options(options)?;
 
     let mut results = ParseResult {
@@ -42,11 +45,10 @@ pub(crate) fn parse(
     };
     let mut unprocessed_raws: Vec<UnprocessedRaw> = Vec::new();
 
-    progress_helper.update_current_task("Parsing raws.");
-
     // Locations can only contain the predefined locations.
     if !options.locations_to_parse.is_empty() {
         let target_path = Path::new(&options.dwarf_fortress_directory);
+        progress_helper.reset_details();
 
         // Build paths for each location
         let data_path = target_path.join("data");
@@ -59,7 +61,7 @@ pub(crate) fn parse(
             .locations_to_parse
             .contains(&RawModuleLocation::Vanilla)
         {
-            progress_helper.update_current_location("Vanilla");
+            progress_helper.set_location(RawModuleLocation::Vanilla);
             info!("Dispatching parse for vanilla raws");
             let parsed_raws = parse_location(&vanilla_path, &options, progress_helper)?;
             results.raws.extend(parsed_raws.parsed_raws);
@@ -69,7 +71,7 @@ pub(crate) fn parse(
             .locations_to_parse
             .contains(&RawModuleLocation::InstalledMods)
         {
-            progress_helper.update_current_location("Installed Mods");
+            progress_helper.set_location(RawModuleLocation::InstalledMods);
             info!("Dispatching parse for installed mods");
             let parsed_raws = parse_location(&installed_mods_path, &options, progress_helper)?;
             results.raws.extend(parsed_raws.parsed_raws);
@@ -79,7 +81,7 @@ pub(crate) fn parse(
             .locations_to_parse
             .contains(&RawModuleLocation::Mods)
         {
-            progress_helper.update_current_location("Workshop Mods");
+            progress_helper.set_location(RawModuleLocation::Mods);
             info!("Dispatching parse for workshop/downloaded mods");
             let parsed_raws = parse_location(&workshop_mods_path, &options, progress_helper)?;
             results.raws.extend(parsed_raws.parsed_raws);
@@ -88,6 +90,9 @@ pub(crate) fn parse(
     }
 
     if !options.raw_modules_to_parse.is_empty() {
+        progress_helper.reset_details();
+        progress_helper.set_task(ProgressTask::ParseModuleInfoFiles);
+
         // Loop through over module and parse it.
         for raw_module in &options.raw_modules_to_parse {
             let target_path = Path::new(&raw_module);
@@ -95,7 +100,7 @@ pub(crate) fn parse(
             // Check for info.txt
             let info_txt_path = target_path.join("info.txt");
             if info_txt_path.exists() {
-                progress_helper.update_current_module(
+                progress_helper.set_module(
                     target_path
                         .file_name()
                         .unwrap_or_default()
@@ -115,15 +120,18 @@ pub(crate) fn parse(
 
     // Next we can check if any raw files are specified
     if !options.raw_files_to_parse.is_empty() {
+        progress_helper.reset_details();
+        progress_helper.set_task(ProgressTask::ParseRaws);
+
         // Parse all raw files that are specified.
         for raw_file in &options.raw_files_to_parse {
             let target_path = Path::new(&raw_file);
-            progress_helper.update_current_task(
-                format!(
-                    "Parsing raw file {:?}",
-                    target_path.file_name().unwrap_or_default()
-                )
-                .as_str(),
+            progress_helper.set_file(
+                target_path
+                    .file_name()
+                    .unwrap_or_default()
+                    .to_str()
+                    .unwrap_or_default(),
             );
             info!(
                 "Dispatching parse for raw file {:?}",
@@ -137,15 +145,18 @@ pub(crate) fn parse(
 
     // Finally we can check if any legends exports are specified
     if !options.legends_exports_to_parse.is_empty() {
+        progress_helper.reset_details();
+        progress_helper.set_task(ProgressTask::ParseLegends);
+
         // Parse all legends exports that are specified.
         for legends_export in &options.legends_exports_to_parse {
             let target_path = Path::new(&legends_export);
-            progress_helper.update_current_task(
-                format!(
-                    "Parsing legends export {:?}",
-                    target_path.file_name().unwrap_or_default()
-                )
-                .as_str(),
+            progress_helper.set_file(
+                target_path
+                    .file_name()
+                    .unwrap_or_default()
+                    .to_str()
+                    .unwrap_or_default(),
             );
             info!(
                 "Dispatching parse for legends export {:?}",
@@ -157,7 +168,8 @@ pub(crate) fn parse(
         }
     }
 
-    progress_helper.update_current_task("Resolving creature raws.");
+    progress_helper.reset_details();
+    progress_helper.set_task(ProgressTask::ResolveRaws);
 
     // Resolve the unprocessed creatures
     // Prerequisites: build a list of creature variations
@@ -279,10 +291,11 @@ pub(crate) fn parse(
         crate::util::log_summary(&summary);
     }
 
-    progress_helper.update_current_task("Parsing module info files.");
+    progress_helper.set_task(ProgressTask::ParseModuleInfoFiles);
     results.info_files = crate::parse_module_info_files(&options)?;
 
-    progress_helper.send_final("Parsing completed.");
+    progress_helper.finalize_and_send();
+
     Ok(results)
 }
 
@@ -312,8 +325,6 @@ fn parse_location<P: AsRef<Path>>(
     let mut results: Vec<Box<dyn RawObject>> = Vec::new();
     let mut unprocessed_raws: Vec<crate::unprocessed_raw::UnprocessedRaw> = Vec::new();
     let location_path: PathBuf = location_path.as_ref().to_path_buf();
-
-    progress_helper.update_current_location(format!("{:?}", &location_path).as_str());
 
     // Get a list of all subdirectories in the location
     let raw_modules_in_location: Vec<DirEntry> = util::subdirectories(location_path)?;
@@ -363,7 +374,7 @@ fn parse_module<P: AsRef<Path>>(
             }
         };
 
-    progress_helper.update_current_module(
+    progress_helper.set_module(
         format!(
             "{} v{}",
             module_info_file.get_identifier(),
@@ -437,8 +448,10 @@ fn parse_module<P: AsRef<Path>>(
                     .extension()
                     .map_or(false, |ext| ext.eq_ignore_ascii_case("txt"))
                 {
-                    progress_helper.add_steps(1);
-                    progress_helper.send_update(file_name_str);
+                    progress_helper.set_file(file_name_str);
+                    progress_helper.set_file_location(file_path.to_str().unwrap_or_default());
+                    progress_helper.advance_and_send_update();
+
                     match parser::parse_raw_file(&file_path, options) {
                         Ok(mut objects_results) => {
                             progress_helper.add_to_running_total(
@@ -472,8 +485,10 @@ fn parse_module<P: AsRef<Path>>(
                     .extension()
                     .map_or(false, |ext| ext.eq_ignore_ascii_case("txt"))
                 {
-                    progress_helper.add_steps(1);
-                    progress_helper.send_update(file_name_str);
+                    progress_helper.set_file(file_name_str);
+                    progress_helper.set_file_location(file_path.to_str().unwrap_or_default());
+                    progress_helper.advance_and_send_update();
+
                     match parser::parse_raw_file(&file_path, options) {
                         Ok(mut graphics_results) => {
                             progress_helper
