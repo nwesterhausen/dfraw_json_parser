@@ -36,4 +36,10 @@ impl Milkable {
         }
         vec
     }
+    pub fn get_material(&self) -> &str {
+        &self.material
+    }
+    pub fn get_frequency(&self) -> u32 {
+        self.frequency
+    }
 }

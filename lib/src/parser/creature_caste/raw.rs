@@ -80,6 +80,12 @@ impl Caste {
             ..Caste::default()
         }
     }
+    pub fn get_tags(&self) -> Vec<CasteTag> {
+        self.tags.clone()
+    }
+    pub fn get_milkable(&self) -> Milkable {
+        self.milkable.clone()
+    }
     pub fn parse_tag(&mut self, key: &str, value: &str) {
         let Some(tag) = CASTE_TOKENS.get(key) else {
             warn!(
