@@ -112,8 +112,7 @@ pub struct Creature {
     ///
     /// This field is always serialized.
     object_id: String,
-    /// Various SELECT_CREATURE modifications. This needs fixed.
-    /// TODO: This needs fixed.
+    /// Various SELECT_CREATURE modifications.
     #[serde(skip_serializing_if = "Vec::is_empty")]
     select_creature_variation: Vec<SelectCreature>,
 }
@@ -168,6 +167,7 @@ impl Creature {
         &self.copy_tags_from
     }
 
+    /// Get the identifiers of creature variations to apply.
     pub fn get_variations_to_apply(&self) -> &[String] {
         self.apply_creature_variation.as_slice()
     }
@@ -370,16 +370,32 @@ impl Creature {
         self.castes.as_slice()
     }
 
-    pub fn does_not_exist(&self) -> bool {
-        self.tags.contains(&CreatureTag::DoesNotExist)
+    /// Get a list of tags that belong to this creature.
+    pub fn get_tags(&self) -> Vec<CreatureTag> {
+        self.tags.clone()
     }
+    /// Get the biomes the creature can be found in.
     pub fn get_biomes(&self) -> Vec<biome::Token> {
         self.biomes.clone()
     }
-
+    /// Set the name of the creature.
+    ///
+    /// # Parameters
+    ///
+    /// * `name`: The name to set for the creature
     pub fn set_name(&mut self, name: Name) {
         self.name = name;
     }
+
+    /// Parse a creature from a set of XML tags from a legends export.
+    ///
+    /// Expects to run on an empty or default creature. Fills in everything it can
+    /// from the XML tags. It's likely that `<creature>` objects are only in
+    /// legends-plus exports, which are enhanced from the base legends export by dfhack.
+    ///
+    /// # Parameters
+    ///
+    /// * `xml_tags`: A vector of strings representing the XML tags for the creature.
     pub fn parse_tags_from_xml(&mut self, xml_tags: &[String]) {
         for tag in xml_tags {
             if tag.contains("has_male") {
