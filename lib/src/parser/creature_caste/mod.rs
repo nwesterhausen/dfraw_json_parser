@@ -1,3 +1,4 @@
+mod full_tokens;
 mod gait;
 mod phf_table;
 mod raw;
