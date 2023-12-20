@@ -1558,14 +1558,202 @@ pub enum CasteTag {
         /// Verb to use in third person tense ("it")
         third_person_verb: String,
     },
+    /// Causes the specified tissue layer(s) of the indicated body part(s) to secrete the designated material. A size 100 ('covering') contaminant is created over the affected body part(s) in its specified material state (and at the temperature appropriate to this state) when the trigger condition is met, as long as one of the secretory tissue layers is still intact. Valid triggers are:
     ///
+    /// * CONTINUOUS: Secretion occurs once every 40 ticks in fortress mode, and every tick in adventurer mode.
+    /// * EXERTION: Secretion occurs continuously (at the rate described above) whilst the creature is at minimum Tired following physical exertion. Note that this cannot occur if the creature has [NOEXERT].
+    /// * EXTREME_EMOTION:  Secretion occurs continuously (as above) whilst the creature is distressed. Cannot occur in creatures with [NOEMOTION].
+    ///
+    /// Arguments:
+    ///
+    /// * `material_token`: The material of the secretion
+    /// * `material_state`: The material state of the secretion
+    /// * `body_part_selector`: The body part selector to use
+    /// * `body_part`: The body part to use
+    /// * `tissue_layer`: The tissue layer to use
+    /// * `trigger`: The trigger to use (CONTINUOUS, EXERTION, EXTREME_EMOTION)
+    ///
+    /// Appears as `SECRETION:SomeMaterial:SomeMaterialState:SomeBodyPartSelector:SomeBodyPart:SomeTissueLayer:SomeTrigger`
+    Secretion {
+        /// The material of the secretion
+        material_token: String,
+        /// The material state of the secretion
+        material_state: String,
+        /// The body part selector to use
+        body_part_selector: String,
+        /// The body part to use
+        body_part: String,
+        /// The tissue layer to use
+        tissue_layer: String,
+        /// The trigger to use (CONTINUOUS, EXERTION, EXTREME_EMOTION)
+        trigger: String,
+    },
+    /// Essentially the same as [MEGABEAST], but more of them are created during worldgen. See the semi-megabeast page for details.
+    ///
+    /// Appears as `SEMIMEGABEAST`
     SemiMegabeast,
+    /// Gives the creature the ability to sense creatures belonging to the specified creature class even when they lie far beyond line of sight, including through walls and floors.
+    /// It also appears to reduce or negate the combat penalty of blind units when fighting creatures they can sense. In adventure mode, the specified tile will be used to represent
+    /// sensed creatures when they cannot be seen directly.
     ///
+    /// Arguments:
+    ///
+    /// * `creature_class`: The creature class to sense
+    /// * `tile`: The tile to use
+    /// * `color`: via foreground, background, and brightness values
+    ///
+    /// Appears as `SENSE_CREATURE_CLASS:SomeCreatureClass:SomeTile:0:0:0`
+    SenseCreatureClass {
+        /// The creature class to sense
+        creature_class: String,
+        /// The tile to use
+        tile: String,
+        /// The foreground color to use
+        foreground: u32,
+        /// The background color to use
+        background: u32,
+        /// The brightness to use
+        brightness: u32,
+    },
+    /// Begins a selection of body parts.
+    ///
+    /// Arguments:
+    ///
+    /// * `body_part_selector`: The body part selector to use (BY_TYPE, BY_CATEGORY, BY_TOKEN)
+    /// * `body_part`: The body part to use (via category, type or token)
+    ///
+    /// Appears as `SET_BP_GROUP:SomeBodyPartSelector:SomeBodyPart`
+    SetBodyPartGroup {
+        /// The body part selector to use (BY_TYPE, BY_CATEGORY, BY_TOKEN)
+        body_part_selector: String,
+        /// The body part to use (via category, type or token)
+        body_part: String,
+    },
+    /// The rate at which this creature learns this skill. Requires [CAN_LEARN] or [INTELLIGENT] to function.
+    ///
+    /// Arguments:
+    ///
+    /// * `skill`: The skill to modify
+    /// * `rate`: The rate to modify the skill by (percentage)
+    ///
+    /// Appears as `SKILL_LEARN_RATE:SomeSkill:100`
+    SkillLearnRate {
+        /// The skill to modify
+        skill: String,
+        /// The rate to modify the skill by
+        rate: u32,
+    },
+    /// The rate at which this creature learns all skills. Requires [CAN_LEARN] or [INTELLIGENT] to function.
+    ///
+    /// Arguments:
+    ///
+    /// * `rate`: The rate to modify the skill by (percentage)
+    ///
+    /// Appears as `SKILL_LEARN_RATES:100`
+    SkillLearnRates {
+        /// The rate to modify the skill by
+        rate: u32,
+    },
+    /// Like [SKILL_RATES], but applies to individual skills instead. Requires [CAN_LEARN] or [INTELLIGENT] to function.
+    ///
+    /// Arguments:
+    ///
+    /// * `skill`: The skill to modify
+    /// * `improvement_rate`: The improvement rate to modify the skill by (percentage)
+    /// * `decay_rate_unused`: The decay rate of the skill when it is unused
+    /// * `decay_rate_rusty`: The decay rate of the skill when it is rusty
+    /// * `decay_rate_demotion`: The decay rate of the skill when it is demoted
+    ///
+    /// Appears as `SKILL_RATE:SomeSkill:100:3:4:3`
+    SkillRate {
+        /// The skill to modify
+        skill: String,
+        /// The improvement rate to modify the skill by
+        improvement_rate: u32,
+        /// The decay rate of the skill when it is unused
+        decay_rate_unused: u32,
+        /// The decay rate of the skill when it is rusty
+        decay_rate_rusty: u32,
+        /// The decay rate of the skill when it is demoted
+        decay_rate_demotion: u32,
+    },
+    /// Affects skill gain and decay. Lower numbers in the last three slots make decay occur faster ([SKILL_RATES:100:1:1:1] would cause rapid decay).
+    /// The counter (decay) rates may also be replaced with NONE.
+    ///
+    /// Default is [SKILL_RATES:100:8:16:16]. Requires [CAN_LEARN] or [INTELLIGENT] to function.
+    ///
+    /// Arguments:
+    ///
+    /// * `improvement_rate`: The improvement rate to modify the skill by (percentage)
+    /// * `decay_rate_unused`: The decay rate of the skill when it is unused
+    /// * `decay_rate_rusty`: The decay rate of the skill when it is rusty
+    /// * `decay_rate_demotion`: The decay rate of the skill when it is demoted
+    ///
+    /// Appears as `SKILL_RATES:100:8:16:16`
+    SkillRates {
+        /// The improvement rate to modify the skill by
+        improvement_rate: u32,
+        /// The decay rate of the skill when it is unused
+        decay_rate_unused: u32,
+        /// The decay rate of the skill when it is rusty
+        decay_rate_rusty: u32,
+        /// The decay rate of the skill when it is demoted
+        decay_rate_demotion: u32,
+    },
+    /// The rate at which this skill decays. Lower values cause the skill to decay faster. Requires [CAN_LEARN] or [INTELLIGENT] to function.
+    ///
+    /// Arguments:
+    ///
+    /// * `skill`: The skill to modify
+    /// * `decay_rate_unused`: The decay rate of the skill when it is unused
+    /// * `decay_rate_rusty`: The decay rate of the skill when it is rusty
+    /// * `decay_rate_demotion`: The decay rate of the skill when it is demoted
+    ///
+    /// Appears as `SKILL_RUST_RATE:SomeSkill:3:4:3`
+    SkillRustRate {
+        /// The skill to modify
+        skill: String,
+        /// The decay rate of the skill when it is unused
+        decay_rate_unused: u32,
+        /// The decay rate of the skill when it is rusty
+        decay_rate_rusty: u32,
+        /// The decay rate of the skill when it is demoted
+        decay_rate_demotion: u32,
+    },
+    /// The rate at which all skills decay. Lower values cause the skills to decay faster. Requires [CAN_LEARN] or [INTELLIGENT] to function.
+    ///
+    /// Arguments:
+    ///
+    /// * `decay_rate_unused`: The decay rate of the skill when it is unused
+    /// * `decay_rate_rusty`: The decay rate of the skill when it is rusty
+    /// * `decay_rate_demotion`: The decay rate of the skill when it is demoted
+    ///
+    /// Appears as `SKILL_RUST_RATES:3:4:3`
+    SkillRustRates {
+        /// The decay rate of the skill when it is unused
+        decay_rate_unused: u32,
+        /// The decay rate of the skill when it is rusty
+        decay_rate_rusty: u32,
+        /// The decay rate of the skill when it is demoted
+        decay_rate_demotion: u32,
+    },
+    /// Caste-specific [SLAIN_SPEECH].
+    ///
+    /// Appears as `SLAIN_CASTE_SPEECH:SomeSpeechSet`
+    SlainSpeech {
+        /// The speech set to use
+        slain_speech: String,
+    },
+    /// Shorthand for [CAN_LEARN] + [SKILL_LEARN_RATES:50].[Verify] Used by a number of 'primitive' creatures (like ogres, giants and troglodytes) in the vanilla game.
+    /// Applicable to player races. Prevents a player from recruiting nobility, even basic ones. Subterranean creatures with this token combined with [EVIL] will become
+    /// servants of goblins in their civilizations, in the style of trolls.
+    ///
+    /// Appears as `SLOW_LEARNER`
     SlowLearner,
+    /// Creature leaves "remains" instead of a corpse. Used by vermin.
     ///
+    /// Appears as `SMALL_REMAINS`
     SmallRemains,
-    /// Acts as [GRAZER] but set to 20000*G*(max size)^(-3/4)
-    StandardGrazer,
     /// Caste-specific solider tile.
     ///
     /// Appears as `CASTE_SOLDIER_TILE:SomeTile`
@@ -1580,12 +1768,112 @@ pub enum CasteTag {
         /// The tile to use
         tile: String,
     },
+    /// Creature makes sounds periodically, which can be heard in Adventure mode.
     ///
+    /// For example, with `SOUND:PEACEFUL_INTERMITTENT:100:1000:VOCALIZATION:bark:barks:a loud bark`
+    ///
+    /// * First-person reads "You 'bark'"
+    /// * Third-person reads "The capybara 'barks'"
+    /// * Out of sight reads "You hear 'a loud bark'"
+    ///
+    /// Arguments:
+    ///
+    /// * `sound_type`: The sound type to use (ALERT or PEACEFUL_INTERMITTENT)
+    /// * `sound_range`: The range of the sound (in tiles)
+    /// * `sound_interval`: A delay before the sound is produced again (in ticks)
+    /// * `requires_breathing`: Whether the creature needs to breathe to make the sound
+    /// * `first_person`: The first-person description of the sound
+    /// * `third_person`: The third-person description of the sound
+    /// * `out_of_sight`: The out-of-sight description of the sound
+    ///
+    /// Appears as `SOUND:SomeSoundType:100:1000:SomeFirstPerson:SomeThirdPerson:SomeOutOfSight`
+    Sound {
+        /// The sound type to use (ALERT or PEACEFUL_INTERMITTENT)
+        sound_type: String,
+        /// The range of the sound (in tiles)
+        sound_range: u32,
+        /// A delay before the sound is produced again (in ticks)
+        sound_interval: u32,
+        /// Whether the creature needs to breathe to make the sound
+        requires_breathing: bool,
+        /// The first-person description of the sound
+        first_person: String,
+        /// The third-person description of the sound
+        third_person: String,
+        /// The out-of-sight description of the sound
+        out_of_sight: String,
+    },
+    /// Creature will only appear in biomes with this plant or creature available.
+    /// Grazers given a specific type of grass (such as pandas and bamboo) will only eat that grass and nothing else, risking starvation if there's none available.
+    ///
+    /// Arguments:
+    ///
+    /// * `is_plant`: Whether the required item is a plant (true) or creature (false)
+    /// * `identifier`: The identifier of the required plant or creature
+    ///
+    /// Appears as `SPECIFIC_FOOD:PLANT:Bamboo` or `SPECIFIC_FOOD:CREATURE:Tiger`
+    SpecificFood {
+        /// Whether the required item is a plant (true) or creature (false)
+        is_plant: bool,
+        /// The identifier of the required plant or creature
+        identifier: String,
+    },
+    /// This creature can be converted by a night creature with [SPOUSE_CONVERTER].
+    ///
+    /// Appears as `SPOUSE_CONVERSION_TARGET`
+    SpouseConversionTarget,
+    /// If the creature has the [NIGHT_CREATURE_HUNTER] tag, it will kidnap [SPOUSE_CONVERSION_TARGET]s and transform them into the caste of its species
+    /// with the [CONVERTED_SPOUSE] tag during worldgen. It may also start families this way.
+    ///
+    /// Appears as `SPOUSE_CONVERTER`
+    SpouseConverter,
+    /// If the creature rules over a site, it will cause the local landscape to be corrupted into evil surroundings associated with the creature's spheres.
+    /// The creature must have at least one of the following spheres for this to take effect: BLIGHT, DEATH, DISEASE, DEFORMITY, NIGHTMARES. The first three kill vegetation,
+    /// while the others sometimes do. The last two get evil plants and evil animals sometimes. NIGHTMARES gets bogeymen. [4] Used by demons in the vanilla game.
+    ///
+    /// Appears as `SPREAD_EVIL_SPHERES_IF_RULER`
+    SpreadEvilSpheresIfRuler,
+    /// Caste does not require [GRASP] body parts to climb -- it can climb with [STANCE] parts instead.
+    ///
+    /// Appears as `STANCE_CLIMBER`
+    StanceClimber,
+    /// Acts as [GRAZER] but set to 20000*G*(max size)^(-3/4), where G defaults to 100 but can be set in d_init, and the whole thing is trapped between 150 and 3 million.
+    /// Used for all grazers in the default creature raws.
+    ///
+    /// Appears as `STANDARD_GRAZER`
+    StandardGrazer,
+    /// The creature will get strange moods in fortress mode and can produce artifacts.
+    ///
+    /// Appears as `STRANGE_MOODS`
+    StrangeMoods,
+    /// Gives the creature knowledge of any secrets with [SUPERNATURAL_LEARNING_POSSIBLE] that match its spheres and also prevents it from becoming a vampire or werebeast.
+    /// Other effects are unknown.
+    ///
+    /// Appears as `SUPERNATURAL`
     Supernatural,
+    /// The creature naturally knows how to swim perfectly and does not use the swimmer skill, as opposed to [SWIMS_LEARNED] below.
+    /// However, Fortress mode AI never paths into water anyway, so it's less useful there.
     ///
+    /// Appears as `SWIMS_INNATE`
     SwimsInnate,
+    /// The creature swims only as well as their present swimming skill allows them to.
     ///
+    /// Appears as `SWIMS_LEARNED`
     SwimsLearned,
+    /// Dilutes the effects of syndromes which have the specified identifier. A percentage of 100 is equal to the regular syndrome effect severity, higher percentages reduce severity.
+    ///
+    /// Arguments:
+    ///
+    /// * `syndrome`: The syndrome to modify
+    /// * `percentage`: The percentage to modify the syndrome by
+    ///
+    /// Appears as `SYNDROME_DILUTION_FACTOR:SomeSyndrome:100`
+    SyndromeDilutionFactor {
+        /// The syndrome to modify
+        syndrome: String,
+        /// The percentage to modify the syndrome by
+        percentage: u32,
+    },
     ///
     ThickWeb,
     /// Caste-specific tile.

@@ -265,6 +265,71 @@ pub enum CreatureTag {
     ///
     /// Appears as `SAVAGE`
     Savage,
+    /// Adds an additional previously defined caste to the selection. Used after [SELECT_CASTE].
+    ///
+    /// Appears as `SELECT_ADDITIONAL_CASTE:Caste`
+    SelectAdditionalCaste {
+        /// The caste to add
+        caste: String,
+    },
+    /// Selects a previously defined caste
+    ///
+    /// Appears as `SELECT_CASTE:Caste`
+    SelectCaste {
+        /// The caste to select
+        caste: String,
+    },
+    /// Selects a locally defined material. Can be ALL.
+    ///
+    /// Appears as `SELECT_MATERIAL:Material`
+    SelectMaterial {
+        /// The material to select
+        material: String,
+    },
+    /// Selects a tissue for editing.
+    ///
+    /// Appears as `SELECT_TISSUE:Tissue`
+    SelectTissue {
+        /// The tissue to select
+        tissue: String,
+    },
+    /// Boasting speeches relating to killing this creature. Examples include text_dwarf.txt and text_elf.txt in data\vanilla\vanilla_creatures\objects.
+    ///
+    /// Appears as `SLAIN_CASTE:SomeSpeechSet`
+    SlainSpeech {
+        /// The speech set to use
+        slain_speech: String,
+    },
+    /// Determines how keen a creature's sense of smell is - lower is better. At 10000, a creature cannot smell at all.
+    ///
+    /// Appears as `SMELL_TRIGGER:10000`
+    SmellTrigger {
+        /// The smell trigger
+        smell_trigger: u32,
+    },
+    /// If this creature is active in its civilization's military, it will blink between its default tile and this one.
+    ///
+    /// Appears as `SOLDIER_ALTTILE:SomeTile`
+    SoldierAltTile {
+        /// The tile to use
+        tile: String,
+    },
+    /// Found on generated angels. This is the historical figure ID of the deity with which the angel is associated. Since HFIDs are not predictable before worldgen,
+    /// this isn't terribly usable in mods.
+    ///
+    /// Appears as `SOURCE_HFID:123`
+    SourceHfid {
+        /// The historical figure ID
+        hfid: u32,
+    },
+    /// Sets what religious spheres the creature is aligned to, for purposes of being worshipped via the [POWER] token. Also affects the layout of hidden fun stuff,
+    /// and the creature's name.
+    ///
+    /// Appears as `SPHERE:SomeSphere`
+    Sphere {
+        /// The sphere to use
+        sphere: String,
+    },
     ///
     Ubiquitous,
     ///
