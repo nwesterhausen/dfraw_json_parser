@@ -112,13 +112,6 @@ pub enum CasteTag {
     ///
     /// Appears as `BENIGN`
     Benign,
-    /// Select a biome the creature may appear in.
-    ///
-    /// Appears as `BIOME:SomeBiomeId`
-    Biome {
-        /// Biome identifier
-        id: String,
-    },
     /// Specifies what the creature's blood is made of.
     ///
     /// Appears as `BLOOD:SomeMaterial:SomeToken`
@@ -529,6 +522,36 @@ pub enum CasteTag {
     ///
     /// Appears as `FLIER`
     Flier,
+    /// Defines a gait by which the creature can move. Typically defined by using `APPLY_CREATURE_VARIATION:STANDARD_GAIT:xxx` in the creature's raws, instead of
+    /// by using this token directly. See [Gait] for more detailed information.
+    ///
+    /// Since it's a bit complicated, we let the [Gait] `from_value()` handle parsing this token.
+    ///
+    /// Appears (typically) as `CV_NEW_TAG:GAIT:WALK:Sprint:!ARG4:10:3:!ARG2:50:LAYERS_SLOW:STRENGTH:AGILITY:STEALTH_SLOWS:50`
+    Gait {
+        /// The value of the token
+        value: String,
+    },
+    /// Has the same function as [MaterialForceMultiplier], but applies to all attacks instead of just those involving a specific material. Appears to be overridden by
+    /// [MaterialForceMultiplier] (werebeasts, for example, use both tokens to provide resistance to all materials, with one exception to which they are especially vulnerable).
+    ///
+    /// When struck with a weapon made of the any material, the force exerted will be multiplied by A/B.
+    ///
+    /// Appears as `GENERAL_MATERIAL_FORCE_MULTIPLIER:1:1`
+    GeneralMaterialForceMultiplier {
+        /// The material to apply the multiplier to
+        value_a: u32,
+        /// The multiplier to apply
+        value_b: u32,
+    },
+    /// Makes the creature get infections from necrotic tissue.
+    ///
+    /// Appears as `GETS_INFECTIONS_FROM_ROT`
+    GetsInfectionsFromRot,
+    /// Makes the creature's wounds become infected if left untreated for too long.
+    ///
+    /// Appears as `GETS_WOUND_INFECTIONS`
+    GetsWoundInfections,
     /// Caste-specific glow color.
     ///
     /// Arguments:
@@ -553,12 +576,120 @@ pub enum CasteTag {
         /// The tile to use
         tile: String,
     },
+    /// The creature can and will gnaw its way out of animal traps and cages using the specified verb, depending on the material from which it is made (normally wood).
     ///
-    Gnawer,
+    /// Appears as `GNAWER:SomeVerb`
+    Gnawer {
+        /// The verb to use
+        verb: String,
+    },
+    /// The creature eats vermin of the specified class.
     ///
+    /// Appears as `GOBBLE_VERMIN_CLASS:SomeVerminClass`
+    GobbleVerminClass {
+        /// The vermin class to eat
+        vermin_class: String,
+    },
+    /// The creature eats a specific vermin.
+    ///
+    /// Appears as `GOBBLE_VERMIN_CREATURE:SomeVerminCreature:SomeVerminCaste`
+    GobbleVerminCreature {
+        /// The vermin creature to eat
+        vermin_creature: String,
+        /// The vermin caste to eat
+        vermin_caste: String,
+    },
+    /// The value determines how rapidly grass is trampled when a creature steps on it - a value of 0 causes the creature to never damage grass,
+    /// while a value of 100 causes grass to be trampled as rapidly as possible.
+    ///
+    /// Defaults to 5.
+    ///
+    /// Appears as `GRASS_TRAMPLE:5`
+    GrassTrample {
+        /// The trample value
+        trample: u32,
+    },
+    /// Used in Creature Variants. This token changes the adult body size to the average of the old adult body size and the target value and scales all intermediate
+    /// growth stages by the same factor.
+    ///
+    /// Appears as `GRAVITATE_BODY_SIZE:25`
+    GravitateBodySize {
+        /// The target body size of the creature when it is an adult (fully grown)
+        target: u32,
+    },
+    /// The creature is a grazer - if tamed in fortress mode, it needs a pasture to survive. The higher the number, the less frequently it needs to eat in order to live.
+    ///
+    /// Not used since 0.40.12, replaced by [StandardGrazer] to fix Bug 4113.
+    ///
+    /// Appears as `GRAZER:100`
+    #[deprecated(note = "Use [StandardGrazer] instead.")]
+    Grazer {
+        /// The grazer value
+        grazer: u32,
+    },
+    /// Defines certain behaviors for the creature. The habit types are:
+    ///
+    /// * COLLECT_TROPHIES
+    /// * COOK_PEOPLE
+    /// * COOK_VERMIN
+    /// * GRIND_VERMIN
+    /// * COOK_BLOOD
+    /// * GRIND_BONE_MEAL
+    /// * EAT_BONE_PORRIDGE
+    /// * USE_ANY_MELEE_WEAPON
+    /// * GIANT_NEST
+    /// * COLLECT_WEALTH
+    ///
+    /// These require the creature to have a [Lair] to work properly, and also don't seem to work on creatures who are not a [SemiMegabeast], [Megabeast], or [NightCreatureHunter].
+    ///
+    /// Appears as `HABIT:SomeHabit`
+    Habit {
+        /// The habit to add
+        habit: String,
+    },
+    /// "If you set HABIT_NUM to a number, it should give you that exact number of habits according to the weights.". All lists of HABITs are preceded by `[HABIT_NUM:TEST_ALL]`
+    ///
+    /// Appears as `HABIT_NUM:2` or `HABIT_NUM:TEST_ALL`
+    HabitNumber {
+        /// The number of habits to add. A value of `TEST_ALL` will add all habits and will cause number to be 0.
+        number: u32,
+    },
+    /// The creature has nerves in its muscles. Cutting the muscle tissue can sever motor and sensory nerves.
+    ///
+    /// Appears as `HAS_NERVES`
     HasNerves,
+    /// The creature has a shell. Seemingly no longer used - holdover from previous versions.
     ///
+    /// Appears as `HASSHELL`
+    HasShell,
+    /// Default 'NONE'. The creature's normal body temperature. Creature ceases maintaining temperature on death unlike fixed material temperatures.
+    /// Provides minor protection from environmental temperature to the creature.
+    ///
+    /// Appears as `HOMEOTHERM:10000`
+    Homeotherm {
+        /// The temperature of the creature, as number or `NONE` which is the default
+        temperature: Option<u32>,
+    },
+    /// Creature hunts and kills nearby vermin, randomly walking between places with food laying on the ground or in stockpiles, to check for possible [VerminEater] vermin,
+    /// but they'll kill any other vermin too.
     HuntsVermin,
+    /// The creature cannot move. Found on sponges. Will also stop a creature from breeding in fortress mode (MALE and FEMALE are affected, if one is IMMOBILE no breeding will happen).
+    ///
+    /// Appears as `IMMOBILE`
+    Immobile,
+    /// The creature is immobile while on land. Only works on [Aquatic] creatures which can't breathe on land.
+    ///
+    /// Appears as `IMMOBILE_LAND`
+    ImmobileLand,
+    /// The creature radiates fire. It will ignite, and potentially completely destroy, items the creature is standing on. Also gives the vermin a high chance of escaping from animal
+    /// traps and cages made of any flammable materials (specifically ones that could be ignited by magma).
+    ///
+    /// Appears as `IMMOLATE`
+    Immolate,
+    /// Alias for [CanSpeak] + [CanLearn].
+    ///
+    /// Appears as `INTELLIGENT`
+    Intelligent,
     /// Specifies interaction details following a [CanDoInteraction] token.
     ///
     /// Appears as `CDI:SomeArgs:etc`
@@ -566,37 +697,326 @@ pub enum CasteTag {
         /// Arbitrary arguments for the interaction
         args: Vec<String>,
     },
+    /// Determines if the creature leaves behind a non-standard corpse (i.e. wood, statue, bars, stone, pool of liquid, etc.). Ethics may prevent actually using the item in jobs or reactions.
     ///
-    Immobile,
+    /// Appears as `ITEMCORPSE:ItemToken:MaterialToken`
+    ItemCorpse {
+        /// The item token to use
+        item: String,
+        /// The material token to use
+        material: String,
+    },
+    /// The quality of an item-type corpse left behind. Valid values are: 0 for ordinary, 1 for well-crafted, 2 for finely-crafted, 3 for superior, 4 for exceptional, 5 for masterpiece.
     ///
-    ImmobileLand,
+    /// Appears as `ITEMCORPSE_QUALITY:3`
+    ItemCorpseQuality {
+        /// The quality of the item
+        quality: u32,
+    },
+    /// Found on megabeasts, semimegabeasts, and night creatures. The creature will seek out sites of this type and take them as lairs. The lair types are:
     ///
-    Immolate,
+    /// * SIMPLE_BURROW
+    /// * SIMPLE_MOUND
+    /// * WILDERNESS_LOCATION
+    /// * SHRINE
+    /// * LABYRINTH
     ///
-    Intelligent,
+    /// Appears as `LAIR:SomeLair:Probability`
+    Lair {
+        /// The lair type
+        lair: String,
+        /// The probability of the lair
+        probability: u32,
+    },
+    /// Defines certain features of the creature's lair. The only valid characteristic is HAS_DOORS.
     ///
+    /// Appears as `LAIR_CHARACTERISTIC:SomeCharacteristic`
+    LairCharacteristic {
+        /// The characteristic to add
+        characteristic: String,
+    },
+    /// This creature will actively hunt adventurers in its lair.
+    ///
+    /// Appears as `LAIR_HUNTER`
+    LairHunter,
+    /// What this creature says while hunting adventurers in its lair.
+    ///
+    /// Appears as `LAIR_HUNTER_SPEECH:SomeSpeech`
+    LairHunterSpeech {
+        /// The file containing what the creature says
+        speech_file: String,
+    },
+    /// Will attack things that are smaller than it (like dwarves). Only one group of "large predators" (possibly two groups on "savage" maps) will appear on any given map.
+    /// In adventure mode, large predators will try to ambush and attack you (and your party will attack them back). When tamed, large predators tend to be much more
+    /// aggressive to enemies than non-large predators, making them a good choice for an animal army. They may go on rampages in worldgen, and adventurers may receive quests
+    /// to kill them. Also, they can be mentioned in the intro paragraph when starting a fortress e.g. "ere the wolves get hungry."
+    ///
+    /// Appears as `LARGE_PREDATOR`
+    LargePredator,
+    /// Creature lays eggs instead of giving birth to live young.
+    ///
+    /// Appears as `LAYS_EGGS`
     LaysEggs,
+    /// Creature lays the specified item instead of regular eggs.
     ///
+    /// Appears as `LAYS_UNUSUAL_EGGS:SomeItem:SomeMaterial`
+    LaysUnusualEggs {
+        /// The item to lay
+        item: String,
+        /// The material of the item
+        material: String,
+    },
+    /// The creature has ligaments in its [CONNECTIVE_TISSUE_ANCHOR] tissues (bone or chitin by default). Cutting the bone/chitin tissue severs the ligaments,
+    /// disabling motor function if the target is a limb.
+    ///
+    /// Appears as `LIGAMENTS:SomeMaterial:HealingRate`
+    Ligaments {
+        /// The material to use
+        material: String,
+        /// The healing rate
+        healing_rate: u32,
+    },
+    /// The creature will generate light, such as in adventurer mode at night.
+    ///
+    /// Appears as `LIGHT_GEN`
     LightGen,
+    /// The creature will attack enemies rather than flee from them. This tag has the same effect on player-controlled creatures - including modded dwarves.
+    /// Retired as of v0.40.14 in favor of [LargePredator].
     ///
+    /// Appears as `LIKES_FIGHTING`
+    #[deprecated(note = "Use [LargePredator] instead.")]
+    LikesFighting,
+    /// Creature uses "sssssnake talk" (multiplies 'S' when talking - "My name isss Recisssiz."). Used by serpent men and reptile men in the vanilla game.
+    /// C's with the same pronunciation (depending on the word) are not affected by this token.
+    ///
+    /// Appears as `LISP`
+    Lisp,
+    /// Determines the number of offspring per one birth; default 1-3, not used in vanilla raws.
+    ///
+    /// Appears as `LITTERSIZE:1:3`
+    LitterSize {
+        /// The minimum number of offspring
+        min: u32,
+        /// The maximum number of offspring
+        max: u32,
+    },
+    /// Lets a creature open doors that are set to forbidden in fortress mode.
+    ///
+    /// Appears as `LOCKPICKER`
     LockPicker,
+    /// Determines how well a creature can see in the dark - higher is better. Dwarves have 10000, which amounts to perfect nightvision.
     ///
+    /// Appears as `LOW_LIGHT_VISION:10000`
+    LowLightVision {
+        /// The vision value
+        vision: u32,
+    },
+    /// According to Toady One, this is completely interchangeable with [AtPeaceWithWildlife] and might have been used in very early versions of the game by
+    /// wandering wizards or the ent-type tree creatures that used to be animated by elves.
+    ///
+    /// Appears as `MAGICAL`
+    Magical,
+    /// The creature is able to see while submerged in magma.
+    ///
+    /// Appears as `MAGMA_VISION`
     MagmaVision,
+    /// Makes the creature biologically male.
     ///
+    /// Appears as `MALE`
     Male,
+    /// Adds a possible mannerism to the creature's profile. These are not defined in raws but hardcoded.
     ///
+    /// Appears as `MANNERISM_LAUGH`
+    MannerismLaugh,
+    /// Adds a possible mannerism to the creature's profile. These are not defined in raws but hardcoded.
+    ///
+    /// Appears as `MANNERISM_SMILE`
+    MannerismSmile,
+    /// Adds a possible mannerism to the creature's profile. These are not defined in raws but hardcoded.
+    ///
+    /// Appears as `MANNERISM_WALK`
+    MannerismWalk,
+    MannerismSit,
+    MannerismBreath,
+    MannerismPosture,
+    MannerismStretch,
+    MannerismEyelids,
+    MannerismFingers {
+        finger: String,
+        fingers: String,
+    },
+    MannerismNose {
+        nose: String,
+    },
+    MannerismEar {
+        ear: String,
+    },
+    MannerismHead {
+        head: String,
+    },
+    MannerismEyes {
+        eyes: String,
+    },
+    MannerismMouth {
+        mouth: String,
+    },
+    MannerismHair {
+        hair: String,
+    },
+    MannerismKnuckles {
+        knuckles: String,
+    },
+    MannerismLips {
+        lips: String,
+    },
+    MannerismCheek {
+        cheek: String,
+    },
+    MannerismNails {
+        nails: String,
+    },
+    MannerismFeet {
+        feet: String,
+    },
+    MannerismArms {
+        arms: String,
+    },
+    MannerismHands {
+        hands: String,
+    },
+    MannerismTongue {
+        tongue: String,
+    },
+    MannerismLeg {
+        leg: String,
+    },
+    /// Sets the creature to be active at dawn in adventurer mode.
+    ///
+    /// Appears as `MATUTINAL`
+    Matutinal,
+    /// Determines the creature's natural lifespan, using the specified minimum and maximum age values (in years). Each individual creature with this token is generated with a
+    /// predetermined date (calculated down to the exact tick!) between these values, at which it is destined to die of old age, should it live long enough. Note that the
+    /// probability of death at any given age does not increase as the creature gets older [3].
+    ///
+    /// Creatures which lack this token are naturally immortal. The NO_AGING syndrome tag will prevent death by old age from occurring. Also note that, among civilized creatures,
+    /// castes which lack this token will refuse to marry others with it, and vice versa.
+    ///
+    /// Appears as `MAXAGE:100:150`
+    MaxAge {
+        /// The minimum age of the creature
+        min: u32,
+        /// The maximum age of the creature
+        max: u32,
+    },
+    /// Makes the creature slowly stroll around, unless it's in combat or performing a job. If combined with [CanLearn], will severely impact their pathfinding and lead the creature
+    /// to move extremely slowly when not performing any task. Problematically applies to animal people based on the animal and war trained animals.
+    ///
+    /// Appears as `MEANDERER`
     Meanderer,
+    /// A 'boss' creature. A small number of the creatures are created during worldgen, their histories and descendants (if any) will be tracked in worldgen (as opposed to simply 'spawning'),
+    /// and they will occasionally go on rampages, potentially leading to worship if they attack the same place multiple times. Their presence and number will also influence age names.
+    /// When appearing in fortress mode, they will have a pop-up message announcing their arrival. They will remain hostile to military even after being tamed.
     ///
+    /// Requires specifying a [Biome] in which the creature will live. Subterranean biomes appear to not be allowed. Does stack with [LargeRoaming] and if both are used the creature will spawn
+    /// as both historical bosses and as wild animals.
+    ///
+    /// Appears as `MEGABEAST`
     Megabeast,
+    /// Default is 200. This means you can increase your attribute to 200% of its starting value (or the average value + your starting value if that is higher).
     ///
+    /// Arguments:
+    ///
+    /// * `attribute`: The attribute to modify
+    /// * `percentage`: The percentage to modify the attribute by
+    ///
+    /// Appears as `MENT_ATT_CAP_PERC:Attribute:200`
+    MentalAttributeCapPercentage {
+        /// The attribute to modify
+        attribute: String,
+        /// The percentage to modify the attribute by
+        percentage: u32,
+    },
+    /// Sets up a mental attribute's range of values (0-5000). All mental attribute ranges default to 200:800:900:1000:1100:1300:2000.
+    ///
+    /// Arguments:
+    ///
+    /// * `attribute`: The attribute to modify
+    /// * `ranges`: The ranges from lowest to highest with 7 steps
+    ///
+    /// Appears as `MENT_ATT_RANGE:Attribute:200:800:900:1000:1100:1300:2000`
+    MentalAttributeRange {
+        /// The attribute to modify
+        attribute: String,
+        /// The ranges from lowest to highest with 7 steps
+        ranges: [u32; 7],
+    },
+    /// Mental attribute gain/decay rates. Lower numbers in the last three slots make decay occur faster. Defaults are 500:4:5:4.
+    ///
+    /// Arguments:
+    ///
+    /// * `attribute`: The attribute to modify
+    /// * `improvement_cost`: The cost to improve the attribute
+    /// * `decay_rate_unused`: The decay rate of the attribute when it is unused
+    /// * `decay_rate_rusty`: The decay rate of the attribute when it is rusty
+    /// * `decay_rate_demotion`: The decay rate of the attribute when it is demoted
+    ///
+    /// Appears as `MENT_ATT_RATE:Attribute:500:4:5:4`
+    MentalAttributeRate {
+        /// The attribute to modify
+        attribute: String,
+        /// The cost to improve the attribute
+        improvement_cost: u32,
+        /// The decay rate of the attribute when it is unused
+        decay_rate_unused: u32,
+        /// The decay rate of the attribute when it is rusty
+        decay_rate_rusty: u32,
+        /// The decay rate of the attribute when it is demoted
+        decay_rate_demotion: u32,
+    },
+    /// Allows the creature to be milked in the farmer's workshop. The frequency is the amount of ticks the creature needs to "recharge" (i.e. how much time needs to pass before
+    /// it can be milked again). Does not work on sentient creatures, regardless of ethics.
+    ///
+    /// Arguments:
+    ///
+    /// * `material`: The material of the milk
+    /// * `frequency`: The frequency the creature can be milked
+    ///
+    /// Appears as `MILKABLE:SomeMaterial:1000`
+    Milkable {
+        /// The material of the milk
+        material: String,
+        /// The frequency the creature can be milked
+        frequency: u32,
+    },
+    /// The creature spawns stealthed and will attempt to path into the fortress, pulling any levers it comes across. It will be invisible on the map and unit list until spotted by a citizen,
+    /// at which point the game will pause and recenter on the creature.
+    ///
+    /// Used by gremlins in the vanilla game. "They go on little missions to mess with various fortress buildings, not just levers."
+    ///
+    /// Appears as `MISCHIEVOUS` or `MISCHIEVIOUS` (sic)
     Mischievous,
+    /// Seemingly no longer used.
     ///
+    /// Appears as `MODVALUE:SomeValue`
+    ModValue {
+        /// The value to modify
+        value: String,
+    },
+    /// Creature may be used as a mount. No use for the player in fortress mode, but enemy sieging forces may arrive with cavalry. Mounts are usable in adventure mode.
+    ///
+    /// Appears as `MOUNT`
     Mount,
+    /// Creature may be used as a mount, but civilizations cannot domesticate it in worldgen without certain exceptions.
     ///
+    /// Appears as `MOUNT_EXOTIC`
     MountExotic,
+    /// Allows the creature to have all-around vision as long as it has multiple heads that can see.
     ///
+    /// Appears as `MULTIPART_FULL_VISION`
     MultipartFullVision,
+    /// Makes the species usually produce a single offspring per birth, with a 1/500 chance of using the [LITTERSIZE] as usual. Requires [FEMALE].
     ///
+    /// Appears as `MULTIPLE_LITTER_RARE`
     MultipleLitterRare,
     /// Name of the caste
     ///
@@ -615,67 +1035,389 @@ pub enum CasteTag {
         /// The adjective form of the caste
         adjective: String,
     },
+    /// Animal is considered to be natural. NATURAL animals will not engage creatures tagged with [AtPeaceWitHWildlife] in combat unless they are
+    /// members of a hostile entity and vice-versa.
     ///
+    /// Appears as `NATURAL` or `NATURAL_ANIMAL`
     Natural,
+    /// The creature possesses the specified skill at this level inherently - that is, it begins with the skill at this level, and the skill may never
+    /// rust below that. A value of 15 is legendary.
     ///
+    /// Arguments:
+    ///
+    /// * `skill`: The skill token to add
+    /// * `level`: The level of the skill
+    ///
+    /// Appears as `NATURAL_SKILL:SomeSkill:15`
+    NaturalSkill {
+        /// The skill token to add
+        skill: String,
+        /// The level of the skill
+        level: u32,
+    },
+    /// Creatures with this token can appear in bogeyman ambushes in adventure mode, where they adopt classical bogeyman traits such as stalking the adventurer
+    /// and vaporising when dawn breaks. Such traits do not manifest if the creature is encountered outside of a bogeyman ambush (for instance, as a megabeast
+    /// or a civilised being). In addition, their corpses and severed body parts turn into smoke after a short while. Note that setting the "Number of Bogeyman Types"
+    /// in advanced world generation to 0 will only remove randomly-generated bogeymen.
+    ///
+    /// Appears as `NIGHT_CREATURE_BOGEYMAN`
+    NightCreatureBogeyman,
+    /// Found on some necromancers. Creatures with this tag may periodically "perform horrible experiments" offscreen, during which they can use creature-targeting
+    /// interactions with an [I_SOURCE:EXPERIMENT] tag on living creatures in their area. Worlds are generated with a list of procedurally-generated experiments,
+    /// allowing necromancers to turn living people and animals into ghouls and other experimental creatures, and these will automatically be available to all experimenters;
+    /// it does not appear possible to prevent this. You can mod in your own custom experiment interactions, but these are used very infrequently due to the large number
+    /// of generated experiments.
+    ///
+    /// Appears as `NIGHT_CREATURE_EXPERIMENTER`
+    NightCreatureExperimenter,
+    /// Found on night trolls and werebeasts. Implies that the creature is a night creature, and shows its description in legends mode entry. The creature is always hostile and
+    /// will start no quarter combat with any nearby creatures, except for members of its own race. Note that this tag does not override the creature's normal behavior in fortress
+    /// mode except for the aforementioned aggression, and doesn't prevent the creature from fleeing the battles it started. It also removes the creature's materials from stockpile
+    /// settings list, making them be stored there regardless of settings.
+    ///
+    /// Does stack with [LARGE_ROAMING] and if both are used the creature will spawn as both historical hunters and as wild animals; this requires specifying a [BIOME] in which the
+    /// creature will live, and subterranean biomes are allowed.
+    ///
+    /// This tag causes the usual behaviour of werebeasts in worldgen, that is, fleeing towns upon being cursed and conducting raids from a lair. If this tag is absent from a deity
+    /// curse, the accursed will simply be driven out of towns in a similar manner to vampires. When paired with SPOUSE_CONVERTER, a very small population of the creature will be
+    /// created during worldgen (sometimes only a single individual will be created), and their histories will be tracked (that is, they will not spawn spontaneously later, they must
+    /// either have children or convert other creatures to increase their numbers). The creature will settle in a lair and go on rampages during worldgen. It will actively attempt to
+    /// seek out potential conversion targets to abduct, convert, and have children with (if possible).
+    ///
+    /// Appears as `NIGHT_CREATURE_HUNTER`
+    NightCreatureHunter,
+    /// Found on nightmares. Corpses and severed body parts derived from creatures with this token turn into smoke after a short while.
+    ///
+    /// Appears as `NIGHT_CREATURE_NIGHTMARE`
+    NightCreatureNightmare,
+    /// Creature doesn't require connected body parts to move; generally used on undead creatures with connections that have rotted away.
+    ///
+    /// Appears as `NO_CONNECTIONS_FOR_MOVEMENT`
     NoConnectionsForMovement,
+    /// Creature cannot become dizzy.
     ///
+    /// Appears as `NO_DIZZINESS`
     NoDizziness,
+    /// Creature does not need to drink.
     ///
+    /// Appears as `NO_DRINK`
     NoDrink,
+    /// Creature does not need to eat.
     ///
+    /// Appears as `NO_EAT`
     NoEat,
+    /// The creature caste does not appear in autumn.
     ///
+    /// Appears as `NO_AUTUMN`
+    NoFall,
+    /// Creature cannot suffer fevers.
+    ///
+    /// Appears as `NO_FEVERS`
     NoFevers,
+    /// The creature is biologically sexless. Makes the creature unable to breed.
     ///
+    /// Appears as `NO_GENDER`
     NoGender,
+    /// The creature cannot raise any physical attributes.
     ///
+    /// Appears as `NO_PHYS_ATT_GAIN`
+    NoPhysicalAttributeGain,
+    /// The creature cannot lose any physical attributes.
+    ///
+    /// Appears as `NO_PHYS_ATT_RUST`
+    NoPhysicalAttributeRust,
+    /// Creature does not need to sleep. Can still be rendered unconscious by other means.
+    ///
+    /// Appears as `NO_SLEEP`
     NoSleep,
+    /// The creature caste does not appear in spring.
     ///
+    /// Appears as `NO_SPRING`
+    NoSpring,
+    /// The creature caste does not appear in summer.
+    ///
+    /// Appears as `NO_SUMMER`
+    NoSummer,
+    /// Creature doesn't require an organ with the [THOUGHT] tag to survive or attack; generally used on creatures that don't have brains.
+    ///
+    /// Appears as `NO_THOUGHT_CENTER_FOR_MOVEMENT`
+    NoThoughtCenterForMovement,
+    /// Prevents creature from selecting its color based on its profession (e.g. Miner, Hunter, Wrestler).
+    ///
+    /// Appears as `NO_UNIT_TYPE_COLOR`
+    NoUnitTypeColor,
+    /// Likely prevents the creature from leaving broken vegetation tracks
+    ///
+    /// Appears as `NO_VEGETATION_PERTURB`
+    NoVegetationDisturbance,
+    /// The creature caste does not appear in winter.
+    ///
+    /// Appears as `NO_WINTER`
+    NoWinter,
+    /// Creature has no bones.
+    ///
+    /// Appears as `NOBONES`
     NoBones,
+    /// Creature doesn't need to breathe or have [BREATHE] parts in body, nor can it drown or be strangled. Creatures living in magma must have this tag,
+    /// otherwise they will drown.
     ///
+    /// Appears as `NOBREATHE`
     NoBreathe,
+    /// Sets the creature to be active at night in adventure mode.
     ///
+    /// Appears as `NOCTURNAL`
+    Nocturnal,
+    /// Creature has no emotions. It is immune to the effects of stress and unable to rage, and its needs cannot be fulfilled in any way.
+    /// Used on undead in the vanilla game.
+    ///
+    /// Appears as `NOEMOTION`
     NoEmotion,
+    /// Creature can't become tired or over-exerted from taking too many combat actions or moving at full speed for extended periods of time.
     ///
+    /// Appears as `NOEXERT`
     NoExert,
+    /// Creature doesn't feel fear and will never flee from battle, and will be immune to ghosts' attempts to 'scare it to death'.
+    /// Additionally, it causes bogeymen and nightmares to become friendly towards the creature.
     ///
+    /// Appears as `NOFEAR`
     NoFear,
+    /// Creature will not be hunted or fed to wild beasts.
     ///
+    /// Appears as `NOMEAT`
     NoMeat,
+    /// Creature isn't nauseated by gut hits and cannot vomit.
     ///
+    /// Appears as `NONAUSEA`
     NoNausea,
+    /// Creature doesn't feel pain.
     ///
+    /// Appears as `NOPAIN`
     NoPain,
+    /// Creature will not drop a hide when butchered.
     ///
+    /// Appears as `NOSKIN`
     NoSkin,
+    /// Creature will not drop a skull on butchering, rot, or decay of severed head.
     ///
+    /// Appears as `NOSKULL`
     NoSkull,
+    /// Does not produce miasma when rotting.
     ///
+    /// Appears as `NOSMELLYROT`
     NoSmellyRot,
+    /// Weapons can't get stuck in the creature.
     ///
+    /// Appears as `NOSTUCKINS`
     NoStuckIns,
+    /// Creature can't be stunned and knocked unconscious by pain or head injuries. Creatures with this tag never wake up from sleep in Fortress Mode.
+    /// If this creature needs to sleep while playing, it will die.
     ///
+    /// Appears as `NOSTUN`
     NoStun,
+    /// Cannot be butchered.
     ///
+    /// Appears as `NOT_BUTCHERABLE`
     NotButcherable,
+    /// Cannot be raised from the dead by necromancers or evil clouds. Implies the creature is not a normal living being. Used by vampires, mummies and
+    /// inorganic creatures like the amethyst man and bronze colossus. Creatures who are [OPPOSED_TO_LIFE] (undead) will be docile towards creatures with this token.
     ///
+    /// Appears as `NOT_LIVING`
     NotLiving,
+    /// Creature doesn't require a [THOUGHT] body part to survive. Has the added effect of preventing speech, though directly controlling creatures that would otherwise
+    /// be capable of speaking allows them to engage in conversation.
     ///
+    /// Appears as `NOTHOUGHT`
     NoThought,
+    /// How easy the creature is to smell. The higher the number, the easier the creature is to sniff out. Defaults to 50.
+    /// Vanilla creatures have values from 0 (undetectable) to 90 (noticeable by humans and dwarves).
     ///
+    /// Appears as `ODOR_LEVEL:50`
+    OdorLevel {
+        /// The odor level, defaults to 50
+        odor_level: u32,
+    },
+    /// What the creature smells like. If no odor string is defined, the creature name (not the caste name) is used.
+    ///
+    /// Appears as `ODOR_STRING:SomeOdor`
+    OdorString {
+        /// The odor string to use
+        odor_string: String,
+    },
+    /// Is hostile to all creatures except undead and other non-living ones and will show Opposed to life in the unit list. Used by undead in the vanilla game.
+    /// Functions without the [NOT_LIVING] token, and seems to imply said token as well. Undead will not be hostile to otherwise-living creatures given this token.
+    /// Living creatures given this token will attack living creatures that lack it, while ignoring other living creatures that also have this token.
+    ///
+    /// Appears as `OPPOSED_TO_LIFE`
     OpposedToLife,
+    /// Determines caste's likelihood of having sexual attraction to certain sexes. Values default to 75:20:5 for the same sex and 5:20:75 for the opposite sex.
+    /// The first value indicates how likely to be entirely uninterested in the sex, the second decides if the creature will be able to become lovers with that sex,
+    /// the third decides whether they will be able to marry in worldgen and post-worldgen world activities (which implies being able to become lovers). Marriage seems
+    /// to be able to happen in fort mode play regardless, as long as they are lovers first.
     ///
+    /// Arguments:
+    ///
+    /// * `caste`: The caste to set orientation to (MALE or FEMALE typically)
+    /// * `disinterested_chance`: The chance of being disinterested in `caste`
+    /// * `casual_chance`: The chance of being casually interested in `caste`
+    /// * `strong_chance`: The chance of being strongly interested in `caste`
+    ///
+    /// Appears as `ORIENTATION:SomeCaste:75:20:5`
+    Orientation {
+        /// The caste to set orientation to
+        caste: String,
+        /// The chance of being disinterested in `caste`
+        disinterested_chance: u32,
+        /// The chance of being casually interested in `caste`
+        casual_chance: u32,
+        /// The chance of being strongly interested in `caste`
+        strong_chance: u32,
+    },
+    /// Lets you play as an outsider of this species in adventure mode.
+    ///
+    /// Appears as `OUTSIDER_CONTROLLABLE`
     OutsiderControllable,
+    /// Allows the creature to be used as a pack animal. Used by merchants without wagons and adventurers. Also prevents creature from dropping hauled items on its own
     ///
+    /// Note: do not use for player-controllable creatures! May lead to the creature being domesticated during worldgen, even if it doesn't have [COMMON_DOMESTIC].
+    ///
+    /// Appears as `PACK_ANIMAL`
     PackAnimal,
+    /// The creature is immune to all paralyzing special attacks.
     ///
+    /// Appears as `PARALYZEIMMUNE`
     ParalyzeImmune,
+    /// Used to control the bat riders with paralyze-dart blowguns that flew through the 2D chasm. Doesn't do anything now.
     ///
+    /// Appears as `PATTERNFLIER`
+    PatternFlier,
+    /// In earlier versions, creature would generate pearls. Does nothing in the current version
+    ///
+    /// Appears as `PEARL`
+    Pearl,
+    /// Controls the ability of vermin to find a way into containers when they are eating food from your stockpiles.
+    ///
+    /// Objects made of most materials (e.g. metal) roll a number from 0-100, and if the resulting number is greater than the penetrate power, their contents escape for the time
+    /// being. Objects made of wood, leather, amber, or coral roll 0-95, and items made of cloth roll 0-90.
+    ///
+    /// Appears as `PENETRATEPOWER:100`
+    PenetratePower {
+        /// The penetration power
+        penetrate_power: u32,
+    },
+    /// Determines the range and chance of personality traits. Standard is 0:50:100.
+    ///
+    /// Arguments:
+    ///
+    /// * `personality_trait`: The trait to modify
+    /// * `low`: The lowest chance of having the trait
+    /// * `median`: The median chance of having the trait
+    /// * `high`: The highest chance of having the trait
+    ///
+    /// Appears as `PERSONALITY:SomeTrait:0:50:100`
+    Personality {
+        /// The trait to modify
+        personality_trait: String,
+        /// The lowest chance of having the trait
+        low: u32,
+        /// The median chance of having the trait
+        median: u32,
+        /// The highest chance of having the trait
+        high: u32,
+    },
+    /// Allows the creature to be tamed in Fortress mode. Prerequisite for all other working animal roles. Civilizations that encounter it in worldgen
+    /// will tame and domesticate it for their own use. Adding this to civilization members will classify them as pets instead of citizens, with all the
+    /// problems that entails. However, you can solve these problems using the popular plugin Dwarf Therapist, which is completely unaffected by the tag.
+    ///
+    /// Appears as `PET`
     Pet,
+    /// Allows the creature to be tamed in Fortress mode. Prequisite for all other working animal roles. Civilizations cannot domesticate it in worldgen,
+    /// with certain exceptions. Adding this to civilization members will classify them as pets instead of citizens, with all the problems that entails.
     ///
+    /// Appears as `PET_EXOTIC`
     PetExotic,
+    /// How valuable a tamed animal is. Actual cost in points in the embarking screen is 1+(PETVALUE/2) for an untrained animal, 1+PETVALUE for a war/hunting one.
     ///
+    /// Appears as `PETVALUE:100`
+    PetValue {
+        /// The pet value
+        pet_value: u32,
+    },
+    /// Divides the creature's [PETVALUE] by the specified number. Used by honey bees to prevent a single hive from being worth a fortune.
+    ///
+    /// Appears as `PETVALUE_DIVISOR:2`
+    PetValueDivisor {
+        /// The divisor
+        divisor: u32,
+    },
+    /// Default is 200. This means you can increase your attribute to 200% of its starting value (or the average value + your starting value if that is higher).
+    ///
+    /// Appears as `PHYS_ATT_CAP_PERC:Attribute:200`
+    PhysicalAttributeCapPercentage {
+        /// The attribute to modify
+        attribute: String,
+        /// The percentage to modify the attribute by
+        percentage: u32,
+    },
+    /// Sets up a physical attribute's range of values (0-5000). All physical attribute ranges default to 200:700:900:1000:1100:1300:2000.
+    ///
+    /// Appears as `PHYS_ATT_RANGE:Attribute:200:700:900:1000:1100:1300:2000`
+    PhysicalAttributeRange {
+        /// The attribute to modify
+        attribute: String,
+        /// The ranges from lowest to highest with 7 steps
+        ranges: [u32; 7],
+    },
+    /// Physical attribute gain/decay rates. Lower numbers in the last three slots make decay occur faster. Defaults for STRENGTH, AGILITY, TOUGHNESS, and ENDURANCE
+    /// are 500:3:4:3, while RECUPERATION and DISEASE_RESISTANCE default to 500:NONE:NONE:NONE.
+    ///
+    /// Arguments:
+    ///
+    /// * `attribute`: The attribute to modify
+    /// * `improvement_cost`: The cost to improve the attribute
+    /// * `decay_rate_unused`: The decay rate of the attribute when it is unused
+    /// * `decay_rate_rusty`: The decay rate of the attribute when it is rusty
+    /// * `decay_rate_demotion`: The decay rate of the attribute when it is demoted
+    ///
+    /// Appears as `PHYS_ATT_RATE:Attribute:500:3:4:3`
+    PhysicalAttributeRate {
+        /// The attribute to modify
+        attribute: String,
+        /// The cost to improve the attribute
+        improvement_cost: u32,
+        /// The decay rate of the attribute when it is unused
+        decay_rate_unused: u32,
+        /// The decay rate of the attribute when it is rusty
+        decay_rate_rusty: u32,
+        /// The decay rate of the attribute when it is demoted
+        decay_rate_demotion: u32,
+    },
+    /// Adds a body part group to selected body part group. Presumably used immediately after [SET_BP_GROUP].
+    ///
+    /// Arguments:
+    ///
+    /// * `body_part_selector`: The body part selector to use
+    /// * `body_part_group`: The body part group to add
+    ///
+    /// Appears as `PLUS_BP_GROUP:SomeBodyPartSelector:SomeBodyPartGroup`
+    PlusBodyPartGroup {
+        /// The body part selector to use
+        body_part_selector: String,
+        /// The body part group to add
+        body_part_group: String,
+    },
+    /// Weighted population of caste; Lower is rarer. Not to be confused with [FREQUENCY].
+    ///
+    /// Appears as `POP_RATIO:100`
+    PopulationRatio {
+        /// The population ratio
+        pop_ratio: u32,
+    },
+    /// Allows the being to represent itself as a deity, allowing it to become the leader of a civilized group. Used by unique demons in the vanilla game.
+    /// Requires [CAN_SPEAK] to actually do anything more than settle at a location (e.g. write books, lead armies, profane temples). Doesn't appear to do anything
+    /// for creatures that are already civilized. Once the creature ascends to a position of leadership, it will proceed to act as a standard ruler for their
+    /// entity and fulfill the same functions (hold tournaments, tame creatures, etc.).
+    ///
+    /// Appears as `POWER`
     Power,
     /// Caste-specific profession name.
     ///
@@ -693,6 +1435,128 @@ pub enum CasteTag {
         singular: String,
         /// The plural name of the profession
         plural: String,
+    },
+    /// Creature has a percentage chance to flip out at visible non-friendly creatures. Enraged creatures attack anything regardless of timidity and get a
+    /// strength bonus to their hits. This is what makes badgers so hardcore.
+    ///
+    /// Appears as `PRONE_TO_RAGE:100`
+    ProneToRage {
+        /// The rage chance
+        rage_chance: u32,
+    },
+    /// The creature has pus. Specifies the stuff secreted by infected wounds.
+    ///
+    /// Arguments:
+    ///
+    /// * `material`: The material of the pus
+    /// * `material_state`: The material state of the pus
+    ///
+    /// Appears as `PUS:SomeMaterial:SomeMaterialState`
+    Pus {
+        /// The material of the pus
+        material: String,
+        /// The material state of the pus
+        material_state: String,
+    },
+    /// Specifies a new relative size for a part than what is stated in the body plan. For example, dwarves have larger livers.
+    ///
+    /// Arguments:
+    ///
+    /// * `body_part_selector`: The body part selector to use
+    /// * `body_part`: The body part to modify
+    /// * `relative_size`: The relative size of the body part (by percentage?)
+    ///
+    /// Appears as `RELATIVE_SIZE:SomeBodyPartSelector:SomeBodyPart:100`
+    RelativeSize {
+        /// The body part selector to use
+        body_part_selector: String,
+        /// The body part to modify
+        body_part: String,
+        /// The relative size of the body part (by percentage?)
+        relative_size: u32,
+    },
+    /// What the creature's remains are called.
+    ///
+    /// Appears as `REMAINS:SomeRemain:SomeRemains`
+    Remains {
+        /// The singular name of the remains
+        singular: String,
+        /// The plural name of the remains
+        plural: String,
+    },
+    /// What color the creature's remains are.
+    ///
+    /// Appears as `REMAINS_COLOR:SomeColor`
+    RemainsColor {
+        /// The color of the remains
+        remains_color: String,
+    },
+    /// Goes with [VERMIN_BITE] and [DIE_WHEN_VERMIN_BITE], the vermin creature will leave remains on death when biting.
+    /// Leaving this tag out will cause the creature to disappear entirely after it bites.
+    ///
+    /// Appears as `REMAINS_ON_VERMIN_BITE_DEATH`
+    RemainsOnVerminBiteDeath,
+    /// Unknown remains variation.
+    ///
+    /// Appears as `REMAINS_UNDETERMINED`
+    RemainsUndetermined,
+    /// The creature will retract into the specified body part(s) when threatened. It will be unable to move or attack, but enemies will only be able to attack the specified body part(s). When one of the specified body part is severed off, the creature automatically unretracts and cannot retract anymore. More than one body part can be selected by using BY_TYPE or BY_CATEGORY.
+    ///
+    /// Second-person descriptions are used for adventurer mode natural ability. "<pro_pos>" can be used in the descriptions, being replaced with the proper pronoun (or lack thereof) in-game.
+    ///
+    /// Undead curled up creatures are buggy, specifically those that retract into their upper bodies: echidnas, hedgehogs and pangolins.Bug:11463Bug:10519 The upper body is prevented from collapsing by a separate body part (the middle spine), which cannot be attacked when the creature is retracted. See [PREVENTS_PARENT_COLLAPSE]. Living creatures eventually succumb to blood loss, but undead creatures do not. Giant creatures also take a very long time to bleed out.
+    ///
+    /// Arguments:
+    ///
+    /// * `body_part_selector`: The body part selector to use
+    /// * `body_part`: The body part to retract
+    /// * `second_person`: Description using "you" and "your"
+    /// * `third_person`: Description using "it" and "its"
+    /// * `second_person_cancel`: Description using "you" and "your" when the creature is no longer retracted
+    /// * `third_person_cancel`: Description using "it" and "its" when the creature is no longer retracted
+    ///
+    /// Appears as `RETRACT_INTO_BP:SomeBodyPartSelector:SomeBodyPart:SomeSecondPerson:SomeThirdPerson:SomeSecondPersonCancel:SomeThirdPersonCancel`
+    RetractIntoBodyPart {
+        /// The body part selector to use
+        body_part_selector: String,
+        /// The body part to retract
+        body_part: String,
+        /// Description using "you" and "your"
+        second_person: String,
+        /// Description using "it" and "its"
+        third_person: String,
+        /// Description using "you" and "your" when the creature is no longer retracted
+        second_person_cancel: String,
+        /// Description using "it" and "its" when the creature is no longer retracted
+        third_person_cancel: String,
+    },
+    /// Cat behavior. If it kills a vermin creature and has an owner, it carries the remains in its mouth and drops them at their feet. Requires [HUNTS_VERMIN].
+    ///
+    /// Appears as `RETURNS_VERMIN_KILLS_TO_OWNER`
+    ReturnsVerminKillsToOwner,
+    /// Creature will occasionally root around in the grass, looking for insects. Used for flavor in Adventurer Mode, spawns vermin edible for this creature in Fortress Mode. Creatures missing the specified body part will be unable to perform this action. The action produces a message (visible in adventure mode) in the form:
+    ///
+    /// [creature] [verb text] the [description of creature's location]
+    ///
+    /// In adventure mode, the "rooting around" ability will be included in the "natural abilities" menu, represented by its second person verb text.
+    ///
+    /// Arguments:
+    ///
+    /// * `body_part_selector`: The body part selector to use
+    /// * `body_part`: The body part to use
+    /// * `second_person_verb`: Verb to use in second person tense ("you")
+    /// * `third_person_verb`: Verb to use in third person tense ("it")
+    ///
+    /// Appears as `ROOT_AROUND:SomeBodyPartSelector:SomeBodyPart:SomeSecondPersonVerb:SomeThirdPersonVerb`
+    RootAround {
+        /// The body part selector to use
+        body_part_selector: String,
+        /// The body part to use
+        body_part: String,
+        /// Verb to use in second person tense ("you")
+        second_person_verb: String,
+        /// Verb to use in third person tense ("it")
+        third_person_verb: String,
     },
     ///
     SemiMegabeast,
@@ -744,14 +1608,6 @@ pub enum CasteTag {
     ///
     TrainableWar,
     ///
-    NoSpring,
-    ///
-    NoSummer,
-    ///
-    NoFall,
-    ///
-    NoWinter,
-    ///
     UniqueDemon,
     ///
     Vegetation,
@@ -769,30 +1625,10 @@ pub enum CasteTag {
     WagonPuller,
     ///
     WebImmune,
-    ///
-    Milkable,
-    ///
-    GrassTrample,
-    ///
-    Grazer,
-    ///
-    LowLightVision,
-    ///
-    PetValue,
-    ///
-    PopRatio,
-    ///
-    LitterSize,
-    ///
-    MaxAge,
     #[default]
     Unknown,
     // Tokens found in the XML exports..
     NightCreature,
-    NightCreatureHunter,
-    NightCreatureBogeyman,
-    NightCreatureNightmare,
-    LargePredator,
     NotFireImmune,
     HasBlood,
     Grasp,
@@ -802,5 +1638,4 @@ pub enum CasteTag {
     CuriousBeast,
     CannotBreatheAir,
     Utterances,
-    Gait,
 }

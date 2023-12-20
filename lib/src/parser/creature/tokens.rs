@@ -4,10 +4,33 @@ use serde::{Deserialize, Serialize};
 #[ts(export)]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, Default)]
 pub enum CreatureTag {
+    /// If set, the creature will blink between its [Tile] and its [AltTile].
+    ///
+    /// Arguments:
+    ///
+    /// - the 'character' or tile number
+    ///
+    /// Appears as `ALTTILE:123`
+    AltTile {
+        /// The character or tile number
+        character: u32,
+    },
     /// Enables the creature to be kept in artificial hives by beekeepers.
     ///
     /// Appears as `ARTIFICIAL_HIVEABLE`
     ArtificialHiveable,
+    /// Select a biome the creature may appear in.
+    ///
+    /// Appears as `BIOME:SomeBiomeId`
+    Biome {
+        /// Biome identifier
+        id: String,
+    },
+    /// Defines a caste
+    Caste {
+        /// The name of the caste
+        name: String,
+    },
     /// Multiplies frequency by a factor of (integer)%.
     ///
     /// Appears as `CHANGE_FREQUENCY_PERC:100`
@@ -56,12 +79,192 @@ pub enum CreatureTag {
     /// The creature is a thing of legend and known to all civilizations. Its materials cannot be requested or preferred. The tag also adds some art value modifiers.
     /// Used by a number of creatures. Conflicts with [CasteToken::CommonDomestic].
     Fanciful,
+    /// Determines the chances of a creature appearing within its environment, with higher values resulting in more frequent appearance. Also affects the chance of a
+    /// creature being brought in a caravan for trading. The game effectively considers all creatures that can possibly appear and uses the FREQUENCY value as a weight
     ///
-    Good,
+    /// For example, if there are three creatures with frequencies 10/25/50, the creature with [FREQUENCY:50] will appear approximately 58.8% of the time.
     ///
-    Savage,
+    /// Defaults to 50 if not specified. Not to be confused with [PopulationRatio].
     ///
+    /// Appears as `FREQUENCY:50`
+    Frequency {
+        /// The frequency of the creature, a number between 0 and 100 (inclusive)
+        frequency: u32,
+    },
+    /// Name of the creatures baby form. Applies to all castes but can be overridden by [CasteToken::BabyName].
+    ///
+    /// Appears as `GENERAL_BABY_NAME:BabyName:BabyNames`
+    GeneralBabyName,
+    /// Name of the creatures child form. Applies to all castes but can be overridden by [CasteToken::ChildName].
+    ///
+    /// Appears as `GENERAL_CHILD_NAME:ChildName:ChildNames`
+    GeneralChildName,
+    /// Found on procedurally generated creatures like forgotten beasts, titans, demons, angels, and night creatures. Cannot be specified in user-defined raws.
+    ///
+    /// Appears as `GENERATED`
     Generated,
+    /// The color of the creature's glow tile.
+    ///
+    /// Arguments:
+    ///
+    /// * `foreground`: The foreground color
+    /// * `background`: The background color
+    /// * `brightness`: The brightness of the color
+    ///
+    /// Appears as `GLOWCOLOR:0:0:0`
+    GlowColor {
+        /// The foreground color
+        foreground: u32,
+        /// The background color
+        background: u32,
+        /// The brightness of the color
+        brightness: u32,
+    },
+    /// The creature's tile when it is glowing.
+    ///
+    /// Arguments:
+    ///
+    /// * `character`: The character or tile number
+    ///
+    /// Appears as `GLOWTILE:123`
+    GlowTile {
+        /// The character or tile number
+        character: u32,
+    },
+    /// Creature is considered good and will only show up in good biomes - unicorns, for example. Civilizations with [EntityToken::UseGoodAnimals] can
+    /// domesticate them regardless of exotic status. Has no effect on cavern creatures except to restrict taming. A civilization that has good
+    /// creatures can colonize good areas in world-gen.
+    ///
+    /// Appears as `GOOD`
+    Good,
+    /// When using tags from an existing creature, inserts new tags at the end of the creature.
+    ///
+    /// Appears as `GO_TO_END`
+    GoToEnd,
+    /// When using tags from an existing creature, inserts new tags at the beginning of the creature.
+    ///
+    /// Appears as `GO_TO_START`
+    GoToStart,
+    /// When using tags from an existing creature, inserts new tags after the specified tag.
+    ///
+    /// Arguments:
+    ///
+    /// * `tag`: The tag to insert after
+    ///
+    /// Appears as `GO_TO_TAG:TAG`
+    GoToTag {
+        /// The tag to insert after
+        tag: String,
+    },
+    /// What product is harvested from beekeeping.
+    ///
+    /// Arguments:
+    ///
+    /// * `number`: The number of products harvested
+    /// * `time`: The time it takes before the next harvest
+    /// * `item tokens`: The item tokens that are harvested (some arbitrary list of items)
+    ///
+    /// Appears as `HARVEST_PRODUCT:1:1:ITEM_TOKENS`
+    HarvestProduct {
+        /// The number of products harvested
+        number: u32,
+        /// The time it takes before the next harvest
+        time: u32,
+        /// The item tokens that are harvested (some arbitrary list of items)
+        item_tokens: Vec<String>,
+    },
+    /// This is the core requisite tag allowing the creature to spawn as a wild animal in the appropriate biomes. Requires specifying a [Biome] in which the creature will spawn.
+    /// Does not require specifying a frequency, population number, or cluster number.
+    ///
+    /// This tag stacks with [CasteToken::Megabeast], [CasteToken::SemiMegabeast], or [CasteToken::NightCreatureHunter]; if used with one of these tags, the creature will spawn
+    /// as both a boss and as a wild animal. This tag does not stack with [CasteToken::FeatureBeast] and if both are used the creature will not spawn. This tag is unaffected by
+    /// [CasteToken::Demon].
+    ///
+    /// Appears as `LARGE_ROAMING`
+    LargeRoaming,
+    /// Allows you to play as a wild animal of this species in adventurer mode. Prevents trading of (tame) instances of this creature in caravans.
+    ///
+    /// Appears as `LOCAL_POPS_CONTROLLABLE`
+    LocalPopsControllable,
+    /// Wild animals of this species may occasionally join a civilization. Prevents trading of (tame) instances of this creature in caravans.
+    ///
+    /// Appears as `LOCAL_POPS_PRODUCE_HEROES`
+    LocalPopsProduceHeroes,
+    /// The creatures will scatter if they have this tag, or form tight packs if they don't.
+    ///
+    /// Appears as `LOOSE_CLUSTERS`
+    LooseClusters,
+    /// Marks if the creature is an actual real-life creature. Only used for age-names at present.
+    Mundane,
+    /// The generic name for any creature of this type - will be used when distinctions between caste are unimportant. For names for specific castes, use [CASTE_NAME] instead.
+    /// If left undefined, the creature will be labeled as "nothing" by the game.
+    ///
+    /// Appears as `NAME:Name:Names:NameAdj`
+    Name {
+        /// The name of the creature
+        name: String,
+        /// The plural name of the creature
+        plural_name: String,
+        /// The adjective form of the creature's name
+        adjective: String,
+    },
+    /// Adds a material to selected materials. Used immediately after [SELECT_MATERIAL].
+    ///
+    /// Appears as `PLUS_MATERIAL:Material`
+    PlusMaterial {
+        /// The material to add
+        material: String,
+    },
+    /// The minimum/maximum numbers of how many of these creatures are present in each world map tile of the appropriate region. Defaults to 1:1 if not specified.
+    ///
+    /// Appears as `POPULATION_NUMBER:1:1`
+    PopulationNumber {
+        /// The minimum number of creatures per spawned cluster
+        min: u32,
+        /// The maximum number of creatures per spawned cluster
+        max: u32,
+    },
+    /// Sets what other creatures prefer about this creature.
+    ///
+    /// "Urist likes dwarves for their beards."
+    ///
+    /// Multiple entries will be chosen from at random. Creatures lacking a PREFSTRING token will never appear under another's preferences.
+    ///
+    /// Appears as `PREFSTRING:PrefString`
+    PrefString {
+        /// The preference string
+        pref_string: String,
+    },
+    /// The generic name for members of this profession, at the creature level. In order to give members of specific castes different names for professions,
+    /// use [CASTE_PROFESSION_NAME] instead.
+    ///
+    /// Appears as `PROFESSION_NAME:ProfessionId:ProfessionName:ProfessionNames`
+    ProfessionName {
+        /// The profession id
+        id: String,
+        /// The name of the profession
+        name: String,
+        /// The plural name of the profession
+        plural_name: String,
+    },
+    /// Removes a material from the creature.
+    ///
+    /// Appears as `REMOVE_MATERIAL:Material`
+    RemoveMaterial {
+        /// The material to remove
+        material: String,
+    },
+    /// Removes a tissue from the creature.
+    ///
+    /// Appears as `REMOVE_TISSUE:Tissue`
+    RemoveTissue {
+        /// The tissue to remove
+        tissue: String,
+    },
+    /// The creature will only show up in "savage" biomes. Has no effect on cavern creatures. Cannot be combined with [GOOD] or [EVIL].
+    ///
+    /// Appears as `SAVAGE`
+    Savage,
     ///
     Ubiquitous,
     ///
@@ -77,59 +280,13 @@ pub enum CreatureTag {
     ///
     VerminEater,
     ///
-    LargeRoaming,
-    ///
-    LocalPopsControllable,
-    ///
-    LocalPopsProduceHeroes,
-    ///
-    LooseClusters,
-    ///
-    Mundane,
-    ///
-    Biome,
-    ///
-    PrefString,
-    ///
-    Name,
-    ///
-    GeneralBabyName,
-    ///
-    GeneralChildName,
-    /// Determines the chances of a creature appearing within its environment, with higher values resulting in more frequent appearance. Also affects the chance of a
-    /// creature being brought in a caravan for trading. The game effectively considers all creatures that can possibly appear and uses the FREQUENCY value as a weight
-    ///
-    /// For example, if there are three creatures with frequencies 10/25/50, the creature with [FREQUENCY:50] will appear approximately 58.8% of the time.
-    ///
-    /// Defaults to 50 if not specified. Not to be confused with [PopulationRatio].
-    ///
-    /// Appears as `FREQUENCY:50`
-    Frequency {
-        /// The frequency of the creature, a number between 0 and 100 (inclusive)
-        frequency: u32,
-    },
-    ///
     UndergroundDepth,
-    ///
-    PopulationNumber,
     ///
     CopyTagsFrom,
     ///
     ApplyCreatureVariation,
     ///
     CreatureTile,
-    /// If set, the creature will blink between its [Tile] and its [AltTile].
-    ///
-    /// Arguments:
-    ///
-    /// - the 'character' or tile number
-    ///
-    /// Appears as `ALTTILE:123`
-    AltTile,
-    ///
-    GlowColor,
-    ///
-    GlowTile,
     #[default]
     Unknown,
     // Tokens found in the legends xml exports but not in the raws
@@ -139,11 +296,6 @@ pub enum CreatureTag {
     SmallRace,
     OccursAsEntityRace,
     Equipment,
-    /// Defines a caste
-    Caste {
-        /// The name of the caste
-        name: String,
-    },
 }
 
 impl std::fmt::Display for CreatureTag {
