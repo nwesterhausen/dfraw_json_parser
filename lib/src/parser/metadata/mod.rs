@@ -1,6 +1,7 @@
 mod object;
 mod raw_metadata;
 mod searchable;
+mod token;
 
 /// A Dwarf Fortress raw object
 pub use object::RawObject;
@@ -15,3 +16,7 @@ pub use searchable::clean_search_vec;
 pub use searchable::get_search_string;
 /// Provides the search functionality for the raw object
 pub use searchable::Searchable;
+/// A Dwarf Fortress raw object token
+pub use token::RawObjectToken;
+/// The complexity of a raw object token
+pub use token::TokenComplexity;

@@ -1,6 +1,7 @@
 mod gait;
 mod phf_table;
 mod raw;
+mod token_parsing;
 mod tokens;
 
 pub use gait::Gait;
