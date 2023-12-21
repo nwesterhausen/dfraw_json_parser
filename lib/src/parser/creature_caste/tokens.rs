@@ -341,7 +341,10 @@ pub enum CasteTag {
     /// (used as targets for [GobbleVerminClass]), `MAMMAL`, and `POISONOUS` (both used for kobold pet eligibility). A single creature can have multiple classes.
     ///
     /// Appears as `CREATURE_CLASS:SomeClass`
-    CreatureClass,
+    CreatureClass {
+        /// The creature class
+        class: String,
+    },
     /// Sets the creature to be active at twilight in adventurer mode.
     ///
     /// Appears as `CREPUSCULAR`
@@ -532,7 +535,7 @@ pub enum CasteTag {
     /// Appears (typically) as `CV_NEW_TAG:GAIT:WALK:Sprint:!ARG4:10:3:!ARG2:50:LAYERS_SLOW:STRENGTH:AGILITY:STEALTH_SLOWS:50`
     Gait {
         /// The value of the token
-        value: String,
+        gait: String,
     },
     /// Has the same function as [MaterialForceMultiplier], but applies to all attacks instead of just those involving a specific material. Appears to be overridden by
     /// [MaterialForceMultiplier] (werebeasts, for example, use both tokens to provide resistance to all materials, with one exception to which they are especially vulnerable).
@@ -1807,7 +1810,7 @@ pub enum CasteTag {
     /// Appears as `SLAIN_CASTE_SPEECH:SomeSpeechSet`
     SlainSpeech {
         /// The speech set to use
-        slain_speech: String,
+        speech_file: String,
     },
     /// Shorthand for [CAN_LEARN] + [SKILL_LEARN_RATES:50].[Verify] Used by a number of 'primitive' creatures (like ogres, giants and troglodytes) in the vanilla game.
     /// Applicable to player races. Prevents a player from recruiting nobility, even basic ones. Subterranean creatures with this token combined with [EVIL] will become
