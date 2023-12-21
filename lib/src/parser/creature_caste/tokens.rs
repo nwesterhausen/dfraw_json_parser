@@ -19,6 +19,8 @@ pub enum CasteTag {
     AlcoholDependent,
     /// Sets the creature to be active during the day, night, and twilight in Adventurer Mode. Seems to be a separate value from `[DIURNAL]/[NOCTURNAL]/[CREPUSCULAR]`,
     /// rather than implying them.
+    ///
+    /// Appears as `ALL_ACTIVE`
     AllActive,
     /// Caste-specific version of [Creature::AltTile]. Requires [Tile].
     ///
@@ -836,57 +838,120 @@ pub enum CasteTag {
     ///
     /// Appears as `MANNERISM_WALK`
     MannerismWalk,
+    /// Adds a possible mannerism to the creature's profile. These are not defined in raws but hardcoded.
+    ///
+    /// Appears as `MANNERISM_SIT`
     MannerismSit,
+    /// Adds a possible mannerism to the creature's profile. These are not defined in raws but hardcoded.
+    ///
+    /// Appears as `MANNERISM_BREATH`
     MannerismBreath,
+    /// Adds a possible mannerism to the creature's profile. These are not defined in raws but hardcoded.
+    ///
+    /// Appears as `MANNERISM_POSTURE`
     MannerismPosture,
+    /// Adds a possible mannerism to the creature's profile. These are not defined in raws but hardcoded.
+    ///
+    /// Appears as `MANNERISM_STRETCH`
     MannerismStretch,
+    /// Adds a possible mannerism to the creature's profile. These are not defined in raws but hardcoded.
+    ///
+    /// Appears as `MANNERISM_EYELIDS`
     MannerismEyelids,
+    /// Adds a possible mannerism to the creature's profile. These are not defined in raws but hardcoded.
+    ///
+    /// Appears as `MANNERISM_FINGERS:SomeFinger:SomeFingers`
     MannerismFingers {
         finger: String,
         fingers: String,
     },
+    /// Adds a possible mannerism to the creature's profile. These are not defined in raws but hardcoded.
+    ///
+    /// Appears as `MANNERISM_NOSE:SomeNose`
     MannerismNose {
         nose: String,
     },
+    /// Adds a possible mannerism to the creature's profile. These are not defined in raws but hardcoded.
+    ///
+    /// Appears as `MANNERISM_EAR:SomeEar`
     MannerismEar {
         ear: String,
     },
+    /// Adds a possible mannerism to the creature's profile. These are not defined in raws but hardcoded.
+    ///
+    /// Appears as `MANNERISM_HEAD:SomeHead`
     MannerismHead {
         head: String,
     },
+    /// Adds a possible mannerism to the creature's profile. These are not defined in raws but hardcoded.
+    ///
+    /// Appears as `MANNERISM_EYES:SomeEyes`
     MannerismEyes {
         eyes: String,
     },
+    /// Adds a possible mannerism to the creature's profile. These are not defined in raws but hardcoded.
+    ///
+    /// Appears as `MANNERISM_MOUTH:SomeMouth`
     MannerismMouth {
         mouth: String,
     },
+    /// Adds a possible mannerism to the creature's profile. These are not defined in raws but hardcoded.
+    ///
+    /// Appears as `MANNERISM_HAIR:SomeHair`
     MannerismHair {
         hair: String,
     },
+    /// Adds a possible mannerism to the creature's profile. These are not defined in raws but hardcoded.
+    ///
+    /// Appears as `MANNERISM_KNUCKLES:SomeKnuckles`
     MannerismKnuckles {
         knuckles: String,
     },
+    /// Adds a possible mannerism to the creature's profile. These are not defined in raws but hardcoded.
+    ///
+    /// Appears as `MANNERISM_LIPS:SomeLips`
     MannerismLips {
         lips: String,
     },
+    /// Adds a possible mannerism to the creature's profile. These are not defined in raws but hardcoded.
+    ///
+    /// Appears as `MANNERISM_CHEEK:SomeCheek`
     MannerismCheek {
         cheek: String,
     },
+    /// Adds a possible mannerism to the creature's profile. These are not defined in raws but hardcoded.
+    ///
+    /// Appears as `MANNERISM_NAILS:SomeNails`
     MannerismNails {
         nails: String,
     },
+    /// Adds a possible mannerism to the creature's profile. These are not defined in raws but hardcoded.
+    ///
+    /// Appears as `MANNERISM_FEET:SomeFeet`
     MannerismFeet {
         feet: String,
     },
+    /// Adds a possible mannerism to the creature's profile. These are not defined in raws but hardcoded.
+    ///
+    /// Appears as `MANNERISM_ARMS:SomeArms`
     MannerismArms {
         arms: String,
     },
+    /// Adds a possible mannerism to the creature's profile. These are not defined in raws but hardcoded.
+    ///
+    /// Appears as `MANNERISM_HANDS:SomeHands`
     MannerismHands {
         hands: String,
     },
+    /// Adds a possible mannerism to the creature's profile. These are not defined in raws but hardcoded. Appears to be unused.
+    ///
+    /// Appears as `MANNERISM_TONGUE:SomeTongue`
     MannerismTongue {
         tongue: String,
     },
+    /// Adds a possible mannerism to the creature's profile. These are not defined in raws but hardcoded. Appears to be unused.
+    ///
+    /// Appears as `MANNERISM_LEG:SomeLeg`
     MannerismLeg {
         leg: String,
     },
@@ -1874,7 +1939,24 @@ pub enum CasteTag {
         /// The percentage to modify the syndrome by
         percentage: u32,
     },
+    /// The creature has tendons in its [CONNECTIVE_TISSUE_ANCHOR] tissues (bone or chitin by default).
+    /// Cutting the bone/chitin tissue severs the tendons, disabling motor function if the target is a limb.
     ///
+    /// Arguments:
+    ///
+    /// * `material`: The material of the tendons
+    /// * `healing_rate`: The rate at which the tendons heal (lower is faster)
+    ///
+    /// Appears as `TENDONS:SomeMaterial:100`
+    Tendons {
+        /// The material of the tendons
+        material: String,
+        /// The rate at which the tendons heal (lower is faster)
+        healing_rate: u32,
+    },
+    /// The creature's webs can catch larger creatures.
+    ///
+    /// Appears as `THICKWEB`
     ThickWeb,
     /// Caste-specific tile.
     ///
@@ -1883,35 +1965,190 @@ pub enum CasteTag {
         /// The tile to use
         tile: String,
     },
+    /// Adds the tissue layer to wherever it is required.
     ///
+    /// Non-argument Locations can be FRONT, RIGHT, LEFT, TOP, BOTTOM. Argument locations are AROUND and CLEANS, requiring a further body part and a % of coverage/cleansing
+    ///
+    /// Arguments:
+    ///
+    /// * `body_part_selector`: The body part selector to use (BY_TYPE, BY_CATEGORY, BY_TOKEN)
+    /// * `body_part`: The body part to use (via category, type or token)
+    /// * `tissue`: The name of the tissue to use
+    /// * `location`: The location to use (FRONT, RIGHT, LEFT, TOP, BOTTOM) or with an additional argument, (AROUND, CLEANS) with a body part and a percentage
+    ///
+    /// Appears as `TISSUE_LAYER:SomeBodyPartSelector:SomeBodyPart:SomeTissue:SomeLocation` or `TISSUE_LAYER:SomeBodyPartSelector:SomeBodyPart:SomeTissue:SomeLocation:SomeBodyPart:100`
+    /// ALSO appears as `TISSUE_LAYER_OVER:SomeBodyPartSelector:SomeBodyPart:SomeTissue:SomeLocation` or `TISSUE_LAYER_OVER:SomeBodyPartSelector:SomeBodyPart:SomeTissue:SomeLocation:SomeBodyPart:100
+    TissueLayer {
+        /// The body part selector to use (BY_TYPE, BY_CATEGORY, BY_TOKEN)
+        body_part_selector: String,
+        /// The body part to use (via category, type or token)
+        body_part: String,
+        /// The name of the tissue to use
+        tissue: String,
+        /// The location to use (FRONT, RIGHT, LEFT, TOP, BOTTOM) or with an additional argument, (AROUND, CLEANS) with a body part and a percentage
+        location: String,
+    },
+    /// Adds the tissue layer under a given part.
+    ///
+    /// For example, an iron man has a gaseous poison within, and this tissue (GAS is its name) has the token [TISSUE_LEAKS] and its state is GAS, so when you puncture the iron outside and
+    /// damage this tissue it leaks gas (can have a syndrome by using a previous one in the creature sample.)
+    /// `[TISSUE_LAYER_UNDER:BY_CATEGORY:ALL:{tissue}]`
+    ///
+    /// `{tissue}` is what will be under the TISSUE_LAYER; here is an example Tissue from the Iron Man:
+    ///
+    /// `[TISSUE:GAS] [TISSUE_NAME:gas:NP] [TISSUE_MATERIAL:LOCAL_CREATURE_MAT:GAS] [TISSUE_MAT_STATE:GAS] [RELATIVE_THICKNESS:50] [TISSUE_LEAKS] [TISSUE_SHAPE:LAYER]`
+    ///
+    /// Arguments:
+    ///
+    /// * `body_part_selector`: The body part selector to use (BY_TYPE, BY_CATEGORY, BY_TOKEN)
+    /// * `body_part`: The body part to use (via category, type or token)
+    /// * `tissue`: The name of the tissue to use
+    ///
+    /// Appears as `TISSUE_LAYER_UNDER:SomeBodyPartSelector:SomeBodyPart:SomeTissue`
+    TissueLayerUnder {
+        /// The body part selector to use (BY_TYPE, BY_CATEGORY, BY_TOKEN)
+        body_part_selector: String,
+        /// The body part to use (via category, type or token)
+        body_part: String,
+        /// The name of the tissue to use
+        tissue: String,
+    },
+    /// Found on titans. Cannot be specified in user-defined raws.
+    ///
+    /// Appears as `TITAN`
     Titan,
+    /// How much the creature can carry when used by merchants. 1000 by default. If a civilization uses a custom pack animal via ALWAYS_PACK, you must manually add a capacity to the raws of that
+    /// creature itself. Capacity defaults to null leading to empty caravans.
     ///
-    Trances,
+    /// Arguments:
     ///
-    TrapAvoid,
+    /// * `capacity`: The capacity of the creature
     ///
+    /// Appears as `TRADE_CAPACITY:1000`
+    TradeCapacity {
+        /// The capacity of the creature
+        capacity: u32,
+    },
+    /// Shortcut for [TRAINABLE_HUNTING] + [TRAINABLE_WAR].
+    ///
+    /// Appears as `TRAINABLE`
     Trainable,
+    /// Can be trained as a hunting beast, increasing speed.
     ///
+    /// Appears as `TRAINABLE_HUNTING`
     TrainableHunting,
+    /// Can be trained as a war beast, increasing strength and endurance.
     ///
+    /// Appears as `TRAINABLE_WAR`
     TrainableWar,
+    /// Allows the creature to go into martial trances. Used by dwarves in the vanilla game.
     ///
+    /// Appears as `TRANCES`
+    Trances,
+    /// The creature will never trigger traps it steps on. Used by a number of creatures. Doesn't make the creature immune to remotely activated traps (like retractable spikes being triggered
+    /// while the creature is standing over them). TRAPAVOID creatures lose this power if they're immobilized while standing in a trap, be it by stepping on thick web, being paralyzed or being
+    /// knocked unconscious.
+    ///
+    /// Appears as `TRAPAVOID`
+    TrapAvoid,
+    /// The creature is displayed as blue when in 7/7 water. Used on fish and amphibious creatures which swim under the water.
+    ///
+    /// Appears as `UNDERSWIM`
+    UnderSwim,
+    /// Found on generated demons; causes the game to create a single named instance of the demon which will emerge from the underworld and take over civilizations during worldgen.
+    ///
+    /// Appears as `UNIQUE_DEMON`
     UniqueDemon,
+    /// Like [AT_PEACE_WITH_WILDLIFE], but also makes the creature more valued in artwork by civilisations with the PLANT sphere. [5] Used by grimelings in the vanilla game.
     ///
+    /// Appears as `VEGETATION`
     Vegetation,
+    /// Enables vermin to bite other creatures, injecting the specified material. See [SPECIALATTACK_INJECT_EXTRACT] for details about injection - this token presumably works in a similar manner.
     ///
+    /// Arguments:
+    ///
+    /// * `chance`: The chance to inject the material
+    /// * `verb`: The verb to use (e.g. "bitten, stung")
+    /// * `material`: The material to inject
+    /// * `material_state`: The material state to inject
+    ///
+    /// Appears as `VERMIN_BITE:100:bitten:SomeMaterial:SomeMaterialState`
+    VerminBite {
+        /// The chance to inject the material
+        chance: u32,
+        /// The verb to use (e.g. "bitten, stung")
+        verb: String,
+        /// The material to inject
+        material: String,
+        /// The material state to inject
+        material_state: String,
+    },
+    /// Some dwarves will hate the creature and get unhappy thoughts when around it. See the list of hateable vermin for details.
+    ///
+    /// Appears as `VERMIN_HATEABLE`
     VerminHateable,
+    /// This makes the creature move in a swarm of creatures of the same race as it (e.g. swarm of flies, swarm of ants).
     ///
+    /// Appears as `VERMIN_MICRO`
     VerminMicro,
+    /// The creature cannot be caught by fishing.
     ///
+    /// Appears as `VERMIN_NOFISH`
     VerminNoFish,
+    /// The creature will not be observed randomly roaming about the map.
     ///
+    /// Appears as `VERMIN_NOROAM`
     VerminNoRoam,
+    /// The creature cannot be caught in baited animal traps; however, a "catch live land animal" task may still be able to capture one if a dwarf finds one roaming around.
     ///
+    /// Appears as `VERMIN_NOTRAP`
     VerminNoTrap,
+    /// Old shorthand for "does cat stuff". Contains [AT_PEACE_WITH_WILDLIFE] + [RETURNS_VERMIN_KILLS_TO_OWNER] + [HUNTS_VERMIN] + [ADOPTS_OWNER].
     ///
+    /// Appears as `VERMINHUNTER`
+    VerminHunter,
+    /// Sets the creature to be active during the evening in adventurer mode.
+    ///
+    /// Appears as `VESPERTINE`
+    Vespertine,
+    /// Value should determine how close you have to get to a critter before it attacks (or prevents adv mode travel etc.) Default is 20.
+    ///
+    /// Appears as `VIEWRANGE:20`
+    ViewRange {
+        /// The view range of the creature, default is 20
+        view_range: u32,
+    },
+    /// The width of the creature's vision arcs, in degrees (i.e. 0 to 360). The first number is binocular vision, the second is non-binocular vision.
+    /// Binocular vision has a minimum of about 10 degrees, monocular, a maximum of about 350 degrees. Values past these limits will be accepted, but will default to ~10 degrees
+    /// and ~350 degrees respectively.
+    ///
+    /// Defaults are 60:120.
+    ///
+    /// Appears as `VISION_ARC:60:120`
+    VisionArc {
+        /// The binocular vision arc of the creature, default is 60
+        binocular: u32,
+        /// The non-binocular vision arc of the creature, default is 120
+        non_binocular: u32,
+    },
+    /// Allows the creature to pull caravan wagons. If a civilization doesn't have access to any, it is restricted to trading with pack animals.
+    ///
+    /// Appears as `WAGON_PULLER`
     WagonPuller,
+    /// Allows the creature to create webs, and defines what the webs are made of.
     ///
+    /// Arguments:
+    ///
+    /// * `material`: The material of the webs
+    ///
+    /// Appears as `WEBBER:SomeMaterial`
+    Webber {
+        /// The material of the webs
+        material: String,
+    },
+    /// The creature will not get caught in thick webs. Used by creatures who can shoot thick webs (such as giant cave spiders) in order to make them immune to their own attacks.
+    ///
+    /// Appears as `WEBIMMUNE`
     WebImmune,
     #[default]
     Unknown,
@@ -1925,5 +2162,4 @@ pub enum CasteTag {
     NaturalAnimal,
     CuriousBeast,
     CannotBreatheAir,
-    Utterances,
 }

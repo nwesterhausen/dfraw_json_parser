@@ -50,6 +50,33 @@ pub enum CreatureTag {
         /// The maximum number of creatures per spawned cluster
         max: u32,
     },
+    /// Copies another specified creature. This will override any definitions made before it; essentially, it makes this creature identical to the other one, which can then
+    /// be modified. Often used in combination with [APPLY_CREATURE_VARIATION] to import standard variations from a file. The vanilla giant animals and animal peoples are
+    /// examples of this token combination.
+    ///
+    /// Arguments:
+    ///
+    /// * `creature`: The identifier of the creature to copy
+    ///
+    /// Appears as `COPY_TAGS_FROM:SomeCreature`
+    CopyTagsFrom {
+        /// The identifier of the creature to copy
+        creature: String,
+    },
+    /// Creatures active in their civilization's military will use this tile instead.
+    ///
+    /// Appears as `CREATURE_SOLDIER_TILE:123`
+    CreatureSoldierTile {
+        /// The character or tile number
+        character: u32,
+    },
+    /// The symbol of the creature in ASCII mode.
+    ///
+    /// Appears as `CREATURE_TILE:123`
+    CreatureTile {
+        /// The character or tile number
+        character: u32,
+    },
     /// The color of the creature's tile.
     ///
     /// Arguments:
@@ -330,28 +357,152 @@ pub enum CreatureTag {
         /// The sphere to use
         sphere: String,
     },
+    /// Begins defining a tissue in the creature file. Follow this with standard tissue definition tokens to define the tissue properties.
     ///
+    /// Arguments:
+    ///
+    /// * `name`: The name of the tissue
+    ///
+    /// Appears as `TISSUE:SomeTissue`
+    Tissue {
+        /// The name of the tissue
+        name: String,
+    },
+    /// A large swarm of vermin can be disturbed, usually in adventurer mode.
+    ///
+    /// Appears as `TRIGGERABLE_GROUP:5:10`
+    TriggerableGroup {
+        /// The minimum number of vermin in the swarm
+        min: u32,
+        /// The maximum number of vermin in the swarm
+        max: u32,
+    },
+    /// Creature will occur in every region with the correct biome. Does not apply to [EVIL]/[GOOD] tags.
+    ///
+    /// Appears as `UBIQUITOUS`
     Ubiquitous,
+    /// Depth that the creature appears underground. Numbers can be from 0 to 5. 0 is actually 'above ground' and can be used if the creature is to appear both above and below ground.
+    /// Values from 1-3 are the respective cavern levels, 4 is the magma sea and 5 is the HFS. A single argument may be used instead of min and max. Demons use only 5:5;
+    /// user-defined creatures with both this depth and [FLIER] will take part in the initial wave from the HFS alongside generated demons, but without [FLIER] they will only spawn from
+    /// the map edges. Civilizations that can use underground plants or animals will only export (via the embark screen or caravans) things that are available at depth 1.
     ///
-    VerminSoil,
+    /// Arguments:
     ///
-    VerminSoilColony,
+    /// * `min`: The minimum depth
+    /// * `max`: The maximum depth
     ///
-    VerminRotter,
+    /// Appears as `UNDERGROUND_DEPTH:1:3`
+    UndergroundDepth {
+        /// The minimum depth
+        min: u32,
+        /// The maximum depth
+        max: u32,
+    },
+    /// Defines a new caste derived directly from a previous caste. The new caste inherits all properties of the old one. The effect of this tag is automatic if one has not yet defined any castes:
+    /// "Any caste-level tag that occurs before castes are explicitly declared is saved up and placed on any caste that is declared later, unless the caste is explicitly derived from another caste."
     ///
-    VerminGrounder,
+    /// "When DF detects duplicate tokens in the raws of the same object, a failsafe seems to kick in; it takes the bottom-most of the duplicates, and disregards the others. In the case of tokens
+    /// added by a mod, it prioritizes the duplicate in the mod." This means that if a tag is defined in the base-caste and redefined in the derived caste, the derived tag overwrites the base tag.
     ///
-    VerminFish,
+    /// Arguments:
     ///
+    /// * `caste`: The name of the new caste
+    /// * `original_caste`: The name of the original caste to copy
+    ///
+    /// Appears as `USE_CASTE:SomeCaste:SomeOriginalCaste`
+    UseCaste {
+        /// The name of the new caste
+        caste: String,
+        /// The name of the original caste to copy
+        original_caste: String,
+    },
+    /// Defines a new local creature material and populates it with all properties defined in the specified local creature material.
+    ///
+    /// Arguments:
+    ///
+    /// * `material`: The name of the new material
+    /// * `original_material`: The name of the original material to copy
+    ///
+    /// Appears as `USE_MATERIAL:SomeMaterial:SomeOriginalMaterial`
+    UseMaterial {
+        /// The name of the new material
+        material: String,
+        /// The name of the original material to copy
+        original_material: String,
+    },
+    /// Defines a new local creature material and populates it with all properties defined in the specified template. There seems to be a limit of 200 materials per creature.
+    ///
+    /// Arguments:
+    ///
+    /// * `material`: The name of the new material
+    /// * `template`: The name of the template to copy
+    ///
+    /// Appears as `USE_MATERIAL_TEMPLATE:SomeMaterial:SomeTemplate`
+    UseMaterialTemplate {
+        /// The name of the new material
+        material: String,
+        /// The name of the template to copy
+        template: String,
+    },
+    /// Defines a new local creature tissue and populates it with all properties defined in the local tissue specified in the second argument.
+    ///
+    /// Arguments:
+    ///
+    /// * `tissue`: The name of the new tissue
+    /// * `original_tissue`: The name of the original tissue to copy
+    ///
+    /// Appears as `USE_TISSUE:SomeTissue:SomeOriginalTissue`
+    UseTissue {
+        /// The name of the new tissue
+        tissue: String,
+        /// The name of the original tissue to copy
+        original_tissue: String,
+    },
+    /// Loads a tissue template listed in OBJECT:TISSUE_TEMPLATE files, such as tissue_template_default.txt.
+    ///
+    /// Arguments:
+    ///
+    /// * `tissue`: The name of the new tissue
+    /// * `template`: The name of the template to copy
+    ///
+    /// Appears as `USE_TISSUE_TEMPLATE:SomeTissue:SomeTemplate`
+    UseTissueTemplate {
+        /// The name of the new tissue
+        tissue: String,
+        /// The name of the template to copy
+        template: String,
+    },
+    /// Changes the language of the creature into unintelligible 'kobold-speak', which creatures of other species will be unable to understand. If a civilized creature has this and is not
+    /// part of a [SKULKING] civ, it will tend to start wars with all nearby civilizations and will be unable to make peace treaties due to 'inability to communicate'.
+    ///
+    /// Appears as `UTTERNANCES`
+    Utterances,
+    /// The vermin creature will attempt to eat exposed food. See [PENETRATEPOWER]. Distinct from [VERMIN_ROTTER].
+    ///
+    /// Appears as `VERMIN_EATER`
     VerminEater,
+    /// The vermin appears in water and will attempt to swim around.
     ///
-    UndergroundDepth,
+    /// Appears as `VERMIN_FISH`
+    VerminFish,
+    /// The creature appears in "general" surface ground locations. Note that this doesn't stop the creature from flying if it can (most vermin birds have this tag).
     ///
-    CopyTagsFrom,
+    /// Appears as `VERMIN_GROUNDER`
+    VerminGrounder,
+    /// The vermin are attracted to rotting stuff and loose food left in the open and cause unhappy thoughts to dwarves who encounter them. Present on flies, knuckle worms,
+    /// acorn flies, and blood gnats. Speeds up decay?
     ///
-    ApplyCreatureVariation,
+    /// Appears as `VERMIN_ROTTER`
+    VerminRotter,
+    /// The creature randomly appears near dirt or mud, and may be uncovered by creatures that have the [ROOT_AROUND] interaction such as geese and chickens.
+    /// Dwarves will ignore the creature when given the "Capture live land animal" task.
     ///
-    CreatureTile,
+    /// Appears as `VERMIN_SOIL`
+    VerminSoil,
+    /// The vermin will appear in a single tile cluster of many vermin, such as a colony of ants.
+    ///
+    /// Appears as `VERMIN_SOIL_COLONY`
+    VerminSoilColony,
     #[default]
     Unknown,
     // Tokens found in the legends xml exports but not in the raws
@@ -365,52 +516,6 @@ pub enum CreatureTag {
 
 impl std::fmt::Display for CreatureTag {
     fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
-        match self {
-            CreatureTag::ArtificialHiveable => write!(f, "ArtificialHiveable"),
-            CreatureTag::DoesNotExist => write!(f, "DoesNotExist"),
-            CreatureTag::Evil => write!(f, "Evil"),
-            CreatureTag::Fanciful => write!(f, "Fanciful"),
-            CreatureTag::Good => write!(f, "Good"),
-            CreatureTag::Savage => write!(f, "Savage"),
-            CreatureTag::Generated => write!(f, "Generated"),
-            CreatureTag::Ubiquitous => write!(f, "Ubiquitous"),
-            CreatureTag::VerminSoil => write!(f, "VerminSoil"),
-            CreatureTag::VerminSoilColony => write!(f, "VerminSoilColony"),
-            CreatureTag::VerminRotter => write!(f, "VerminRotter"),
-            CreatureTag::VerminGrounder => write!(f, "VerminGrounder"),
-            CreatureTag::VerminFish => write!(f, "VerminFish"),
-            CreatureTag::VerminEater => write!(f, "VerminEater"),
-            CreatureTag::LargeRoaming => write!(f, "LargeRoaming"),
-            CreatureTag::LocalPopsControllable => write!(f, "LocalPopsControllable"),
-            CreatureTag::LocalPopsProduceHeroes => write!(f, "LocalPopsProduceHeroes"),
-            CreatureTag::LooseClusters => write!(f, "LooseClusters"),
-            CreatureTag::Mundane => write!(f, "Mundane"),
-            CreatureTag::Biome => write!(f, "Biome"),
-            CreatureTag::PrefString => write!(f, "PrefString"),
-            CreatureTag::Name => write!(f, "Name"),
-            CreatureTag::GeneralBabyName => write!(f, "GeneralBabyName"),
-            CreatureTag::GeneralChildName => write!(f, "GeneralChildName"),
-            CreatureTag::Frequency => write!(f, "Frequency"),
-            CreatureTag::UndergroundDepth => write!(f, "UndergroundDepth"),
-            CreatureTag::PopulationNumber => write!(f, "PopulationNumber"),
-            CreatureTag::CopyTagsFrom => write!(f, "CopyTagsFrom"),
-            CreatureTag::ApplyCreatureVariation => write!(f, "ApplyCreatureVariation"),
-            CreatureTag::CreatureTile => write!(f, "CreatureTile"),
-            CreatureTag::AltTile => write!(f, "AltTile"),
-            CreatureTag::Color => write!(f, "Color"),
-            CreatureTag::GlowColor => write!(f, "GlowColor"),
-            CreatureTag::GlowTile => write!(f, "GlowTile"),
-            CreatureTag::ChangeFrequencyPercent => write!(f, "ChangeFrequencyPercent"),
-            CreatureTag::ClusterNumber => write!(f, "ClusterNumber"),
-            CreatureTag::Unknown => write!(f, "Unknown"),
-            CreatureTag::MatesToBreed => write!(f, "MatesToBreed"),
-            CreatureTag::TwoGenders => write!(f, "TwoGenders"),
-            CreatureTag::AllCastesAlive => write!(f, "AllCastesAlive"),
-            CreatureTag::SmallRace => write!(f, "SmallRace"),
-            CreatureTag::OccursAsEntityRace => write!(f, "OccursAsEntityRace"),
-            CreatureTag::Equipment => write!(f, "Equipment"),
-            CreatureTag::EquipmentWagon => write!(f, "EquipmentWagon"),
-            CreatureTag::Caste { name } => write!(f, "Caste: {}", name),
-        }
+        format!("{:?}", self).fmt(f)
     }
 }
