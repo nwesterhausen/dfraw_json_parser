@@ -14,8 +14,56 @@ impl RawObjectToken for CasteTag {
           CasteTag::BabyName {.. } |
           CasteTag::Body { .. } |
           CasteTag::Blood {..}|
-          CasteTag::BodyAppearanceModifier { .. }
-          // TODO: remaining complex tags
+          CasteTag::BodyAppearanceModifier { .. }|
+          CasteTag::BodyDetailPlan { .. } |
+          CasteTag::BodyPartAppearanceModifier {..}|
+            CasteTag::ChildName { .. } |
+            CasteTag::ClutchSize { .. } |
+            CasteTag::Color { .. } |
+            CasteTag::ExtraButcherObjectItem { .. } |
+            CasteTag::ExtraButcherObject { .. } |
+            CasteTag::GeneralMaterialForceMultiplier { .. } |
+            CasteTag::GlowColor { .. } |
+            CasteTag::GobbleVerminCreature { .. } |
+            CasteTag::InteractionDetail { .. } |
+            CasteTag::Lair { .. } |
+            CasteTag::LaysUnusualEggs {..}|
+            CasteTag::Ligaments { .. } |
+            CasteTag::LitterSize { .. } |
+            CasteTag::MannerismFingers { .. } |
+            CasteTag::MaxAge { .. } |
+            CasteTag::MentalAttributeCapPercentage { .. } |
+            CasteTag::MentalAttributeRange { .. } |
+            CasteTag::MentalAttributeRate { .. } |
+            CasteTag::Milkable { .. } |
+            CasteTag::Name { .. } |
+            CasteTag::NaturalSkill { .. } |
+            CasteTag::Orientation { .. } |
+            CasteTag::Personality { .. } |
+            CasteTag::PhysicalAttributeCapPercentage { .. } |
+            CasteTag::PhysicalAttributeRange { .. } |
+            CasteTag::PhysicalAttributeRate { .. } |
+            CasteTag::ProfessionName { .. } |
+            CasteTag::Pus { .. } |
+            CasteTag::RelativeSize { .. } |
+            CasteTag::Remains { .. } |
+            CasteTag::RetractIntoBodyPart { .. } |
+            CasteTag::RootAround { .. } |
+            CasteTag::Secretion { .. } |
+            CasteTag::SenseCreatureClass { .. } |
+            CasteTag::SetBodyPartGroup { .. } |
+            CasteTag::SkillLearnRate { .. } |
+            CasteTag::SkillRate { .. } |
+            CasteTag::SkillRates { .. } |
+            CasteTag::SkillRustRate { .. } |
+            CasteTag::SkillRustRates { .. } |
+            CasteTag::Sound { .. } |
+            CasteTag::SyndromeDilutionFactor { .. } |
+            CasteTag::Tendons { .. } |
+            CasteTag::TissueLayer { .. } |
+            CasteTag::TissueLayerUnder { .. } |
+            CasteTag::VerminBite { .. } |
+            CasteTag::VisionArc { .. }
           => TokenComplexity::Complex,
           CasteTag::AltTile { .. } |
           CasteTag::Baby { .. } |

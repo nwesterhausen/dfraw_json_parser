@@ -87,7 +87,7 @@ pub static BIOME_TOKENS: phf::Map<&'static str, Biome> = phf::phf_map! {
 
 impl std::fmt::Display for Biome {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        match self { 
+        match self {
     Biome::Mountain => write!(f, "Mountain"),
     Biome::Mountains => write!(f, "Mountains"),
     Biome::Glacier => write!(f, "Glacier"),
