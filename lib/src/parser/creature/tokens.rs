@@ -15,6 +15,19 @@ pub enum CreatureTag {
         /// The character or tile number
         character: u32,
     },
+    /// Applies the specified creature variation with the given arguments to the creature. See [ApplyCreatureVariation] for more information.
+    ///
+    /// Appears as `APPLY_CREATURE_VARIATION:SOME_VARIATION` or `APPLY_CREATURE_VARIATION:SOME_VARIATION:ARG1:ARG2:ARG3`
+    ApplyCreatureVariation {
+        /// Creature variation ID to apply
+        id: String,
+        /// (Optional) any number of arguments to pass to the creature variation
+        args: Vec<String>,
+    },
+    /// Applies the effects of all pending `[CV_ADD_TAG]` and `[CV_REMOVE_TAG]` tokens that have been defined in the current creature (so far).
+    ///
+    /// Appears as `APPLY_CURRENT_CREATURE_VARIATION`
+    ApplyCurrentCreatureVariation,
     /// Enables the creature to be kept in artificial hives by beekeepers.
     ///
     /// Appears as `ARTIFICIAL_HIVEABLE`
@@ -86,7 +99,14 @@ pub enum CreatureTag {
     /// * `brightness`: The brightness of the color
     ///
     /// Appears as `COLOR:0:0:0`
-    Color,
+    Color {
+        /// The foreground color
+        foreground: u32,
+        /// The background color
+        background: u32,
+        /// The brightness of the color
+        brightness: u32,
+    },
     /// Adding this token to a creature prevents it from appearing in generated worlds (unless it's marked as always present for a particular
     /// civilization). For example, adding it to dogs will lead to worlds being generated without dogs in them. Also removes the creature from the
     /// object testing arena's spawn list. If combined with [Fanciful], artistic depictions of the creature will occur regardless. Used by centaurs,
@@ -121,11 +141,21 @@ pub enum CreatureTag {
     /// Name of the creatures baby form. Applies to all castes but can be overridden by [CasteToken::BabyName].
     ///
     /// Appears as `GENERAL_BABY_NAME:BabyName:BabyNames`
-    GeneralBabyName,
+    GeneralBabyName {
+        /// The name of the baby
+        singular: String,
+        /// The plural name of the baby
+        plural: String,
+    },
     /// Name of the creatures child form. Applies to all castes but can be overridden by [CasteToken::ChildName].
     ///
     /// Appears as `GENERAL_CHILD_NAME:ChildName:ChildNames`
-    GeneralChildName,
+    GeneralChildName {
+        /// The name of the child
+        singular: String,
+        /// The plural name of the child
+        plural: String,
+    },
     /// Found on procedurally generated creatures like forgotten beasts, titans, demons, angels, and night creatures. Cannot be specified in user-defined raws.
     ///
     /// Appears as `GENERATED`
@@ -516,6 +546,6 @@ pub enum CreatureTag {
 
 impl std::fmt::Display for CreatureTag {
     fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
-        format!("{:?}", self).fmt(f)
+        format!("{self:?}").fmt(f)
     }
 }

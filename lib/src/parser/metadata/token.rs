@@ -1,4 +1,5 @@
 /// The `TokenComplexity` enum is used to determine how a token is parsed.
+#[allow(clippy::module_name_repetitions)]
 pub enum TokenComplexity {
     /// The token affects raws by itself with no arguments
     None,
@@ -38,7 +39,7 @@ pub trait RawObjectToken: RawObjectTokenToAny + std::fmt::Debug + Send + Sync {
 
 impl std::fmt::Display for dyn RawObjectToken {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        write!(f, "{:?}", self)
+        write!(f, "{self:?}")
     }
 }
 

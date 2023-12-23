@@ -4,7 +4,7 @@ use tracing::{debug, trace, warn};
 use crate::parser::{
     biome, clean_search_vec, creature_caste::Caste, creature_caste::TOKEN_MAP as CASTE_TOKENS,
     creature_variation::Requirements as CreatureVariationRequirements,
-    helpers::build_object_id_from_pieces, helpers::parse_min_max_range, object_types::ObjectType,
+    helpers::build_object_id_from_pieces, metadata::RawObjectToken, object_types::ObjectType,
     select_creature::SelectCreature, serializer_helper, Name, RawMetadata, RawObject, Searchable,
     SingPlurName, Tile,
 };
@@ -64,18 +64,18 @@ pub struct Creature {
     ///
     /// Note: not to be confused with [POP_RATIO].
     #[serde(skip_serializing_if = "serializer_helper::is_default_frequency")]
-    frequency: u16,
+    frequency: u32,
     /// The minimum/maximum numbers of how many creatures per spawned cluster. Vermin fish with this token in combination with
     /// temperate ocean and river biome tokens will perform seasonal migrations.
     ///
     /// Defaults to [1,1] if not specified.
     #[serde(skip_serializing_if = "serializer_helper::min_max_is_ones")]
-    cluster_number: [u16; 2],
+    cluster_number: [u32; 2],
     /// The minimum/maximum numbers of how many of these creatures are present in each world map tile of the appropriate region.
     ///
     /// Defaults to [1,1] if not specified.
     #[serde(skip_serializing_if = "serializer_helper::min_max_is_ones")]
-    population_number: [u16; 2],
+    population_number: [u32; 2],
     /// Depth that the creature appears underground. Numbers can be from 0 to 5. 0 is actually 'above ground' and can be used if the
     /// creature is to appear both above and below ground. Values from 1-3 are the respective cavern levels, 4 is the magma sea and
     /// 5 is the HFS.
@@ -86,7 +86,7 @@ pub struct Creature {
     ///
     /// Default [0, 0] (aboveground)
     #[serde(skip_serializing_if = "serializer_helper::min_max_is_zeroes")]
-    underground_depth: [u16; 2],
+    underground_depth: [u32; 2],
     /// Like `[BABYNAME]`, but applied regardless of caste.
     #[serde(skip_serializing_if = "SingPlurName::is_empty")]
     general_baby_name: SingPlurName,
@@ -500,73 +500,73 @@ impl RawObject for Creature {
             return;
         }
 
-        let Some(tag) = CREATURE_TOKENS.get(key) else {
+        let Some(tag) = CreatureTag::parse_token(key, value) else {
             warn!(
-                "Creature::parse_tag: called `Option::unwrap()` on a `None` value for presumed creature tag: {}",
-                key
+                "Creature::parse_tag: Unknown tag {} with value {}",
+                key, value
             );
             return;
         };
 
+        self.tags.push(tag.clone());
+
         match tag {
-            CreatureTag::Biome => {
-                let Some(biome) = biome::TOKEN_MAP.get(value) else {
+            CreatureTag::Biome { id } => {
+                if let Some(biome) = biome::TOKEN_MAP.get(&id) {
+                    self.biomes.push(biome.clone());
+                } else {
                     warn!(
-                        "CreatureParsing: called `Option::unwrap()` on a `None` value for presumed biome: {}",
-                        value
+                        "CreatureParsing: Unknown biome {} for creature {}",
+                        id, self.identifier
                     );
-                    return;
-                };
-                self.biomes.push(biome.clone());
+                }
             }
-            CreatureTag::Name => {
+            CreatureTag::Name { .. } => {
                 self.name = Name::from_value(value);
             }
-            CreatureTag::GeneralBabyName => {
+            CreatureTag::GeneralBabyName { .. } => {
                 self.general_baby_name = SingPlurName::from_value(value);
             }
-            CreatureTag::GeneralChildName => {
+            CreatureTag::GeneralChildName { .. } => {
                 self.general_child_name = SingPlurName::from_value(value);
             }
-            CreatureTag::PrefString => {
-                self.pref_strings.push(String::from(value));
+            CreatureTag::PrefString { pref_string } => {
+                self.pref_strings.push(pref_string.clone());
             }
-            CreatureTag::PopulationNumber => {
-                self.population_number = parse_min_max_range(value).unwrap_or([1, 1]);
+            CreatureTag::PopulationNumber { min, max } => {
+                self.population_number = [min, max];
             }
-            CreatureTag::Frequency => {
-                self.frequency = value.parse::<u16>().unwrap_or(0);
+            CreatureTag::Frequency { frequency } => {
+                self.frequency = frequency;
             }
-            CreatureTag::UndergroundDepth => {
-                self.underground_depth = parse_min_max_range(value).unwrap_or([0, 0]);
+            CreatureTag::UndergroundDepth { min, max } => {
+                self.underground_depth = [min, max];
             }
-            CreatureTag::ClusterNumber => {
-                self.cluster_number = parse_min_max_range(value).unwrap_or([1, 1]);
+            CreatureTag::ClusterNumber { min, max } => {
+                self.cluster_number = [min, max];
             }
-            CreatureTag::CopyTagsFrom => {
-                self.copy_tags_from = String::from(value);
+            CreatureTag::CopyTagsFrom { creature } => {
+                self.copy_tags_from = creature.clone();
             }
-            CreatureTag::ApplyCreatureVariation => {
+            CreatureTag::ApplyCreatureVariation { .. } => {
                 self.apply_creature_variation.push(String::from(value));
             }
-            CreatureTag::CreatureTile => {
+            CreatureTag::CreatureTile { .. } => {
                 self.tile.set_character(value);
             }
-            CreatureTag::AltTile => {
+            CreatureTag::AltTile { .. } => {
                 self.tile.set_alt_character(value);
             }
-            CreatureTag::Color => {
+            CreatureTag::Color { .. } => {
                 self.tile.set_color(value);
             }
-            CreatureTag::GlowColor => {
+            CreatureTag::GlowColor { .. } => {
                 self.tile.set_glow_color(value);
             }
-            CreatureTag::GlowTile => {
+            CreatureTag::GlowTile { .. } => {
                 self.tile.set_glow_character(value);
             }
-            _ => {
-                self.tags.push(tag.clone());
-            }
+            _ => {}
         }
     }
     fn get_object_id(&self) -> &str {
@@ -602,7 +602,7 @@ impl CreatureVariationRequirements for Creature {
         };
 
         match tag {
-            CreatureTag::Biome => {
+            CreatureTag::Biome { .. } => {
                 let Some(biome) = biome::TOKEN_MAP.get(value) else {
                     warn!(
                         "CreatureParsing: called `Option::unwrap()` on a `None` value for presumed biome: {}",
@@ -612,49 +612,49 @@ impl CreatureVariationRequirements for Creature {
                 };
                 self.biomes.retain(|x| x != biome);
             }
-            CreatureTag::Name => {
+            CreatureTag::Name { .. } => {
                 self.name = Name::default();
             }
-            CreatureTag::GeneralBabyName => {
+            CreatureTag::GeneralBabyName { .. } => {
                 self.general_baby_name = SingPlurName::default();
             }
-            CreatureTag::GeneralChildName => {
+            CreatureTag::GeneralChildName { .. } => {
                 self.general_child_name = SingPlurName::default();
             }
-            CreatureTag::PrefString => {
+            CreatureTag::PrefString { .. } => {
                 self.pref_strings.retain(|x| x != value);
             }
-            CreatureTag::PopulationNumber => {
+            CreatureTag::PopulationNumber { .. } => {
                 self.population_number = [1, 1];
             }
-            CreatureTag::Frequency => {
-                self.frequency = 0;
+            CreatureTag::Frequency { .. } => {
+                self.frequency = 50;
             }
-            CreatureTag::UndergroundDepth => {
+            CreatureTag::UndergroundDepth { .. } => {
                 self.underground_depth = [0, 0];
             }
-            CreatureTag::ClusterNumber => {
+            CreatureTag::ClusterNumber { .. } => {
                 self.cluster_number = [1, 1];
             }
-            CreatureTag::CopyTagsFrom => {
+            CreatureTag::CopyTagsFrom { .. } => {
                 self.copy_tags_from = String::default();
             }
-            CreatureTag::ApplyCreatureVariation => {
+            CreatureTag::ApplyCreatureVariation { .. } => {
                 self.apply_creature_variation.retain(|x| x != value);
             }
-            CreatureTag::CreatureTile => {
+            CreatureTag::CreatureTile { .. } => {
                 self.tile.set_character("");
             }
-            CreatureTag::AltTile => {
+            CreatureTag::AltTile { .. } => {
                 self.tile.set_alt_character("");
             }
-            CreatureTag::Color => {
+            CreatureTag::Color { .. } => {
                 self.tile.set_color("");
             }
-            CreatureTag::GlowColor => {
+            CreatureTag::GlowColor { .. } => {
                 self.tile.set_glow_color("");
             }
-            CreatureTag::GlowTile => {
+            CreatureTag::GlowTile { .. } => {
                 self.tile.set_glow_character("");
             }
             _ => {

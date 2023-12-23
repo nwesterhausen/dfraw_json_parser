@@ -1,11 +1,10 @@
-use xmlparser::ElementEnd;
-
 use crate::parser::metadata::{RawObjectToken, TokenComplexity};
 
 use super::{Token as CasteTag, TOKEN_MAP};
 
 #[typetag::serde]
 impl RawObjectToken for CasteTag {
+    #[allow(clippy::too_many_lines)]
     fn get_complexity(&self) -> TokenComplexity {
         match self {
           CasteTag::ApplyCreatureVariation { .. } |
@@ -111,8 +110,6 @@ impl RawObjectToken for CasteTag {
           CasteTag::MannerismMouth { .. }|
           CasteTag::MannerismNose { .. }|
           CasteTag::MannerismTongue { .. }|
-          CasteTag::MannerismLeg { .. }|
-          CasteTag::MannerismLips { .. }|
           CasteTag::MannerismNails { .. }|
           CasteTag::ModValue { .. }|
           CasteTag::OdorLevel { .. }|
@@ -135,7 +132,7 @@ impl RawObjectToken for CasteTag {
         }
     }
 
-    fn parse_token(key: &str, value: &str) -> Option<Self>
+    fn parse_token(key: &str, _value: &str) -> Option<Self>
     where
         Self: Sized,
     {

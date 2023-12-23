@@ -32,7 +32,7 @@ pub struct Syndrome {
 
     /// Seen the \[SYN_CONCENTRATION_ADDED:100:1000\] tag in material_templates.txt
     #[serde(skip_serializing_if = "serializer_helper::min_max_is_zeroes")]
-    concentration_added: [u16; 2],
+    concentration_added: [u32; 2],
 
     #[serde(skip_serializing_if = "Vec::is_empty")]
     tags: Vec<SyndromeToken>,
@@ -87,8 +87,8 @@ impl Syndrome {
                 let min = split.next().unwrap_or_default().trim();
                 let max = split.next().unwrap_or_default().trim();
                 self.concentration_added = [
-                    min.parse::<u16>().unwrap_or_default(),
-                    max.parse::<u16>().unwrap_or_default(),
+                    min.parse::<u32>().unwrap_or_default(),
+                    max.parse::<u32>().unwrap_or_default(),
                 ];
             }
             SyndromeToken::Injected => self.tags.push(SyndromeToken::Injected),

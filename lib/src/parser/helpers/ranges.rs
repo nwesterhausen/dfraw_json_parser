@@ -16,15 +16,15 @@ use tracing::error;
 /// # Errors
 ///
 /// Will return a `ParseIntError` if the string cannot be parsed into two unsigned 16-bit integers.
-pub fn parse_min_max_range_from_vec(split: &[&str]) -> Result<[u16; 2], ParseIntError> {
-    let min: u16 = match split.first().unwrap_or(&"").parse() {
+pub fn parse_min_max_range_from_vec(split: &[&str]) -> Result<[u32; 2], ParseIntError> {
+    let min: u32 = match split.first().unwrap_or(&"").parse() {
         Ok(n) => n,
         Err(e) => {
             error!("min_value parsing error\n{:?}", e);
             return Err(e);
         }
     };
-    let max: u16 = match split.get(1).unwrap_or(&"").parse() {
+    let max: u32 = match split.get(1).unwrap_or(&"").parse() {
         Ok(n) => n,
         Err(e) => {
             error!("max_value parsing error\n{:?}", e);
@@ -48,7 +48,7 @@ pub fn parse_min_max_range_from_vec(split: &[&str]) -> Result<[u16; 2], ParseInt
 /// # Errors
 ///
 /// Will return a `ParseIntError` if the string cannot be parsed into two unsigned 16-bit integers.
-pub fn parse_min_max_range(value: &str) -> Result<[u16; 2], ParseIntError> {
+pub fn parse_min_max_range(value: &str) -> Result<[u32; 2], ParseIntError> {
     let split: Vec<&str> = value.split(':').collect::<Vec<&str>>();
     parse_min_max_range_from_vec(&split)
 }

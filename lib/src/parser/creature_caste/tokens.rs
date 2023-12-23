@@ -627,7 +627,6 @@ pub enum CasteTag {
     /// Not used since 0.40.12, replaced by [StandardGrazer] to fix Bug 4113.
     ///
     /// Appears as `GRAZER:100`
-    #[deprecated(note = "Use [StandardGrazer] instead.")]
     Grazer {
         /// The grazer value
         grazer: u32,
@@ -789,7 +788,6 @@ pub enum CasteTag {
     /// Retired as of v0.40.14 in favor of [LargePredator].
     ///
     /// Appears as `LIKES_FIGHTING`
-    #[deprecated(note = "Use [LargePredator] instead.")]
     LikesFighting,
     /// Creature uses "sssssnake talk" (multiplies 'S' when talking - "My name isss Recisssiz."). Used by serpent men and reptile men in the vanilla game.
     /// C's with the same pronunciation (depending on the word) are not affected by this token.

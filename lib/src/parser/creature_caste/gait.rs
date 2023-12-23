@@ -3,7 +3,7 @@ use tracing::warn;
 
 #[derive(ts_rs::TS)]
 #[ts(export)]
-#[derive(Serialize, Deserialize, Debug, Clone, Default)]
+#[derive(Serialize, Deserialize, Debug, Clone, Default, PartialEq, Eq)]
 #[serde(rename_all = "camelCase")]
 /// Gaits are a way to describe how a creature moves. Defined in the raws with:
 ///

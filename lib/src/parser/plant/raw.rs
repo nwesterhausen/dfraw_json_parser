@@ -40,10 +40,10 @@ pub struct Plant {
     // Environment Tokens
     /// Default [0, 0] (aboveground)
     #[serde(skip_serializing_if = "serializer_helper::min_max_is_zeroes")]
-    underground_depth: [u16; 2],
+    underground_depth: [u32; 2],
     /// Default frequency is 50
     #[serde(skip_serializing_if = "serializer_helper::is_default_frequency")]
-    frequency: u16,
+    frequency: u32,
     /// List of biomes this plant can grow in
     #[serde(skip_serializing_if = "Vec::is_empty")]
     biomes: Vec<biome::Token>,
@@ -202,7 +202,7 @@ impl RawObject for Plant {
                 self.underground_depth = parse_min_max_range(value).unwrap_or([0, 0]);
             }
             PlantTag::Frequency => {
-                self.frequency = value.parse::<u16>().unwrap_or(50);
+                self.frequency = value.parse::<u32>().unwrap_or(50);
             }
             PlantTag::UseMaterialTemplate => {
                 self.materials

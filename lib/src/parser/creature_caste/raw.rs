@@ -2,7 +2,7 @@ use serde::{Deserialize, Serialize};
 use tracing::warn;
 
 use crate::parser::{
-    helpers::parse_min_max_range,
+    metadata::{RawObjectToken, TokenComplexity},
     names::{Name, SingPlurName},
     serializer_helper, BodySize, Milkable, Searchable, Tile,
 };
@@ -30,13 +30,13 @@ pub struct Caste {
     // [min, max] ranges
     /// Default \[0,0\]
     #[serde(skip_serializing_if = "serializer_helper::min_max_is_zeroes")]
-    clutch_size: [u16; 2],
+    clutch_size: [u32; 2],
     /// Default \[0,0\]
     #[serde(skip_serializing_if = "serializer_helper::min_max_is_zeroes")]
-    litter_size: [u16; 2],
+    litter_size: [u32; 2],
     /// Default \[0,0\]
     #[serde(skip_serializing_if = "serializer_helper::min_max_is_zeroes")]
-    max_age: [u16; 2],
+    max_age: [u32; 2],
     // Integer tokens
     #[serde(skip_serializing_if = "serializer_helper::is_zero")]
     baby: u32,
@@ -46,8 +46,8 @@ pub struct Caste {
     difficulty: u32,
     #[serde(skip_serializing_if = "serializer_helper::is_zero")]
     egg_size: u32,
-    #[serde(skip_serializing_if = "serializer_helper::is_zero_u8")]
-    grass_trample: u8,
+    #[serde(skip_serializing_if = "serializer_helper::is_zero")]
+    grass_trample: u32,
     #[serde(skip_serializing_if = "serializer_helper::is_zero")]
     grazer: u32,
     #[serde(skip_serializing_if = "serializer_helper::is_zero")]
@@ -100,47 +100,62 @@ impl Caste {
             self.tags.push(tag.clone());
             return;
         }
+        if let TokenComplexity::None = tag.get_complexity() {
+            // If the tag is a TokenComplexity::None, then the value should be empty
+            // So we should log the extra value before adding the tag to the last caste
+            warn!(
+                "Caste::parse_tag: tag {} has a value of {} but is a TokenComplexity::None as {:?}",
+                key, value, tag
+            );
+            self.tags.push(tag.clone());
+            return;
+        }
+        // Both simple and complex tags should have a value, and that needs to be parsed. So let the tag handle it.
+        let Some(tag_and_value) = CasteTag::parse_token(key, value) else {
+            warn!(
+                "Caste::parse_tag: Called unwrap on a None value for tag {} with value {}",
+                key, value
+            );
+            return;
+        };
+        self.tags.push(tag_and_value.clone());
 
-        match tag {
-            CasteTag::Description => self.description = String::from(value),
-            CasteTag::EggSize => self.egg_size = value.parse::<u32>().unwrap_or_default(),
-            CasteTag::Baby => self.baby = value.parse::<u32>().unwrap_or_default(),
-            CasteTag::Child => self.child = value.parse::<u32>().unwrap_or_default(),
-            CasteTag::Difficulty => self.difficulty = value.parse::<u32>().unwrap_or_default(),
-            CasteTag::Grazer => self.grazer = value.parse::<u32>().unwrap_or_default(),
-            CasteTag::GrassTrample => self.grass_trample = value.parse::<u8>().unwrap_or_default(),
-            CasteTag::LowLightVision => {
-                self.low_light_vision = value.parse::<u32>().unwrap_or_default();
+        match tag_and_value {
+            CasteTag::Description { description } => self.description = description.clone(),
+            CasteTag::EggSize { size } => self.egg_size = size,
+            CasteTag::Baby { age } => self.baby = age,
+            CasteTag::Child { age } => self.child = age,
+            CasteTag::Difficulty { difficulty } => self.difficulty = difficulty,
+            CasteTag::Grazer { grazer } => self.grazer = grazer,
+            CasteTag::GrassTrample { trample } => self.grass_trample = trample,
+            CasteTag::LowLightVision { vision } => self.low_light_vision = vision,
+            CasteTag::PopulationRatio { pop_ratio } => self.pop_ratio = pop_ratio,
+            CasteTag::PetValue { pet_value } => self.pet_value = pet_value,
+            CasteTag::ClutchSize { min, max } => self.clutch_size = [min, max],
+            CasteTag::LitterSize { min, max } => self.litter_size = [min, max],
+            CasteTag::MaxAge { min, max } => self.max_age = [min, max],
+            CasteTag::CreatureClass { class } => {
+                self.creature_class.push(class.clone());
             }
-            CasteTag::PopRatio => self.pop_ratio = value.parse::<u32>().unwrap_or_default(),
-            CasteTag::PetValue => self.pet_value = value.parse::<u32>().unwrap_or_default(),
-            CasteTag::ClutchSize => {
-                self.clutch_size = parse_min_max_range(value).unwrap_or_default();
-            }
-            CasteTag::LitterSize => {
-                self.litter_size = parse_min_max_range(value).unwrap_or_default();
-            }
-            CasteTag::MaxAge => self.max_age = parse_min_max_range(value).unwrap_or_default(),
-            CasteTag::CreatureClass => self.creature_class.push(String::from(value)),
-            CasteTag::BodySize => {
+            CasteTag::BodySize { .. } => {
                 self.body_size.push(BodySize::from_value(value));
             }
-            CasteTag::Milkable => self.milkable = Milkable::from_value(value),
-            CasteTag::BabyName => self.baby_name = SingPlurName::from_value(value),
-            CasteTag::CasteName => self.caste_name = Name::from_value(value),
-            CasteTag::ChildName => self.child_name = SingPlurName::from_value(value),
-            CasteTag::CasteTile => self.tile.set_character(value),
-            CasteTag::CasteAltTile => self.tile.set_alt_character(value),
-            CasteTag::CasteColor => self.tile.set_color(value),
-            CasteTag::CasteGlowTile => self.tile.set_glow_character(value),
-            CasteTag::CasteGlowColor => self.tile.set_glow_color(value),
-            CasteTag::ChangeBodySizePercent => {
+            CasteTag::Milkable { .. } => self.milkable = Milkable::from_value(value),
+            CasteTag::BabyName { .. } => self.baby_name = SingPlurName::from_value(value),
+            CasteTag::Name { .. } => self.caste_name = Name::from_value(value),
+            CasteTag::ChildName { .. } => self.child_name = SingPlurName::from_value(value),
+            CasteTag::Tile { .. } => self.tile.set_character(value),
+            CasteTag::AltTile { .. } => self.tile.set_alt_character(value),
+            CasteTag::Color { .. } => self.tile.set_color(value),
+            CasteTag::GlowTile { .. } => self.tile.set_glow_character(value),
+            CasteTag::GlowColor { .. } => self.tile.set_glow_color(value),
+            CasteTag::ChangeBodySizePercent { .. } => {
                 self.change_body_size_percentage = value.parse::<u32>().unwrap_or_default();
             }
-            CasteTag::Gait => {
+            CasteTag::Gait { .. } => {
                 self.gaits.push(Gait::from_value(value));
             }
-            _ => self.tags.push(tag.clone()),
+            _ => {}
         }
     }
 
@@ -157,42 +172,67 @@ impl Caste {
             return;
         };
 
-        // If value is empty, remove the tag from the last caste
-        if value.is_empty() {
-            self.tags.retain(|t| t != tag);
+        if let TokenComplexity::None = tag.get_complexity() {
+            // If the tag is a TokenComplexity::None, then the value should be empty
+            // So we should log the extra value before adding the tag to the last caste
+            warn!(
+                "Caste::remove_tag_and_value: tag {} has a value of {} but is a TokenComplexity::None as {:?}",
+                key, value, tag
+            );
             return;
         }
 
-        match tag {
-            CasteTag::Description => self.description = String::new(),
-            CasteTag::EggSize => self.egg_size = 0,
-            CasteTag::Baby => self.baby = 0,
-            CasteTag::Child => self.child = 0,
-            CasteTag::Difficulty => self.difficulty = 0,
-            CasteTag::Grazer => self.grazer = 0,
-            CasteTag::GrassTrample => self.grass_trample = 0,
-            CasteTag::LowLightVision => self.low_light_vision = 0,
-            CasteTag::PopRatio => self.pop_ratio = 0,
-            CasteTag::PetValue => self.pet_value = 0,
-            CasteTag::ClutchSize => self.clutch_size = [0, 0],
-            CasteTag::LitterSize => self.litter_size = [0, 0],
-            CasteTag::MaxAge => self.max_age = [0, 0],
-            CasteTag::CreatureClass => self.creature_class.retain(|c| c != value),
-            CasteTag::BodySize => {
-                let body_size_to_remove = BodySize::from_value(value);
-                self.body_size.retain(|bs| bs != &body_size_to_remove);
+        // For simple and complex, some of the tags are stored as part of the struct.
+        // So we need to remove them from the struct as well as the tags vector.
+        let Some(tag_and_value) = CasteTag::parse_token(key, value) else {
+            warn!(
+                        "Caste::remove_tag_and_value: Called unwrap on a None value for tag {} with value {}",
+                        key, value
+                    );
+            return;
+        };
+        self.tags.retain(|tag| tag != &tag_and_value);
+
+        match tag_and_value {
+            CasteTag::Description { .. } => self.description = String::new(),
+            CasteTag::EggSize { .. } => self.egg_size = 0,
+            CasteTag::Baby { .. } => self.baby = 0,
+            CasteTag::Child { .. } => self.child = 0,
+            CasteTag::Difficulty { .. } => self.difficulty = 0,
+            CasteTag::Grazer { .. } => self.grazer = 0,
+            CasteTag::GrassTrample { .. } => self.grass_trample = 0,
+            CasteTag::LowLightVision { .. } => self.low_light_vision = 0,
+            CasteTag::PopulationRatio { .. } => self.pop_ratio = 0,
+            CasteTag::PetValue { .. } => self.pet_value = 0,
+            CasteTag::ClutchSize { .. } => self.clutch_size = [0, 0],
+            CasteTag::LitterSize { .. } => self.litter_size = [0, 0],
+            CasteTag::MaxAge { .. } => self.max_age = [0, 0],
+            CasteTag::CreatureClass { .. } => {
+                // Remove the specific creature class from the creature classes vector
+                self.creature_class.retain(|class| class != value);
             }
-            CasteTag::Milkable => self.milkable = Milkable::default(),
-            CasteTag::BabyName => self.baby_name = SingPlurName::default(),
-            CasteTag::CasteName => self.caste_name = Name::default(),
-            CasteTag::ChildName => self.child_name = SingPlurName::default(),
-            CasteTag::CasteTile => self.tile.set_character(""),
-            CasteTag::CasteAltTile => self.tile.set_alt_character(""),
-            CasteTag::CasteColor => self.tile.set_color(""),
-            CasteTag::CasteGlowTile => self.tile.set_glow_character(""),
-            CasteTag::CasteGlowColor => self.tile.set_glow_color(""),
-            CasteTag::ChangeBodySizePercent => self.change_body_size_percentage = 0,
-            _ => self.tags.retain(|t| t != tag),
+            CasteTag::BodySize { .. } => {
+                // Remove the specific body size from the body sizes vector
+                self.body_size
+                    .retain(|body_size| body_size != &BodySize::from_value(value));
+            }
+            CasteTag::Milkable { .. } => self.milkable = Milkable::default(),
+            CasteTag::BabyName { .. } => self.baby_name = SingPlurName::default(),
+            CasteTag::Name { .. } => self.caste_name = Name::default(),
+            CasteTag::ChildName { .. } => self.child_name = SingPlurName::default(),
+            CasteTag::Tile { .. } | //=> self.tile = Tile::default(),
+            CasteTag::AltTile { .. } | //=> self.tile = Tile::default(),
+            CasteTag::Color { .. } | //=> self.tile = Tile::default(),
+            CasteTag::GlowTile { .. } | //=> self.tile = Tile::default(),
+            CasteTag::GlowColor { .. } => self.tile = Tile::default(),
+            CasteTag::ChangeBodySizePercent { .. } => {
+                self.change_body_size_percentage = 0;
+            }
+            CasteTag::Gait { .. } => {
+                // Remove the specific gait from the gaits vector
+                self.gaits.retain(|gait| gait != &Gait::from_value(value));
+            }
+            _ => {}
         }
     }
 
@@ -273,7 +313,27 @@ impl Caste {
         self.tags.contains(&CasteTag::LaysEggs)
     }
     pub fn is_milkable(&self) -> bool {
-        self.tags.contains(&CasteTag::Milkable)
+        self.has_tag(&CasteTag::Milkable {
+            material: String::new(),
+            frequency: 0,
+        })
+    }
+    /// Returns true if the caste has the given tag, no values are checked.
+    ///
+    /// ## Arguments
+    ///
+    /// * `tag` - The tag to check for (note that any values are ignored)
+    ///
+    /// ## Returns
+    ///
+    /// True if the caste has the given tag, false otherwise.
+    pub fn has_tag(&self, tag: &CasteTag) -> bool {
+        for t in &self.tags {
+            if std::mem::discriminant(t) == std::mem::discriminant(tag) {
+                return true;
+            }
+        }
+        false
     }
 }
 
@@ -305,10 +365,6 @@ impl Searchable for Caste {
         // If flier, include flyer information
         if self.tags.contains(&CasteTag::Flier) {
             vec.push(String::from("flying flies flier"));
-        }
-        // If gnawer, include gnawer information
-        if self.tags.contains(&CasteTag::Gnawer) {
-            vec.push(String::from("gnawer"));
         }
         // If playable/civilized, include playable information
         if self.tags.contains(&CasteTag::OutsiderControllable) {
