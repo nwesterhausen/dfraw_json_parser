@@ -19,7 +19,7 @@ impl Dimensions {
     }
     pub fn from_token(token: &str) -> Self {
         let split = token.split(':').collect::<Vec<&str>>();
-        //	[TILE_DIM:32:32]
+        //  [TILE_DIM:32:32]
 
         let Some(dim_x) = split.first() else {
             error!(

@@ -237,7 +237,7 @@ pub static GRAPHIC_TYPE_TAGS: phf::Map<&'static str, GraphicType> = phf::phf_map
     "TOOL_GRAPHICS_HIVE_BLD" => GraphicType::ToolHiveBuilding,
     // [TOOL_GRAPHICS_GLASS:1:ITEM_BOOKCASE:0:3]
     "TOOL_GRAPHICS_GLASS" => GraphicType::ToolGlass,
-    // 	[TOOL_GRAPHICS_SHAPE:PLATONIC_CUBE:TOOLS:1:29]
+    // [TOOL_GRAPHICS_SHAPE:PLATONIC_CUBE:TOOLS:1:29]
     "TOOL_GRAPHICS_SHAPE" => GraphicType::ToolShape,
     // [TOOL_GRAPHICS_GLASS_VARIANT:3:ITEM_BOOKCASE:9:3]
     "TOOL_GRAPHICS_GLASS_VARIANT" => GraphicType::ToolGlassVariant,
