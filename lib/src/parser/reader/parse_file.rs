@@ -58,28 +58,6 @@ pub struct FileParseResults {
 ///
 /// * `Result<FileParseResults, ParserError>` - The results of parsing the raw file.
 ///
-/// # Examples
-///
-/// `parse_raw_file` is called by `parse` when parsing to get the actual raw data.
-///
-/// ```
-/// use std::path::PathBuf;
-/// use dfraw_json_parser::{ObjectType, parse, ParserOptions, ParseResult};
-///
-/// let mut options = ParserOptions::default();
-///
-/// let amphibian_raw = PathBuf::from("./tests/data/creature_amphibians.txt");
-/// let c_variation_raw = PathBuf::from("./tests/data/c_variation_default.txt");
-///
-/// options.add_raw_file_to_parse(&amphibian_raw);
-/// options.add_raw_file_to_parse(&c_variation_raw); // Required to resolve the `apply_creature_variation` tags
-///
-/// let results: ParseResult = parse(&options).unwrap();
-///
-/// // Should have parsed 3 amphibians and 32 creature variations (total of 35 raws)
-/// assert_eq!(results.raws.len(), 35);
-/// ```
-///
 /// # Errors
 ///
 /// * `ParserError::InvalidRawFile` - If the raw file is invalid.
