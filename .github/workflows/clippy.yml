@@ -123,5 +123,7 @@ jobs:
       # The idea being the logs from the parsing tests will be useful for reference
       # `cargo run` will run the cli automatically
 
-      - name: Parse a single raw
-        run: cargo run -- -r /home/runner/vanilla-raws/vanilla_creatures/objects/creature_birds.txt
+      - name: Parse creature_birds.txt with creature variation support
+        run:
+          cargo run -- -r /home/runner/vanilla-raws/vanilla_creatures/objects/creature_birds.txt -r
+          /home/runner/vanilla-raws/vanilla_creatures/objects/c_variation_default.txt
