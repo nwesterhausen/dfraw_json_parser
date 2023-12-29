@@ -1,7 +1,6 @@
 # Added by cargo
 
 /target
-Cargo.lock
 
 # Ignore cli output in example dir
 examples/www/out.json
@@ -10,3 +9,6 @@ examples/www/out.json
 # Ingore Mac OS X system files
 .DS_Store
 ._*
+
+# Ignore vanilla raws
+vanilla-raws/

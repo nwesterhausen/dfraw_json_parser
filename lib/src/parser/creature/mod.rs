@@ -1,5 +1,6 @@
 mod phf_table;
 mod raw;
+mod token_parsing;
 mod tokens;
 
 pub use phf_table::CREATURE_TOKENS as TOKEN_MAP;

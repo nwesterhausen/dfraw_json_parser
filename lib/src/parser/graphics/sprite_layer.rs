@@ -39,7 +39,7 @@ impl SpriteLayer {
         }
     }
     pub fn parse_layer_from_value(value: &str) -> Option<Self> {
-        // 		...BODY:CREATURES_DOMESTIC:0:21]
+        // ...BODY:CREATURES_DOMESTIC:0:21]
         let mut split = value.split(':');
 
         let layer_name = match split.next() {

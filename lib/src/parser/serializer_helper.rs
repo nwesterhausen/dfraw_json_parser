@@ -2,12 +2,12 @@ use crate::RawMetadata;
 
 /// This is only used for serialize
 #[allow(clippy::trivially_copy_pass_by_ref)]
-pub fn min_max_is_ones(min_max: &[u16; 2]) -> bool {
+pub fn min_max_is_ones(min_max: &[u32; 2]) -> bool {
     min_max[0] == 1 && min_max[1] == 1
 }
 /// This is only used for serialize
 #[allow(clippy::trivially_copy_pass_by_ref)]
-pub fn min_max_is_zeroes(min_max: &[u16; 2]) -> bool {
+pub fn min_max_is_zeroes(min_max: &[u32; 2]) -> bool {
     min_max[0] == 0 && min_max[1] == 0
 }
 /// This is only used for serialize
@@ -17,7 +17,7 @@ pub fn is_zero(num: &u32) -> bool {
 }
 /// This is only used for serialize
 #[allow(clippy::trivially_copy_pass_by_ref)]
-pub fn is_default_frequency(frequency: &u16) -> bool {
+pub fn is_default_frequency(frequency: &u32) -> bool {
     *frequency == 50
 }
 /// This is only used for serialize
