@@ -4,7 +4,7 @@ on:
 name: Clippy Check
 jobs:
   clippy_check:
-    name: 'Clippy Check Nightly'
+    name: Clippy Check Nightly
     runs-on: ubuntu-latest
     steps:
       - name: Harden Runner
@@ -24,15 +24,14 @@ jobs:
               file \
               libssl-dev \
               libgtk-3-dev \
-              libayatana-appindicator3-dev \
-              librsvg2-dev 
+              librsvg2-dev
           sudo apt-get install -y javascriptcoregtk-4.1 \
               libsoup-3.0 \
               webkit2gtk-4.1
       - uses: dtolnay/rust-toolchain@be73d7920c329f220ce78e0234b8f96b7ae60248 # master
         with:
-          toolchain: stable 
-          components: clippy          
+          toolchain: stable
+          components: clippy
         name: Install Clippy
       - name: Rust cache
         uses: swatinem/rust-cache@3cf7f8cc28d1b4e7d01e3783be10a97d55d483c8 # v2.7.1
@@ -45,7 +44,7 @@ jobs:
           options: |
             --all-features
   verify_bindings:
-    name: 'Verify Type Bindings'
+    name: Verify Type Bindings
     needs: clippy_check
     runs-on: ubuntu-latest
     steps:
@@ -66,14 +65,13 @@ jobs:
               file \
               libssl-dev \
               libgtk-3-dev \
-              libayatana-appindicator3-dev \
-              librsvg2-dev 
+              librsvg2-dev
           sudo apt-get install -y javascriptcoregtk-4.1 \
               libsoup-3.0 \
               webkit2gtk-4.1
       - uses: dtolnay/rust-toolchain@be73d7920c329f220ce78e0234b8f96b7ae60248 # master
         with:
-          toolchain: stable 
+          toolchain: stable
       - name: Rust cache
         uses: swatinem/rust-cache@3cf7f8cc28d1b4e7d01e3783be10a97d55d483c8 # v2.7.1
         with:
@@ -86,3 +84,44 @@ jobs:
       - name: Check for changes
         run: |
           git diff --exit-code
+  test_parsing:
+    name: Test Parsing
+    needs: clippy_check
+    runs-on: ubuntu-latest
+    steps:
+      - name: Harden Runner
+        uses: step-security/harden-runner@eb238b55efaa70779f274895e782ed17c84f2895 # v2.6.1
+        with:
+          egress-policy: audit
+
+      - name: Vanilla Raws Cache
+        id: vanilla-raws-cache
+        uses: actions/cache@v3
+        with:
+          key: vanilla-raws-${{ vars.DF_VERSION }}
+          path: /home/runner/.cache/vanilla-raws
+      - name: Download Vanilla Raws Bundle
+        if: ${{ steps.vanilla-raws-cache.outputs.cache-hit != 'true' }}
+        run: |
+          wget -O vanilla-raws.zip https://build-deps.ci.nwest.one/dwarfforestress/vanilla_${{ vars.DF_VERSION }}.zip
+          unzip -d /home/runner/.cache/vanilla-raws vanilla-raws.zip
+
+      - uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11 # v4.1.1
+      - uses: dtolnay/rust-toolchain@be73d7920c329f220ce78e0234b8f96b7ae60248 # master
+        with:
+          toolchain: stable
+      - name: Rust cache
+        uses: swatinem/rust-cache@3cf7f8cc28d1b4e7d01e3783be10a97d55d483c8 # v2.7.1
+        with:
+          shared-key: clippy
+          cache-on-failure: true
+
+      - name: Build CLI
+        run: cargo build
+
+      # TODO: Add various parsing scenarios (e.g. a single raw, an entire module, all vanilla, the info.txt files, etc.)
+      # The idea being the logs from the parsing tests will be useful for reference
+      # `cargo run` will run the cli automatically
+
+      - name: Parse a single raw
+        run: cargo run -- -r /home/runner/.cache/vanilla-raws/vanilla_creatures/objects/creature_birds.txt
