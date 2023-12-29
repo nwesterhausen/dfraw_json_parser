@@ -1,7 +1,6 @@
 # Added by cargo
 
 /target
-Cargo.lock
 
 # Ignore cli output in example dir
 examples/www/out.json
