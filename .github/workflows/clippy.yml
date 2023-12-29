@@ -103,7 +103,7 @@ jobs:
       - name: Download Vanilla Raws Bundle
         if: ${{ steps.vanilla-raws-cache.outputs.cache-hit != 'true' }}
         run: |
-          wget -O vanilla-raws.zip https://build-deps.ci.nwest.one/dwarfforestress/vanilla_${{ vars.DF_VERSION }}.zip
+          wget -O vanilla-raws.zip https://build-deps.ci.nwest.one/dwarffortress/vanilla_${{ vars.DF_VERSION }}.zip
           unzip -d /home/runner/.cache/vanilla-raws vanilla-raws.zip
 
       - uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11 # v4.1.1
