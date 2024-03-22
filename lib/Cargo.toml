@@ -49,6 +49,6 @@ default-features = true
 features = ["derive"]
 
 [dependencies.ts-rs]
-version = "7.0"
+version = "8.1"
 default-features = true
 features = ["serde-compat"]
