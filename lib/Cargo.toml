@@ -33,10 +33,10 @@ tracing = "0.1.40"
 typetag = "0.2"
 walkdir = "2"
 # Tauri feature dependency needs tauri lib
-tauri = { version = "1.5", optional = true }
+tauri = { version = "1.6", optional = true }
 xmlparser = "0.13.6"
 quick-xml = "0.31.0"
-thiserror = "1.0.51"
+thiserror = "1.0.58"
 
 [dependencies.phf]
 version = "0.11.2"
@@ -44,11 +44,11 @@ default-features = true
 features = ["macros"]
 
 [dependencies.serde]
-version = "1"
+version = "1.0"
 default-features = true
 features = ["derive"]
 
 [dependencies.ts-rs]
-version = "7.0"
+version = "7.1.1"
 default-features = true
 features = ["serde-compat"]

@@ -8,7 +8,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Harden Runner
-        uses: step-security/harden-runner@eb238b55efaa70779f274895e782ed17c84f2895 # v2.6.1
+        uses: step-security/harden-runner@63c24ba6bd7ba022e95695ff85de572c04a18142 # v2.7.0
         with:
           egress-policy: audit
 
@@ -24,32 +24,37 @@ jobs:
               file \
               libssl-dev \
               libgtk-3-dev \
+              libayatana-appindicator3-dev \
               librsvg2-dev
           sudo apt-get install -y javascriptcoregtk-4.1 \
               libsoup-3.0 \
               webkit2gtk-4.1
+      - name: Run sccache-cache
+        uses: mozilla-actions/sccache-action@2e7f9ec7921547d4b46598398ca573513895d0bd # 0.0.4
       - uses: dtolnay/rust-toolchain@be73d7920c329f220ce78e0234b8f96b7ae60248 # master
         with:
+          targets: x86_64-unknown-linux-gnu
           toolchain: stable
           components: clippy
-        name: Install Clippy
-      - name: Rust cache
-        uses: swatinem/rust-cache@3cf7f8cc28d1b4e7d01e3783be10a97d55d483c8 # v2.7.1
-        with:
-          shared-key: clippy
-          cache-on-failure: true
-      - uses: nwesterhausen/clippy-check@0888eda19b093be682431e08dfd7f3a56f9ac693 # v1
-        with:
-          token: ${{ secrets.GITHUB_TOKEN }}
-          options: |
-            --all-features
+      - name: Build
+        run: cargo build
+      - name: Show sccache stats
+        shell: bash
+        run: |
+          echo '## SCCACHE STATS' >> $GITHUB_STEP_SUMMARY
+          echo '| Metric | Value |' >> $GITHUB_STEP_SUMMARY
+          echo '|--------|-------|' >> $GITHUB_STEP_SUMMARY
+          ${SCCACHE_PATH} --show-stats | awk -F'[[:space:]][[:space:]]+' 'NR<=22{ print "| "$1" | "$2" |"}' >> $GITHUB_STEP_SUMMARY
+          echo '</hr>' >> $GITHUB_STEP_SUMMARY
+      - name: Run clippy
+        run: cargo clippy -- -D warnings
   verify_bindings:
     name: Verify Type Bindings
     needs: clippy_check
     runs-on: ubuntu-latest
     steps:
       - name: Harden Runner
-        uses: step-security/harden-runner@eb238b55efaa70779f274895e782ed17c84f2895 # v2.6.1
+        uses: step-security/harden-runner@63c24ba6bd7ba022e95695ff85de572c04a18142 # v2.7.0
         with:
           egress-policy: audit
 
@@ -65,18 +70,17 @@ jobs:
               file \
               libssl-dev \
               libgtk-3-dev \
+              libayatana-appindicator3-dev \
               librsvg2-dev
           sudo apt-get install -y javascriptcoregtk-4.1 \
               libsoup-3.0 \
               webkit2gtk-4.1
+      - name: Run sccache-cache
+        uses: mozilla-actions/sccache-action@2e7f9ec7921547d4b46598398ca573513895d0bd # 0.0.4
       - uses: dtolnay/rust-toolchain@be73d7920c329f220ce78e0234b8f96b7ae60248 # master
         with:
+          targets: x86_64-unknown-linux-gnu
           toolchain: stable
-      - name: Rust cache
-        uses: swatinem/rust-cache@3cf7f8cc28d1b4e7d01e3783be10a97d55d483c8 # v2.7.1
-        with:
-          shared-key: clippy
-          cache-on-failure: true
       - name: Generate Type Bindings
         run: |
           cargo test --all-features
