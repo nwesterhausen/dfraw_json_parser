@@ -184,7 +184,7 @@ pub fn write_raw_vec_to_file<P: AsRef<Path>>(
 ///
 /// * `parsed_raws_string_vec`: String
 /// * `out_filepath`: Path
-pub fn write_json_string_vec_to_file<P: AsRef<Path>>(strings_vec: &Vec<String>, out_filepath: &P) {
+pub fn write_json_string_vec_to_file<P: AsRef<Path>>(strings_vec: &[String], out_filepath: &P) {
     info!(
         "write_json_string_vec_to_file: Writing {} strings to file {:?}",
         strings_vec.len(),
