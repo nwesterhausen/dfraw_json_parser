@@ -1,8 +1,6 @@
 use serde::{Deserialize, Serialize};
 use tracing::warn;
 
-use crate::parser::serializer_helper;
-
 use super::tokens::GraphicType;
 
 #[derive(ts_rs::TS)]
@@ -12,12 +10,9 @@ use super::tokens::GraphicType;
 #[serde(rename_all = "camelCase")]
 pub struct CustomGraphicExtension {
     extension_type: GraphicType,
-    #[serde(skip_serializing_if = "String::is_empty")]
-    tile_page_id: String,
-    #[serde(skip_serializing_if = "serializer_helper::is_zero")]
-    value_1: u32,
-    #[serde(skip_serializing_if = "serializer_helper::is_zero")]
-    value_2: u32,
+    tile_page_id: Option<String>,
+    value_1: Option<u32>,
+    value_2: Option<u32>,
 }
 
 impl CustomGraphicExtension {
@@ -40,7 +35,7 @@ impl CustomGraphicExtension {
         if let Ok(value_1) = possible_value_1.parse::<u32>() {
             return Some(Self {
                 extension_type,
-                value_1,
+                value_1: Some(value_1),
                 ..Self::default()
             });
         }
@@ -66,9 +61,9 @@ impl CustomGraphicExtension {
         ) {
             Some(Self {
                 extension_type,
-                tile_page_id,
-                value_1,
-                value_2,
+                tile_page_id: Some(tile_page_id),
+                value_1: Some(value_1),
+                value_2: Some(value_2),
             })
         } else {
             warn!(

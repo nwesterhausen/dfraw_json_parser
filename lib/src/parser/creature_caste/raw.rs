@@ -16,61 +16,38 @@ use super::{phf_table::CASTE_TOKENS, tokens::CasteTag, Gait};
 #[serde(rename_all = "camelCase")]
 pub struct Caste {
     identifier: String,
-    #[serde(skip_serializing_if = "Vec::is_empty")]
-    tags: Vec<CasteTag>,
-    #[serde(skip_serializing_if = "String::is_empty")]
-    description: String,
+    tags: Option<Vec<CasteTag>>,
+    description: Option<String>,
     // String Tokens
-    #[serde(skip_serializing_if = "SingPlurName::is_empty")]
-    baby_name: SingPlurName,
-    #[serde(skip_serializing_if = "Name::is_empty")]
-    caste_name: Name,
-    #[serde(skip_serializing_if = "SingPlurName::is_empty")]
-    child_name: SingPlurName,
+    baby_name: Option<SingPlurName>,
+    caste_name: Option<Name>,
+    child_name: Option<SingPlurName>,
     // [min, max] ranges
     /// Default \[0,0\]
-    #[serde(skip_serializing_if = "serializer_helper::min_max_is_zeroes")]
-    clutch_size: [u32; 2],
+    clutch_size: Option<[u32; 2]>,
     /// Default \[0,0\]
-    #[serde(skip_serializing_if = "serializer_helper::min_max_is_zeroes")]
-    litter_size: [u32; 2],
+    litter_size: Option<[u32; 2]>,
     /// Default \[0,0\]
-    #[serde(skip_serializing_if = "serializer_helper::min_max_is_zeroes")]
-    max_age: [u32; 2],
+    max_age: Option<[u32; 2]>,
     // Integer tokens
-    #[serde(skip_serializing_if = "serializer_helper::is_zero")]
-    baby: u32,
-    #[serde(skip_serializing_if = "serializer_helper::is_zero")]
-    child: u32,
-    #[serde(skip_serializing_if = "serializer_helper::is_zero")]
-    difficulty: u32,
-    #[serde(skip_serializing_if = "serializer_helper::is_zero")]
-    egg_size: u32,
-    #[serde(skip_serializing_if = "serializer_helper::is_zero")]
-    grass_trample: u32,
-    #[serde(skip_serializing_if = "serializer_helper::is_zero")]
-    grazer: u32,
-    #[serde(skip_serializing_if = "serializer_helper::is_zero")]
-    low_light_vision: u32,
-    #[serde(skip_serializing_if = "serializer_helper::is_zero")]
-    pet_value: u32,
-    #[serde(skip_serializing_if = "serializer_helper::is_zero")]
-    pop_ratio: u32,
-    #[serde(skip_serializing_if = "serializer_helper::is_zero")]
-    change_body_size_percentage: u32,
+    baby: Option<u32>,
+    child: Option<u32>,
+    difficulty: Option<u32>,
+    egg_size: Option<u32>,
+    grass_trample: Option<u32>,
+    grazer: Option<u32>,
+    low_light_vision: Option<u32>,
+    pet_value: Option<u32>,
+    pop_ratio: Option<u32>,
+    change_body_size_percentage: Option<u32>,
     // Arrays
-    #[serde(skip_serializing_if = "Vec::is_empty")]
-    creature_class: Vec<String>,
+    creature_class: Option<Vec<String>>,
     // Special Tokens
-    #[serde(skip_serializing_if = "Vec::is_empty")]
-    body_size: Vec<BodySize>,
-    #[serde(skip_serializing_if = "Milkable::is_default")]
-    milkable: Milkable,
-    #[serde(skip_serializing_if = "Tile::is_default")]
-    tile: Tile,
+    body_size: Option<Vec<BodySize>>,
+    milkable: Option<Milkable>,
+    tile: Option<Tile>,
     /// The gaits by which the creature can move.
-    #[serde(skip_serializing_if = "Vec::is_empty")]
-    gaits: Vec<Gait>,
+    gaits: Option<Vec<Gait>>,
 }
 
 impl Caste {
@@ -80,11 +57,19 @@ impl Caste {
             ..Caste::default()
         }
     }
-    pub fn get_tags(&self) -> Vec<CasteTag> {
-        self.tags.clone()
+    pub fn get_tags(&self) -> &[CasteTag] {
+        if let Some(tags) = &self.tags {
+            tags.clone().as_slice()
+        } else {
+            &[]
+        }
     }
     pub fn get_milkable(&self) -> Milkable {
-        self.milkable.clone()
+        if let Some(milkable) = &self.milkable {
+            milkable.clone()
+        } else {
+            Milkable::default()
+        }
     }
     pub fn parse_tag(&mut self, key: &str, value: &str) {
         let Some(tag) = CASTE_TOKENS.get(key) else {
@@ -97,7 +82,11 @@ impl Caste {
 
         // If value is empty, add the tag to the last caste
         if value.is_empty() {
-            self.tags.push(tag.clone());
+            if let Some(tags) = self.tags.as_mut() {
+                tags.push(tag.clone());
+            } else {
+                self.tags = Some(vec![tag.clone()]);
+            }
             return;
         }
         if let TokenComplexity::None = tag.get_complexity() {
@@ -107,7 +96,11 @@ impl Caste {
                 "Caste::parse_tag: tag {} has a value of {} but is a TokenComplexity::None as {:?}",
                 key, value, tag
             );
-            self.tags.push(tag.clone());
+            if let Some(tags) = self.tags.as_mut() {
+                tags.push(tag.clone());
+            } else {
+                self.tags = Some(vec![tag.clone()]);
+            }
             return;
         }
         // Both simple and complex tags should have a value, and that needs to be parsed. So let the tag handle it.
@@ -118,42 +111,88 @@ impl Caste {
             );
             return;
         };
-        self.tags.push(tag_and_value.clone());
+        if let Some(tags) = self.tags.as_mut() {
+            tags.push(tag_and_value.clone());
+        } else {
+            self.tags = Some(vec![tag_and_value.clone()]);
+        }
 
         match tag_and_value {
-            CasteTag::Description { description } => self.description = description.clone(),
-            CasteTag::EggSize { size } => self.egg_size = size,
-            CasteTag::Baby { age } => self.baby = age,
-            CasteTag::Child { age } => self.child = age,
-            CasteTag::Difficulty { difficulty } => self.difficulty = difficulty,
-            CasteTag::Grazer { grazer } => self.grazer = grazer,
-            CasteTag::GrassTrample { trample } => self.grass_trample = trample,
-            CasteTag::LowLightVision { vision } => self.low_light_vision = vision,
-            CasteTag::PopulationRatio { pop_ratio } => self.pop_ratio = pop_ratio,
-            CasteTag::PetValue { pet_value } => self.pet_value = pet_value,
-            CasteTag::ClutchSize { min, max } => self.clutch_size = [min, max],
-            CasteTag::LitterSize { min, max } => self.litter_size = [min, max],
-            CasteTag::MaxAge { min, max } => self.max_age = [min, max],
+            CasteTag::Description { description } => self.description = Some(description.clone()),
+            CasteTag::EggSize { size } => self.egg_size = Some(size),
+            CasteTag::Baby { age } => self.baby = Some(age),
+            CasteTag::Child { age } => self.child = Some(age),
+            CasteTag::Difficulty { difficulty } => self.difficulty = Some(difficulty),
+            CasteTag::Grazer { grazer } => self.grazer = Some(grazer),
+            CasteTag::GrassTrample { trample } => self.grass_trample = Some(trample),
+            CasteTag::LowLightVision { vision } => self.low_light_vision = Some(vision),
+            CasteTag::PopulationRatio { pop_ratio } => self.pop_ratio = Some(pop_ratio),
+            CasteTag::PetValue { pet_value } => self.pet_value = Some(pet_value),
+            CasteTag::ClutchSize { min, max } => self.clutch_size = Some([min, max]),
+            CasteTag::LitterSize { min, max } => self.litter_size = Some([min, max]),
+            CasteTag::MaxAge { min, max } => self.max_age = Some([min, max]),
             CasteTag::CreatureClass { class } => {
-                self.creature_class.push(class.clone());
+                if let Some(creature_classes) = self.creature_class.as_mut() {
+                    creature_classes.push(class.clone());
+                } else {
+                    self.creature_class = Some(vec![class.clone()]);
+                }
             }
             CasteTag::BodySize { .. } => {
-                self.body_size.push(BodySize::from_value(value));
+                if let Some(body_sizes) = self.body_size.as_mut() {
+                    body_sizes.push(BodySize::from_value(value));
+                } else {
+                    self.body_size = Some(vec![BodySize::from_value(value)]);
+                }
             }
-            CasteTag::Milkable { .. } => self.milkable = Milkable::from_value(value),
-            CasteTag::BabyName { .. } => self.baby_name = SingPlurName::from_value(value),
-            CasteTag::Name { .. } => self.caste_name = Name::from_value(value),
-            CasteTag::ChildName { .. } => self.child_name = SingPlurName::from_value(value),
-            CasteTag::Tile { .. } => self.tile.set_character(value),
-            CasteTag::AltTile { .. } => self.tile.set_alt_character(value),
-            CasteTag::Color { .. } => self.tile.set_color(value),
-            CasteTag::GlowTile { .. } => self.tile.set_glow_character(value),
-            CasteTag::GlowColor { .. } => self.tile.set_glow_color(value),
+            CasteTag::Milkable { .. } => self.milkable = Some(Milkable::from_value(value)),
+            CasteTag::BabyName { .. } => self.baby_name = Some(SingPlurName::from_value(value)),
+            CasteTag::Name { .. } => self.caste_name = Some(Name::from_value(value)),
+            CasteTag::ChildName { .. } => self.child_name = Some(SingPlurName::from_value(value)),
+            CasteTag::Tile { .. } => {
+                if let Some(tile) = self.tile.as_mut() {
+                    tile.set_character(value);
+                } else {
+                    self.tile = Some(Tile::default().with_character(value));
+                }
+            }
+            CasteTag::AltTile { .. } => {
+                if let Some(tile) = self.tile.as_mut() {
+                    tile.set_alt_character(value);
+                } else {
+                    self.tile = Some(Tile::default().with_alt_character(value));
+                }
+            }
+            CasteTag::Color { .. } => {
+                if let Some(tile) = self.tile.as_mut() {
+                    tile.set_color(value);
+                } else {
+                    self.tile = Some(Tile::default().with_color(value));
+                }
+            }
+            CasteTag::GlowTile { .. } => {
+                if let Some(tile) = self.tile.as_mut() {
+                    tile.set_glow_character(value);
+                } else {
+                    self.tile = Some(Tile::default().with_glow_character(value));
+                }
+            }
+            CasteTag::GlowColor { .. } => {
+                if let Some(tile) = self.tile.as_mut() {
+                    tile.set_glow_color(value);
+                } else {
+                    self.tile = Some(Tile::default().with_glow_color(value));
+                }
+            }
             CasteTag::ChangeBodySizePercent { .. } => {
-                self.change_body_size_percentage = value.parse::<u32>().unwrap_or_default();
+                self.change_body_size_percentage = Some(value.parse::<u32>().unwrap_or_default());
             }
             CasteTag::Gait { .. } => {
-                self.gaits.push(Gait::from_value(value));
+                if let Some(gaits) = self.gaits.as_mut() {
+                    gaits.push(Gait::from_value(value));
+                } else {
+                    self.gaits = Some(vec![Gait::from_value(value)]);
+                }
             }
             _ => {}
         }
@@ -191,46 +230,53 @@ impl Caste {
                     );
             return;
         };
-        self.tags.retain(|tag| tag != &tag_and_value);
+        if let Some(tags) = self.tags.as_mut() {
+            tags.retain(|tag| tag != &tag_and_value);
+        }
 
         match tag_and_value {
-            CasteTag::Description { .. } => self.description = String::new(),
-            CasteTag::EggSize { .. } => self.egg_size = 0,
-            CasteTag::Baby { .. } => self.baby = 0,
-            CasteTag::Child { .. } => self.child = 0,
-            CasteTag::Difficulty { .. } => self.difficulty = 0,
-            CasteTag::Grazer { .. } => self.grazer = 0,
-            CasteTag::GrassTrample { .. } => self.grass_trample = 0,
-            CasteTag::LowLightVision { .. } => self.low_light_vision = 0,
-            CasteTag::PopulationRatio { .. } => self.pop_ratio = 0,
-            CasteTag::PetValue { .. } => self.pet_value = 0,
-            CasteTag::ClutchSize { .. } => self.clutch_size = [0, 0],
-            CasteTag::LitterSize { .. } => self.litter_size = [0, 0],
-            CasteTag::MaxAge { .. } => self.max_age = [0, 0],
+            CasteTag::Description { .. } => self.description = None,
+            CasteTag::EggSize { .. } => self.egg_size =None,
+            CasteTag::Baby { .. } => self.baby =None,
+            CasteTag::Child { .. } => self.child = None,
+            CasteTag::Difficulty { .. } => self.difficulty = None,
+            CasteTag::Grazer { .. } => self.grazer = None,
+            CasteTag::GrassTrample { .. } => self.grass_trample = None,
+            CasteTag::LowLightVision { .. } => self.low_light_vision = None,
+            CasteTag::PopulationRatio { .. } => self.pop_ratio = None,
+            CasteTag::PetValue { .. } => self.pet_value = None,
+            CasteTag::ClutchSize { .. } => self.clutch_size = None,
+            CasteTag::LitterSize { .. } => self.litter_size = None,
+            CasteTag::MaxAge { .. } => self.max_age = None,
             CasteTag::CreatureClass { .. } => {
                 // Remove the specific creature class from the creature classes vector
-                self.creature_class.retain(|class| class != value);
+                if let Some(creature_classes) = self.creature_class.as_mut() {
+                    creature_classes.retain(|class| class != value);
+                }
             }
             CasteTag::BodySize { .. } => {
                 // Remove the specific body size from the body sizes vector
-                self.body_size
-                    .retain(|body_size| body_size != &BodySize::from_value(value));
+                if let Some(body_sizes) = self.body_size.as_mut() {
+                    body_sizes.retain(|body_size| body_size != &BodySize::from_value(value));
+                }
             }
-            CasteTag::Milkable { .. } => self.milkable = Milkable::default(),
-            CasteTag::BabyName { .. } => self.baby_name = SingPlurName::default(),
-            CasteTag::Name { .. } => self.caste_name = Name::default(),
-            CasteTag::ChildName { .. } => self.child_name = SingPlurName::default(),
+            CasteTag::Milkable { .. } => self.milkable = None,
+            CasteTag::BabyName { .. } => self.baby_name = None,
+            CasteTag::Name { .. } => self.caste_name = None,
+            CasteTag::ChildName { .. } => self.child_name = None,
             CasteTag::Tile { .. } | //=> self.tile = Tile::default(),
             CasteTag::AltTile { .. } | //=> self.tile = Tile::default(),
             CasteTag::Color { .. } | //=> self.tile = Tile::default(),
             CasteTag::GlowTile { .. } | //=> self.tile = Tile::default(),
-            CasteTag::GlowColor { .. } => self.tile = Tile::default(),
+            CasteTag::GlowColor { .. } => self.tile = None,
             CasteTag::ChangeBodySizePercent { .. } => {
-                self.change_body_size_percentage = 0;
+                self.change_body_size_percentage = None;
             }
             CasteTag::Gait { .. } => {
                 // Remove the specific gait from the gaits vector
-                self.gaits.retain(|gait| gait != &Gait::from_value(value));
+                if let Some(gaits) = self.gaits.as_mut() {
+                gaits.retain(|gait| gait != &Gait::from_value(value));
+                }
             }
             _ => {}
         }
@@ -238,79 +284,97 @@ impl Caste {
 
     pub fn overwrite_caste(&mut self, other: &Caste) {
         // Include any tags from other that aren't in self
-        for tag in &other.tags {
-            if !self.tags.contains(tag) {
-                self.tags.push(tag.clone());
+        if let Some(tags) = &other.tags {
+            for tag in tags {
+                if !self.has_tag(tag) {
+                    self.add_tag(tag.clone());
+                }
             }
         }
         // For any of the other's values that are not default, overwrite self's values
-        if !other.description.is_empty() {
-            self.description = other.description.clone();
+        if let Some(other_description) = &other.description {
+            if !other_description.is_empty() {
+                self.description = Some(other_description.clone());
+            }
         }
-        if !other.baby_name.is_empty() {
-            self.baby_name = other.baby_name.clone();
+        if let Some(other_baby_name) = &other.baby_name {
+            if !other_baby_name.is_empty() {
+                self.baby_name = Some(other_baby_name.clone());
+            }
         }
-        if !other.caste_name.is_empty() {
-            self.caste_name = other.caste_name.clone();
+        if let Some(other_caste_name) = &other.caste_name {
+            if !other_caste_name.is_empty() {
+                self.caste_name = Some(other_caste_name.clone());
+            }
         }
-        if !other.child_name.is_empty() {
-            self.child_name = other.child_name.clone();
+        if let Some(other_child_name) = &other.child_name {
+            if !other_child_name.is_empty() {
+                self.child_name = Some(other_child_name.clone());
+            }
         }
-        if other.clutch_size != [0, 0] {
+        if !serializer_helper::min_max_is_zeroes(&other.clutch_size) {
             self.clutch_size = other.clutch_size;
         }
-        if other.litter_size != [0, 0] {
+        if !serializer_helper::min_max_is_zeroes(&other.litter_size) {
             self.litter_size = other.litter_size;
         }
-        if other.max_age != [0, 0] {
+        if !serializer_helper::min_max_is_zeroes(&other.max_age) {
             self.max_age = other.max_age;
         }
-        if other.baby != 0 {
+        if !serializer_helper::is_zero(&other.baby) {
             self.baby = other.baby;
         }
-        if other.child != 0 {
+        if !serializer_helper::is_zero(&other.child) {
             self.child = other.child;
         }
-        if other.difficulty != 0 {
+        if !serializer_helper::is_zero(&other.difficulty) {
             self.difficulty = other.difficulty;
         }
-        if other.egg_size != 0 {
+        if !serializer_helper::is_zero(&other.egg_size) {
             self.egg_size = other.egg_size;
         }
-        if other.grass_trample != 0 {
+        if !serializer_helper::is_zero(&other.grass_trample) {
             self.grass_trample = other.grass_trample;
         }
-        if other.grazer != 0 {
+        if !serializer_helper::is_zero(&other.grazer) {
             self.grazer = other.grazer;
         }
-        if other.low_light_vision != 0 {
+        if !serializer_helper::is_zero(&other.low_light_vision) {
             self.low_light_vision = other.low_light_vision;
         }
-        if other.pet_value != 0 {
+        if !serializer_helper::is_zero(&other.pet_value) {
             self.pet_value = other.pet_value;
         }
-        if other.pop_ratio != 0 {
+        if !serializer_helper::is_zero(&other.pop_ratio) {
             self.pop_ratio = other.pop_ratio;
         }
-        if other.change_body_size_percentage != 0 {
+        if !serializer_helper::is_zero(&other.change_body_size_percentage) {
             self.change_body_size_percentage = other.change_body_size_percentage;
         }
-        if !other.creature_class.is_empty() {
-            self.creature_class = other.creature_class.clone();
+        if let Some(other_creature_class) = &other.creature_class {
+            if !other_creature_class.is_empty() {
+                self.creature_class = Some(other_creature_class.clone());
+            }
         }
-        if !other.body_size.is_empty() {
-            self.body_size = other.body_size.clone();
+        if let Some(other_body_size) = &other.body_size {
+            if !other_body_size.is_empty() {
+                self.body_size = Some(other_body_size.clone());
+            }
         }
-        if !other.milkable.is_default() {
-            self.milkable = other.milkable.clone();
+        if let Some(other_milkable) = &other.milkable {
+            if !other_milkable.is_default() {
+                self.milkable = Some(other_milkable.clone());
+            }
         }
-        if !other.tile.is_default() {
-            self.tile = other.tile.clone();
+        if let Some(other_tile) = &other.tile {
+            if !other_tile.is_default() {
+                self.tile = Some(other_tile.clone());
+            }
         }
     }
 
     pub fn is_egg_layer(&self) -> bool {
-        self.tags.contains(&CasteTag::LaysEggs)
+        self.has_tag(&CasteTag::LaysEggs)
     }
     pub fn is_milkable(&self) -> bool {
         self.has_tag(&CasteTag::Milkable {
@@ -328,12 +392,155 @@ impl Caste {
     ///
     /// True if the caste has the given tag, false otherwise.
     pub fn has_tag(&self, tag: &CasteTag) -> bool {
-        for t in &self.tags {
-            if std::mem::discriminant(t) == std::mem::discriminant(tag) {
-                return true;
+        if let Some(tags) = &self.tags {
+            for t in tags {
+                if std::mem::discriminant(t) == std::mem::discriminant(tag) {
+                    return true;
+                }
             }
         }
         false
+    }
+
+    /// Function to "clean" the creature. This is used to remove any empty list or strings,
+    /// and to remove any default values. By "removing" it means setting the value to None.
+    ///
+    /// This also will remove the metadata if is_metadata_hidden is true.
+    ///
+    /// Steps:
+    /// - Set any metadata to None if is_metadata_hidden is true.
+    /// - Set any empty string to None.
+    /// - Set any empty list to None.
+    /// - Set any default values to None.
+    pub fn cleaned(&self) -> Self {
+        let mut cleaned = self.clone();
+
+        // Set any empty string to None.
+        if cleaned.description.is_some() && cleaned.description.as_deref() == Some("") {
+            cleaned.description = None;
+        }
+
+        // Set any empty list to None.
+        if cleaned.creature_class.is_some() && cleaned.creature_class.as_deref() == Some(&[]) {
+            cleaned.creature_class = None;
+        }
+
+        // Set any empty list to None.
+        if cleaned.body_size.is_some() && cleaned.body_size.as_deref() == Some(&[]) {
+            cleaned.body_size = None;
+        }
+
+        // Set any default values to None.
+        if serializer_helper::is_zero(&cleaned.baby) {
+            cleaned.baby = None;
+        }
+
+        // Set any default values to None.
+        if serializer_helper::is_zero(&cleaned.child) {
+            cleaned.child = None;
+        }
+
+        // Set any default values to None.
+        if serializer_helper::is_zero(&cleaned.difficulty) {
+            cleaned.difficulty = None;
+        }
+
+        // Set any default values to None.
+        if serializer_helper::is_zero(&cleaned.egg_size) {
+            cleaned.egg_size = None;
+        }
+
+        // Set any default values to None.
+        if serializer_helper::is_zero(&cleaned.grass_trample) {
+            cleaned.grass_trample = None;
+        }
+
+        // Set any default values to None.
+        if serializer_helper::is_zero(&cleaned.grazer) {
+            cleaned.grazer = None;
+        }
+
+        // Set any default values to None.
+        if serializer_helper::is_zero(&cleaned.low_light_vision) {
+            cleaned.low_light_vision = None;
+        }
+
+        // Set any default values to None.
+        if serializer_helper::is_zero(&cleaned.pet_value) {
+            cleaned.pet_value = None;
+        }
+
+        // Set any default values to None.
+        if serializer_helper::is_zero(&cleaned.pop_ratio) {
+            cleaned.pop_ratio = None;
+        }
+
+        // Set any default values to None.
+        if serializer_helper::is_zero(&cleaned.change_body_size_percentage) {
+            cleaned.change_body_size_percentage = None;
+        }
+
+        // Set any default values to None.
+        if serializer_helper::min_max_is_zeroes(&cleaned.clutch_size) {
+            cleaned.clutch_size = None;
+        }
+
+        // Set any default values to None.
+        if serializer_helper::min_max_is_zeroes(&cleaned.litter_size) {
+            cleaned.litter_size = None;
+        }
+
+        // Set any default values to None.
+        if serializer_helper::min_max_is_zeroes(&cleaned.max_age) {
+            cleaned.max_age = None;
+        }
+
+        // Set any default values to None.
+        if let Some(baby_name) = cleaned.baby_name {
+            if baby_name.is_empty() {
+                cleaned.baby_name = None;
+            }
+        }
+
+        // Set any default values to None.
+        if let Some(caste_name) = cleaned.caste_name {
+            if caste_name.is_empty() {
+                cleaned.caste_name = None;
+            }
+        }
+
+        // Set any default values to None.
+        if let Some(child_name) = cleaned.child_name {
+            if child_name.is_empty() {
+                cleaned.child_name = None;
+            }
+        }
+
+        // Set any default values to None.
+        if let Some(milkable) = cleaned.milkable {
+            if milkable.is_default() {
+                cleaned.milkable = None;
+            }
+        }
+
+        // Set any default values to None.
+        if let Some(tile) = cleaned.tile {
+            if tile.is_default() {
+                cleaned.tile = None;
+            }
+        }
+
+        cleaned
+    }
+
+    fn add_tag(&self, tag: CasteTag) {
+        if let Some(tags) = &self.tags.as_mut() {
+            if !tags.contains(&tag) {
+                tags.push(tag);
+            }
+        } else {
+            self.tags = Some(vec![tag]);
+        }
     }
 }
 
@@ -345,52 +552,71 @@ impl Searchable for Caste {
         // Identifier
         vec.push(self.identifier.clone());
         // Name (and child/baby names)
-        vec.extend(self.caste_name.as_vec());
-        vec.extend(self.child_name.as_vec());
-        vec.extend(self.baby_name.as_vec());
+        if let Some(caste_name) = &self.caste_name {
+            vec.extend(caste_name.as_vec());
+        }
+        if let Some(child_name) = &self.child_name {
+            vec.extend(child_name.as_vec());
+        }
+        if let Some(baby_name) = &self.baby_name {
+            vec.extend(baby_name.as_vec());
+        }
         // Creature Class
-        vec.extend(self.creature_class.clone());
+        if let Some(creature_class) = &self.creature_class {
+            vec.extend(creature_class.clone());
+        }
         // Description
-        vec.push(self.description.clone());
+        if let Some(description) = &self.description {
+            vec.push(description.clone());
+        }
         // If egg layer, include egg information
         if self.is_egg_layer() {
             vec.push(String::from("eggs"));
-            vec.push(format!("{}", self.egg_size));
+            if let Some(clutch_size) = self.clutch_size {
+                vec.push(format!("{}-{}", clutch_size[0], clutch_size[1]));
+            }
+            if let Some(egg_size) = self.egg_size {
+                vec.push(format!("{}", egg_size));
+            }
         }
         // If milkable, include milk information
         if self.is_milkable() {
             vec.push(String::from("milk"));
-            vec.extend(self.milkable.as_vec());
+            if let Some(milkable) = &self.milkable {
+                vec.extend(milkable.as_vec());
+            }
         }
-        // If flier, include flyer information
-        if self.tags.contains(&CasteTag::Flier) {
-            vec.push(String::from("flying flies flier"));
-        }
-        // If playable/civilized, include playable information
-        if self.tags.contains(&CasteTag::OutsiderControllable) {
-            vec.push(String::from("playable civilized"));
+        if let Some(tags) = &self.tags {
+            // If flier, include flyer information
+            if tags.contains(&CasteTag::Flier) {
+                vec.push(String::from("flying flies flier"));
+            }
+            // If playable/civilized, include playable information
+            if tags.contains(&CasteTag::OutsiderControllable) {
+                vec.push(String::from("playable civilized"));
+            }
+            // If speaks, include language information
+            // If learns, include learn
+            // If both, include "intelligent"
+            if tags.contains(&CasteTag::Intelligent) || tags.contains(&CasteTag::CanSpeak) {
+                vec.push(String::from("speaks language"));
+            }
+            if tags.contains(&CasteTag::Intelligent) || tags.contains(&CasteTag::CanLearn) {
+                vec.push(String::from("learns"));
+            }
+            if tags.contains(&CasteTag::Intelligent)
+                || (tags.contains(&CasteTag::CanSpeak) && tags.contains(&CasteTag::CanLearn))
+            {
+                vec.push(String::from("intelligent"));
+            }
         }
         // Include difficulty if not 0
-        if self.difficulty > 0 {
-            vec.push(format!("{}", self.difficulty));
+        if let Some(difficulty) = self.difficulty {
+            vec.push(format!("{}", difficulty));
         }
         // Include pet value if not 0
-        if self.pet_value > 0 {
-            vec.push(format!("{}", self.pet_value));
-        }
-        // If speaks, include language information
-        // If learns, include learn
-        // If both, include "intelligent"
-        if self.tags.contains(&CasteTag::Intelligent) || self.tags.contains(&CasteTag::CanSpeak) {
-            vec.push(String::from("speaks language"));
-        }
-        if self.tags.contains(&CasteTag::Intelligent) || self.tags.contains(&CasteTag::CanLearn) {
-            vec.push(String::from("learns"));
-        }
-        if self.tags.contains(&CasteTag::Intelligent)
-            || (self.tags.contains(&CasteTag::CanSpeak) && self.tags.contains(&CasteTag::CanLearn))
-        {
-            vec.push(String::from("intelligent"));
+        if let Some(pet_value) = self.pet_value {
+            vec.push(format!("{}", pet_value));
         }
 
         vec

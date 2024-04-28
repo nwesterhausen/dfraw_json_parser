@@ -30,6 +30,11 @@ pub trait RawObject: RawObjectToAny + Send + Sync + Searchable {
     /// If no name is found, the identifier is returned instead.
     /// This is used for searching.
     fn get_name(&self) -> &str;
+    /// Function to "clean" the creature. This is used to remove any empty list or strings,
+    /// and to remove any default values. By "removing" it means setting the value to None.
+    ///
+    /// This also will remove the metadata if is_metadata_hidden is true.
+    fn clean_self(&mut self);
 }
 
 /// The `RawObjectToAny` trait is implemented by all raw objects. This trait is

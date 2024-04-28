@@ -43,4 +43,38 @@ impl Tile {
             && self.glow_character.is_empty()
             && self.glow_color.is_default()
     }
+
+    pub fn get_character(&self) -> &str {
+        &self.character
+    }
+    pub fn get_alt_character(&self) -> &str {
+        &self.alt_character
+    }
+    pub fn get_color(&self) -> &Color {
+        &self.color
+    }
+    pub fn get_glow_color(&self) -> &Color {
+        &self.glow_color
+    }
+
+    pub fn with_character(mut self, character: &str) -> Self {
+        self.set_character(character);
+        self
+    }
+    pub fn with_alt_character(mut self, character: &str) -> Self {
+        self.set_alt_character(character);
+        self
+    }
+    pub fn with_color(mut self, color: &str) -> Self {
+        self.set_color(color);
+        self
+    }
+    pub fn with_glow_color(mut self, color: &str) -> Self {
+        self.set_glow_color(color);
+        self
+    }
+    pub fn with_glow_character(mut self, character: &str) -> Self {
+        self.set_glow_character(character);
+        self
+    }
 }

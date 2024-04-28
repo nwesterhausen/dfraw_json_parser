@@ -105,4 +105,45 @@ impl Metadata {
     pub fn get_module_object_id(&self) -> &str {
         &self.module_object_id
     }
+
+    /// Set the object_type of the metadata at creation.
+    pub fn with_object_type(mut self, object_type: ObjectType) -> Self {
+        self.object_type = object_type;
+        self
+    }
+    /// Set the raw_module_location of the metadata at creation.
+    pub fn with_raw_module_location(mut self, raw_module_location: RawModuleLocation) -> Self {
+        self.raw_module_location = raw_module_location;
+        self
+    }
+    /// Set the hidden status of the metadata at creation.
+    pub fn with_hidden(mut self, hidden: bool) -> Self {
+        self.hidden = hidden;
+        self
+    }
+    /// Set the raw_identifier of the metadata at creation.
+    pub fn with_raw_identifier(mut self, raw_identifier: String) -> Self {
+        self.raw_identifier = raw_identifier;
+        self
+    }
+    /// Set the raw_file_path of the metadata at creation.
+    pub fn with_raw_file_path(mut self, raw_file_path: String) -> Self {
+        self.raw_file_path = raw_file_path;
+        self
+    }
+    /// Set the module_name of the metadata at creation.
+    pub fn with_module_name(mut self, module_name: String) -> Self {
+        self.module_name = module_name;
+        self
+    }
+    /// Set the module_version of the metadata at creation.
+    pub fn with_module_version(mut self, module_version: String) -> Self {
+        self.module_version = module_version;
+        self
+    }
+    /// Set the module_object_id of the metadata at creation.
+    pub fn with_module_object_id(mut self, module_object_id: String) -> Self {
+        self.module_object_id = module_object_id;
+        self
+    }
 }
