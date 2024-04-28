@@ -24,14 +24,12 @@ use super::{
 #[serde(rename_all = "camelCase")]
 pub struct Material {
     /// The type of the material is also the trigger to start tracking a material
-    //#[serde(skip_serializing_if = "MaterialType::is_default")]
     material_type: Option<MaterialType>,
     /// The material might have a name, but its more likely that there is only an identifier to
     /// refer to another creature/plant/reaction, which are listed elsewhere.
     /// If there is no name provided, then it is a special hardcoded case, e.g. magma or green glass.
     name: Option<String>,
     /// For the coal tag, it specifies the type of fuel that can be used. It will never be None.
-    //#[serde(skip_serializing_if = "FuelType::is_default")]
     fuel_type: Option<FuelType>,
     /// Linked creature identifier (and then material_name might be "skin", like for "CREATURE_MAT:DWARF:SKIN")
     creature_identifier: Option<String>,
@@ -50,22 +48,16 @@ pub struct Material {
     /// Usage tags
     usage: Option<Vec<MaterialUsage>>,
 
-    //#[serde(skip_serializing_if = "serializer_helper::is_one")]
     value: Option<u32>,
 
-    //#[serde(skip_serializing_if = "Color::is_default")]
     color: Option<Color>,
 
-    //#[serde(skip_serializing_if = "StateName::is_empty")]
     state_names: Option<StateName>,
 
-    //#[serde(skip_serializing_if = "StateName::is_empty")]
     state_adjectives: Option<StateName>,
 
-    //#[serde(skip_serializing_if = "StateName::is_empty")]
     state_colors: Option<StateName>,
 
-    //#[serde(skip_serializing_if = "Temperatures::is_empty")]
     temperatures: Option<Temperatures>,
 
     /// Catch-all for remaining tags we identify but don't do anything with... yet.
@@ -74,22 +66,16 @@ pub struct Material {
     // Syndromes attached to materials..
     syndromes: Option<Vec<Syndrome>>,
     // Material Mechanical Properties
-    //#[serde(skip_serializing_if = "MaterialMechanics::is_empty")]
     mechanical_properties: Option<MaterialMechanics>,
     // Technically, the material mechanics wouldn't apply to liquid or gaseous forms
-    //#[serde(skip_serializing_if = "serializer_helper::is_zero_i32")]
     liquid_density: Option<i32>,
-    //#[serde(skip_serializing_if = "serializer_helper::is_zero_i32")]
     molar_mass: Option<i32>,
 
     // Colors
-    //#[serde(skip_serializing_if = "Color::is_default")]
     build_color: Option<Color>,
-    //#[serde(skip_serializing_if = "Color::is_default")]
     display_color: Option<Color>,
 
     // Display
-    //#[serde(skip_serializing_if = "Tile::is_default")]
     tile: Option<Tile>,
     item_symbol: Option<String>,
 }

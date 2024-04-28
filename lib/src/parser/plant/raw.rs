@@ -36,10 +36,8 @@ pub struct Plant {
 
     // Environment Tokens
     /// Default [0, 0] (aboveground)
-    //#[serde(skip_serializing_if = "serializer_helper::min_max_is_zeroes")]
     underground_depth: Option<[u32; 2]>,
     /// Default frequency is 50
-    //#[serde(skip_serializing_if = "serializer_helper::is_default_frequency")]
     frequency: Option<u32>,
     /// List of biomes this plant can grow in
     biomes: Option<Vec<biome::Token>>,

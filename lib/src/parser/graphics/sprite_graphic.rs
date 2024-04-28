@@ -19,19 +19,12 @@ pub struct SpriteGraphic {
     primary_condition: Condition,
     tile_page_id: String,
     offset: Dimensions,
-    //#[serde(skip_serializing_if = "ColorModification::is_default")]
     color: Option<ColorModification>,
-    //#[serde(skip_serializing_if = "serializer_helper::is_false")]
     large_image: Option<bool>,
-    //#[serde(skip_serializing_if = "Dimensions::is_empty")]
     offset2: Option<Dimensions>,
-    //#[serde(skip_serializing_if = "Condition::is_none")]
     secondary_condition: Option<Condition>,
-    //#[serde(skip_serializing_if = "serializer_helper::is_zero")]
     color_pallet_swap: Option<u32>,
-    //#[serde(skip_serializing_if = "String::is_empty")]
     target_identifier: Option<String>,
-    //#[serde(skip_serializing_if = "String::is_empty")]
     extra_descriptor: Option<String>,
 }
 

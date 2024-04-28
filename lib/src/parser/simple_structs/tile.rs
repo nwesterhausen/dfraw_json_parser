@@ -10,14 +10,10 @@ use super::color::Color;
 /// Representation of a character tile (literally a single character) that is used in DF Classic
 pub struct Tile {
     character: String,
-    #[serde(skip_serializing_if = "String::is_empty")]
-    alt_character: String,
-    #[serde(skip_serializing_if = "Color::is_default")]
-    color: Color,
-    #[serde(skip_serializing_if = "String::is_empty")]
-    glow_character: String,
-    #[serde(skip_serializing_if = "Color::is_default")]
-    glow_color: Color,
+    alt_character: Option<String>,
+    color: Option<Color>,
+    glow_character: Option<String>,
+    glow_color: Option<Color>,
 }
 
 impl Tile {
@@ -25,36 +21,52 @@ impl Tile {
         self.character = String::from(character);
     }
     pub fn set_alt_character(&mut self, character: &str) {
-        self.alt_character = String::from(character);
+        self.alt_character = Some(String::from(character));
     }
     pub fn set_color(&mut self, color: &str) {
-        self.color = Color::from_value(color);
+        self.color = Some(Color::from_value(color));
     }
     pub fn set_glow_color(&mut self, color: &str) {
-        self.glow_color = Color::from_value(color);
+        self.glow_color = Some(Color::from_value(color));
     }
     pub fn set_glow_character(&mut self, character: &str) {
-        self.glow_character = String::from(character);
+        self.glow_character = Some(String::from(character));
     }
     pub fn is_default(&self) -> bool {
         self.character.is_empty()
-            && self.alt_character.is_empty()
-            && self.color.is_default()
-            && self.glow_character.is_empty()
-            && self.glow_color.is_default()
+            && self.alt_character.is_none()
+            && self.color.is_none()
+            && self.glow_character.is_none()
+            && self.glow_color.is_none()
     }
 
     pub fn get_character(&self) -> &str {
         &self.character
     }
     pub fn get_alt_character(&self) -> &str {
-        &self.alt_character
+        if let Some(alt_character) = &self.alt_character {
+            alt_character
+        } else {
+            ""
+        }
     }
-    pub fn get_color(&self) -> &Color {
-        &self.color
+    #[must_use]
+    pub fn get_color(&self) -> Color {
+        if let Some(color) = &self.color {
+            color.clone()
+        } else {
+            tracing::info!("Had to coerce a default color for a tile");
+            Color::default()
+        }
     }
-    pub fn get_glow_color(&self) -> &Color {
-        &self.glow_color
+    #[must_use]
+    pub fn get_glow_color(&self) -> Color {
+        if let Some(color) = &self.glow_color {
+            color.clone()
+        } else {
+            tracing::info!("Had to coerce a default color for a tile");
+            Color::default()
+        }
     }
 
     #[must_use]

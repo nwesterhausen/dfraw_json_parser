@@ -24,11 +24,8 @@ pub struct Inorganic {
     metal_ore_chance: Option<Vec<(String, u8)>>,
     thread_metal_chance: Option<Vec<(String, u8)>>,
 
-    //#[serde(skip_serializing_if = "EnvironmentClass::is_default")]
     environment_class: Option<EnvironmentClass>,
-    //#[serde(skip_serializing_if = "InclusionType::is_default")]
     environment_inclusion_type: Option<InclusionType>,
-    //#[serde(skip_serializing_if = "serializer_helper::is_zero")]
     environment_inclusion_frequency: Option<u32>,
     environment_class_specific: Option<Vec<String>>,
 

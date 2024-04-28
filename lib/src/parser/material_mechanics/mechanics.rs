@@ -11,23 +11,15 @@ use tracing::warn;
 /// Represents the specific yield, fracture, and elasticity of a material for the various
 /// types of mechanical stress.
 pub struct Mechanics {
-    //#[serde(skip_serializing_if = "Properties::is_empty")]
     impact: Option<Properties>,
-    //#[serde(skip_serializing_if = "Properties::is_empty")]
     compressive: Option<Properties>,
-    //#[serde(skip_serializing_if = "Properties::is_empty")]
     tensile: Option<Properties>,
-    //#[serde(skip_serializing_if = "Properties::is_empty")]
     torsion: Option<Properties>,
-    //#[serde(skip_serializing_if = "Properties::is_empty")]
     shear: Option<Properties>,
-    //#[serde(skip_serializing_if = "Properties::is_empty")]
     bending: Option<Properties>,
 
-    //#[serde(skip_serializing_if = "serializer_helper::is_zero_i32")]
     max_edge: Option<i32>,
 
-    //#[serde(skip_serializing_if = "serializer_helper::is_zero_i32")]
     solid_density: Option<i32>,
 }
 
