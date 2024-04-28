@@ -180,7 +180,7 @@ impl Creature {
         if self.select_creature_variation.is_none() {
             self.select_creature_variation = Some(Vec::new());
         }
-        if let Some(select_creature_variation) = &self.select_creature_variation.as_mut() {
+        if let Some(select_creature_variation) = self.select_creature_variation.as_mut() {
             select_creature_variation.push(select_creature);
         } else {
             warn!(
@@ -279,10 +279,10 @@ impl Creature {
     ///
     /// Returns a vector of `object_id`s.
     pub fn get_child_object_ids(&self) -> Vec<&str> {
-        if let Some(select_creature_variation) = self.select_creature_variation {
+        if let Some(select_creature_variation) = &self.select_creature_variation {
             select_creature_variation
                 .iter()
-                .map(|select_creature| select_creature.get_object_id())
+                .map(crate::RawObject::get_object_id)
                 .collect()
         } else {
             Vec::new()
@@ -406,19 +406,31 @@ impl Creature {
 
     /// Get a list of tags that belong to this creature.
     pub fn get_tags(&self) -> Vec<CreatureTag> {
-        if let Some(tags) = self.tags {
-            tags
-        } else {
-            Vec::new()
+        if self.tags.is_none() {
+            return Vec::new();
         }
+
+        let mut ret_tags = Vec::new();
+        if let Some(tags) = &self.tags {
+            for tag in tags {
+                ret_tags.push(tag.clone());
+            }
+        }
+        ret_tags
     }
     /// Get the biomes the creature can be found in.
     pub fn get_biomes(&self) -> Vec<biome::Token> {
-        if let Some(biomes) = self.biomes {
-            biomes
-        } else {
-            Vec::new()
+        if self.biomes.is_none() {
+            return Vec::new();
         }
+
+        let mut ret_biomes = Vec::new();
+        if let Some(biomes) = &self.biomes {
+            for biome in biomes {
+                ret_biomes.push(biome.clone());
+            }
+        }
+        ret_biomes
     }
     /// Set the name of the creature.
     ///
@@ -551,7 +563,8 @@ impl Creature {
     /// Function to "clean" the creature. This is used to remove any empty list or strings,
     /// and to remove any default values. By "removing" it means setting the value to None.
     ///
-    /// This also will remove the metadata if is_metadata_hidden is true.
+    /// This also will remove the metadata if `is_metadata_hidden` is true.
+    #[must_use]
     pub fn cleaned(&self) -> Self {
         let mut cleaned = self.clone();
 
@@ -577,7 +590,7 @@ impl Creature {
         }
 
         // Remove any default values
-        if serializer_helper::is_default_frequency(&cleaned.frequency) {
+        if serializer_helper::is_default_frequency(cleaned.frequency) {
             cleaned.frequency = None;
         }
         if serializer_helper::min_max_is_ones(&cleaned.cluster_number) {
@@ -612,15 +625,15 @@ impl Creature {
 
 #[typetag::serde]
 impl RawObject for Creature {
-    fn get_metadata(&self) -> &RawMetadata {
+    fn get_metadata(&self) -> RawMetadata {
         if let Some(metadata) = &self.metadata {
-            metadata
+            metadata.clone()
         } else {
             warn!(
                 "Creature::get_metadata: ({}) metadata is None",
                 self.identifier
             );
-            &RawMetadata::default()
+            RawMetadata::default()
                 .with_object_type(ObjectType::Creature)
                 .with_hidden(true)
         }
@@ -637,6 +650,7 @@ impl RawObject for Creature {
     fn get_type(&self) -> &ObjectType {
         &ObjectType::Creature
     }
+    #[allow(clippy::too_many_lines)]
     fn parse_tag(&mut self, key: &str, value: &str) {
         if CASTE_TOKENS.contains_key(key) {
             self.castes.last_mut().unwrap().parse_tag(key, value);
@@ -697,7 +711,7 @@ impl RawObject for Creature {
                 self.cluster_number = Some([min, max]);
             }
             CreatureTag::CopyTagsFrom { creature } => {
-                self.copy_tags_from = Some(String::from(creature));
+                self.copy_tags_from = Some(creature);
             }
             CreatureTag::ApplyCreatureVariation { .. } => {
                 if let Some(apply_creature_variation) = self.apply_creature_variation.as_mut() {

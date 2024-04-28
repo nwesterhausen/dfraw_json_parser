@@ -87,13 +87,14 @@ impl CreatureVariation {
     /// Function to "clean" the creature. This is used to remove any empty list or strings,
     /// and to remove any default values. By "removing" it means setting the value to None.
     ///
-    /// This also will remove the metadata if is_metadata_hidden is true.
+    /// This also will remove the metadata if `is_metadata_hidden` is true.
     ///
     /// Steps for all "Option" fields:
-    /// - Set any metadata to None if is_metadata_hidden is true.
+    /// - Set any metadata to None if `is_metadata_hidden` is true.
     /// - Set any empty string to None.
     /// - Set any empty list to None.
     /// - Set any default values to None.
+    #[must_use]
     pub fn cleaned(&self) -> Self {
         let mut cleaned = self.clone();
 
@@ -110,12 +111,12 @@ impl CreatureVariation {
 
 #[typetag::serde]
 impl RawObject for CreatureVariation {
-    fn get_metadata(&self) -> &RawMetadata {
+    fn get_metadata(&self) -> RawMetadata {
         if let Some(metadata) = &self.metadata {
-            metadata
+            metadata.clone()
         } else {
             warn!("Metadata is missing for {}", self.get_identifier());
-            &RawMetadata::default()
+            RawMetadata::default()
                 .with_object_type(ObjectType::CreatureVariation)
                 .with_hidden(true)
         }

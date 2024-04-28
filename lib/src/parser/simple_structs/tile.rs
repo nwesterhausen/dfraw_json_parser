@@ -57,22 +57,27 @@ impl Tile {
         &self.glow_color
     }
 
+    #[must_use]
     pub fn with_character(mut self, character: &str) -> Self {
         self.set_character(character);
         self
     }
+    #[must_use]
     pub fn with_alt_character(mut self, character: &str) -> Self {
         self.set_alt_character(character);
         self
     }
+    #[must_use]
     pub fn with_color(mut self, color: &str) -> Self {
         self.set_color(color);
         self
     }
+    #[must_use]
     pub fn with_glow_color(mut self, color: &str) -> Self {
         self.set_glow_color(color);
         self
     }
+    #[must_use]
     pub fn with_glow_character(mut self, character: &str) -> Self {
         self.set_glow_character(character);
         self

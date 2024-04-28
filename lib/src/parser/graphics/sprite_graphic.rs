@@ -694,13 +694,14 @@ impl SpriteGraphic {
     /// Function to "clean" the creature. This is used to remove any empty list or strings,
     /// and to remove any default values. By "removing" it means setting the value to None.
     ///
-    /// This also will remove the metadata if is_metadata_hidden is true.
+    /// This also will remove the metadata if `is_metadata_hidden` is true.
     ///
     /// Steps:
-    /// - Set any metadata to None if is_metadata_hidden is true.
+    /// - Set any metadata to None if `is_metadata_hidden` is true.
     /// - Set any empty string to None.
     /// - Set any empty list to None.
     /// - Set any default values to None.
+    #[must_use]
     pub fn cleaned(&self) -> Self {
         let mut cleaned = self.clone();
 
@@ -740,7 +741,7 @@ impl SpriteGraphic {
         }
 
         // Set any default values to None.
-        if serializer_helper::is_zero(&cleaned.color_pallet_swap) {
+        if serializer_helper::is_zero(cleaned.color_pallet_swap) {
             cleaned.color_pallet_swap = None;
         }
 

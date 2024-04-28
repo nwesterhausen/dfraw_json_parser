@@ -52,6 +52,7 @@ impl PlantGrowth {
             ..PlantGrowth::default()
         }
     }
+    #[allow(clippy::too_many_lines)]
     pub fn parse_tag(&mut self, key: &str, value: &str) {
         let Some(tag) = GROWTH_TOKENS.get(key) else {
             warn!(
@@ -165,13 +166,14 @@ impl PlantGrowth {
     /// Function to "clean" the raw. This is used to remove any empty list or strings,
     /// and to remove any default values. By "removing" it means setting the value to None.
     ///
-    /// This also will remove the metadata if is_metadata_hidden is true.
+    /// This also will remove the metadata if `is_metadata_hidden` is true.
     ///
     /// Steps for all "Option" fields:
-    /// - Set any metadata to None if is_metadata_hidden is true.
+    /// - Set any metadata to None if `is_metadata_hidden` is true.
     /// - Set any empty string to None.
     /// - Set any empty list to None.
     /// - Set any default values to None.
+    #[must_use]
     pub fn cleaned(&self) -> Self {
         let mut cleaned = self.clone();
 
@@ -190,7 +192,7 @@ impl PlantGrowth {
         if serializer_helper::is_default_trunk_height_percentage(&cleaned.trunk_height_percentage) {
             cleaned.trunk_height_percentage = None;
         }
-        if serializer_helper::is_default_growth_density(&cleaned.density) {
+        if serializer_helper::is_default_growth_density(cleaned.density) {
             cleaned.density = None;
         }
         if serializer_helper::is_default_growth_timing(&cleaned.timing) {

@@ -63,13 +63,15 @@ impl Position {
     /// Function to "clean" the raw. This is used to remove any empty list or strings,
     /// and to remove any default values. By "removing" it means setting the value to None.
     ///
-    /// This also will remove the metadata if is_metadata_hidden is true.
+    /// This also will remove the metadata if `is_metadata_hidden` is true.
     ///
     /// Steps for all "Option" fields:
-    /// - Set any metadata to None if is_metadata_hidden is true.
+    /// - Set any metadata to None if `is_metadata_hidden` is true.
     /// - Set any empty string to None.
     /// - Set any empty list to None.
     /// - Set any default values to None.
+    #[allow(clippy::too_many_lines)]
+    #[must_use]
     pub fn cleaned(&self) -> Self {
         let mut cleaned = self.clone();
 
@@ -104,7 +106,7 @@ impl Position {
                 cleaned.commander = None;
             }
         }
-        if serializer_helper::is_zero_u32(&cleaned.demand_max) {
+        if serializer_helper::is_zero_u32(cleaned.demand_max) {
             cleaned.demand_max = None;
         }
         if let Some(execution_skill) = &cleaned.execution_skill {
@@ -117,7 +119,7 @@ impl Position {
                 cleaned.gender = None;
             }
         }
-        if serializer_helper::is_zero_u32(&cleaned.land_holder) {
+        if serializer_helper::is_zero_u32(cleaned.land_holder) {
             cleaned.land_holder = None;
         }
         if let Some(land_name) = &cleaned.land_name {
@@ -125,7 +127,7 @@ impl Position {
                 cleaned.land_name = None;
             }
         }
-        if serializer_helper::is_zero_u32(&cleaned.mandate_max) {
+        if serializer_helper::is_zero_u32(cleaned.mandate_max) {
             cleaned.mandate_max = None;
         }
         if let Some(name) = &cleaned.name {
@@ -143,10 +145,10 @@ impl Position {
                 cleaned.name_female = None;
             }
         }
-        if serializer_helper::is_zero_i32(&cleaned.number) {
+        if serializer_helper::is_zero_i32(cleaned.number) {
             cleaned.number = None;
         }
-        if serializer_helper::is_zero_i32(&cleaned.precedence) {
+        if serializer_helper::is_zero_i32(cleaned.precedence) {
             cleaned.precedence = None;
         }
         if let Some(rejected_creatures) = &cleaned.rejected_creatures {
@@ -159,31 +161,31 @@ impl Position {
                 cleaned.replaced_by = None;
             }
         }
-        if serializer_helper::is_zero_u32(&cleaned.required_bedroom) {
+        if serializer_helper::is_zero_u32(cleaned.required_bedroom) {
             cleaned.required_bedroom = None;
         }
-        if serializer_helper::is_zero_u32(&cleaned.required_boxes) {
+        if serializer_helper::is_zero_u32(cleaned.required_boxes) {
             cleaned.required_boxes = None;
         }
-        if serializer_helper::is_zero_u32(&cleaned.required_cabinets) {
+        if serializer_helper::is_zero_u32(cleaned.required_cabinets) {
             cleaned.required_cabinets = None;
         }
-        if serializer_helper::is_zero_u32(&cleaned.required_dining) {
+        if serializer_helper::is_zero_u32(cleaned.required_dining) {
             cleaned.required_dining = None;
         }
-        if serializer_helper::is_zero_u32(&cleaned.required_office) {
+        if serializer_helper::is_zero_u32(cleaned.required_office) {
             cleaned.required_office = None;
         }
-        if serializer_helper::is_zero_u32(&cleaned.required_racks) {
+        if serializer_helper::is_zero_u32(cleaned.required_racks) {
             cleaned.required_racks = None;
         }
-        if serializer_helper::is_zero_u32(&cleaned.required_stands) {
+        if serializer_helper::is_zero_u32(cleaned.required_stands) {
             cleaned.required_stands = None;
         }
-        if serializer_helper::is_zero_u32(&cleaned.required_tomb) {
+        if serializer_helper::is_zero_u32(cleaned.required_tomb) {
             cleaned.required_tomb = None;
         }
-        if serializer_helper::is_zero_u32(&cleaned.requires_population) {
+        if serializer_helper::is_zero_u32(cleaned.requires_population) {
             cleaned.requires_population = None;
         }
         if let Some(responsibilities) = &cleaned.responsibilities {
@@ -250,7 +252,7 @@ impl Position {
             PositionToken::Spouse => self.spouse = Some(SingPlurName::from_value(value)),
             PositionToken::NameFemale => self.name_female = Some(SingPlurName::from_value(value)),
             PositionToken::SpouseFemale => {
-                self.spouse_female = Some(SingPlurName::from_value(value))
+                self.spouse_female = Some(SingPlurName::from_value(value));
             }
             PositionToken::NameMale => self.name_male = Some(SingPlurName::from_value(value)),
             PositionToken::SpouseMale => self.spouse_male = Some(SingPlurName::from_value(value)),
@@ -277,7 +279,7 @@ impl Position {
                 self.required_bedroom = Some(value.parse().unwrap_or_default());
             }
             PositionToken::RequiredBoxes => {
-                self.required_boxes = Some(value.parse().unwrap_or_default())
+                self.required_boxes = Some(value.parse().unwrap_or_default());
             }
             PositionToken::RequiredCabinets => {
                 self.required_cabinets = Some(value.parse().unwrap_or_default());
@@ -289,13 +291,13 @@ impl Position {
                 self.required_office = Some(value.parse().unwrap_or_default());
             }
             PositionToken::RequiredRacks => {
-                self.required_racks = Some(value.parse().unwrap_or_default())
+                self.required_racks = Some(value.parse().unwrap_or_default());
             }
             PositionToken::RequiredStands => {
                 self.required_stands = Some(value.parse().unwrap_or_default());
             }
             PositionToken::RequiredTomb => {
-                self.required_tomb = Some(value.parse().unwrap_or_default())
+                self.required_tomb = Some(value.parse().unwrap_or_default());
             }
             PositionToken::RequiresPopulation => {
                 self.requires_population = Some(value.parse().unwrap_or_default());

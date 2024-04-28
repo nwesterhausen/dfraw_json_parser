@@ -9,7 +9,7 @@ use crate::{ObjectType, RawMetadata, Searchable};
 /// stored in a single vector. It also provides a common interface for parsing.
 pub trait RawObject: RawObjectToAny + Send + Sync + Searchable {
     /// Get the metadata for the raw.
-    fn get_metadata(&self) -> &RawMetadata;
+    fn get_metadata(&self) -> RawMetadata;
     /// Get the identifier of the raw.
     fn get_identifier(&self) -> &str;
     /// Returns true if the raw is empty.

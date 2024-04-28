@@ -399,7 +399,7 @@ impl Material {
                 // Colors
                 MaterialProperty::BuildColor => self.build_color = Some(Color::from_value(value)),
                 MaterialProperty::DisplayColor => {
-                    self.display_color = Some(Color::from_value(value))
+                    self.display_color = Some(Color::from_value(value));
                 }
 
                 MaterialProperty::Tile => {
@@ -481,13 +481,15 @@ impl Material {
     /// Function to "clean" the raw. This is used to remove any empty list or strings,
     /// and to remove any default values. By "removing" it means setting the value to None.
     ///
-    /// This also will remove the metadata if is_metadata_hidden is true.
+    /// This also will remove the metadata if `is_metadata_hidden` is true.
     ///
     /// Steps for all "Option" fields:
-    /// - Set any metadata to None if is_metadata_hidden is true.
+    /// - Set any metadata to None if `is_metadata_hidden` is true.
     /// - Set any empty string to None.
     /// - Set any empty list to None.
     /// - Set any default values to None.
+    #[allow(clippy::too_many_lines)]
+    #[must_use]
     pub fn cleaned(&self) -> Self {
         let mut cleaned = self.clone();
 
@@ -541,7 +543,7 @@ impl Material {
                 cleaned.usage = None;
             }
         }
-        if serializer_helper::is_one(&cleaned.value) {
+        if serializer_helper::is_one(cleaned.value) {
             cleaned.value = None;
         }
         if let Some(color) = &cleaned.color {
@@ -575,8 +577,14 @@ impl Material {
             }
         }
         if let Some(syndromes) = &cleaned.syndromes {
-            if syndromes.is_empty() {
+            let mut cleaned_syndromes = Vec::new();
+            for syndrome in syndromes {
+                cleaned_syndromes.push(syndrome.cleaned());
+            }
+            if cleaned_syndromes.is_empty() {
                 cleaned.syndromes = None;
+            } else {
+                cleaned.syndromes = Some(cleaned_syndromes);
             }
         }
         if let Some(mechanical_properties) = &cleaned.mechanical_properties {
@@ -584,10 +592,10 @@ impl Material {
                 cleaned.mechanical_properties = None;
             }
         }
-        if serializer_helper::is_zero_i32(&cleaned.liquid_density) {
+        if serializer_helper::is_zero_i32(cleaned.liquid_density) {
             cleaned.liquid_density = None;
         }
-        if serializer_helper::is_zero_i32(&cleaned.molar_mass) {
+        if serializer_helper::is_zero_i32(cleaned.molar_mass) {
             cleaned.molar_mass = None;
         }
         if let Some(build_color) = &cleaned.build_color {

@@ -43,6 +43,7 @@ impl Mechanics {
             && self.shear.is_none()
             && self.bending.is_none()
     }
+    #[allow(clippy::too_many_lines)]
     pub fn parse_tag(&mut self, key: &PropertyToken, value: &str) {
         match key {
             PropertyToken::ImpactYield => {
@@ -205,13 +206,14 @@ impl Mechanics {
     /// Function to "clean" the raw. This is used to remove any empty list or strings,
     /// and to remove any default values. By "removing" it means setting the value to None.
     ///
-    /// This also will remove the metadata if is_metadata_hidden is true.
+    /// This also will remove the metadata if `is_metadata_hidden` is true.
     ///
     /// Steps for all "Option" fields:
-    /// - Set any metadata to None if is_metadata_hidden is true.
+    /// - Set any metadata to None if `is_metadata_hidden` is true.
     /// - Set any empty string to None.
     /// - Set any empty list to None.
     /// - Set any default values to None.
+    #[must_use]
     pub fn cleaned(&self) -> Self {
         let mut cleaned = self.clone();
 
@@ -246,10 +248,10 @@ impl Mechanics {
             }
         }
 
-        if serializer_helper::is_zero_i32(&cleaned.max_edge) {
+        if serializer_helper::is_zero_i32(cleaned.max_edge) {
             cleaned.max_edge = None;
         }
-        if serializer_helper::is_zero_i32(&cleaned.solid_density) {
+        if serializer_helper::is_zero_i32(cleaned.solid_density) {
             cleaned.solid_density = None;
         }
 

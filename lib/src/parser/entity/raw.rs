@@ -123,13 +123,15 @@ impl Entity {
     /// Function to "clean" the creature. This is used to remove any empty list or strings,
     /// and to remove any default values. By "removing" it means setting the value to None.
     ///
-    /// This also will remove the metadata if is_metadata_hidden is true.
+    /// This also will remove the metadata if `is_metadata_hidden` is true.
     ///
     /// Steps:
-    /// - Set the metadata to None if is_metadata_hidden is true.
+    /// - Set the metadata to None if `is_metadata_hidden` is true.
     /// - Set any empty string to None.
     /// - Set any empty list to None.
     /// - Set any default values to None.
+    #[allow(clippy::too_many_lines)]
+    #[must_use]
     pub fn cleaned(&self) -> Self {
         let mut cleaned = self.clone();
 
@@ -170,13 +172,13 @@ impl Entity {
             cleaned.world_constructions = None;
         }
 
-        if serializer_helper::is_500_u32(&cleaned.max_pop_number) {
+        if serializer_helper::is_500_u32(cleaned.max_pop_number) {
             cleaned.max_pop_number = None;
         }
-        if serializer_helper::is_50_u32(&cleaned.max_site_pop_number) {
+        if serializer_helper::is_50_u32(cleaned.max_site_pop_number) {
             cleaned.max_site_pop_number = None;
         }
-        if serializer_helper::is_3_u32(&cleaned.max_starting_civ_number) {
+        if serializer_helper::is_3_u32(cleaned.max_starting_civ_number) {
             cleaned.max_starting_civ_number = None;
         }
 
@@ -256,26 +258,26 @@ impl Entity {
             cleaned.active_season = None;
         }
 
-        if serializer_helper::is_zero_f32(&cleaned.banditry) {
+        if serializer_helper::is_zero_f32(cleaned.banditry) {
             cleaned.banditry = None;
         }
 
-        if serializer_helper::is_zero_u8(&cleaned.progress_trigger_population) {
+        if serializer_helper::is_zero_u8(cleaned.progress_trigger_population) {
             cleaned.progress_trigger_population = None;
         }
-        if serializer_helper::is_zero_u8(&cleaned.progress_trigger_production) {
+        if serializer_helper::is_zero_u8(cleaned.progress_trigger_production) {
             cleaned.progress_trigger_production = None;
         }
-        if serializer_helper::is_zero_u8(&cleaned.progress_trigger_trade) {
+        if serializer_helper::is_zero_u8(cleaned.progress_trigger_trade) {
             cleaned.progress_trigger_trade = None;
         }
-        if serializer_helper::is_zero_u8(&cleaned.progress_trigger_population_siege) {
+        if serializer_helper::is_zero_u8(cleaned.progress_trigger_population_siege) {
             cleaned.progress_trigger_population_siege = None;
         }
-        if serializer_helper::is_zero_u8(&cleaned.progress_trigger_production_siege) {
+        if serializer_helper::is_zero_u8(cleaned.progress_trigger_production_siege) {
             cleaned.progress_trigger_production_siege = None;
         }
-        if serializer_helper::is_zero_u8(&cleaned.progress_trigger_trade_siege) {
+        if serializer_helper::is_zero_u8(cleaned.progress_trigger_trade_siege) {
             cleaned.progress_trigger_trade_siege = None;
         }
 
@@ -332,7 +334,7 @@ impl Entity {
             cleaned.stone_shape = None;
         }
 
-        if serializer_helper::is_zero_u32(&cleaned.source_hfid) {
+        if serializer_helper::is_zero_u32(cleaned.source_hfid) {
             cleaned.source_hfid = None;
         }
 
@@ -345,12 +347,14 @@ impl RawObject for Entity {
     fn get_object_id(&self) -> &str {
         self.object_id.as_str()
     }
-    fn get_metadata(&self) -> &RawMetadata {
+    fn get_metadata(&self) -> RawMetadata {
         if let Some(metadata) = &self.metadata {
-            metadata
+            metadata.clone()
         } else {
             warn!("Entity::get_metadata: no metadata for {}", self.identifier);
-            &RawMetadata::default()
+            RawMetadata::default()
+                .with_object_type(ObjectType::Entity)
+                .with_hidden(true)
         }
     }
     fn get_identifier(&self) -> &str {

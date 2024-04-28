@@ -98,6 +98,7 @@ impl Graphic {
             );
         }
     }
+    #[allow(clippy::too_many_lines)]
     pub fn parse_sprite_from_tag(&mut self, key: &str, value: &str, graphic_type: GraphicType) {
         // Check if key is LAYER_SET meaning a new layer group is starting
         if let "LAYER_SET" = key {
@@ -257,13 +258,14 @@ impl Graphic {
     /// Function to "clean" the creature. This is used to remove any empty list or strings,
     /// and to remove any default values. By "removing" it means setting the value to None.
     ///
-    /// This also will remove the metadata if is_metadata_hidden is true.
+    /// This also will remove the metadata if `is_metadata_hidden` is true.
     ///
     /// Steps for all "Option" fields:
-    /// - Set any metadata to None if is_metadata_hidden is true.
+    /// - Set any metadata to None if `is_metadata_hidden` is true.
     /// - Set any empty string to None.
     /// - Set any empty list to None.
     /// - Set any default values to None.
+    #[must_use]
     pub fn cleaned(&self) -> Self {
         let mut cleaned = self.clone();
 
@@ -323,12 +325,12 @@ impl Graphic {
 
 #[typetag::serde]
 impl RawObject for Graphic {
-    fn get_metadata(&self) -> &RawMetadata {
+    fn get_metadata(&self) -> RawMetadata {
         if let Some(metadata) = &self.metadata {
-            metadata
+            metadata.clone()
         } else {
             warn!("Metadata is missing for {}", self.get_identifier());
-            &RawMetadata::default()
+            RawMetadata::default()
                 .with_object_type(ObjectType::Graphics)
                 .with_hidden(true)
         }

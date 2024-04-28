@@ -62,13 +62,14 @@ impl Inorganic {
     /// Function to "clean" the creature. This is used to remove any empty list or strings,
     /// and to remove any default values. By "removing" it means setting the value to None.
     ///
-    /// This also will remove the metadata if is_metadata_hidden is true.
+    /// This also will remove the metadata if `is_metadata_hidden` is true.
     ///
     /// Steps for all "Option" fields:
-    /// - Set any metadata to None if is_metadata_hidden is true.
+    /// - Set any metadata to None if `is_metadata_hidden` is true.
     /// - Set any empty string to None.
     /// - Set any empty list to None.
     /// - Set any default values to None.
+    #[must_use]
     pub fn cleaned(&self) -> Self {
         let mut cleaned = self.clone();
 
@@ -98,7 +99,7 @@ impl Inorganic {
                 cleaned.environment_inclusion_type = None;
             }
         }
-        if serializer_helper::is_zero(&cleaned.environment_inclusion_frequency) {
+        if serializer_helper::is_zero(cleaned.environment_inclusion_frequency) {
             cleaned.environment_inclusion_frequency = None;
         }
         if let Some(environment_class_specific) = &cleaned.environment_class_specific {
@@ -136,12 +137,12 @@ impl RawObject for Inorganic {
     fn get_name(&self) -> &str {
         &self.identifier
     }
-    fn get_metadata(&self) -> &RawMetadata {
+    fn get_metadata(&self) -> RawMetadata {
         if let Some(metadata) = &self.metadata {
-            metadata
+            metadata.clone()
         } else {
             tracing::warn!("Metadata is missing for Inorganic {}", self.get_object_id());
-            &RawMetadata::default()
+            RawMetadata::default()
                 .with_object_type(ObjectType::Inorganic)
                 .with_hidden(true)
         }
@@ -204,7 +205,7 @@ impl RawObject for Inorganic {
                     let metal = String::from(split.next().unwrap_or(""));
                     let chance = split.next().unwrap_or("0").parse::<u8>().unwrap_or(0);
 
-                    if let Some(metal_ore_chance) = &self.metal_ore_chance.as_mut() {
+                    if let Some(metal_ore_chance) = self.metal_ore_chance.as_mut() {
                         metal_ore_chance.push((metal, chance));
                     }
                 }
@@ -218,7 +219,7 @@ impl RawObject for Inorganic {
                     let metal = String::from(split.next().unwrap_or(""));
                     let chance = split.next().unwrap_or("0").parse::<u8>().unwrap_or(0);
 
-                    if let Some(thread_metal_chance) = &self.thread_metal_chance.as_mut() {
+                    if let Some(thread_metal_chance) = self.thread_metal_chance.as_mut() {
                         thread_metal_chance.push((metal, chance));
                     }
                 }

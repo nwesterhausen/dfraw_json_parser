@@ -59,7 +59,7 @@ impl Caste {
     }
     pub fn get_tags(&self) -> &[CasteTag] {
         if let Some(tags) = &self.tags {
-            tags.clone().as_slice()
+            tags.as_slice()
         } else {
             &[]
         }
@@ -71,6 +71,7 @@ impl Caste {
             Milkable::default()
         }
     }
+    #[allow(clippy::too_many_lines)]
     pub fn parse_tag(&mut self, key: &str, value: &str) {
         let Some(tag) = CASTE_TOKENS.get(key) else {
             warn!(
@@ -321,34 +322,34 @@ impl Caste {
         if !serializer_helper::min_max_is_zeroes(&other.max_age) {
             self.max_age = other.max_age;
         }
-        if !serializer_helper::is_zero(&other.baby) {
+        if !serializer_helper::is_zero(other.baby) {
             self.baby = other.baby;
         }
-        if !serializer_helper::is_zero(&other.child) {
+        if !serializer_helper::is_zero(other.child) {
             self.child = other.child;
         }
-        if !serializer_helper::is_zero(&other.difficulty) {
+        if !serializer_helper::is_zero(other.difficulty) {
             self.difficulty = other.difficulty;
         }
-        if !serializer_helper::is_zero(&other.egg_size) {
+        if !serializer_helper::is_zero(other.egg_size) {
             self.egg_size = other.egg_size;
         }
-        if !serializer_helper::is_zero(&other.grass_trample) {
+        if !serializer_helper::is_zero(other.grass_trample) {
             self.grass_trample = other.grass_trample;
         }
-        if !serializer_helper::is_zero(&other.grazer) {
+        if !serializer_helper::is_zero(other.grazer) {
             self.grazer = other.grazer;
         }
-        if !serializer_helper::is_zero(&other.low_light_vision) {
+        if !serializer_helper::is_zero(other.low_light_vision) {
             self.low_light_vision = other.low_light_vision;
         }
-        if !serializer_helper::is_zero(&other.pet_value) {
+        if !serializer_helper::is_zero(other.pet_value) {
             self.pet_value = other.pet_value;
         }
-        if !serializer_helper::is_zero(&other.pop_ratio) {
+        if !serializer_helper::is_zero(other.pop_ratio) {
             self.pop_ratio = other.pop_ratio;
         }
-        if !serializer_helper::is_zero(&other.change_body_size_percentage) {
+        if !serializer_helper::is_zero(other.change_body_size_percentage) {
             self.change_body_size_percentage = other.change_body_size_percentage;
         }
         if let Some(other_creature_class) = &other.creature_class {
@@ -405,13 +406,14 @@ impl Caste {
     /// Function to "clean" the creature. This is used to remove any empty list or strings,
     /// and to remove any default values. By "removing" it means setting the value to None.
     ///
-    /// This also will remove the metadata if is_metadata_hidden is true.
+    /// This also will remove the metadata if `is_metadata_hidden` is true.
     ///
     /// Steps:
-    /// - Set any metadata to None if is_metadata_hidden is true.
+    /// - Set any metadata to None if `is_metadata_hidden` is true.
     /// - Set any empty string to None.
     /// - Set any empty list to None.
     /// - Set any default values to None.
+    #[must_use]
     pub fn cleaned(&self) -> Self {
         let mut cleaned = self.clone();
 
@@ -431,52 +433,52 @@ impl Caste {
         }
 
         // Set any default values to None.
-        if serializer_helper::is_zero(&cleaned.baby) {
+        if serializer_helper::is_zero(cleaned.baby) {
             cleaned.baby = None;
         }
 
         // Set any default values to None.
-        if serializer_helper::is_zero(&cleaned.child) {
+        if serializer_helper::is_zero(cleaned.child) {
             cleaned.child = None;
         }
 
         // Set any default values to None.
-        if serializer_helper::is_zero(&cleaned.difficulty) {
+        if serializer_helper::is_zero(cleaned.difficulty) {
             cleaned.difficulty = None;
         }
 
         // Set any default values to None.
-        if serializer_helper::is_zero(&cleaned.egg_size) {
+        if serializer_helper::is_zero(cleaned.egg_size) {
             cleaned.egg_size = None;
         }
 
         // Set any default values to None.
-        if serializer_helper::is_zero(&cleaned.grass_trample) {
+        if serializer_helper::is_zero(cleaned.grass_trample) {
             cleaned.grass_trample = None;
         }
 
         // Set any default values to None.
-        if serializer_helper::is_zero(&cleaned.grazer) {
+        if serializer_helper::is_zero(cleaned.grazer) {
             cleaned.grazer = None;
         }
 
         // Set any default values to None.
-        if serializer_helper::is_zero(&cleaned.low_light_vision) {
+        if serializer_helper::is_zero(cleaned.low_light_vision) {
             cleaned.low_light_vision = None;
         }
 
         // Set any default values to None.
-        if serializer_helper::is_zero(&cleaned.pet_value) {
+        if serializer_helper::is_zero(cleaned.pet_value) {
             cleaned.pet_value = None;
         }
 
         // Set any default values to None.
-        if serializer_helper::is_zero(&cleaned.pop_ratio) {
+        if serializer_helper::is_zero(cleaned.pop_ratio) {
             cleaned.pop_ratio = None;
         }
 
         // Set any default values to None.
-        if serializer_helper::is_zero(&cleaned.change_body_size_percentage) {
+        if serializer_helper::is_zero(cleaned.change_body_size_percentage) {
             cleaned.change_body_size_percentage = None;
         }
 
@@ -496,35 +498,35 @@ impl Caste {
         }
 
         // Set any default values to None.
-        if let Some(baby_name) = cleaned.baby_name {
+        if let Some(baby_name) = cleaned.baby_name.clone() {
             if baby_name.is_empty() {
                 cleaned.baby_name = None;
             }
         }
 
         // Set any default values to None.
-        if let Some(caste_name) = cleaned.caste_name {
+        if let Some(caste_name) = cleaned.caste_name.clone() {
             if caste_name.is_empty() {
                 cleaned.caste_name = None;
             }
         }
 
         // Set any default values to None.
-        if let Some(child_name) = cleaned.child_name {
+        if let Some(child_name) = cleaned.child_name.clone() {
             if child_name.is_empty() {
                 cleaned.child_name = None;
             }
         }
 
         // Set any default values to None.
-        if let Some(milkable) = cleaned.milkable {
+        if let Some(milkable) = cleaned.milkable.clone() {
             if milkable.is_default() {
                 cleaned.milkable = None;
             }
         }
 
         // Set any default values to None.
-        if let Some(tile) = cleaned.tile {
+        if let Some(tile) = cleaned.tile.clone() {
             if tile.is_default() {
                 cleaned.tile = None;
             }
@@ -533,8 +535,8 @@ impl Caste {
         cleaned
     }
 
-    fn add_tag(&self, tag: CasteTag) {
-        if let Some(tags) = &self.tags.as_mut() {
+    fn add_tag(&mut self, tag: CasteTag) {
+        if let Some(tags) = self.tags.as_mut() {
             if !tags.contains(&tag) {
                 tags.push(tag);
             }
@@ -572,11 +574,11 @@ impl Searchable for Caste {
         // If egg layer, include egg information
         if self.is_egg_layer() {
             vec.push(String::from("eggs"));
-            if let Some(clutch_size) = self.clutch_size {
-                vec.push(format!("{}-{}", clutch_size[0], clutch_size[1]));
+            if let Some([clutch_size_0, clutch_size_1, ..]) = self.clutch_size {
+                vec.push(format!("{clutch_size_0}-{clutch_size_1}"));
             }
             if let Some(egg_size) = self.egg_size {
-                vec.push(format!("{}", egg_size));
+                vec.push(format!("{egg_size}"));
             }
         }
         // If milkable, include milk information
@@ -612,11 +614,11 @@ impl Searchable for Caste {
         }
         // Include difficulty if not 0
         if let Some(difficulty) = self.difficulty {
-            vec.push(format!("{}", difficulty));
+            vec.push(format!("{difficulty}"));
         }
         // Include pet value if not 0
         if let Some(pet_value) = self.pet_value {
-            vec.push(format!("{}", pet_value));
+            vec.push(format!("{pet_value}"));
         }
 
         vec
