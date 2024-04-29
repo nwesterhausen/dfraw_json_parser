@@ -2,6 +2,13 @@ on:
   - push
   - pull_request
 name: Clippy Check
+
+env:
+  CARGO_TERM_COLOR: always
+  # sccache enablement
+  SCCACHE_GHA_ENABLED: true
+  RUSTC_WRAPPER: sccache
+
 jobs:
   clippy_check:
     name: Clippy Check Nightly
@@ -83,6 +90,7 @@ jobs:
           toolchain: stable
       - name: Generate Type Bindings
         run: |
+          cargo build
           cargo test --all-features
           npx prettier --write lib/bindings/*.ts
       - name: Check for changes
@@ -111,14 +119,11 @@ jobs:
           unzip -d /home/runner/vanilla-raws vanilla-raws.zip
 
       - uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11 # v4.1.1
+      - name: Run sccache-cache
+        uses: mozilla-actions/sccache-action@2e7f9ec7921547d4b46598398ca573513895d0bd # 0.0.4
       - uses: dtolnay/rust-toolchain@be73d7920c329f220ce78e0234b8f96b7ae60248 # master
         with:
           toolchain: stable
-      - name: Rust cache
-        uses: swatinem/rust-cache@3cf7f8cc28d1b4e7d01e3783be10a97d55d483c8 # v2.7.1
-        with:
-          shared-key: clippy
-          cache-on-failure: true
 
       - name: Build CLI
         run: cargo build
