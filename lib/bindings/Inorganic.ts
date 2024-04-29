@@ -5,16 +5,16 @@ import type { InorganicToken } from "./InorganicToken";
 import type { Material } from "./Material";
 import type { RawMetadata } from "./RawMetadata";
 
-export interface Inorganic {
+export type Inorganic = {
   identifier: string;
-  metadata: RawMetadata;
+  metadata: RawMetadata | null;
   objectId: string;
   material: Material;
-  metalOreChance: Array<[string, number]>;
-  threadMetalChance: Array<[string, number]>;
-  environmentClass: EnvironmentClass;
-  environmentInclusionType: InclusionType;
-  environmentInclusionFrequency: number;
-  environmentClassSpecific: Array<string>;
-  tags: Array<InorganicToken>;
-}
+  metalOreChance: Array<[string, number]> | null;
+  threadMetalChance: Array<[string, number]> | null;
+  environmentClass: EnvironmentClass | null;
+  environmentInclusionType: InclusionType | null;
+  environmentInclusionFrequency: number | null;
+  environmentClassSpecific: Array<string> | null;
+  tags: Array<InorganicToken> | null;
+};

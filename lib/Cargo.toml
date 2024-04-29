@@ -49,8 +49,8 @@ default-features = true
 features = ["derive"]
 
 [dependencies.ts-rs]
-#version = "8.1.0"
-git = "https://github.com/Aleph-Alpha/ts-rs.git"
+# version = "8.1.0"
+git = "https://github.com/Aleph-Alpha/ts-rs"
 branch = "main"
-default-features = true
+default-features = false
 features = ["serde-compat"]

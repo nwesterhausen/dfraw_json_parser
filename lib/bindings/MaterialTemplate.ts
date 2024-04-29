@@ -2,9 +2,9 @@
 import type { Material } from "./Material";
 import type { RawMetadata } from "./RawMetadata";
 
-export interface MaterialTemplate {
+export type MaterialTemplate = {
   identifier: string;
-  metadata: RawMetadata;
+  metadata: RawMetadata | null;
   objectId: string;
   material: Material;
-}
+};

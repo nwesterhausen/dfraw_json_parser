@@ -7,29 +7,41 @@ import type { Name } from "./Name";
 import type { SingPlurName } from "./SingPlurName";
 import type { Tile } from "./Tile";
 
-export interface Caste {
+export type Caste = {
   identifier: string;
-  tags: Array<CasteTag>;
-  description: string;
-  babyName: SingPlurName;
-  casteName: Name;
-  childName: SingPlurName;
-  clutchSize: Array<number>;
-  litterSize: Array<number>;
-  maxAge: Array<number>;
-  baby: number;
-  child: number;
-  difficulty: number;
-  eggSize: number;
-  grassTrample: number;
-  grazer: number;
-  lowLightVision: number;
-  petValue: number;
-  popRatio: number;
-  changeBodySizePercentage: number;
-  creatureClass: Array<string>;
-  bodySize: Array<BodySize>;
-  milkable: Milkable;
-  tile: Tile;
-  gaits: Array<Gait>;
-}
+  tags: Array<CasteTag> | null;
+  description: string | null;
+  babyName: SingPlurName | null;
+  casteName: Name | null;
+  childName: SingPlurName | null;
+  /**
+   * Default \[0,0\]
+   */
+  clutchSize: [number, number] | null;
+  /**
+   * Default \[0,0\]
+   */
+  litterSize: [number, number] | null;
+  /**
+   * Default \[0,0\]
+   */
+  maxAge: [number, number] | null;
+  baby: number | null;
+  child: number | null;
+  difficulty: number | null;
+  eggSize: number | null;
+  grassTrample: number | null;
+  grazer: number | null;
+  lowLightVision: number | null;
+  petValue: number | null;
+  popRatio: number | null;
+  changeBodySizePercentage: number | null;
+  creatureClass: Array<string> | null;
+  bodySize: Array<BodySize> | null;
+  milkable: Milkable | null;
+  tile: Tile | null;
+  /**
+   * The gaits by which the creature can move.
+   */
+  gaits: Array<Gait> | null;
+};

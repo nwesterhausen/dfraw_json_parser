@@ -9,30 +9,63 @@ import type { Syndrome } from "./Syndrome";
 import type { Temperatures } from "./Temperatures";
 import type { Tile } from "./Tile";
 
-export interface Material {
-  materialType: MaterialType;
-  name: string;
-  fuelType: FuelType;
-  creatureIdentifier: string;
-  plantIdentifier: string;
-  isLocalMaterial: boolean;
-  reagentIdentifier: string;
-  reactionProductIdentifier: string;
-  templateIdentifier: string;
-  usage: Array<MaterialUsage>;
-  value: number;
-  color: Color;
-  stateNames: StateName;
-  stateAdjectives: StateName;
-  stateColors: StateName;
-  temperatures: Temperatures;
-  properties: Array<string>;
-  syndromes: Array<Syndrome>;
-  mechanicalProperties: MaterialMechanics;
-  liquidDensity: number;
-  molarMass: number;
-  buildColor: Color;
-  displayColor: Color;
-  tile: Tile;
-  itemSymbol: string;
-}
+export type Material = {
+  /**
+   * The type of the material is also the trigger to start tracking a material
+   */
+  materialType: MaterialType | null;
+  /**
+   * The material might have a name, but its more likely that there is only an identifier to
+   * refer to another creature/plant/reaction, which are listed elsewhere.
+   * If there is no name provided, then it is a special hardcoded case, e.g. magma or green glass.
+   */
+  name: string | null;
+  /**
+   * For the coal tag, it specifies the type of fuel that can be used. It will never be None.
+   */
+  fuelType: FuelType | null;
+  /**
+   * Linked creature identifier (and then material_name might be "skin", like for "CREATURE_MAT:DWARF:SKIN")
+   */
+  creatureIdentifier: string | null;
+  /**
+   * Linked plant identifier (and then material_name might be "leaf", like for "PLANT_MAT:BUSH_QUARRY:LEAF")
+   */
+  plantIdentifier: string | null;
+  /**
+   * If a material is defined within a creature itself, it will use LOCAL_CREATURE_MAT tag, which implies
+   * that the material is only used by that creature. This is also true for plants and LOCAL_PLANT_MAT.
+   */
+  isLocalMaterial: boolean | null;
+  /**
+   * Within a reaction, there can be special material definitions. Todo: Figure this out.
+   */
+  reagentIdentifier: string | null;
+  reactionProductIdentifier: string | null;
+  /**
+   * If material is defined from a template, we need a way to refer to that
+   */
+  templateIdentifier: string | null;
+  /**
+   * Usage tags
+   */
+  usage: Array<MaterialUsage> | null;
+  value: number | null;
+  color: Color | null;
+  stateNames: StateName | null;
+  stateAdjectives: StateName | null;
+  stateColors: StateName | null;
+  temperatures: Temperatures | null;
+  /**
+   * Catch-all for remaining tags we identify but don't do anything with... yet.
+   */
+  properties: Array<string> | null;
+  syndromes: Array<Syndrome> | null;
+  mechanicalProperties: MaterialMechanics | null;
+  liquidDensity: number | null;
+  molarMass: number | null;
+  buildColor: Color | null;
+  displayColor: Color | null;
+  tile: Tile | null;
+  itemSymbol: string | null;
+};

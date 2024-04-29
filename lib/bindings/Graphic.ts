@@ -3,17 +3,16 @@ import type { CustomGraphicExtension } from "./CustomGraphicExtension";
 import type { GraphicType } from "./GraphicType";
 import type { RawMetadata } from "./RawMetadata";
 import type { SpriteGraphic } from "./SpriteGraphic";
-import type { SpriteLayer } from "./SpriteLayer";
 
-export interface Graphic {
-  metadata: RawMetadata;
+export type Graphic = {
+  metadata: RawMetadata | null;
   identifier: string;
   objectId: string;
-  casteIdentifier: string;
+  casteIdentifier: string | null;
   kind: GraphicType;
-  sprites: Array<SpriteGraphic>;
-  layers: Array<[string, Array<SpriteLayer>]>;
-  growths: Array<[string, Array<SpriteGraphic>]>;
-  customExtensions: Array<CustomGraphicExtension>;
-  tags: Array<string>;
-}
+  sprites: Array<SpriteGraphic> | null;
+  layers: Array<[string, Array<SpriteLayer>]> | null;
+  growths: Array<[string, Array<SpriteGraphic>]> | null;
+  customExtensions: Array<CustomGraphicExtension> | null;
+  tags: Array<string> | null;
+};
