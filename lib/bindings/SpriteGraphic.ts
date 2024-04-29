@@ -3,15 +3,15 @@ import type { ColorModification } from "./ColorModification";
 import type { Condition } from "./Condition";
 import type { Dimensions } from "./Dimensions";
 
-export interface SpriteGraphic {
+export type SpriteGraphic = {
   primaryCondition: Condition;
   tilePageId: string;
   offset: Dimensions;
-  color: ColorModification;
-  largeImage: boolean;
-  offset2: Dimensions;
-  secondaryCondition: Condition;
-  colorPalletSwap: number;
-  targetIdentifier: string;
-  extraDescriptor: string;
-}
+  color: ColorModification | null;
+  largeImage: boolean | null;
+  offset2: Dimensions | null;
+  secondaryCondition: Condition | null;
+  colorPalletSwap: number | null;
+  targetIdentifier: string | null;
+  extraDescriptor: string | null;
+};

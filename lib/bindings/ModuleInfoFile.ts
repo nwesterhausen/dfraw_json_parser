@@ -2,7 +2,10 @@
 import type { RawModuleLocation } from "./RawModuleLocation";
 import type { SteamData } from "./SteamData";
 
-export interface ModuleInfoFile {
+/**
+ * Represents the `info.txt` file for a raw module
+ */
+export type ModuleInfoFile = {
   identifier: string;
   objectId: string;
   location: RawModuleLocation;
@@ -14,9 +17,9 @@ export interface ModuleInfoFile {
   author: string;
   name: string;
   description: string;
-  requiresIds: Array<string>;
-  conflictsWithIds: Array<string>;
-  requiresIdsBefore: Array<string>;
-  requiresIdsAfter: Array<string>;
-  steamData: SteamData;
-}
+  requiresIds: Array<string> | null;
+  conflictsWithIds: Array<string> | null;
+  requiresIdsBefore: Array<string> | null;
+  requiresIdsAfter: Array<string> | null;
+  steamData: SteamData | null;
+};

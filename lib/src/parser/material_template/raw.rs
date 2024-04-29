@@ -11,19 +11,26 @@ use crate::parser::{
 #[serde(rename_all = "camelCase")]
 pub struct MaterialTemplate {
     identifier: String,
-    metadata: RawMetadata,
+    metadata: Option<RawMetadata>,
     object_id: String,
     material: Material,
 }
 
 impl MaterialTemplate {
-    pub fn empty() -> MaterialTemplate {
-        MaterialTemplate::default()
+    pub fn empty() -> Self {
+        Self {
+            metadata: Some(
+                RawMetadata::default()
+                    .with_object_type(ObjectType::MaterialTemplate)
+                    .with_hidden(true),
+            ),
+            ..Self::default()
+        }
     }
     pub fn new(identifier: &str, metadata: &RawMetadata) -> MaterialTemplate {
         MaterialTemplate {
             identifier: String::from(identifier),
-            metadata: metadata.clone(),
+            metadata: Some(metadata.clone()),
             object_id: format!(
                 "{}-{}-{}",
                 metadata.get_raw_identifier(),
@@ -32,6 +39,29 @@ impl MaterialTemplate {
             ),
             ..MaterialTemplate::default()
         }
+    }
+
+    /// Function to "clean" the raw. This is used to remove any empty list or strings,
+    /// and to remove any default values. By "removing" it means setting the value to None.
+    ///
+    /// This also will remove the metadata if `is_metadata_hidden` is true.
+    ///
+    /// Steps for all "Option" fields:
+    /// - Set any metadata to None if `is_metadata_hidden` is true.
+    /// - Set any empty string to None.
+    /// - Set any empty list to None.
+    /// - Set any default values to None.
+    #[must_use]
+    pub fn cleaned(&self) -> Self {
+        let mut cleaned = self.clone();
+
+        if let Some(metadata) = &cleaned.metadata {
+            if metadata.is_hidden() {
+                cleaned.metadata = None;
+            }
+        }
+
+        cleaned
     }
 }
 
@@ -47,8 +77,18 @@ impl RawObject for MaterialTemplate {
         &self.identifier
     }
 
-    fn get_metadata(&self) -> &RawMetadata {
-        &self.metadata
+    fn get_metadata(&self) -> RawMetadata {
+        if let Some(metadata) = &self.metadata {
+            metadata.clone()
+        } else {
+            tracing::warn!(
+                "Metadata is missing for MaterialTemplate {}",
+                self.get_object_id()
+            );
+            RawMetadata::default()
+                .with_object_type(ObjectType::MaterialTemplate)
+                .with_hidden(true)
+        }
     }
 
     fn get_object_id(&self) -> &str {
@@ -60,6 +100,9 @@ impl RawObject for MaterialTemplate {
     }
     fn get_type(&self) -> &ObjectType {
         &ObjectType::MaterialTemplate
+    }
+    fn clean_self(&mut self) {
+        *self = self.cleaned();
     }
 }
 

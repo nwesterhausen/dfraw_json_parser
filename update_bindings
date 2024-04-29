@@ -13,4 +13,5 @@ rm -rf lib/bindings
 # formatted nicely. So we then run prettier to format them.
 cargo test --all-features
 
-pnpx prettier --write lib/bindings/*.ts
+# Ensure that the generated bindings are formatted nicely.
+bunx prettier --write lib/bindings/*.ts

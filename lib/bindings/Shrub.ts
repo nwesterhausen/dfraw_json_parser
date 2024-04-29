@@ -3,25 +3,101 @@ import type { Color } from "./Color";
 import type { SeasonToken } from "./SeasonToken";
 import type { SeedMaterial } from "./SeedMaterial";
 
-export interface Shrub {
-  growingSeason: Array<SeasonToken>;
-  growDuration: number;
-  value: number;
-  pickedTile: number;
-  deadPickedTile: number;
-  shrubTile: number;
-  deadShrubTile: number;
-  clusterSize: number;
-  pickedColor: Color;
-  deadPickedColor: Color;
-  shrubColor: Color;
-  deadShrubColor: Color;
-  shrubDrownLevel: number;
-  drink: string;
-  mill: string;
-  thread: string;
-  seed: SeedMaterial;
-  extractStillVial: string;
-  extractVial: string;
-  extractBarrel: string;
-}
+export type Shrub = {
+  /**
+   * Allows the plant to grow in farm plots during the given season.
+   * If the plant is a surface plant, allows it to grow in the wild during this season; wild surface plants without
+   * this token will disappear at the beginning of the season. Underground plants grow wild in all seasons, regardless
+   * of their season tokens.
+   * Default: empty (plant will not grow in farm plots)
+   */
+  growingSeason: Array<SeasonToken> | null;
+  /**
+   * How long the plant takes to grow to harvest in a farm plot. Unit hundreds of ticks.
+   * There are 1008 GROWDUR units in a season. Defaults to 300.
+   */
+  growDuration: number | null;
+  /**
+   * Has no known effect. Previously set the value of the harvested plant.
+   */
+  value: number | null;
+  /**
+   * The tile used when the plant is harvested whole, or is ready to be picked from a farm plot. May either be a cp437
+   * tile number, or a character between single quotes. See character table. Defaults to 231 (τ).
+   */
+  pickedTile: number | null;
+  /**
+   * The tile used when a plant harvested whole has wilted. Defaults to 169 (⌐).
+   */
+  deadPickedTile: number | null;
+  /**
+   * The tile used to represent this plant when it is wild, alive, and has no growths. Defaults to 34 (").
+   */
+  shrubTile: number | null;
+  /**
+   * The tile used to represent this plant when it is dead in the wild. Defaults to 34 (").
+   */
+  deadShrubTile: number | null;
+  /**
+   * The maximum stack size collected when gathered via herbalism (possibly also from farm plots?). Defaults to 5.
+   */
+  clusterSize: number | null;
+  /**
+   * The color of the plant when it has been picked whole, or when it is ready for harvest in a farm plot. Defaults to 2:0:0 (dark green).
+   */
+  pickedColor: Color | null;
+  /**
+   * The color of the plant when it has been picked whole, but has wilted. Defaults to 0:0:1 (dark gray).
+   */
+  deadPickedColor: Color | null;
+  /**
+   * The color of the plant when it is alive, wild, and has no growths. Defaults to 2:0:0 (dark green).
+   */
+  shrubColor: Color | null;
+  /**
+   * The color of the plant when it is dead in the wild. Defaults to 6:0:0 (brown).
+   */
+  deadShrubColor: Color | null;
+  /**
+   * The shrub will drown once the water on its tile reaches this level. Defaults to 4.
+   */
+  shrubDrownLevel: number | null;
+  /**
+   * Names a drink made from the plant, allowing it to be used in entity resources.
+   * Previously also permitted brewing the plant into alcohol made of this material.
+   * Now, a MATERIAL_REACTION_PRODUCT of type DRINK_MAT should be used on the proper plant material.
+   */
+  drink: string | null;
+  /**
+   * Permits milling the plant at a quern or millstone into a powder made of this material and allows its use in entity resources.
+   * Said material should have \[POWDER_MISC_PLANT\] to permit proper stockpiling. This token makes the whole plant harvestable regardless
+   * of which material is designated for milling.
+   * For plants with millable growths, use only MATERIAL_REACTION_PRODUCT or ITEM_REACTION_PRODUCT tokens to define the milling products.
+   */
+  mill: string | null;
+  /**
+   * Permits processing the plant at a farmer's workshop to yield threads made of this material and allows its use in entity resources.
+   * Said material should have \[THREAD_PLANT\] to permit proper stockpiling.
+   */
+  thread: string | null;
+  /**
+   * Causes the plant to yield plantable seeds made of this material and having these properties.
+   * Said material should have \[SEED_MAT\] to permit proper stockpiling.
+   */
+  seed: SeedMaterial | null;
+  /**
+   * Permits processing the plant into a vial at a still to yield extract made of this material.
+   * Said material should have \[EXTRACT_STORAGE:FLASK\].
+   */
+  extractStillVial: string | null;
+  /**
+   * Permits processing the plant into a vial at a farmer's workshop to yield extract made of this material.
+   * Said material should have \[EXTRACT_STORAGE:VIAL\].
+   */
+  extractVial: string | null;
+  /**
+   * Permits processing the plant into a barrel at a farmer's workshop to yield extract made of this material.
+   * Said material should have \[EXTRACT_STORAGE:BARREL\].
+   */
+  extractBarrel: string | null;
+};

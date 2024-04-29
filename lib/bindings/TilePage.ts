@@ -2,11 +2,11 @@
 import type { Dimensions } from "./Dimensions";
 import type { RawMetadata } from "./RawMetadata";
 
-export interface TilePage {
-  metadata: RawMetadata;
+export type TilePage = {
+  metadata: RawMetadata | null;
   identifier: string;
   objectId: string;
   file: string;
   tileDim: Dimensions;
   pageDim: Dimensions;
-}
+};

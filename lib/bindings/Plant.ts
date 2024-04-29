@@ -8,18 +8,39 @@ import type { RawMetadata } from "./RawMetadata";
 import type { Shrub } from "./Shrub";
 import type { Tree } from "./Tree";
 
-export interface Plant {
-  metadata: RawMetadata;
+export type Plant = {
+  /**
+   * Common Raw file Things
+   */
+  metadata: RawMetadata | null;
   identifier: string;
   objectId: string;
   name: Name;
-  prefStrings: Array<string>;
-  tags: Array<PlantTag>;
-  undergroundDepth: Array<number>;
-  frequency: number;
-  biomes: Array<Biome>;
-  growths: Array<PlantGrowth>;
-  treeDetails?: Tree;
-  shrubDetails?: Shrub;
-  materials: Array<Material>;
-}
+  prefStrings: Array<string> | null;
+  tags: Array<PlantTag> | null;
+  /**
+   * Default [0, 0] (aboveground)
+   */
+  undergroundDepth: [number, number] | null;
+  /**
+   * Default frequency is 50
+   */
+  frequency: number | null;
+  /**
+   * List of biomes this plant can grow in
+   */
+  biomes: Array<Biome> | null;
+  /**
+   * Growth Tokens define the growths of the plant (leaves, fruit, etc.)
+   */
+  growths: Array<PlantGrowth> | null;
+  /**
+   * If plant is a tree, it will have details about the tree.
+   */
+  treeDetails: Tree | null;
+  /**
+   * If plant is a shrub, it will have details about the shrub.
+   */
+  shrubDetails: Shrub | null;
+  materials: Array<Material> | null;
+};

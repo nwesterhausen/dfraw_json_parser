@@ -24,31 +24,25 @@ pub struct PlantGrowth {
     /// 1. item token, 2: material token. Generally the item type should be PLANT_GROWTH:NONE.
     item: String,
     /// Specifies on which part of the plant this growth grows. This is defined with "GROWTH_HOST_TILE" key.
-    /// This can be unused, like in the case of crops where the plant is the growth (I think?).    
-    #[serde(skip_serializing_if = "Vec::is_empty")]
-    host_tiles: Vec<PlantPart>,
+    /// This can be unused, like in the case of crops where the plant is the growth (I think?).
+    host_tiles: Option<Vec<PlantPart>>,
     /// Controls the height on the trunk above which the growth begins to appear.
     /// The first value is the percent of the trunk height where the growth begins appearing:
     /// 0 will cause it along the entire trunk (above the first tile), 100 will cause it to appear
     /// at the topmost trunk tile. Can be larger than 100 to cause it to appear above the trunk.
     /// The second value must be -1, but might be intended to control whether it starts height counting
     /// from the bottom or top.
-    #[serde(skip_serializing_if = "serializer_helper::is_default_trunk_height_percentage")]
-    trunk_height_percentage: [i32; 2],
+    trunk_height_percentage: Option<[i32; 2]>,
     /// Currently has no effect.
-    #[serde(skip_serializing_if = "serializer_helper::is_default_growth_density")]
-    density: u32,
+    density: Option<u32>,
     /// Specifies the appearance of the growth. This is defined with "GROWTH_PRINT" key.
     /// This is a string until we make a proper print structure.
-    #[serde(skip_serializing_if = "String::is_empty")]
-    print: String,
+    print: Option<String>,
     /// Specifies at which part of the year the growth appears. Default is all year round.
     /// Minimum: 0, Maximum: 402_200. This is defined with "GROWTH_TIMING" key.
-    #[serde(skip_serializing_if = "serializer_helper::is_default_growth_timing")]
-    timing: [u32; 2],
+    timing: Option<[u32; 2]>,
     /// Where we gather some of the growth's tags.
-    #[serde(skip_serializing_if = "Vec::is_empty")]
-    tags: Vec<GrowthTag>,
+    tags: Option<Vec<GrowthTag>>,
 }
 
 impl PlantGrowth {
@@ -58,6 +52,7 @@ impl PlantGrowth {
             ..PlantGrowth::default()
         }
     }
+    #[allow(clippy::too_many_lines)]
     pub fn parse_tag(&mut self, key: &str, value: &str) {
         let Some(tag) = GROWTH_TOKENS.get(key) else {
             warn!(
@@ -68,8 +63,13 @@ impl PlantGrowth {
         };
 
         if value.is_empty() {
+            if self.tags.is_none() {
+                self.tags = Some(Vec::new());
+            }
             // If there is no value, we just add the tag to the list.
-            self.tags.push(tag.clone());
+            if let Some(tags) = &mut self.tags {
+                tags.push(tag.clone());
+            }
             return;
         }
 
@@ -81,6 +81,9 @@ impl PlantGrowth {
                 self.item = value.to_string();
             }
             GrowthTag::GrowthHostTile => {
+                if self.host_tiles.is_none() {
+                    self.host_tiles = Some(Vec::new());
+                }
                 let Some(part) = PLANT_PART_TOKENS.get(value) else {
                     warn!(
                         "PlantGrowthParsing: called `Option::unwrap()` on a `None` value for presumed plant part: {}",
@@ -88,7 +91,9 @@ impl PlantGrowth {
                     );
                     return;
                 };
-                self.host_tiles.push(part.clone());
+                if let Some(host_tiles) = &mut self.host_tiles {
+                    host_tiles.push(part.clone());
+                }
             }
             GrowthTag::GrowthTrunkHeightPercent => {
                 let split: Vec<&str> = value.split(':').collect::<Vec<&str>>();
@@ -113,10 +118,10 @@ impl PlantGrowth {
                         return;
                     }
                 };
-                self.trunk_height_percentage = [percentage, dir];
+                self.trunk_height_percentage = Some([percentage, dir]);
             }
             GrowthTag::GrowthDensity => {
-                self.density = value.parse().unwrap_or_default();
+                self.density = Some(value.parse().unwrap_or_default());
             }
             GrowthTag::GrowthTiming => {
                 let split: Vec<&str> = value.split(':').collect::<Vec<&str>>();
@@ -141,16 +146,66 @@ impl PlantGrowth {
                         return;
                     }
                 };
-                self.timing = [start, end];
+                self.timing = Some([start, end]);
             }
             GrowthTag::GrowthPrint => {
-                self.print = value.to_string();
+                self.print = Some(value.to_string());
             }
             _ => {
                 // If we don't recognize the tag, we just add it to the list.
-                self.tags.push(tag.clone());
+                if self.tags.is_none() {
+                    self.tags = Some(Vec::new());
+                }
+                if let Some(tags) = &mut self.tags {
+                    tags.push(tag.clone());
+                }
             }
         }
+    }
+
+    /// Function to "clean" the raw. This is used to remove any empty list or strings,
+    /// and to remove any default values. By "removing" it means setting the value to None.
+    ///
+    /// This also will remove the metadata if `is_metadata_hidden` is true.
+    ///
+    /// Steps for all "Option" fields:
+    /// - Set any metadata to None if `is_metadata_hidden` is true.
+    /// - Set any empty string to None.
+    /// - Set any empty list to None.
+    /// - Set any default values to None.
+    #[must_use]
+    pub fn cleaned(&self) -> Self {
+        let mut cleaned = self.clone();
+
+        if let Some(host_tiles) = &cleaned.host_tiles {
+            if host_tiles.is_empty() {
+                cleaned.host_tiles = None;
+            }
+        }
+
+        if let Some(tags) = &cleaned.tags {
+            if tags.is_empty() {
+                cleaned.tags = None;
+            }
+        }
+
+        if serializer_helper::is_default_trunk_height_percentage(&cleaned.trunk_height_percentage) {
+            cleaned.trunk_height_percentage = None;
+        }
+        if serializer_helper::is_default_growth_density(cleaned.density) {
+            cleaned.density = None;
+        }
+        if serializer_helper::is_default_growth_timing(&cleaned.timing) {
+            cleaned.timing = None;
+        }
+
+        if let Some(print) = &cleaned.print {
+            if print.is_empty() {
+                cleaned.print = None;
+            }
+        }
+
+        cleaned
     }
 }
 
@@ -161,7 +216,9 @@ impl Searchable for PlantGrowth {
         vec.extend(self.name.as_vec());
         vec.push(format!("{:?}", self.growth_type));
         vec.push(self.item.clone());
-        vec.extend(self.tags.iter().map(|tag| format!("{tag:?}")));
+        if let Some(tags) = &self.tags {
+            vec.extend(tags.iter().map(|tag| format!("{tag:?}")));
+        }
 
         clean_search_vec(vec.as_slice())
     }

@@ -28,8 +28,7 @@ use super::{phf_table::CREATURE_TOKENS, tokens::CreatureTag};
 pub struct Creature {
     /// The `metadata` field is of type `RawMetadata` and is used to provide additional information
     /// about the raws the `Creature` is found in.
-    #[serde(skip_serializing_if = "serializer_helper::is_metadata_hidden")]
-    metadata: RawMetadata,
+    metadata: Option<RawMetadata>,
     /// The `identifier` field is a string that represents the identifier of the creature. It is used
     /// to uniquely identify the creature (however it is not guaranteed to be unique across object types
     /// or all raws parsed, *especially* if you are parsing multiple versions of the same raws).
@@ -41,17 +40,13 @@ pub struct Creature {
     /// A lot of the properties of the `Creature` object are actually properties of a special `Caste`, `ALL`.
     castes: Vec<Caste>,
     /// Any tags that are not parsed into their own fields are stored in the `tags` field.
-    #[serde(skip_serializing_if = "Vec::is_empty")]
-    tags: Vec<CreatureTag>,
+    tags: Option<Vec<CreatureTag>>,
     /// The biomes that this creature can be found in.
-    #[serde(skip_serializing_if = "Vec::is_empty")]
-    biomes: Vec<biome::Token>,
+    biomes: Option<Vec<biome::Token>>,
     /// Pref strings are things that make dwarves (or others?) like or dislike the creature.
-    #[serde(skip_serializing_if = "Vec::is_empty")]
-    pref_strings: Vec<String>,
+    pref_strings: Option<Vec<String>>,
     /// The tile that represents the creature in the game (classic mode)
-    #[serde(skip_serializing_if = "Tile::is_default")]
-    tile: Tile,
+    tile: Option<Tile>,
     /// Determines the chances of a creature appearing within its environment, with higher values resulting in more frequent appearance.
     ///
     /// Also affects the chance of a creature being brought in a caravan for trading. The game effectively considers all creatures that
@@ -63,19 +58,16 @@ pub struct Creature {
     /// Minimum value is 0, maximum value is 100.
     ///
     /// Note: not to be confused with [POP_RATIO].
-    #[serde(skip_serializing_if = "serializer_helper::is_default_frequency")]
-    frequency: u32,
+    frequency: Option<u32>,
     /// The minimum/maximum numbers of how many creatures per spawned cluster. Vermin fish with this token in combination with
     /// temperate ocean and river biome tokens will perform seasonal migrations.
     ///
     /// Defaults to [1,1] if not specified.
-    #[serde(skip_serializing_if = "serializer_helper::min_max_is_ones")]
-    cluster_number: [u32; 2],
+    cluster_number: Option<[u32; 2]>,
     /// The minimum/maximum numbers of how many of these creatures are present in each world map tile of the appropriate region.
     ///
     /// Defaults to [1,1] if not specified.
-    #[serde(skip_serializing_if = "serializer_helper::min_max_is_ones")]
-    population_number: [u32; 2],
+    population_number: Option<[u32; 2]>,
     /// Depth that the creature appears underground. Numbers can be from 0 to 5. 0 is actually 'above ground' and can be used if the
     /// creature is to appear both above and below ground. Values from 1-3 are the respective cavern levels, 4 is the magma sea and
     /// 5 is the HFS.
@@ -85,14 +77,11 @@ pub struct Creature {
     /// Civilizations that can use underground plants or animals will only export (via the embark screen or caravans) things that are available at depth 1.
     ///
     /// Default [0, 0] (aboveground)
-    #[serde(skip_serializing_if = "serializer_helper::min_max_is_zeroes")]
-    underground_depth: [u32; 2],
+    underground_depth: Option<[u32; 2]>,
     /// Like `[BABYNAME]`, but applied regardless of caste.
-    #[serde(skip_serializing_if = "SingPlurName::is_empty")]
-    general_baby_name: SingPlurName,
+    general_baby_name: Option<SingPlurName>,
     /// Like `[CHILDNAME]`, but applied regardless of caste.
-    #[serde(skip_serializing_if = "SingPlurName::is_empty")]
-    general_child_name: SingPlurName,
+    general_child_name: Option<SingPlurName>,
     /// The generic name for any creature of this type - will be used when distinctions between caste are unimportant. For names for specific castes,
     /// use `[CASTE_NAME]` instead. If left undefined, the creature will be labeled as "nothing" by the game.
     name: Name,
@@ -101,20 +90,17 @@ pub struct Creature {
     /// which can then be modified. Often used in combination with `[APPLY_CREATURE_VARIATION]` to import standard variations from a file.
     ///
     /// The vanilla giant animals and animal peoples are examples of this token combination.
-    #[serde(skip_serializing_if = "String::is_empty")]
-    copy_tags_from: String,
+    copy_tags_from: Option<String>,
     /// Applies the specified creature variation.
     ///
     /// These are stored "in the raw", i.e. how they appear in the raws. They are not handled until the end of the parsing process.
-    #[serde(skip_serializing_if = "Vec::is_empty")]
-    apply_creature_variation: Vec<String>,
+    apply_creature_variation: Option<Vec<String>>,
     /// A generated field that is used to uniquely identify this object. It is generated from the `metadata`, `identifier`, and `ObjectType`.
     ///
     /// This field is always serialized.
     object_id: String,
     /// Various SELECT_CREATURE modifications.
-    #[serde(skip_serializing_if = "Vec::is_empty")]
-    select_creature_variation: Vec<SelectCreature>,
+    select_creature_variation: Option<Vec<SelectCreature>>,
 }
 
 impl Creature {
@@ -125,10 +111,15 @@ impl Creature {
     /// An empty instance of `Creature`.
     pub fn empty() -> Creature {
         Creature {
+            metadata: Some(
+                RawMetadata::default()
+                    .with_object_type(ObjectType::CreatureVariation)
+                    .with_hidden(true),
+            ),
             castes: vec![Caste::new("ALL")],
-            population_number: [1, 1],
-            cluster_number: [1, 1],
-            frequency: 50,
+            population_number: Some([1, 1]),
+            cluster_number: Some([1, 1]),
+            frequency: Some(50),
             ..Creature::default()
         }
     }
@@ -148,11 +139,11 @@ impl Creature {
     pub fn new(identifier: &str, metadata: &RawMetadata) -> Self {
         Creature {
             identifier: String::from(identifier),
-            metadata: metadata.clone(),
-            frequency: 50,
+            metadata: Some(metadata.clone()),
+            frequency: Some(50),
             castes: vec![Caste::new("ALL")],
-            population_number: [1, 1],
-            cluster_number: [1, 1],
+            population_number: Some([1, 1]),
+            cluster_number: Some([1, 1]),
             object_id: build_object_id_from_pieces(metadata, identifier, &ObjectType::Creature),
             ..Creature::default()
         }
@@ -164,12 +155,20 @@ impl Creature {
     ///
     /// The private field `copy_tags_from`.
     pub fn get_copy_tags_from(&self) -> &str {
-        &self.copy_tags_from
+        if let Some(copy_tags_from) = &self.copy_tags_from {
+            copy_tags_from.as_str()
+        } else {
+            ""
+        }
     }
 
     /// Get the identifiers of creature variations to apply.
     pub fn get_variations_to_apply(&self) -> &[String] {
-        self.apply_creature_variation.as_slice()
+        if let Some(apply_creature_variation) = &self.apply_creature_variation {
+            apply_creature_variation.as_slice()
+        } else {
+            &[]
+        }
     }
 
     /// Adds a `SelectCreature` object to the internal `SelectCreature` vector.
@@ -178,7 +177,17 @@ impl Creature {
     ///
     /// * `select_creature`: The parameter `select_creature` is of type `SelectCreature`.
     pub fn push_select_creature_variation(&mut self, select_creature: SelectCreature) {
-        self.select_creature_variation.push(select_creature);
+        if self.select_creature_variation.is_none() {
+            self.select_creature_variation = Some(Vec::new());
+        }
+        if let Some(select_creature_variation) = self.select_creature_variation.as_mut() {
+            select_creature_variation.push(select_creature);
+        } else {
+            warn!(
+                "Creature::push_select_creature_variation: ({}) select_creature_variation is None",
+                self.identifier
+            );
+        }
     }
 
     /// Extends the internal `SelectCreature` vector with the elements from the `select_creature_vec`
@@ -188,7 +197,14 @@ impl Creature {
     ///
     /// * `select_creature_vec`: A vector of `SelectCreature` objects.
     pub fn extend_select_creature_variation(&mut self, select_creature_vec: Vec<SelectCreature>) {
-        self.select_creature_variation.extend(select_creature_vec);
+        if self.select_creature_variation.is_none() {
+            self.select_creature_variation = Some(Vec::new());
+        }
+        if let Some(select_creature_variation) = &mut self.select_creature_variation {
+            select_creature_variation.extend(select_creature_vec);
+        } else {
+            warn!("Creature::extend_select_creature_variation: ({}) select_creature_variation is None", self.identifier);
+        }
     }
 
     /// The function `add_caste` adds a new `Caste` object with the given name to a vector called
@@ -263,11 +279,14 @@ impl Creature {
     ///
     /// Returns a vector of `object_id`s.
     pub fn get_child_object_ids(&self) -> Vec<&str> {
-        let mut object_ids = Vec::new();
-        for select_creature in &self.select_creature_variation {
-            object_ids.push(select_creature.get_object_id());
+        if let Some(select_creature_variation) = &self.select_creature_variation {
+            select_creature_variation
+                .iter()
+                .map(crate::RawObject::get_object_id)
+                .collect()
+        } else {
+            Vec::new()
         }
-        object_ids
     }
 
     /// Takes two `Creature` objects and creates a new `Creature` object
@@ -296,6 +315,9 @@ impl Creature {
         // our object_id is preserved
         combined_creature.object_id = creature.object_id.clone();
 
+        // Clean the "creature" to remove any empty lists or strings for comparison
+        let creature = creature.cleaned();
+
         // We need to loop over our castes and apply any differences.
         for caste in &creature.castes {
             let caste_identifier = caste.get_identifier();
@@ -312,49 +334,61 @@ impl Creature {
         }
 
         // Loop over our pref_strings and if they aren't in combined_creature, add them
-        for pref_string in &creature.pref_strings {
-            if !combined_creature.pref_strings.contains(pref_string) {
-                combined_creature.pref_strings.push(pref_string.clone());
+        if let Some(pref_strings) = &creature.pref_strings {
+            let mut combined_pref_strings = combined_creature.pref_strings.unwrap_or_default();
+            for pref_string in pref_strings {
+                if !combined_pref_strings.contains(pref_string) {
+                    combined_pref_strings.push(pref_string.clone());
+                }
             }
+            combined_creature.pref_strings = Some(combined_pref_strings);
         }
 
         // Loop over our biomes and if they aren't in combined_creature, add them
-        for biome in &creature.biomes {
-            if !combined_creature.biomes.contains(biome) {
-                combined_creature.biomes.push(biome.clone());
+        if let Some(biomes) = &creature.biomes {
+            let mut combined_biomes = combined_creature.biomes.unwrap_or_default();
+            for biome in biomes {
+                if !combined_biomes.contains(biome) {
+                    combined_biomes.push(biome.clone());
+                }
             }
+            combined_creature.biomes = Some(combined_biomes);
         }
 
         // Loop over our tags and if they aren't in combined_creature, add them
-        for tag in &creature.tags {
-            if !combined_creature.tags.contains(tag) {
-                combined_creature.tags.push(tag.clone());
+        if let Some(tags) = &creature.tags {
+            let mut combined_tags = combined_creature.tags.unwrap_or_default();
+            for tag in tags {
+                if !combined_tags.contains(tag) {
+                    combined_tags.push(tag.clone());
+                }
             }
+            combined_creature.tags = Some(combined_tags);
         }
 
         // If any of our other properties are not default, we need to apply them to the combined creature.
-        if !serializer_helper::is_default_frequency(&creature.frequency) {
+        if creature.frequency.is_some() {
             combined_creature.frequency = creature.frequency;
         }
-        if !serializer_helper::min_max_is_ones(&creature.cluster_number) {
+        if creature.cluster_number.is_some() {
             combined_creature.population_number = creature.population_number;
         }
-        if !serializer_helper::min_max_is_ones(&creature.cluster_number) {
+        if creature.cluster_number.is_some() {
             combined_creature.cluster_number = creature.cluster_number;
         }
-        if !serializer_helper::min_max_is_zeroes(&creature.underground_depth) {
+        if creature.underground_depth.is_some() {
             combined_creature.underground_depth = creature.underground_depth;
         }
-        if !creature.general_baby_name.is_empty() {
+        if creature.general_baby_name.is_some() {
             combined_creature.general_baby_name = creature.general_baby_name.clone();
         }
-        if !creature.general_child_name.is_empty() {
+        if creature.general_child_name.is_some() {
             combined_creature.general_child_name = creature.general_child_name.clone();
         }
         if !creature.name.is_empty() {
             combined_creature.name = creature.name.clone();
         }
-        if creature.tile.is_default() {
+        if creature.tile.is_some() {
             combined_creature.tile = creature.tile.clone();
         }
 
@@ -372,11 +406,31 @@ impl Creature {
 
     /// Get a list of tags that belong to this creature.
     pub fn get_tags(&self) -> Vec<CreatureTag> {
-        self.tags.clone()
+        if self.tags.is_none() {
+            return Vec::new();
+        }
+
+        let mut ret_tags = Vec::new();
+        if let Some(tags) = &self.tags {
+            for tag in tags {
+                ret_tags.push(tag.clone());
+            }
+        }
+        ret_tags
     }
     /// Get the biomes the creature can be found in.
     pub fn get_biomes(&self) -> Vec<biome::Token> {
-        self.biomes.clone()
+        if self.biomes.is_none() {
+            return Vec::new();
+        }
+
+        let mut ret_biomes = Vec::new();
+        if let Some(biomes) = &self.biomes {
+            for biome in biomes {
+                ret_biomes.push(biome.clone());
+            }
+        }
+        ret_biomes
     }
     /// Set the name of the creature.
     ///
@@ -411,7 +465,7 @@ impl Creature {
                     .join("_")
                     .to_uppercase();
                 if let Some(biome) = biome::TOKEN_MAP.get(&biome) {
-                    self.biomes.push(biome.clone());
+                    self.add_biome(biome.clone());
                 } else {
                     warn!(
                         "Creature::parse_tags_from_xml: ({}) Unknown biome '{}'",
@@ -450,7 +504,7 @@ impl Creature {
                 } else {
                     // Try parsing the tag as a creature tag
                     if let Some(tag) = CREATURE_TOKENS.get(&caste_tag) {
-                        self.tags.push(tag.clone());
+                        self.add_tag(tag.clone());
                     } else {
                         warn!(
                             "Creature::parse_tags_from_xml: ({}) Unknown tag {}",
@@ -461,7 +515,7 @@ impl Creature {
             } else {
                 // Try to parse the tag
                 if let Some(tag) = CREATURE_TOKENS.get(&tag.to_uppercase()) {
-                    self.tags.push(tag.clone());
+                    self.add_tag(tag.clone());
                 } else {
                     warn!(
                         "Creature::parse_tags_from_xml: ({}) Unknown tag {}",
@@ -471,12 +525,118 @@ impl Creature {
             }
         }
     }
+
+    /// Add a tag to the creature.
+    ///
+    /// This handles making sure the tags vector is initialized.
+    pub fn add_tag(&mut self, tag: CreatureTag) {
+        if self.tags.is_none() {
+            self.tags = Some(Vec::new());
+        }
+        if let Some(tags) = self.tags.as_mut() {
+            tags.push(tag);
+        } else {
+            warn!(
+                "Creature::add_tag: ({}) Failed to add tag {:?}",
+                self.identifier, tag
+            );
+        }
+    }
+
+    /// Add a biome to the creature.
+    ///
+    /// This handles making sure the biomes vector is initialized.
+    pub fn add_biome(&mut self, biome: biome::Token) {
+        if self.biomes.is_none() {
+            self.biomes = Some(Vec::new());
+        }
+        if let Some(biomes) = self.biomes.as_mut() {
+            biomes.push(biome);
+        } else {
+            warn!(
+                "Creature::add_biome: ({}) Failed to add biome {:?}",
+                self.identifier, biome
+            );
+        }
+    }
+
+    /// Function to "clean" the creature. This is used to remove any empty list or strings,
+    /// and to remove any default values. By "removing" it means setting the value to None.
+    ///
+    /// This also will remove the metadata if `is_metadata_hidden` is true.
+    #[must_use]
+    pub fn cleaned(&self) -> Self {
+        let mut cleaned = self.clone();
+
+        // Set the metadata to None if it is hidden
+        if serializer_helper::is_metadata_hidden(&cleaned.metadata) {
+            cleaned.metadata = None;
+        }
+
+        // Remove any empty lists
+        if cleaned.tags.is_some() && cleaned.tags.as_deref() == Some(&[]) {
+            cleaned.tags = None;
+        }
+        if cleaned.biomes.is_some() && cleaned.biomes.as_deref() == Some(&[]) {
+            cleaned.biomes = None;
+        }
+        if cleaned.pref_strings.is_some() && cleaned.pref_strings.as_deref() == Some(&[]) {
+            cleaned.pref_strings = None;
+        }
+        if let Some(create_variations) = &cleaned.apply_creature_variation {
+            if create_variations.is_empty() {
+                cleaned.apply_creature_variation = None;
+            }
+        }
+
+        // Remove any default values
+        if serializer_helper::is_default_frequency(cleaned.frequency) {
+            cleaned.frequency = None;
+        }
+        if serializer_helper::min_max_is_ones(&cleaned.cluster_number) {
+            cleaned.cluster_number = None;
+        }
+        if serializer_helper::min_max_is_ones(&cleaned.population_number) {
+            cleaned.population_number = None;
+        }
+        if serializer_helper::min_max_is_zeroes(&cleaned.underground_depth) {
+            cleaned.underground_depth = None;
+        }
+
+        if let Some(general_baby_name) = &cleaned.general_baby_name {
+            if general_baby_name.is_empty() {
+                cleaned.general_baby_name = None;
+            }
+        }
+        if let Some(general_child_name) = &cleaned.general_child_name {
+            if general_child_name.is_empty() {
+                cleaned.general_child_name = None;
+            }
+        }
+        if let Some(tile) = &cleaned.tile {
+            if tile.is_default() {
+                cleaned.tile = None;
+            }
+        }
+
+        cleaned
+    }
 }
 
 #[typetag::serde]
 impl RawObject for Creature {
-    fn get_metadata(&self) -> &RawMetadata {
-        &self.metadata
+    fn get_metadata(&self) -> RawMetadata {
+        if let Some(metadata) = &self.metadata {
+            metadata.clone()
+        } else {
+            warn!(
+                "Creature::get_metadata: ({}) metadata is None",
+                self.identifier
+            );
+            RawMetadata::default()
+                .with_object_type(ObjectType::Creature)
+                .with_hidden(true)
+        }
     }
     fn get_identifier(&self) -> &str {
         &self.identifier
@@ -490,6 +650,7 @@ impl RawObject for Creature {
     fn get_type(&self) -> &ObjectType {
         &ObjectType::Creature
     }
+    #[allow(clippy::too_many_lines)]
     fn parse_tag(&mut self, key: &str, value: &str) {
         if CASTE_TOKENS.contains_key(key) {
             self.castes.last_mut().unwrap().parse_tag(key, value);
@@ -508,12 +669,12 @@ impl RawObject for Creature {
             return;
         };
 
-        self.tags.push(tag.clone());
+        self.add_tag(tag.clone());
 
         match tag {
             CreatureTag::Biome { id } => {
                 if let Some(biome) = biome::TOKEN_MAP.get(&id) {
-                    self.biomes.push(biome.clone());
+                    self.add_biome(biome.clone());
                 } else {
                     warn!(
                         "CreatureParsing: Unknown biome {} for creature {}",
@@ -525,52 +686,88 @@ impl RawObject for Creature {
                 self.name = Name::from_value(value);
             }
             CreatureTag::GeneralBabyName { .. } => {
-                self.general_baby_name = SingPlurName::from_value(value);
+                self.general_baby_name = Some(SingPlurName::from_value(value));
             }
             CreatureTag::GeneralChildName { .. } => {
-                self.general_child_name = SingPlurName::from_value(value);
+                self.general_child_name = Some(SingPlurName::from_value(value));
             }
             CreatureTag::PrefString { pref_string } => {
-                self.pref_strings.push(pref_string.clone());
+                if let Some(pref_strings) = self.pref_strings.as_mut() {
+                    pref_strings.push(pref_string);
+                } else {
+                    self.pref_strings = Some(vec![pref_string]);
+                }
             }
             CreatureTag::PopulationNumber { min, max } => {
-                self.population_number = [min, max];
+                self.population_number = Some([min, max]);
             }
             CreatureTag::Frequency { frequency } => {
-                self.frequency = frequency;
+                self.frequency = Some(frequency);
             }
             CreatureTag::UndergroundDepth { min, max } => {
-                self.underground_depth = [min, max];
+                self.underground_depth = Some([min, max]);
             }
             CreatureTag::ClusterNumber { min, max } => {
-                self.cluster_number = [min, max];
+                self.cluster_number = Some([min, max]);
             }
             CreatureTag::CopyTagsFrom { creature } => {
-                self.copy_tags_from = creature.clone();
+                self.copy_tags_from = Some(creature);
             }
             CreatureTag::ApplyCreatureVariation { .. } => {
-                self.apply_creature_variation.push(String::from(value));
+                if let Some(apply_creature_variation) = self.apply_creature_variation.as_mut() {
+                    apply_creature_variation.push(String::from(value));
+                } else {
+                    self.apply_creature_variation = Some(vec![String::from(value)]);
+                }
             }
             CreatureTag::CreatureTile { .. } => {
-                self.tile.set_character(value);
+                if self.tile.is_none() {
+                    self.tile = Some(Tile::default());
+                }
+                if let Some(tile) = self.tile.as_mut() {
+                    tile.set_character(value);
+                }
             }
             CreatureTag::AltTile { .. } => {
-                self.tile.set_alt_character(value);
+                if self.tile.is_none() {
+                    self.tile = Some(Tile::default());
+                }
+                if let Some(tile) = self.tile.as_mut() {
+                    tile.set_alt_character(value);
+                }
             }
             CreatureTag::Color { .. } => {
-                self.tile.set_color(value);
+                if self.tile.is_none() {
+                    self.tile = Some(Tile::default());
+                }
+                if let Some(tile) = self.tile.as_mut() {
+                    tile.set_color(value);
+                }
             }
             CreatureTag::GlowColor { .. } => {
-                self.tile.set_glow_color(value);
+                if self.tile.is_none() {
+                    self.tile = Some(Tile::default());
+                }
+                if let Some(tile) = self.tile.as_mut() {
+                    tile.set_glow_color(value);
+                }
             }
             CreatureTag::GlowTile { .. } => {
-                self.tile.set_glow_character(value);
+                if self.tile.is_none() {
+                    self.tile = Some(Tile::default());
+                }
+                if let Some(tile) = self.tile.as_mut() {
+                    tile.set_glow_character(value);
+                }
             }
             _ => {}
         }
     }
     fn get_object_id(&self) -> &str {
         self.object_id.as_str()
+    }
+    fn clean_self(&mut self) {
+        *self = self.cleaned();
     }
 }
 
@@ -610,55 +807,73 @@ impl CreatureVariationRequirements for Creature {
                     );
                     return;
                 };
-                self.biomes.retain(|x| x != biome);
+                if let Some(biomes) = self.biomes.as_mut() {
+                    biomes.retain(|x| x != biome);
+                }
             }
             CreatureTag::Name { .. } => {
                 self.name = Name::default();
             }
             CreatureTag::GeneralBabyName { .. } => {
-                self.general_baby_name = SingPlurName::default();
+                self.general_baby_name = None;
             }
             CreatureTag::GeneralChildName { .. } => {
-                self.general_child_name = SingPlurName::default();
+                self.general_child_name = None;
             }
             CreatureTag::PrefString { .. } => {
-                self.pref_strings.retain(|x| x != value);
+                if let Some(pref_strings) = self.pref_strings.as_mut() {
+                    pref_strings.retain(|x| x != value);
+                }
             }
             CreatureTag::PopulationNumber { .. } => {
-                self.population_number = [1, 1];
+                self.population_number = None;
             }
             CreatureTag::Frequency { .. } => {
-                self.frequency = 50;
+                self.frequency = None;
             }
             CreatureTag::UndergroundDepth { .. } => {
-                self.underground_depth = [0, 0];
+                self.underground_depth = None;
             }
             CreatureTag::ClusterNumber { .. } => {
-                self.cluster_number = [1, 1];
+                self.cluster_number = None;
             }
             CreatureTag::CopyTagsFrom { .. } => {
-                self.copy_tags_from = String::default();
+                self.copy_tags_from = None;
             }
             CreatureTag::ApplyCreatureVariation { .. } => {
-                self.apply_creature_variation.retain(|x| x != value);
+                if let Some(apply_creature_variation) = self.apply_creature_variation.as_mut() {
+                    apply_creature_variation.retain(|x| x != value);
+                }
             }
             CreatureTag::CreatureTile { .. } => {
-                self.tile.set_character("");
+                if let Some(tile) = self.tile.as_mut() {
+                    tile.set_character("");
+                }
             }
             CreatureTag::AltTile { .. } => {
-                self.tile.set_alt_character("");
+                if let Some(tile) = self.tile.as_mut() {
+                    tile.set_alt_character("");
+                }
             }
             CreatureTag::Color { .. } => {
-                self.tile.set_color("");
+                if let Some(tile) = self.tile.as_mut() {
+                    tile.set_color("");
+                }
             }
             CreatureTag::GlowColor { .. } => {
-                self.tile.set_glow_color("");
+                if let Some(tile) = self.tile.as_mut() {
+                    tile.set_glow_color("");
+                }
             }
             CreatureTag::GlowTile { .. } => {
-                self.tile.set_glow_character("");
+                if let Some(tile) = self.tile.as_mut() {
+                    tile.set_glow_character("");
+                }
             }
             _ => {
-                self.tags.retain(|x| x != tag);
+                if let Some(tags) = self.tags.as_mut() {
+                    tags.retain(|x| x != tag);
+                }
             }
         }
     }
@@ -700,21 +915,31 @@ impl Searchable for Creature {
             vec.extend(caste.get_search_vec());
         }
         // Add tags
-        for tag in &self.tags {
-            vec.push(tag.to_string());
+        if let Some(tags) = &self.tags {
+            for tag in tags {
+                vec.push(tag.to_string());
+            }
         }
         // Add biomes
-        for biome in &self.biomes {
-            vec.push(biome.to_string());
+        if let Some(biomes) = &self.biomes {
+            for biome in biomes {
+                vec.push(biome.to_string());
+            }
         }
         // Add pref strings
-        vec.extend(self.pref_strings.clone());
+        if let Some(pref_strings) = &self.pref_strings {
+            vec.extend(pref_strings.clone());
+        }
         // Add name
         vec.extend(self.name.as_vec());
         // Add general baby name
-        vec.extend(self.general_baby_name.as_vec());
+        if let Some(general_baby_name) = &self.general_baby_name {
+            vec.extend(general_baby_name.as_vec());
+        }
         // Add general child name
-        vec.extend(self.general_child_name.as_vec());
+        if let Some(general_child_name) = &self.general_child_name {
+            vec.extend(general_child_name.as_vec());
+        }
         // Add identifier
         vec.push(self.identifier.clone());
 

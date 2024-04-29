@@ -2,9 +2,24 @@
 import type { ProgressDetails } from "./ProgressDetails";
 import type { ProgressTask } from "./ProgressTask";
 
-export interface ProgressPayload {
+/**
+ * A payload that can be used to gauge the progress of the parsing process.
+ */
+export type ProgressPayload = {
+  /**
+   * The details of the current progress.
+   */
   details: ProgressDetails;
+  /**
+   * The current task.
+   */
   currentTask: ProgressTask;
+  /**
+   * The estimated percentage of completion.
+   */
   percentage: number;
+  /**
+   * The current total number of raws parsed.
+   */
   runningTotal: number;
-}
+};

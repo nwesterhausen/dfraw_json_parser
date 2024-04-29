@@ -3,9 +3,32 @@ import type { Modification } from "./Modification";
 import type { ObjectType } from "./ObjectType";
 import type { RawMetadata } from "./RawMetadata";
 
-export interface UnprocessedRaw {
+export type UnprocessedRaw = {
+  /**
+   * The raw type of the object. This is to tell us what to parse it into.
+   */
   rawType: ObjectType;
+  /**
+   * The modifications to apply to the object.
+   *
+   * Allows us to handle parsing advanced things like
+   *
+   * * `COPY_TAGS_FROM` tag
+   * * `APPLY_CREATURE_VARIATION` tag
+   * * `GO_TO_TAG:tag` raw instruction
+   * * `GO_TO_END` and `GO_TO_START` raw instructions
+   * * (and includes the raws themselves under `MainRawBody`)
+   *
+   * So when the raws are parsed from this into the actual object, we can apply these modifications
+   * in order to get the final object.
+   */
   modifications: Array<Modification>;
+  /**
+   * Metadata to be passed on to the final object
+   */
   metadata: RawMetadata;
+  /**
+   * Identifier of the object
+   */
   identifier: string;
-}
+};
