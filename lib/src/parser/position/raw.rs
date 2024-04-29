@@ -6,7 +6,7 @@ use super::tokens::PositionToken;
 
 #[derive(ts_rs::TS)]
 #[ts(export)]
-#[derive(Serialize, Deserialize, Debug, Clone, Default)]
+#[derive(Serialize, Deserialize, Debug, Clone, Default, specta::Type)]
 #[serde(rename_all = "camelCase")]
 pub struct Position {
     identifier: String,

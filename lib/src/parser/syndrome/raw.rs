@@ -10,7 +10,7 @@ use super::{phf_table::SYNDROME_TOKEN, tokens::SyndromeToken};
 
 #[derive(ts_rs::TS)]
 #[ts(export)]
-#[derive(Serialize, Deserialize, Debug, Clone, Default)]
+#[derive(Serialize, Deserialize, Debug, Clone, Default, specta::Type)]
 #[serde(rename_all = "camelCase")]
 pub struct Syndrome {
     /// Seen the \[SYN_IDENTIFIER:INEBRIATION\] tag in material_templates.txt

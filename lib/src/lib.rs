@@ -76,7 +76,7 @@ use walkdir::{DirEntry, WalkDir};
 mod errors;
 mod legends_export;
 mod options;
-mod parser;
+pub mod parser;
 mod traits;
 
 pub use errors::ParserError;

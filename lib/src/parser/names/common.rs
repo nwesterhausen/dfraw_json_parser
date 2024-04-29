@@ -3,7 +3,7 @@ use std::fmt::Debug;
 
 #[derive(ts_rs::TS)]
 #[ts(export)]
-#[derive(Serialize, Deserialize, Debug, Clone, Default)]
+#[derive(Serialize, Deserialize, Debug, Clone, Default, specta::Type)]
 #[serde(rename_all = "camelCase")]
 /// A name with a singular, plural, and adjective form
 pub struct Name {

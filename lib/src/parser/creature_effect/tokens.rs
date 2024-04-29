@@ -2,7 +2,7 @@ use serde::{Deserialize, Serialize};
 
 #[derive(ts_rs::TS)]
 #[ts(export)]
-#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, Default)]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, Default, specta::Type)]
 pub enum CreatureEffectToken {
     // Negative Effects
     /// Afflicts the targeted body part with intense pain. If no target is specified this applies to all body parts.
@@ -101,7 +101,7 @@ pub enum CreatureEffectToken {
 
 #[derive(ts_rs::TS)]
 #[ts(export)]
-#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, Default)]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, Default, specta::Type)]
 pub enum CreatureEffectProperty {
     /// The severity of the effect. Higher values appear to be worse, with SEV:1000 CE_NECROSIS causing a part to near-instantly become rotten.
     Severity,

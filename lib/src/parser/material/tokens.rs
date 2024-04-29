@@ -2,7 +2,7 @@ use serde::{Deserialize, Serialize};
 
 #[derive(ts_rs::TS)]
 #[ts(export)]
-#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, Default)]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, Default, specta::Type)]
 pub enum MaterialType {
     Inorganic,
     Stone,
@@ -41,7 +41,7 @@ pub enum MaterialType {
 
 #[derive(ts_rs::TS)]
 #[ts(export)]
-#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, Default)]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, Default, specta::Type)]
 pub enum FuelType {
     Charcoal,
     Coke,
@@ -53,7 +53,7 @@ pub enum FuelType {
 
 #[derive(ts_rs::TS)]
 #[ts(export)]
-#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, Default)]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, Default, specta::Type)]
 pub enum MaterialState {
     Solid,
     Liquid,
@@ -75,7 +75,7 @@ pub enum MaterialState {
 
 #[derive(ts_rs::TS)]
 #[ts(export)]
-#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, Default)]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, Default, specta::Type)]
 pub enum MaterialUsage {
     /// Lets the game know that an animal was likely killed in the production of this item.
     /// Entities opposed to killing animals (Elves in vanilla) will refuse to accept these items in trade.
@@ -241,7 +241,7 @@ pub enum MaterialUsage {
 
 #[derive(ts_rs::TS)]
 #[ts(export)]
-#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, Default)]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, Default, specta::Type)]
 pub enum MaterialProperty {
     /// Imports the properties of the specified preexisting material template.
     UseMaterialTemplate,

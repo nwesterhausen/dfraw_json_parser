@@ -2,7 +2,7 @@ use serde::{Deserialize, Serialize};
 
 #[derive(ts_rs::TS)]
 #[ts(export)]
-#[derive(Serialize, Deserialize, Debug, Clone, Eq, PartialEq)]
+#[derive(Serialize, Deserialize, Debug, Clone, Eq, PartialEq, specta::Type)]
 #[serde(rename_all = "camelCase")]
 pub enum Modification {
     /// `COPY_TAGS_FROM` tag

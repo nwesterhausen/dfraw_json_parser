@@ -2,7 +2,7 @@ use serde::{Deserialize, Serialize};
 
 #[derive(ts_rs::TS)]
 #[ts(export)]
-#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq)]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, specta::Type)]
 #[serde(rename_all = "camelCase")]
 #[allow(clippy::module_name_repetitions)]
 pub enum SelectRules {

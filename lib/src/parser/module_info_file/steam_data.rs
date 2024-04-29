@@ -1,6 +1,6 @@
 use serde::{Deserialize, Serialize};
 
-#[derive(Serialize, Deserialize, Default, Clone, Debug)]
+#[derive(Serialize, Deserialize, Default, Clone, Debug, specta::Type)]
 #[serde(rename_all = "camelCase")]
 #[derive(ts_rs::TS)]
 #[ts(export)]

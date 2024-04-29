@@ -2,7 +2,7 @@ use serde::{Deserialize, Serialize};
 
 #[derive(ts_rs::TS)]
 #[ts(export)]
-#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, Default)]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, Default, specta::Type)]
 pub enum PositionToken {
     /// The position holder is not subjected to the economy. Less than relevant right now.
     AccountExempt,

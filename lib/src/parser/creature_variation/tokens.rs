@@ -3,7 +3,7 @@ use tracing::warn;
 
 use super::phf_table::CV_TOKENS;
 
-#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, Default)]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, Default, specta::Type)]
 pub enum CVTag {
     NewTag,
     AddTag,

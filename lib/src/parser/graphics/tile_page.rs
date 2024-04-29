@@ -13,7 +13,7 @@ use super::{dimensions::Dimensions, phf_table::TILE_PAGE_TAGS, tokens::TilePageT
 #[derive(ts_rs::TS)]
 #[ts(export)]
 #[allow(clippy::module_name_repetitions)]
-#[derive(Serialize, Deserialize, Debug, Clone, Default)]
+#[derive(Serialize, Deserialize, Debug, Clone, Default, specta::Type)]
 #[serde(rename_all = "camelCase")]
 pub struct TilePage {
     metadata: Option<RawMetadata>,

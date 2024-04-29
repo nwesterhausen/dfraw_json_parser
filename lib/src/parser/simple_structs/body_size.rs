@@ -3,7 +3,7 @@ use serde::{Deserialize, Serialize};
 #[derive(ts_rs::TS)]
 #[ts(export)]
 #[allow(clippy::module_name_repetitions)]
-#[derive(Serialize, Deserialize, Debug, Clone, Default, PartialEq, Eq)]
+#[derive(Serialize, Deserialize, Debug, Clone, Default, PartialEq, Eq, specta::Type)]
 #[serde(rename_all = "camelCase")]
 pub struct BodySize {
     years: u32,

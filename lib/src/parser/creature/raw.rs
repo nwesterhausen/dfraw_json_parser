@@ -23,7 +23,7 @@ use super::{phf_table::CREATURE_TOKENS, tokens::CreatureTag};
 /// they are saved and can be applied later (at the consumer's discretion).
 #[derive(ts_rs::TS)]
 #[ts(export)]
-#[derive(Serialize, Deserialize, Debug, Clone, Default)]
+#[derive(Serialize, Deserialize, Debug, Clone, Default, specta::Type)]
 #[serde(rename_all = "camelCase")]
 pub struct Creature {
     /// The `metadata` field is of type `RawMetadata` and is used to provide additional information

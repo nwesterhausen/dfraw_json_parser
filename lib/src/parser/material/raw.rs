@@ -20,7 +20,7 @@ use super::{
 #[derive(ts_rs::TS)]
 #[ts(export)]
 #[allow(clippy::module_name_repetitions)]
-#[derive(Serialize, Deserialize, Debug, Clone, Default)]
+#[derive(Serialize, Deserialize, Debug, Clone, Default, specta::Type)]
 #[serde(rename_all = "camelCase")]
 pub struct Material {
     /// The type of the material is also the trigger to start tracking a material

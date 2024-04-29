@@ -836,7 +836,7 @@ fn parse_complex_token(token: &CasteTag, simple_value: &str, value: &str) -> Opt
         CasteTag::EggMaterial { .. } => {
             // Need to combine the two arguments into a single `Vec<String>`
             let mut raw_args: Vec<String> = format!("{simple_value}:{value}")
-                .split(":")
+                .split(':')
                 .map(String::from)
                 .collect();
             // The state is the last element in the vector

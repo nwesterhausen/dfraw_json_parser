@@ -3,7 +3,7 @@ use tracing::warn;
 
 #[derive(ts_rs::TS)]
 #[ts(export)]
-#[derive(Serialize, Deserialize, Debug, Clone, Default, PartialEq, Eq)]
+#[derive(Serialize, Deserialize, Debug, Clone, Default, PartialEq, Eq, specta::Type)]
 #[serde(rename_all = "camelCase")]
 /// Gaits are a way to describe how a creature moves. Defined in the raws with:
 ///
@@ -44,7 +44,7 @@ pub struct Gait {
 
 #[derive(ts_rs::TS)]
 #[ts(export)]
-#[derive(Serialize, Deserialize, Debug, Clone, Default, PartialEq, Eq)]
+#[derive(Serialize, Deserialize, Debug, Clone, Default, PartialEq, Eq, specta::Type)]
 #[serde(rename_all = "camelCase")]
 #[allow(clippy::module_name_repetitions)]
 pub enum GaitType {
@@ -72,7 +72,7 @@ pub enum GaitType {
 
 #[derive(ts_rs::TS)]
 #[ts(export)]
-#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq)]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, specta::Type)]
 #[serde(rename_all = "camelCase")]
 pub enum Modifier {
     /// Fat/muscle layers slow the movement (muscle-slowing counter-acted by strength bonus)

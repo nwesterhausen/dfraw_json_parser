@@ -6,7 +6,7 @@ use super::tokens::GraphicType;
 #[derive(ts_rs::TS)]
 #[ts(export)]
 #[allow(clippy::module_name_repetitions)]
-#[derive(Serialize, Deserialize, Debug, Clone, Default)]
+#[derive(Serialize, Deserialize, Debug, Clone, Default, specta::Type)]
 #[serde(rename_all = "camelCase")]
 pub struct CustomGraphicExtension {
     extension_type: GraphicType,

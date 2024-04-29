@@ -10,7 +10,7 @@ use super::tokens::{SeasonToken, ShrubToken};
 
 #[derive(ts_rs::TS)]
 #[ts(export)]
-#[derive(Serialize, Deserialize, Debug, Clone, Default)]
+#[derive(Serialize, Deserialize, Debug, Clone, Default, specta::Type)]
 #[serde(rename_all = "camelCase")]
 pub struct Shrub {
     /// Allows the plant to grow in farm plots during the given season.

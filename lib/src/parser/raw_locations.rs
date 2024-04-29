@@ -8,7 +8,9 @@ use tracing::warn;
 
 #[derive(ts_rs::TS)]
 #[ts(export)]
-#[derive(Serialize, Debug, Deserialize, Clone, Copy, PartialEq, Eq, Default, Hash)]
+#[derive(
+    Serialize, Debug, Deserialize, Clone, Copy, PartialEq, Eq, Default, Hash, specta::Type,
+)]
 /// Raws are part of modules since 50.xx. Raw modules are loaded from 3 common locations:
 /// `{df_directory}/data/vanilla`, `{df_directory}/mods`, and `{df_directory/data/installed_mods}`
 pub enum RawModuleLocation {

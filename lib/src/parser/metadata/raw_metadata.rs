@@ -4,10 +4,6 @@ use serde::{Deserialize, Serialize};
 
 use crate::{ModuleInfoFile, ObjectType, RawModuleLocation};
 
-#[derive(Serialize, Deserialize, Clone, Debug, Default)]
-#[serde(rename_all = "camelCase")]
-#[derive(ts_rs::TS)]
-#[ts(export, rename = "RawMetadata")]
 /// The `RawMetadata` struct represents metadata about a raw module in Rust, including its name,
 /// version, file path, identifier, object type, module location, and visibility status.
 ///
@@ -31,6 +27,10 @@ use crate::{ModuleInfoFile, ObjectType, RawModuleLocation};
 /// * `hidden`: The `hidden` property is a boolean value that indicates whether the raw metadata should
 /// be hidden or not when exporting. By default, it is set to `true`, meaning that the raw metadata will
 /// be hidden unless specified in the `ParsingOptions` struct.
+#[derive(Serialize, Deserialize, Clone, Debug, Default, specta::Type)]
+#[serde(rename_all = "camelCase")]
+#[derive(ts_rs::TS)]
+#[ts(export, rename = "RawMetadata")]
 pub struct Metadata {
     // The object_id of the raw module
     module_object_id: String,

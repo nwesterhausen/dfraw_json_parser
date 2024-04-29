@@ -10,7 +10,7 @@ use super::{
 
 #[derive(ts_rs::TS)]
 #[ts(export)]
-#[derive(Serialize, Deserialize, Debug, Clone, Default)]
+#[derive(Serialize, Deserialize, Debug, Clone, Default, specta::Type)]
 #[serde(rename_all = "camelCase")]
 pub struct Tree {
     /// Tree will yield logs made of that material. Instead, if it's `[TREE:NONE]`, no logs will result.

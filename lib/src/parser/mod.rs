@@ -49,6 +49,8 @@ pub use metadata::RawObjectToAny;
 pub use metadata::Searchable;
 /// A module info file is the `info.txt` file in the module directory.
 pub use module_info_file::ModuleInfoFile;
+/// The Steam data included in the module info file
+pub use module_info_file::SteamData;
 pub use names::*;
 /// Represents the type of an object in DF Raws
 pub use object_types::ObjectType;

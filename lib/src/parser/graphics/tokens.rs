@@ -5,7 +5,7 @@ use super::phf_table::CONDITION_TAGS;
 
 #[derive(ts_rs::TS)]
 #[ts(export)]
-#[derive(Serialize, Deserialize, Debug, PartialEq, Eq, Clone, Copy, Default)]
+#[derive(Serialize, Deserialize, Debug, PartialEq, Eq, Clone, Copy, Default, specta::Type)]
 pub enum Condition {
     None,
     Condition,
@@ -131,7 +131,7 @@ pub enum Condition {
 
 #[derive(ts_rs::TS)]
 #[ts(export)]
-#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, Default)]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, Default, specta::Type)]
 pub enum ColorModification {
     #[default]
     AsIs,
@@ -139,7 +139,7 @@ pub enum ColorModification {
 
 #[derive(ts_rs::TS)]
 #[ts(export)]
-#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq)]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, specta::Type)]
 pub enum PlantGraphicTemplate {
     StandardLeaves,
     StandardFruit1,
@@ -154,7 +154,7 @@ pub enum PlantGraphicTemplate {
 
 #[derive(ts_rs::TS)]
 #[ts(export)]
-#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, Default)]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, Default, specta::Type)]
 pub enum GrowthTag {
     Fruit,
     Growth1,
@@ -167,7 +167,7 @@ pub enum GrowthTag {
 
 #[derive(ts_rs::TS)]
 #[ts(export)]
-#[derive(Serialize, Deserialize, Debug, Clone, Copy, PartialEq, Eq, Default)]
+#[derive(Serialize, Deserialize, Debug, Clone, Copy, PartialEq, Eq, Default, specta::Type)]
 pub enum GraphicType {
     Creature,
     CreatureCaste,
@@ -299,7 +299,7 @@ pub enum GraphicType {
 
 #[derive(ts_rs::TS)]
 #[ts(export)]
-#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, Default)]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, Default, specta::Type)]
 pub enum TilePageTag {
     TileDim,
     PageDim,

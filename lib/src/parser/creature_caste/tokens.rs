@@ -2,7 +2,7 @@ use serde::{Deserialize, Serialize};
 
 #[derive(ts_rs::TS)]
 #[ts(export)]
-#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, Default)]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, Default, specta::Type)]
 /// Tokens that can be found in a creature's caste definitions.
 pub enum CasteTag {
     /// Prevents tamed creature from being made available for adoption, instead allowing it to automatically adopt whoever it wants.

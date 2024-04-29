@@ -2,7 +2,7 @@ use serde::{Deserialize, Serialize};
 
 #[derive(ts_rs::TS)]
 #[ts(export)]
-#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, Default)]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, Default, specta::Type)]
 pub enum SyndromeToken {
     /// Used to specify the name of the syndrome as it appears in-game. Names don't have to be unique;
     /// It's perfectly acceptable to have multiple syndromes with identical names.

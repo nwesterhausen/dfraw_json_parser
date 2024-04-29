@@ -3,7 +3,7 @@ use serde::{Deserialize, Serialize};
 #[derive(ts_rs::TS)]
 #[ts(export)]
 #[allow(clippy::module_name_repetitions)]
-#[derive(Serialize, Deserialize, Debug, Clone, Default)]
+#[derive(Serialize, Deserialize, Debug, Clone, Default, specta::Type)]
 #[serde(rename_all = "camelCase")]
 /// How often a creature can be milked and what material it produces
 pub struct Milkable {

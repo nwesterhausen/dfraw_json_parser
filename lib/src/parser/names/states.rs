@@ -3,7 +3,7 @@ use std::fmt::Debug;
 
 #[derive(ts_rs::TS)]
 #[ts(export)]
-#[derive(Serialize, Deserialize, Debug, Clone, Default)]
+#[derive(Serialize, Deserialize, Debug, Clone, Default, specta::Type)]
 #[serde(rename_all = "camelCase", rename = "StateName")]
 /// Represents the name of a materials 3 states (solid, liquid, gas)
 pub struct Name {
