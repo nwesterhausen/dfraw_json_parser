@@ -16,9 +16,11 @@ impl RawObjectToken for CasteTag {
           CasteTag::BodyAppearanceModifier { .. }|
           CasteTag::BodyDetailPlan { .. } |
           CasteTag::BodyPartAppearanceModifier {..}|
+          CasteTag::BodySize {..}|
             CasteTag::ChildName { .. } |
             CasteTag::ClutchSize { .. } |
             CasteTag::Color { .. } |
+            CasteTag::EggMaterial { .. } |
             CasteTag::ExtraButcherObjectItem { .. } |
             CasteTag::ExtraButcherObject { .. } |
             CasteTag::GeneralMaterialForceMultiplier { .. } |
@@ -63,7 +65,10 @@ impl RawObjectToken for CasteTag {
             CasteTag::TissueLayerUnder { .. } |
             CasteTag::VerminBite { .. } |
             CasteTag::VisionArc { .. }
-          => TokenComplexity::Complex,
+          => {
+                tracing::trace!("get_complexity: {self:?} is 'Complex'");
+                TokenComplexity::Complex
+        }
           CasteTag::AltTile { .. } |
           CasteTag::Baby { .. } |
           CasteTag::BeachFrequency { .. } |
@@ -127,8 +132,14 @@ impl RawObjectToken for CasteTag {
           CasteTag::Tile { .. }|
           CasteTag::TradeCapacity { .. }|
           CasteTag::ViewRange { .. }|
-          CasteTag::Webber { .. } => TokenComplexity::Simple,
-          _ => TokenComplexity::None,
+          CasteTag::Webber { .. } => {
+                tracing::trace!("get_complexity: {self:?} is 'Simple'");
+                TokenComplexity::Simple
+          }
+          _ => {
+                tracing::trace!("get_complexity: {self:?} is 'None'");
+                TokenComplexity::None
+          }
         }
     }
 
@@ -137,7 +148,7 @@ impl RawObjectToken for CasteTag {
         Self: Sized,
     {
         let Some(token) = TOKEN_MAP.get(key) else {
-            tracing::warn!("Unknown token: {}", key);
+            tracing::error!("parse_token: unknown token: {}", key);
             return None;
         };
 
@@ -146,12 +157,14 @@ impl RawObjectToken for CasteTag {
             TokenComplexity::Simple => {
                 // All of these tokens have a pattern of `key:value` so we can parse `value` as appropriate
                 // We just pass this off to the token's `simple_parse` method to handle the parsing
-                parse_simple_token(token, value)
+                let simple_value = key.split(':').nth(1).unwrap_or_default();
+                parse_simple_token(token, simple_value)
             }
             TokenComplexity::Complex => {
                 // These tokens have a variable number of arguments, so we need to parse them differently
                 // We pass this off to the token's `complex_parse` method to handle the parsing
-                parse_complex_token(token, value)
+                let simple_value = key.split(':').nth(1).unwrap_or_default();
+                parse_complex_token(token, simple_value, value)
             }
         }
     }
@@ -178,20 +191,11 @@ fn parse_simple_token(token: &CasteTag, value: &str) -> Option<CasteTag> {
             Some(CasteTag::AltTile { tile })
         }
         CasteTag::Baby { .. } => {
-            let Ok(age) = value.parse::<u32>() else {
-                tracing::warn!("parse_simple_token: Cannot parse baby age: {}", value);
-                return None;
-            };
+            let age: u32 = value.parse().ok().unwrap_or_default();
             Some(CasteTag::Baby { age })
         }
         CasteTag::BeachFrequency { .. } => {
-            let Ok(frequency) = value.parse::<u32>() else {
-                tracing::warn!(
-                    "parse_simple_token: Cannot parse beach frequency: {}",
-                    value
-                );
-                return None;
-            };
+            let frequency: u32 = value.parse().ok().unwrap_or_default();
             Some(CasteTag::BeachFrequency { frequency })
         }
         CasteTag::BodyGloss { .. } => {
@@ -207,13 +211,7 @@ fn parse_simple_token(token: &CasteTag, value: &str) -> Option<CasteTag> {
             Some(CasteTag::BodyPartRemoveType { body_part_type })
         }
         CasteTag::BuildingDestroyer { .. } => {
-            let Ok(building_destroyer) = value.parse::<u32>() else {
-                tracing::warn!(
-                    "parse_simple_token: Cannot parse building destroyer: {}",
-                    value
-                );
-                return None;
-            };
+            let building_destroyer: u32 = value.parse().ok().unwrap_or_default();
             let door_and_furniture_focused = building_destroyer == 1;
             Some(CasteTag::BuildingDestroyer {
                 door_and_furniture_focused,
@@ -224,20 +222,11 @@ fn parse_simple_token(token: &CasteTag, value: &str) -> Option<CasteTag> {
             Some(CasteTag::CanDoInteraction { interaction })
         }
         CasteTag::ChangeBodySizePercent { .. } => {
-            let Ok(percent) = value.parse::<u32>() else {
-                tracing::warn!(
-                    "parse_simple_token: Cannot parse body size percent: {}",
-                    value
-                );
-                return None;
-            };
+            let percent: u32 = value.parse().ok().unwrap_or_default();
             Some(CasteTag::ChangeBodySizePercent { percent })
         }
         CasteTag::Child { .. } => {
-            let Ok(age) = value.parse::<u32>() else {
-                tracing::warn!("parse_simple_token: Cannot parse child age: {}", value);
-                return None;
-            };
+            let age: u32 = value.parse().ok().unwrap_or_default();
             Some(CasteTag::Child { age })
         }
         CasteTag::CreatureClass { .. } => {
@@ -261,10 +250,7 @@ fn parse_simple_token(token: &CasteTag, value: &str) -> Option<CasteTag> {
             Some(CasteTag::ExtraButcherObjectShape { shape })
         }
         CasteTag::EggSize { .. } => {
-            let Ok(size) = value.parse::<u32>() else {
-                tracing::warn!("parse_simple_token: Cannot parse egg size: {}", value);
-                return None;
-            };
+            let size: u32 = value.parse().ok().unwrap_or_default();
             Some(CasteTag::EggSize { size })
         }
         CasteTag::Extract { .. } => {
@@ -272,10 +258,7 @@ fn parse_simple_token(token: &CasteTag, value: &str) -> Option<CasteTag> {
             Some(CasteTag::Extract { material })
         }
         CasteTag::FixedTemp { .. } => {
-            let Ok(temperature) = value.parse::<i32>() else {
-                tracing::warn!("parse_simple_token: Cannot parse fixed temp: {}", value);
-                return None;
-            };
+            let temperature: i32 = value.parse().ok().unwrap_or_default();
             Some(CasteTag::FixedTemp { temperature })
         }
         CasteTag::Gait { .. } => {
@@ -299,20 +282,11 @@ fn parse_simple_token(token: &CasteTag, value: &str) -> Option<CasteTag> {
             Some(CasteTag::GrassTrample { trample })
         }
         CasteTag::GravitateBodySize { .. } => {
-            let Ok(target) = value.parse::<u32>() else {
-                tracing::warn!(
-                    "parse_simple_token: Cannot parse gravitate body size: {}",
-                    value
-                );
-                return None;
-            };
+            let target: u32 = value.parse().ok().unwrap_or_default();
             Some(CasteTag::GravitateBodySize { target })
         }
         CasteTag::Grazer { .. } => {
-            let Ok(grazer) = value.parse::<u32>() else {
-                tracing::warn!("parse_simple_token: Cannot parse grazer: {}", value);
-                return None;
-            };
+            let grazer: u32 = value.parse().ok().unwrap_or_default();
             Some(CasteTag::Grazer { grazer })
         }
         CasteTag::Habit { .. } => {
@@ -320,18 +294,14 @@ fn parse_simple_token(token: &CasteTag, value: &str) -> Option<CasteTag> {
             Some(CasteTag::Habit { habit })
         }
         CasteTag::HabitNumber { .. } => {
-            let Ok(number) = value.parse::<u32>() else {
-                tracing::warn!("parse_simple_token: Cannot parse habit number: {}", value);
-                return None;
-            };
+            let number: u32 = value.parse().ok().unwrap_or_default();
             Some(CasteTag::HabitNumber { number })
         }
         CasteTag::Homeotherm { .. } => {
-            let temperature = match value.parse::<u32>() {
-                Ok(temperature) => Some(temperature),
-                Err(_) => None,
-            };
-            Some(CasteTag::Homeotherm { temperature })
+            let temperature: u32 = value.parse().ok().unwrap_or_default();
+            Some(CasteTag::Homeotherm {
+                temperature: Some(temperature),
+            })
         }
         CasteTag::ItemCorpseQuality { .. } => {
             let quality = value.parse::<u32>().ok()?;
@@ -414,10 +384,7 @@ fn parse_simple_token(token: &CasteTag, value: &str) -> Option<CasteTag> {
             Some(CasteTag::ModValue { value })
         }
         CasteTag::OdorLevel { .. } => {
-            let Ok(odor_level) = value.parse::<u32>() else {
-                tracing::warn!("parse_simple_token: Cannot parse odor level: {}", value);
-                return None;
-            };
+            let odor_level: u32 = value.parse().ok().unwrap_or_default();
             Some(CasteTag::OdorLevel { odor_level })
         }
         CasteTag::OdorString { .. } => {
@@ -425,20 +392,11 @@ fn parse_simple_token(token: &CasteTag, value: &str) -> Option<CasteTag> {
             Some(CasteTag::OdorString { odor_string })
         }
         CasteTag::PenetratePower { .. } => {
-            let Ok(penetrate_power) = value.parse::<u32>() else {
-                tracing::warn!(
-                    "parse_simple_token: Cannot parse penetrate power: {}",
-                    value
-                );
-                return None;
-            };
+            let penetrate_power: u32 = value.parse().ok().unwrap_or_default();
             Some(CasteTag::PenetratePower { penetrate_power })
         }
         CasteTag::PetValue { .. } => {
-            let Ok(pet_value) = value.parse::<u32>() else {
-                tracing::warn!("parse_simple_token: Cannot parse pet value: {}", value);
-                return None;
-            };
+            let pet_value: u32 = value.parse().ok().unwrap_or_default();
             Some(CasteTag::PetValue { pet_value })
         }
         CasteTag::PetValueDivisor { .. } => {
@@ -517,7 +475,7 @@ fn parse_simple_token(token: &CasteTag, value: &str) -> Option<CasteTag> {
             Some(CasteTag::Webber { material })
         }
         _ => {
-            tracing::debug!(
+            tracing::error!(
                 "parse_simple_token: Cannot parse token (not simple): {:?}",
                 token
             );
@@ -539,85 +497,48 @@ fn parse_simple_token(token: &CasteTag, value: &str) -> Option<CasteTag> {
 ///
 /// * `Some(Self)` - The parsed token
 /// * `None` - The token could not be parsed
-fn parse_complex_token(token: &CasteTag, value: &str) -> Option<CasteTag> {
+fn parse_complex_token(token: &CasteTag, simple_value: &str, value: &str) -> Option<CasteTag> {
     match token {
         CasteTag::ApplyCreatureVariation { .. } => {
             // This token has an identifier and then a list of argument values, delimited by `:`
-            // The first argument is the identifier, and the rest are the arguments
-            let mut args = value.split(':');
-            let Some(identifier) = args.next() else {
-                tracing::warn!(
-                    "parse_complex_token: Cannot parse apply creature variation 'id': {}",
-                    value
-                );
-                return None;
-            };
-            let arguments = args.collect::<Vec<&str>>();
+            // Parse first argument as `String`
+            let identifier = simple_value.to_string();
+            // Parse remaining arguments as `Vec<String>`
+            let remaining_args = value.split(':').map(String::from).collect::<Vec<String>>();
             Some(CasteTag::ApplyCreatureVariation {
-                id: String::from(identifier),
-                args: arguments.iter().map(|s| String::from(*s)).collect(),
+                id: identifier,
+                args: remaining_args,
             })
         }
         CasteTag::Attack { .. } => {
             // Appears as `ATTACK:NAME:BODYPART:BY_CATEGORY:HORN`
-            // The first argument is the name, the rest is the body part (we include just as a string)
-            let mut args = value.split(':');
-            let Some(name) = args.next() else {
-                tracing::warn!("parse_complex_token: Cannot parse attack name: {}", value);
-                return None;
-            };
-            let body_part = args.collect::<Vec<&str>>().join(":");
-            Some(CasteTag::Attack {
-                name: String::from(name),
-                body_part,
-            })
+            // Parse first argument as `String`
+            let name = simple_value.to_string();
+            // Parse second argument as `String`
+            let body_part = value.to_string();
+            Some(CasteTag::Attack { name, body_part })
         }
         CasteTag::AttackTrigger { .. } => {
             // Appears as `ATTACK_TRIGGER:0:1:2` for population, exported_wealth and created_wealth
-            // The arguments are u32s, so we parse them as such
-            let mut args = value.split(':');
-            let Some(population) = args.next() else {
+            // Parse first argument as `u32`
+            let population = simple_value.parse::<u32>().unwrap_or_default();
+            // Parse the remaining as `Vec<u32>` by splitting on `:` and parsing each value
+            let mut values = value
+                .split(':')
+                .map(|s| s.parse::<u32>().unwrap_or_default())
+                .collect::<Vec<u32>>();
+            if values.len() < 2 {
                 tracing::warn!(
-                    "parse_complex_token: Cannot parse attack trigger population: {}",
+                    "parse_complex_token: Cannot parse attack trigger: not enough arguments: {}/3 '{}'",
+                    values.len(),
                     value
                 );
                 return None;
-            };
-            let Some(exported_wealth) = args.next() else {
-                tracing::warn!(
-                    "parse_complex_token: Cannot parse attack trigger exported wealth: {}",
-                    value
-                );
-                return None;
-            };
-            let Some(created_wealth) = args.next() else {
-                tracing::warn!(
-                    "parse_complex_token: Cannot parse attack trigger created wealth: {}",
-                    value
-                );
-                return None;
-            };
-            let Ok(population) = population.parse::<u32>() else {
-                tracing::warn!(
-                    "parse_complex_token: Cannot parse attack trigger population: {}",
-                    value
-                );
-                return None;
-            };
-            let Ok(exported_wealth) = exported_wealth.parse::<u32>() else {
-                tracing::warn!(
-                    "parse_complex_token: Cannot parse attack trigger exported wealth: {}",
-                    value
-                );
-                return None;
-            };
-            let Ok(created_wealth) = created_wealth.parse::<u32>() else {
-                tracing::warn!(
-                    "parse_complex_token: Cannot parse attack trigger created wealth: {}",
-                    value
-                );
-                return None;
-            };
+            }
+            // Set the first argument as `u32`
+            let exported_wealth = values.remove(0);
+            // Set the second argument as `u32`
+            let created_wealth = values.remove(0);
             Some(CasteTag::AttackTrigger {
                 population,
                 exported_wealth,
@@ -625,100 +546,308 @@ fn parse_complex_token(token: &CasteTag, value: &str) -> Option<CasteTag> {
             })
         }
         CasteTag::BabyName { .. } => {
-            // Arguments become a singular name and plural name, separated by `:`
-            let mut args = value.split(':');
-            let Some(singular) = args.next() else {
-                tracing::warn!(
-                    "parse_complex_token: Cannot parse baby name singular: {}",
-                    value
-                );
-                return None;
-            };
-            let Some(plural) = args.next() else {
-                tracing::warn!(
-                    "parse_complex_token: Cannot parse baby name plural: {}",
-                    value
-                );
-                return None;
-            };
-            Some(CasteTag::BabyName {
-                singular: String::from(singular),
-                plural: String::from(plural),
-            })
+            // Parse first argument as `String`
+            let singular = simple_value.to_string();
+            // Parse second argument as `String`
+            let plural = value.to_string();
+            Some(CasteTag::BabyName { singular, plural })
         }
         CasteTag::Body { .. } => {
+            // Parse first argument as `String`
+            let body_part_0 = simple_value.to_string();
             // Arguments need to be turned into a vector of strings
-            let body_parts = value.split(':').map(String::from).collect();
+            let mut body_parts = vec![body_part_0];
+            body_parts.extend(value.split(':').map(String::from));
             Some(CasteTag::Body { body_parts })
         }
         CasteTag::Blood { .. } => {
-            // Arguments become two strings, material and state; separated by `:`
-            let mut args = value.split(':');
-            let Some(material) = args.next() else {
-                tracing::warn!(
-                    "parse_complex_token: Cannot parse blood material: {}",
-                    value
-                );
-                return None;
-            };
-            let Some(state) = args.next() else {
-                tracing::warn!("parse_complex_token: Cannot parse blood state: {}", value);
-                return None;
-            };
-            Some(CasteTag::Blood {
-                material: String::from(material),
-                state: String::from(state),
-            })
+            // Parse first argument as `String`
+            let material = simple_value.to_string();
+            // Parse second argument as `String`
+            let state = value.to_string();
+            Some(CasteTag::Blood { material, state })
         }
         CasteTag::BodyAppearanceModifier { .. } => {
             // Arguments become a string (attribute) and 7 i32s, separated by `:`
-            let mut args = value.split(':');
-            let Some(attribute) = args.next() else {
+            // Parse first argument as `String`
+            let attribute = simple_value.to_string();
+            // Parse remaining arguments as `Vec<i32>`
+            let mut values = value
+                .split(':')
+                .map(|s| s.parse::<i32>().unwrap_or_default())
+                .collect::<Vec<i32>>();
+            if values.len() < 7 {
                 tracing::warn!(
-                    "parse_complex_token: Cannot parse body appearance modifier attribute: {}",
+                    "parse_complex_token: Cannot parse body appearance modifier: not enough arguments: {}/8 '{}'",
+                    values.len() + 1,
                     value
                 );
-                return None;
-            };
-            let values = args
-                .filter_map(|s| match s.parse::<i32>() {
-                    Ok(value) => Some(value),
-                    Err(_) => None,
-                })
-                .collect::<Vec<i32>>();
-            // Confirm we have 7 values
-            if values.len() != 7 {
-                tracing::warn!("parse_complex_token: Cannot parse body appearance modifier values {} instead of 7: {}", values.len(), value);
                 return None;
             }
-            let Ok(values) = values.try_into() else {
-                tracing::warn!(
-                    "parse_complex_token: Cannot parse body appearance modifier values: {}",
-                    value
-                );
-                return None;
-            };
+            // Set the first argument as `i32`
+            let low = values.remove(0);
+            // Set the second argument as `i32`
+            let median = values.remove(0);
+            // Set the third argument as `i32`
+            let high = values.remove(0);
+            // Set the fourth argument as `i32`
+            let low_variance = values.remove(0);
+            // Set the fifth argument as `i32`
+            let high_variance = values.remove(0);
+            // Set the sixth argument as `i32`
+            let low_cap = values.remove(0);
+            // Set the seventh argument as `i32`
+            let high_cap = values.remove(0);
             Some(CasteTag::BodyAppearanceModifier {
-                attribute: String::from(attribute),
-                values,
+                attribute,
+                values: [
+                    low,
+                    median,
+                    high,
+                    low_variance,
+                    high_variance,
+                    low_cap,
+                    high_cap,
+                ],
             })
         }
         CasteTag::BodyDetailPlan { .. } => {
             // Arguments become a string (body_plan) and string arguments (arguments); separated by `:`
-            let mut args = value.split(':');
-            let Some(body_plan) = args.next() else {
-                tracing::warn!(
-                    "parse_complex_token: Cannot parse body detail plan body plan: {}",
-                    value
-                );
-                return None;
-            };
-            let arguments = args.map(String::from).collect::<Vec<String>>();
+            // Parse first argument as `String`
+            let body_plan = simple_value.to_string();
+            // Parse remaining arguments as `Vec<String>`
+            let arguments = value.split(':').map(String::from).collect::<Vec<String>>();
             Some(CasteTag::BodyDetailPlan {
-                body_plan: String::from(body_plan),
+                body_plan,
                 arguments,
             })
         }
-        _ => todo!(),
+        CasteTag::Name { .. } => {
+            // Arguments become a singular name, plural name, and adjective, separated by `:`
+            // Parse first argument as `String`
+            let singular = simple_value.to_string();
+            // Parse second argument as `Vec<String>`
+            let mut args = value.split(':').map(String::from).collect::<Vec<String>>();
+            if args.len() < 2 {
+                tracing::warn!(
+                    "parse_complex_token: Cannot parse name: not enough arguments: {}/3 '{}'",
+                    args.len() + 1,
+                    value
+                );
+                return None;
+            }
+            // Set the second argument as `String`
+            let plural = args.remove(0);
+            // Set the third argument as `String`
+            let adjective = args.join(":");
+            Some(CasteTag::Name {
+                singular,
+                plural,
+                adjective,
+            })
+        }
+        CasteTag::NaturalSkill { .. } => {
+            // Parse first argument as `String`
+            let skill = simple_value.to_string();
+            // Parse second argument as `u32`
+            let level = value.parse::<u32>().unwrap_or_default();
+            Some(CasteTag::NaturalSkill { skill, level })
+        }
+        CasteTag::Personality { .. } => {
+            // Parse first argument as `String`
+            let personality_trait = simple_value.to_string();
+            // Parse second argument as `Vec<u32>`
+            let values = value
+                .split(':')
+                .map(|s| s.parse::<u32>().unwrap_or_default())
+                .collect::<Vec<u32>>();
+            // Set the first argument as `u32`
+            let low = values.first().copied().unwrap_or_default();
+            // Set the second argument as `u32`
+            let median = values.get(1).copied().unwrap_or_default();
+            // Set the third argument as `u32`
+            let high = values.get(2).copied().unwrap_or_default();
+            Some(CasteTag::Personality {
+                personality_trait,
+                low,
+                median,
+                high,
+            })
+        }
+        CasteTag::SkillRates { .. } => {
+            // Parse first argument as `u32`
+            let improvement_rate = simple_value.parse::<u32>().unwrap_or_default();
+            // Parse second argument as `Vec<u32>`
+            let values = value
+                .split(':')
+                .map(|s| s.parse::<u32>().unwrap_or_default())
+                .collect::<Vec<u32>>();
+            // Set the first argument as `u32`
+            let decay_rate_unused = values.first().copied().unwrap_or_default();
+            // Set the second argument as `u32`
+            let decay_rate_rusty = values.get(1).copied().unwrap_or_default();
+            // Set the third argument as `u32`
+            let decay_rate_demotion = values.get(2).copied().unwrap_or_default();
+            Some(CasteTag::SkillRates {
+                improvement_rate,
+                decay_rate_unused,
+                decay_rate_rusty,
+                decay_rate_demotion,
+            })
+        }
+        CasteTag::SkillRustRates { .. } => {
+            // Parse first argument as `u32`
+            let decay_rate_unused = simple_value.parse::<u32>().unwrap_or_default();
+            // Parse second argument as `Vec<u32>`
+            let mut values = value
+                .split(':')
+                .map(|s| s.parse::<u32>().unwrap_or_default())
+                .collect::<Vec<u32>>();
+            if values.len() < 2 {
+                tracing::warn!(
+                    "parse_complex_token: Cannot parse skill rust rates: not enough arguments: {}/2 '{}'",
+                    values.len(),
+                    value
+                );
+                return None;
+            }
+            // Set the first argument as `u32`
+            let decay_rate_rusty = values.remove(0);
+            // Set the second argument as `u32`
+            let decay_rate_demotion = values.remove(0);
+            Some(CasteTag::SkillRustRates {
+                decay_rate_unused,
+                decay_rate_rusty,
+                decay_rate_demotion,
+            })
+        }
+        CasteTag::Sound { .. } => {
+            // Parse first argument as `String`
+            let sound_type = String::from(simple_value);
+            // Parse second argument as `Vec<String>`
+            let mut args = value.split(':').map(String::from).collect::<Vec<String>>();
+            if args.len() < 6 {
+                tracing::warn!(
+                    "parse_complex_token: Cannot parse sound: not enough arguments: {}/7 '{}'",
+                    args.len() + 1,
+                    value
+                );
+                return None;
+            }
+            // Convert the first argument to a `u32`
+            let sound_interval = args.remove(0).parse::<u32>().unwrap_or_default();
+            // Convert the second argument to a `u32`
+            let sound_range = args.remove(0).parse::<u32>().unwrap_or_default();
+            // Convert the third argument to a `bool`
+            let requires_breathing = args.remove(0).parse::<bool>().unwrap_or_default();
+            // Convert the fourth argument to a `String`
+            let third_person = args.remove(0);
+            // Convert the fifth argument to a `String`
+            let first_person = args.remove(0);
+            // Convert the sixth argument to a `String`
+            let out_of_sight = args.join(":");
+            Some(CasteTag::Sound {
+                sound_type,
+                sound_range,
+                sound_interval,
+                requires_breathing,
+                third_person,
+                first_person,
+                out_of_sight,
+            })
+        }
+        CasteTag::SyndromeDilutionFactor { .. } => {
+            // Parse first argument as `String`
+            let syndrome = String::from(simple_value);
+            // Parse second argument as `u32`
+            let percentage = value.parse::<u32>().ok().unwrap_or_default();
+            Some(CasteTag::SyndromeDilutionFactor {
+                syndrome,
+                percentage,
+            })
+        }
+        CasteTag::TissueLayer { .. } => {
+            // Parse first argument as `String`
+            let body_part_selector = String::from(simple_value);
+            // Parse second argument as `Vec<String>`
+            let mut args = value.split(':').map(String::from).collect::<Vec<String>>();
+            let body_part = args.remove(0);
+            let tissue = args.remove(0);
+            let location = args.join(":");
+            Some(CasteTag::TissueLayer {
+                body_part_selector,
+                body_part,
+                tissue,
+                location,
+            })
+        }
+        CasteTag::TissueLayerUnder { .. } => {
+            // Parse first argument as `String`
+            let body_part_selector = String::from(simple_value);
+            // Parse second argument as `Vec<String>`
+            let mut args = value.split(':').map(String::from).collect::<Vec<String>>();
+            let body_part = args.remove(0);
+            let tissue = args.join(":");
+            Some(CasteTag::TissueLayerUnder {
+                body_part_selector,
+                body_part,
+                tissue,
+            })
+        }
+        CasteTag::VerminBite { .. } => {
+            // Parse first argument as `u32`
+            let chance = simple_value.parse::<u32>().ok().unwrap_or_default();
+            // Parse second argument as `Vec<String>`
+            let mut args = value.split(':').map(String::from).collect::<Vec<String>>();
+            let verb = args.remove(0);
+            let material = args.remove(0);
+            let material_state = args.join(":");
+            Some(CasteTag::VerminBite {
+                chance,
+                verb,
+                material,
+                material_state,
+            })
+        }
+        CasteTag::VisionArc { .. } => {
+            // Parse first argument as `u32`
+            let binocular = simple_value.parse::<u32>().ok().unwrap_or_default();
+            // Parse second argument as `u32`
+            let non_binocular = value.parse::<u32>().ok().unwrap_or_default();
+            Some(CasteTag::VisionArc {
+                binocular,
+                non_binocular,
+            })
+        }
+        CasteTag::MaxAge { .. } => {
+            // Parse first argument as `u32`
+            let min = simple_value.parse::<u32>().ok().unwrap_or_default();
+            // Parse second argument as `u32`
+            let max = value.parse::<u32>().ok().unwrap_or_default();
+            Some(CasteTag::MaxAge { min, max })
+        }
+        CasteTag::ClutchSize { .. } => {
+            // Parse first argument as `u32`
+            let min = simple_value.parse::<u32>().ok().unwrap_or_default();
+            // Parse second argument as `u32`
+            let max = value.parse::<u32>().ok().unwrap_or_default();
+            Some(CasteTag::ClutchSize { min, max })
+        }
+        CasteTag::EggMaterial { .. } => {
+            // Need to combine the two arguments into a single `Vec<String>`
+            let mut raw_args: Vec<String> = format!("{simple_value}:{value}")
+                .split(":")
+                .map(String::from)
+                .collect();
+            // The state is the last element in the vector
+            let state = raw_args.pop().unwrap_or_default();
+            // The material is a combined string of the remaining elements
+            let material = raw_args.join(":");
+            Some(CasteTag::EggMaterial { material, state })
+        }
+        _ => {
+            tracing::error!("parse_complex_token: cannot parse {:?}", token);
+            None
+        }
     }
 }

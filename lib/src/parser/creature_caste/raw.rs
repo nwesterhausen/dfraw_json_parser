@@ -75,7 +75,7 @@ impl Caste {
     pub fn parse_tag(&mut self, key: &str, value: &str) {
         let Some(tag) = CASTE_TOKENS.get(key) else {
             warn!(
-                "CasteParsing: called `Option::unwrap()` on a `None` value for presumed caste tag: {}",
+                "parse_tag: called `Option::unwrap()` on a `None` value for presumed caste tag: {}",
                 key
             );
             return;
@@ -94,7 +94,7 @@ impl Caste {
             // If the tag is a TokenComplexity::None, then the value should be empty
             // So we should log the extra value before adding the tag to the last caste
             warn!(
-                "Caste::parse_tag: tag {} has a value of {} but is a TokenComplexity::None as {:?}",
+                "parse_tag: tag {} has a value of {} but is a TokenComplexity::None as {:?}",
                 key, value, tag
             );
             if let Some(tags) = self.tags.as_mut() {
@@ -107,7 +107,7 @@ impl Caste {
         // Both simple and complex tags should have a value, and that needs to be parsed. So let the tag handle it.
         let Some(tag_and_value) = CasteTag::parse_token(key, value) else {
             warn!(
-                "Caste::parse_tag: Called unwrap on a None value for tag {} with value {}",
+                "parse_tag: Called unwrap on a None value for tag {} with value {}",
                 key, value
             );
             return;
@@ -203,11 +203,11 @@ impl Caste {
         &self.identifier
     }
 
+    #[allow(clippy::too_many_lines)]
     pub fn remove_tag_and_value(&mut self, key: &str, value: &str) {
         let Some(tag) = CASTE_TOKENS.get(key) else {
             warn!(
-                "CreatureParsing: called `Option::unwrap()` on a `None` value for presumed caste tag: {}",
-                key
+                "remove_tag_and_value: called `Option::unwrap()` on a `None` value for presumed caste tag: {key}"
             );
             return;
         };
@@ -215,72 +215,63 @@ impl Caste {
         if let TokenComplexity::None = tag.get_complexity() {
             // If the tag is a TokenComplexity::None, then the value should be empty
             // So we should log the extra value before adding the tag to the last caste
-            warn!(
-                "Caste::remove_tag_and_value: tag {} has a value of {} but is a TokenComplexity::None as {:?}",
+            if !value.is_empty() {
+                warn!(
+                "remove_tag_and_value: tag {} has a value of {} but is a TokenComplexity::None as {:?}",
                 key, value, tag
             );
-            return;
+                return;
+            }
         }
-
-        // For simple and complex, some of the tags are stored as part of the struct.
-        // So we need to remove them from the struct as well as the tags vector.
-        let Some(tag_and_value) = CasteTag::parse_token(key, value) else {
-            warn!(
-                        "Caste::remove_tag_and_value: Called unwrap on a None value for tag {} with value {}",
-                        key, value
-                    );
-            return;
-        };
-        if let Some(tags) = self.tags.as_mut() {
-            tags.retain(|tag| tag != &tag_and_value);
-        }
-
-        match tag_and_value {
-            CasteTag::Description { .. } => self.description = None,
-            CasteTag::EggSize { .. } => self.egg_size =None,
-            CasteTag::Baby { .. } => self.baby =None,
-            CasteTag::Child { .. } => self.child = None,
-            CasteTag::Difficulty { .. } => self.difficulty = None,
-            CasteTag::Grazer { .. } => self.grazer = None,
-            CasteTag::GrassTrample { .. } => self.grass_trample = None,
-            CasteTag::LowLightVision { .. } => self.low_light_vision = None,
-            CasteTag::PopulationRatio { .. } => self.pop_ratio = None,
-            CasteTag::PetValue { .. } => self.pet_value = None,
-            CasteTag::ClutchSize { .. } => self.clutch_size = None,
-            CasteTag::LitterSize { .. } => self.litter_size = None,
-            CasteTag::MaxAge { .. } => self.max_age = None,
-            CasteTag::CreatureClass { .. } => {
-                // Remove the specific creature class from the creature classes vector
-                if let Some(creature_classes) = self.creature_class.as_mut() {
-                    creature_classes.retain(|class| class != value);
+        // Complex tags won't parse if we are removing them, (only the KEY is set)
+        match key {
+                "DESCRIPTION" => self.description = None,
+                "EGG_SIZE" => self.egg_size = None,
+                "BABY" => self.baby = None,
+                "CHILD" => self.child = None,
+                "DIFFICULTY" => self.difficulty = None,
+                "GRAZER" => self.grazer = None,
+                "GRASS_TRAMPLE" => self.grass_trample = None,
+                "LOW_LIGHT_VISION" => self.low_light_vision = None,
+                "POP_RATIO" => self.pop_ratio = None,
+                "PET_VALUE" => self.pet_value = None,
+                "CLUTCH_SIZE" => self.clutch_size = None,
+                "LITTER_SIZE" => self.litter_size = None,
+                "MAX_AGE" => self.max_age = None,
+                "CREATURE_CLASS" => {
+                    if let Some(creature_classes) = self.creature_class.as_mut() {
+                        creature_classes.retain(|class| class != value);
+                    }
+                }
+                "BODY_SIZE" => {
+                    if let Some(body_sizes) = self.body_size.as_mut() {
+                        body_sizes.retain(|body_size| body_size != &BodySize::from_value(value));
+                    }
+                }
+                "MILKABLE" => self.milkable = None,
+                "BABY_NAME" => self.baby_name = None,
+                "NAME" => self.caste_name = None,
+                "CHILD_NAME" => self.child_name = None,
+                "TILE" | //=> self.tile = Tile::default(),
+                "ALTTILE" | //=> self.tile = Tile::default(),
+                "COLOR" | //=> self.tile = Tile::default(),
+                "GLOWTILE" | //=> self.tile = Tile::default(),
+                "GLOWCOLOR" => self.tile = None,
+                "CHANGE_BODY_SIZE_PERCENT" => {
+                    self.change_body_size_percentage = None;
+                }
+                "GAIT" => {
+                    // Remove the specific gait from the gaits vector
+                    if let Some(gaits) = self.gaits.as_mut() {
+                        gaits.retain(|gait| gait != &Gait::from_value(value));
+                    }
+                }
+                _ => {
+                    if let Some(tags) = self.tags.as_mut() {
+                        tags.retain(|t| t != tag);
+                    }
                 }
             }
-            CasteTag::BodySize { .. } => {
-                // Remove the specific body size from the body sizes vector
-                if let Some(body_sizes) = self.body_size.as_mut() {
-                    body_sizes.retain(|body_size| body_size != &BodySize::from_value(value));
-                }
-            }
-            CasteTag::Milkable { .. } => self.milkable = None,
-            CasteTag::BabyName { .. } => self.baby_name = None,
-            CasteTag::Name { .. } => self.caste_name = None,
-            CasteTag::ChildName { .. } => self.child_name = None,
-            CasteTag::Tile { .. } | //=> self.tile = Tile::default(),
-            CasteTag::AltTile { .. } | //=> self.tile = Tile::default(),
-            CasteTag::Color { .. } | //=> self.tile = Tile::default(),
-            CasteTag::GlowTile { .. } | //=> self.tile = Tile::default(),
-            CasteTag::GlowColor { .. } => self.tile = None,
-            CasteTag::ChangeBodySizePercent { .. } => {
-                self.change_body_size_percentage = None;
-            }
-            CasteTag::Gait { .. } => {
-                // Remove the specific gait from the gaits vector
-                if let Some(gaits) = self.gaits.as_mut() {
-                gaits.retain(|gait| gait != &Gait::from_value(value));
-                }
-            }
-            _ => {}
-        }
     }
 
     pub fn overwrite_caste(&mut self, other: &Caste) {

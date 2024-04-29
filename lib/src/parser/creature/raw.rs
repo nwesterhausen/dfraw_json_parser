@@ -657,15 +657,12 @@ impl RawObject for Creature {
             return;
         }
         if !CREATURE_TOKENS.contains_key(key) {
-            trace!("CreatureParsing: Unknown tag {} with value {}", key, value);
+            trace!("parse_tag: unknown tag {} with value {}", key, value);
             return;
         }
 
         let Some(tag) = CreatureTag::parse_token(key, value) else {
-            warn!(
-                "Creature::parse_tag: Unknown tag {} with value {}",
-                key, value
-            );
+            warn!("parse_tag: unknown tag {} with value {}", key, value);
             return;
         };
 
@@ -677,7 +674,7 @@ impl RawObject for Creature {
                     self.add_biome(biome.clone());
                 } else {
                     warn!(
-                        "CreatureParsing: Unknown biome {} for creature {}",
+                        "parse_tag: unknown biome {} for creature {}",
                         id, self.identifier
                     );
                 }
