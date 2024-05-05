@@ -1,7 +1,7 @@
 use serde::{Deserialize, Serialize};
 
-#[derive(ts_rs::TS)]
-#[ts(export)]
+
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, Default, specta::Type)]
 pub enum PlantTag {
     Dry,

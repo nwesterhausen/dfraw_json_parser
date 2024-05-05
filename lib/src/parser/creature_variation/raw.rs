@@ -5,8 +5,8 @@ use crate::{helpers::build_object_id_from_pieces, ObjectType, RawMetadata, RawOb
 
 use super::{Rule, Token, TOKEN_MAP};
 
-#[derive(ts_rs::TS)]
-#[ts(export)]
+
+
 #[allow(clippy::module_name_repetitions)]
 #[derive(Serialize, Deserialize, Debug, Clone, Default, specta::Type)]
 #[serde(rename_all = "camelCase")]

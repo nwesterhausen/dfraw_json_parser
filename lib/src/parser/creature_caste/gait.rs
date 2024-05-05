@@ -1,8 +1,8 @@
 use serde::{Deserialize, Serialize};
 use tracing::warn;
 
-#[derive(ts_rs::TS)]
-#[ts(export)]
+
+
 #[derive(Serialize, Deserialize, Debug, Clone, Default, PartialEq, Eq, specta::Type)]
 #[serde(rename_all = "camelCase")]
 /// Gaits are a way to describe how a creature moves. Defined in the raws with:
@@ -42,8 +42,8 @@ pub struct Gait {
     modifiers: Vec<Modifier>,
 }
 
-#[derive(ts_rs::TS)]
-#[ts(export)]
+
+
 #[derive(Serialize, Deserialize, Debug, Clone, Default, PartialEq, Eq, specta::Type)]
 #[serde(rename_all = "camelCase")]
 #[allow(clippy::module_name_repetitions)]
@@ -70,8 +70,8 @@ pub enum GaitType {
     Unknown,
 }
 
-#[derive(ts_rs::TS)]
-#[ts(export)]
+
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, specta::Type)]
 #[serde(rename_all = "camelCase")]
 pub enum Modifier {

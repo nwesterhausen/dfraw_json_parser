@@ -3,9 +3,9 @@ use tracing::warn;
 
 use super::phf_table::CONDITION_TAGS;
 
-#[derive(ts_rs::TS)]
-#[ts(export)]
-#[derive(Serialize, Deserialize, Debug, PartialEq, Eq, Clone, Copy, Default, specta::Type)]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, Default, specta::Type, Copy)]
+#[serde(rename_all = "camelCase")]
+
 pub enum Condition {
     None,
     Condition,
@@ -129,17 +129,17 @@ pub enum Condition {
     Dancer,
 }
 
-#[derive(ts_rs::TS)]
-#[ts(export)]
-#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, Default, specta::Type)]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, Default, specta::Type, Copy)]
+#[serde(rename_all = "camelCase")]
+
 pub enum ColorModification {
     #[default]
     AsIs,
 }
 
-#[derive(ts_rs::TS)]
-#[ts(export)]
-#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, specta::Type)]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, specta::Type, Copy)]
+#[serde(rename_all = "camelCase")]
+
 pub enum PlantGraphicTemplate {
     StandardLeaves,
     StandardFruit1,
@@ -152,10 +152,10 @@ pub enum PlantGraphicTemplate {
     StandardFlowers4,
 }
 
-#[derive(ts_rs::TS)]
-#[ts(export)]
-#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, Default, specta::Type)]
-pub enum GrowthTag {
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, Default, specta::Type, Copy)]
+#[serde(rename_all = "camelCase")]
+
+pub enum GrowthToken {
     Fruit,
     Growth1,
     Growth2,
@@ -165,9 +165,9 @@ pub enum GrowthTag {
     AsIs,
 }
 
-#[derive(ts_rs::TS)]
-#[ts(export)]
 #[derive(Serialize, Deserialize, Debug, Clone, Copy, PartialEq, Eq, Default, specta::Type)]
+#[serde(rename_all = "camelCase")]
+
 pub enum GraphicType {
     Creature,
     CreatureCaste,
@@ -297,9 +297,9 @@ pub enum GraphicType {
     WeaponUpright10B,
 }
 
-#[derive(ts_rs::TS)]
-#[ts(export)]
-#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, Default, specta::Type)]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, Default, specta::Type, Copy)]
+#[serde(rename_all = "camelCase")]
+
 pub enum TilePageTag {
     TileDim,
     PageDim,

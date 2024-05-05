@@ -3,17 +3,9 @@ use crate::{creature::Creature, RawObject, VARIATION_ARGUMENT_RE};
 use super::Requirements;
 
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    Default,
-    ts_rs::TS,
-    specta::Type,
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, Default, specta::Type,
 )]
-#[ts(export)]
+
 pub enum CreatureVariationRule {
     #[default]
     Unknown,

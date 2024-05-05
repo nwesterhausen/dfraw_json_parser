@@ -8,8 +8,6 @@ use crate::{
 
 use super::Modification;
 
-#[derive(ts_rs::TS)]
-#[ts(export)]
 #[derive(Serialize, Deserialize, Debug, Clone, Default, specta::Type)]
 #[serde(rename_all = "camelCase")]
 #[allow(clippy::module_name_repetitions)]

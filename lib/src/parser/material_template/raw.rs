@@ -5,8 +5,8 @@ use crate::parser::{
     clean_search_vec, material::Material, ObjectType, RawMetadata, RawObject, Searchable,
 };
 
-#[derive(ts_rs::TS)]
-#[ts(export)]
+
+
 #[derive(Serialize, Deserialize, Debug, Clone, Default, specta::Type)]
 #[serde(rename_all = "camelCase")]
 pub struct MaterialTemplate {

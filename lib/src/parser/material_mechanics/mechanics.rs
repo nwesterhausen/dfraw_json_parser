@@ -3,8 +3,8 @@ use crate::parser::{material::PropertyToken, serializer_helper};
 use serde::{Deserialize, Serialize};
 use tracing::warn;
 
-#[derive(ts_rs::TS)]
-#[ts(export)]
+
+
 #[allow(clippy::module_name_repetitions)]
 #[derive(Serialize, Deserialize, Debug, Clone, Default, specta::Type)]
 #[serde(rename_all = "camelCase", rename = "MaterialMechanics")]

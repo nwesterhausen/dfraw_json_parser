@@ -1,8 +1,7 @@
 use serde::{Deserialize, Serialize};
 
 /// Tasks that describe what the parser is currently doing.
-#[derive(ts_rs::TS)]
-#[ts(export)]
+
 #[derive(Serialize, Deserialize, Debug, Clone, Default)]
 #[serde(rename_all = "camelCase")]
 #[allow(clippy::module_name_repetitions)]

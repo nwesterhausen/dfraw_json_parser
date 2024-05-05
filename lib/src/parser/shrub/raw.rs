@@ -8,8 +8,8 @@ use crate::parser::Color;
 use super::phf_table::SHRUB_TOKENS;
 use super::tokens::{SeasonToken, ShrubToken};
 
-#[derive(ts_rs::TS)]
-#[ts(export)]
+
+
 #[derive(Serialize, Deserialize, Debug, Clone, Default, specta::Type)]
 #[serde(rename_all = "camelCase")]
 pub struct Shrub {

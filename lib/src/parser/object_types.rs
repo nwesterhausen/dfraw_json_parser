@@ -45,8 +45,6 @@ pub static OBJECT_TOKEN_MAP: phf::Map<&'static str, ObjectType> = phf::phf_map! 
     "INTERACTION" => ObjectType::Interaction,
 };
 
-#[derive(ts_rs::TS)]
-#[ts(export)]
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize, Default, Hash, specta::Type)]
 pub enum ObjectType {
     Creature,

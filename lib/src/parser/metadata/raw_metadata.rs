@@ -29,8 +29,6 @@ use crate::{ModuleInfoFile, ObjectType, RawModuleLocation};
 /// be hidden unless specified in the `ParsingOptions` struct.
 #[derive(Serialize, Deserialize, Clone, Debug, Default, specta::Type)]
 #[serde(rename_all = "camelCase")]
-#[derive(ts_rs::TS)]
-#[ts(export, rename = "RawMetadata")]
 pub struct Metadata {
     // The object_id of the raw module
     module_object_id: String,

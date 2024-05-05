@@ -18,8 +18,6 @@ use super::steam_data::SteamData;
 
 #[derive(Serialize, Deserialize, Default, Clone, Debug, specta::Type)]
 #[serde(rename_all = "camelCase")]
-#[derive(ts_rs::TS)]
-#[ts(export, rename = "ModuleInfoFile")]
 /// Represents the `info.txt` file for a raw module
 pub struct InfoFile {
     identifier: String,

@@ -1,8 +1,8 @@
 use serde::{Deserialize, Serialize};
 use tracing::{error, warn};
 
-#[derive(ts_rs::TS)]
-#[ts(export)]
+
+
 #[derive(Serialize, Deserialize, Copy, Clone, Debug, Default, specta::Type)]
 pub struct Dimensions {
     x: i32,

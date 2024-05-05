@@ -1,8 +1,8 @@
 use serde::{Deserialize, Serialize};
 use std::fmt::Debug;
 
-#[derive(ts_rs::TS)]
-#[ts(export)]
+
+
 #[derive(Serialize, Deserialize, Debug, Clone, Default, specta::Type)]
 #[serde(rename_all = "camelCase", rename = "SingPlurName")]
 /// The name of a raw object with only singular and plural forms

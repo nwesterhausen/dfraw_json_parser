@@ -1,7 +1,5 @@
 use serde::{Deserialize, Serialize};
 
-#[derive(ts_rs::TS)]
-#[ts(export)]
 #[derive(Serialize, Deserialize, Debug, Clone, Default, specta::Type)]
 #[serde(rename_all = "camelCase")]
 /// The temperature properties of a material

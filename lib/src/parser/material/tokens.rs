@@ -1,7 +1,7 @@
 use serde::{Deserialize, Serialize};
 
-#[derive(ts_rs::TS)]
-#[ts(export)]
+
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, Default, specta::Type)]
 pub enum MaterialType {
     Inorganic,
@@ -39,8 +39,8 @@ pub enum MaterialType {
     Unknown,
 }
 
-#[derive(ts_rs::TS)]
-#[ts(export)]
+
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, Default, specta::Type)]
 pub enum FuelType {
     Charcoal,
@@ -51,8 +51,8 @@ pub enum FuelType {
     None,
 }
 
-#[derive(ts_rs::TS)]
-#[ts(export)]
+
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, Default, specta::Type)]
 pub enum MaterialState {
     Solid,
@@ -73,8 +73,8 @@ pub enum MaterialState {
     AllSolid,
 }
 
-#[derive(ts_rs::TS)]
-#[ts(export)]
+
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, Default, specta::Type)]
 pub enum MaterialUsage {
     /// Lets the game know that an animal was likely killed in the production of this item.
@@ -239,8 +239,8 @@ pub enum MaterialUsage {
     Unknown,
 }
 
-#[derive(ts_rs::TS)]
-#[ts(export)]
+
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, Default, specta::Type)]
 pub enum MaterialProperty {
     /// Imports the properties of the specified preexisting material template.

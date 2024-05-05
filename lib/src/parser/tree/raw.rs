@@ -8,8 +8,6 @@ use super::{
     tokens::{TreeToken, TwigPlacement},
 };
 
-#[derive(ts_rs::TS)]
-#[ts(export)]
 #[derive(Serialize, Deserialize, Debug, Clone, Default, specta::Type)]
 #[serde(rename_all = "camelCase")]
 pub struct Tree {

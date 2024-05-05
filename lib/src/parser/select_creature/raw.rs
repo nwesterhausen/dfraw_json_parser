@@ -5,8 +5,8 @@ use crate::parser::{
     ObjectType, {clean_search_vec, Searchable}, {RawMetadata, RawObject},
 };
 
-#[derive(ts_rs::TS)]
-#[ts(export)]
+
+
 #[derive(Serialize, Deserialize, Debug, Clone, Default, specta::Type)]
 #[serde(rename_all = "camelCase")]
 pub struct SelectCreature {

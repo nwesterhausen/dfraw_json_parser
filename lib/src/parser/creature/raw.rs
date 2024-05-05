@@ -21,8 +21,8 @@ use super::{phf_table::CREATURE_TOKENS, tokens::CreatureTag};
 /// based on the properties of the creature they are applied to. But right now the application
 /// of those changes is not applied, in order to preserve the original creature. So instead,
 /// they are saved and can be applied later (at the consumer's discretion).
-#[derive(ts_rs::TS)]
-#[ts(export)]
+
+
 #[derive(Serialize, Deserialize, Debug, Clone, Default, specta::Type)]
 #[serde(rename_all = "camelCase")]
 pub struct Creature {

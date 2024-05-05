@@ -11,8 +11,8 @@ use super::{
     tokens::{EnvironmentClass, InclusionType, InorganicToken},
 };
 
-#[derive(ts_rs::TS)]
-#[ts(export)]
+
+
 #[derive(Serialize, Deserialize, Debug, Clone, Default, specta::Type)]
 #[serde(rename_all = "camelCase")]
 pub struct Inorganic {

@@ -1,7 +1,7 @@
 use serde::{Deserialize, Serialize};
 
-#[derive(ts_rs::TS)]
-#[ts(export)]
+
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, Default, specta::Type)]
 pub enum GrowthType {
     Leaves,
@@ -21,8 +21,8 @@ pub enum GrowthType {
     None,
 }
 
-#[derive(ts_rs::TS)]
-#[ts(export)]
+
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, Default, specta::Type)]
 pub enum GrowthTag {
     Growth,
@@ -40,8 +40,8 @@ pub enum GrowthTag {
     Unknown,
 }
 
-#[derive(ts_rs::TS)]
-#[ts(export)]
+
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, Default, specta::Type)]
 pub enum PlantPart {
     Twigs,

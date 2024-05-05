@@ -19,7 +19,6 @@ lexopt = "0.3"
 tracing = "0.1.40"
 tracing-subscriber = "0.3.18"
 serde_json = "1.0"
-specta = { version = "1.0.5", features = ["typescript"] }
 
 [dependencies.fern]
 version = "0.6.2"

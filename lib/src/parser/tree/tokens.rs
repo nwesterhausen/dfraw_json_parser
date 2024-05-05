@@ -1,7 +1,5 @@
 use serde::{Deserialize, Serialize};
 
-#[derive(ts_rs::TS)]
-#[ts(export)]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, Default, specta::Type)]
 pub enum TreeToken {
     Tree,
@@ -54,8 +52,6 @@ pub enum TreeToken {
     Unknown,
 }
 
-#[derive(ts_rs::TS)]
-#[ts(export)]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, Default, specta::Type)]
 pub enum TwigPlacement {
     SideBranches,

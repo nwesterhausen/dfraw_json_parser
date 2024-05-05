@@ -3,8 +3,7 @@ use serde::{Deserialize, Serialize};
 use crate::RawModuleLocation;
 
 /// Details about the current file being parsed, specifically where and what it is.
-#[derive(ts_rs::TS)]
-#[ts(export)]
+
 #[derive(Serialize, Deserialize, Debug, Clone, Default)]
 #[serde(rename_all = "camelCase")]
 #[allow(clippy::module_name_repetitions)]

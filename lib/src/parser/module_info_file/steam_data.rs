@@ -2,8 +2,8 @@ use serde::{Deserialize, Serialize};
 
 #[derive(Serialize, Deserialize, Default, Clone, Debug, specta::Type)]
 #[serde(rename_all = "camelCase")]
-#[derive(ts_rs::TS)]
-#[ts(export)]
+
+
 /// The additional data specific to the steam workshop
 pub struct SteamData {
     title: Option<String>,

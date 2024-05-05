@@ -1,7 +1,7 @@
 use serde::{Deserialize, Serialize};
 
-#[derive(ts_rs::TS)]
-#[ts(export)]
+
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, Default, specta::Type)]
 pub enum CreatureEffectToken {
     // Negative Effects
@@ -99,8 +99,8 @@ pub enum CreatureEffectToken {
     Unknown,
 }
 
-#[derive(ts_rs::TS)]
-#[ts(export)]
+
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, Default, specta::Type)]
 pub enum CreatureEffectProperty {
     /// The severity of the effect. Higher values appear to be worse, with SEV:1000 CE_NECROSIS causing a part to near-instantly become rotten.

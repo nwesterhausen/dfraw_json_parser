@@ -1,4 +1,4 @@
-use super::tokens::{Condition, GraphicType, GrowthTag, PlantGraphicTemplate, TilePageTag};
+use super::tokens::{Condition, GraphicType, GrowthToken, PlantGraphicTemplate, TilePageTag};
 
 pub static CONDITION_TAGS: phf::Map<&'static str, Condition> = phf::phf_map! {
     "DEFAULT" => Condition::Default,
@@ -373,16 +373,16 @@ pub static GRAPHIC_TYPE_TAGS: phf::Map<&'static str, GraphicType> = phf::phf_map
 
 };
 
-pub static GROWTH_TAGS: phf::Map<&'static str, GrowthTag> = phf::phf_map! {
-    "GROWTH_FRUIT" => GrowthTag::Fruit,
+pub static GROWTH_TAGS: phf::Map<&'static str, GrowthToken> = phf::phf_map! {
+    "GROWTH_FRUIT" => GrowthToken::Fruit,
     // [GROWTH_1:GRASS_FLOWERS:0:1]
-    "GROWTH_1" => GrowthTag::Growth1,
+    "GROWTH_1" => GrowthToken::Growth1,
     // [GROWTH_2:GRASS_FLOWERS:1:1]
-    "GROWTH_2" => GrowthTag::Growth2,
+    "GROWTH_2" => GrowthToken::Growth2,
     // [GROWTH_3:GRASS_FLOWERS:2:1]
-    "GROWTH_3" => GrowthTag::Growth3,
+    "GROWTH_3" => GrowthToken::Growth3,
     // [GROWTH_4:GRASS_FLOWERS:3:1]
-    "GROWTH_4" => GrowthTag::Growth4,
+    "GROWTH_4" => GrowthToken::Growth4,
 };
 
 pub static TILE_PAGE_TAGS: phf::Map<&'static str, TilePageTag> = phf::phf_map! {

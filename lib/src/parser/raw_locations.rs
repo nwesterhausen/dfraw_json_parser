@@ -6,8 +6,6 @@ use std::{
 use serde::{Deserialize, Serialize};
 use tracing::warn;
 
-#[derive(ts_rs::TS)]
-#[ts(export)]
 #[derive(
     Serialize, Debug, Deserialize, Clone, Copy, PartialEq, Eq, Default, Hash, specta::Type,
 )]
