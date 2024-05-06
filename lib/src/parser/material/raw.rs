@@ -30,12 +30,12 @@ pub struct Material {
     name: Option<String>,
     /// For the coal tag, it specifies the type of fuel that can be used. It will never be None.
     fuel_type: Option<FuelType>,
-    /// Linked creature identifier (and then material_name might be "skin", like for "CREATURE_MAT:DWARF:SKIN")
+    /// Linked creature identifier (and then material_name might be "skin", like for "`CREATURE_MAT:DWARF:SKIN`")
     creature_identifier: Option<String>,
-    /// Linked plant identifier (and then material_name might be "leaf", like for "PLANT_MAT:BUSH_QUARRY:LEAF")
+    /// Linked plant identifier (and then material_name might be "leaf", like for "`PLANT_MAT:BUSH_QUARRY:LEAF`")
     plant_identifier: Option<String>,
-    /// If a material is defined within a creature itself, it will use LOCAL_CREATURE_MAT tag, which implies
-    /// that the material is only used by that creature. This is also true for plants and LOCAL_PLANT_MAT.
+    /// If a material is defined within a creature itself, it will use `LOCAL_CREATURE_MAT` tag, which implies
+    /// that the material is only used by that creature. This is also true for plants and `LOCAL_PLANT_MAT`.
     // skip if false
     is_local_material: Option<bool>,
     /// Within a reaction, there can be special material definitions. Todo: Figure this out.
@@ -92,7 +92,7 @@ impl Material {
             ..Self::default()
         }
     }
-    /// This may not be correct. This should be for `\[USE_MATERIAL:XX:XX\]` but couldn't find an example for Plant.
+    /// This may not be correct. This should be for `[USE_MATERIAL:XX:XX]` but couldn't find an example for Plant.
     ///
     /// # Arguments
     ///
@@ -164,7 +164,7 @@ impl Material {
     /// A new material
     #[must_use]
     pub fn from_value(value: &str) -> Self {
-        // Value is a string like "CREATURE_MAT:DWARF:SKIN" or "INORGANIC" or "STONE:MARBLE" or "LOCAL_PLANT_MAT:LEAF"
+        // Value is a string like "`CREATURE_MAT:DWARF:SKIN`" or "`INORGANIC`" or "`STONE:MARBLE`" or "`LOCAL_PLANT_MAT:LEAF`"
         // It's possible that the number of parts to the value str is 1, 2, or 3.
         let mut split = value.split(':');
         let split_len = split.clone().count();

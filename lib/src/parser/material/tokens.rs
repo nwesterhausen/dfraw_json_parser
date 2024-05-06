@@ -97,7 +97,7 @@ pub enum MaterialState {
     Unknown,
     /// Denotes all possible material states
     All,
-    /// Denotes 'Solid', 'Powder', 'Paste', and 'Pressed'
+    /// Denotes '`Solid`', '`Powder`', '`Paste`', and '`Pressed`'
     AllSolid,
 }
 
@@ -111,13 +111,13 @@ pub enum MaterialUsage {
     AlcoholPlant,
     /// Classifies the material as animal-based alcohol, allowing its storage in food stockpiles under "Drink (Animal)".
     AlcoholCreature,
-    /// Classifies the material as generic alcohol. Implied by both ALCOHOL_PLANT and ALCOHOL_CREATURE. Exact behavior unknown, possibly vestigial.
+    /// Classifies the material as generic alcohol. Implied by both `ALCOHOL_PLANT` and `ALCOHOL_CREATURE`. Exact behavior unknown, possibly vestigial.
     Alcohol,
     /// Classifies the material as plant-based cheese, allowing its storage in food stockpiles under "Cheese (Plant)".
     CheesePlant,
     /// Classifies the material as animal-based cheese, allowing its storage in food stockpiles under "Cheese (Animal)".
     CheeseCreature,
-    /// Classifies the material as generic cheese. Implied by both CHEESE_PLANT and CHEESE_CREATURE. Exact behavior unknown, possibly vestigial.
+    /// Classifies the material as generic cheese. Implied by both `CHEESE_PLANT` and `CHEESE_CREATURE`. Exact behavior unknown, possibly vestigial.
     Cheese,
     /// Classifies the material as plant powder, allowing its storage in food stockpiles under "Milled Plant".
     PowderMiscPlant,
@@ -125,7 +125,7 @@ pub enum MaterialUsage {
     /// Unlike milled plants, such as sugar and flour, "Bone Meal" barrels or pots may not contain bags.
     /// Custom reactions using this product better use buckets or jugs instead.
     PowderMiscCreature,
-    /// Classifies the material as generic powder. Implied by both POWDER_MISC_PLANT and POWDER_MISC_CREATURE.
+    /// Classifies the material as generic powder. Implied by both `POWDER_MISC_PLANT` and `POWDER_MISC_CREATURE`.
     /// Exact behavior unknown, possibly vestigial.
     PowderMisc,
     /// Permits globs of the material in solid form to be stored in food stockpiles under "Fat" - without it,
@@ -143,7 +143,7 @@ pub enum MaterialUsage {
     LiquidMiscCreature,
     /// Classifies the material as a miscellaneous liquid, allowing its storage in food stockpiles under "Misc. Liquid" along with lye.
     LiquidMiscOther,
-    /// Classifies the material as a generic liquid. Implied by LIQUID_MISC_PLANT, LIQUID_MISC_CREATURE, and LIQUID_MISC_OTHER. Exact behavior unknown, possibly vestigial.
+    /// Classifies the material as a generic liquid. Implied by `LIQUID_MISC_PLANT`, `LIQUID_MISC_CREATURE`, and `LIQUID_MISC_OTHER`. Exact behavior unknown, possibly vestigial.
     LiquidMisc,
     /// Classifies the material as a plant, allowing its storage in food stockpiles under "Plants".
     StructuralPlantMat,
@@ -212,11 +212,11 @@ pub enum MaterialUsage {
     NoStoneStockpile,
     /// The material can be made into minecarts, wheelbarrows, and stepladders at the metalsmith's forge.
     ItemsMetal,
-    /// Equivalent to ITEMS_HARD. Given to bone.
+    /// Equivalent to `ITEMS_HARD`. Given to bone.
     ItemsBarred,
-    /// Equivalent to ITEMS_HARD. Given to shell.
+    /// Equivalent to `ITEMS_HARD`. Given to shell.
     ItemsScaled,
-    /// Equivalent to ITEMS_SOFT. Given to leather.
+    /// Equivalent to `ITEMS_SOFT`. Given to leather.
     ItemsLeather,
     /// The material can be made into clothing, amulets, bracelets, earrings, backpacks, and quivers, contingent
     /// on which workshops accept the material. Given to plant fiber, silk and wool.
@@ -256,7 +256,7 @@ pub enum MaterialUsage {
     ItemsDigger,
     /// Armor can be made out of this material.
     ItemsArmor,
-    /// Used internally by amber and coral. Functionally equivalent to ITEMS_HARD.
+    /// Used internally by amber and coral. Functionally equivalent to `ITEMS_HARD`.
     ItemsDelicate,
     /// Siege engine parts can be made out of this material. Does not appear to work.
     ItemsSiegeEngine,
@@ -402,14 +402,14 @@ pub enum MaterialProperty {
     /// affects blunt-force damage and ability of weak-in-impact-yield blunt attacks to pierce armor. Defaults to `NONE`.
     SolidDensity,
     /// Specifies the density of the material when in liquid form. Defaults to `NONE`. Also affects combat calculations;
-    /// affects blunt force damage like SOLID_DENSITY, but only for attacks made by liquids (e.g. forgotten beasts made of water).
+    /// affects blunt force damage like `SOLID_DENSITY`, but only for attacks made by liquids (e.g. forgotten beasts made of water).
     LiquidDensity,
     /// Specifies (in kg/mol) the molar mass of the material in gaseous form. Also affects combat calculations like the densities,
     /// but only for attacks made by gases (e.g. forgotten beasts made of steam).
     MolarMass,
     /// Specifies the type of container used to store the material. Used in conjunction with the `EXTRACT_BARREL`, `EXTRACT_VIAL`,
     /// or `EXTRACT_STILL_VIAL` plant tokens.
-    /// Defaults to BARREL.
+    /// Defaults to `BARREL`.
     ExtractStorage,
     /// Specifies the item type used for butchering results made of this material. Stock raws use `GLOB:NONE` for fat and `MEAT:NONE` for other meat materials.
     ButcherSpecial,
@@ -434,10 +434,10 @@ pub enum MaterialProperty {
     /// `GYPSUM` - can be processed into gypsum plaster.
     /// `CALCIUM_CARBONATE` - can be used in production of quicklime."
     ReactionClass,
-    /// Makes BOULDER acceptable as a reagent in reactions that require `METAL_ORE:MATERIAL_NAME`, as well as smelting directly into metal bars.
+    /// Makes `BOULDER` acceptable as a reagent in reactions that require `METAL_ORE:MATERIAL_NAME`, as well as smelting directly into metal bars.
     /// Places the material under Metal Ores in Stone stockpiles. The specified value determines the probability for this product (see Tetrahedrite or Galena for details).
     MetalOre,
-    /// Makes BOULDER items made of the material acceptable for strand extraction into threads; see also STOCKPILE_THREAD_METAL.
+    /// Makes `BOULDER` items made of the material acceptable for strand extraction into threads; see also `STOCKPILE_THREAD_METAL`.
     /// Value presumably determines the probability of this product extracted.
     ThreadMetal,
     /// Allows the material to be used to make casts.

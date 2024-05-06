@@ -74,17 +74,17 @@ pub enum PositionToken {
     KillQuest,
     /// Arguments: importance tier (1-`10`)
     ///
-    /// This is an alternative to SITE. What it does is allow positions to be created at civ-level 'as needed' for all sites that
-    /// meet the requirements to have them, which are the values set in LAND_HOLDER_TRIGGER. The character is tied permanently to
+    /// This is an alternative to `SITE`. What it does is allow positions to be created at civ-level 'as needed' for all sites that
+    /// meet the requirements to have them, which are the values set in `LAND_HOLDER_TRIGGER`. The character is tied permanently to
     /// a particular site but also operates at the civ-level. Since 50* modded levels of higher than 3 are possible.
     LandHolder,
     /// Arguments: name (a string)
     ///
-    /// The name the area takes on when under the control of a LAND_HOLDER.
+    /// The name the area takes on when under the control of a `LAND_HOLDER`.
     ///
     /// E.g. for the DUKE, `[LAND_NAME:a duchy]`.
     ///
-    /// If the position is not a LAND_HOLDER, the land_name is still displayed left of the position in the nobles menu.
+    /// If the position is not a `LAND_HOLDER`, the `land_name` is still displayed left of the position in the nobles menu.
     LandName,
     /// Arguments: number (0-`100`)
     ///
@@ -116,7 +116,7 @@ pub enum PositionToken {
     ///
     /// Description of this position in the nobles screen.
     Description,
-    /// Arguments: number or 'AS_NEEDED'
+    /// Arguments: number or `AS_NEEDED`
     ///
     /// How many of the position there should be. If the `[SITE]` token exists, this is per site, otherwise this is per civilization.
     ///

@@ -42,7 +42,7 @@ pub enum SyndromeToken {
     /// `SYN_AFFECTED_CREATURE` check if this is included) will be able to contract the syndrome. This token can be specified multiple times
     /// per syndrome, in which case creatures which have at least one matching class will be considered susceptible.
     ///
-    /// If SYN_IMMUNE_CLASS and/or SYN_IMMUNE_CREATURE are included, creatures which fail these checks will be unable to contract the syndrome
+    /// If `SYN_IMMUNE_CLASS` and/or SYN_IMMUNE_CREATURE are included, creatures which fail these checks will be unable to contract the syndrome
     /// even if they pass this class check.
     AffectedClass,
     /// If this is included, creatures which belong to the specified creature class will be unable to contract the syndrome. This token can be

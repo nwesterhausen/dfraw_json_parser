@@ -132,7 +132,7 @@ pub enum ObjectType {
     /// An unknown object type
     #[default]
     Unknown,
-    /// SelectCreature tag
+    /// `SelectCreature` tag
     SelectCreature,
     /// A creature caste
     CreatureCaste,
