@@ -8,6 +8,7 @@ use super::{
     tokens::{TreeToken, TwigPlacement},
 };
 
+/// A struct representing a tree.
 #[derive(Serialize, Deserialize, Debug, Clone, Default, specta::Type)]
 #[serde(rename_all = "camelCase")]
 pub struct Tree {
@@ -38,9 +39,9 @@ pub struct Tree {
     branch_radius: Option<u8>,
     /// What thick branches of the tree are named.
     heavy_branches_name: Option<Name>,
-    /// Similar to BRANCH_DENSITY for thick branches. Default: 0
+    /// Similar to `BRANCH_DENSITY` for thick branches. Default: 0
     heavy_branch_density: Option<u8>,
-    /// Similar as BRANCH_DENSITY for thick branches. Values outside 0-3 can cause crashes. Default: 0
+    /// Similar as `BRANCH_DENSITY` for thick branches. Values outside 0-3 can cause crashes. Default: 0
     heavy_branch_radius: Option<u8>,
     /// How much the trunk branches out. 0 makes the trunk straight (default)
     trunk_branching: Option<u8>,
@@ -52,13 +53,13 @@ pub struct Tree {
     root_radius: Option<u8>,
     /// What the twigs of the tree are named.
     twigs_name: Option<Name>,
-    /// Where twigs appear, defaults to [SideBranches, AboveBranches]
+    /// Where twigs appear, defaults to `[SideBranches, AboveBranches]`
     twigs_placement: Option<Vec<TwigPlacement>>,
-    /// What this mushroom-cap is called. Only makes sense with TREE_HAS_MUSHROOM_CAP.
+    /// What this mushroom-cap is called. Only makes sense with `TREE_HAS_MUSHROOM_CAP`.
     cap_name: Option<Name>,
-    /// Similar to the other PERIOD tags, influences the rate of the mushroom cap growth. Only makes sense with TREE_HAS_MUSHROOM_CAP. Default: 1
+    /// Similar to the other PERIOD tags, influences the rate of the mushroom cap growth. Only makes sense with `TREE_HAS_MUSHROOM_CAP`. Default: 1
     cap_period: Option<u8>,
-    /// The radius of a mushroom cap. Only makes sense with TREE_HAS_MUSHROOM_CAP. Default: 0
+    /// The radius of a mushroom cap. Only makes sense with `TREE_HAS_MUSHROOM_CAP`. Default: 0
     cap_radius: Option<u8>,
     /// The tile used for trees of this type on the world map. Defaults to 24 (↑).
     tree_tile: Option<String>,
@@ -85,6 +86,16 @@ pub struct Tree {
 }
 
 impl Tree {
+    /// Create a new `Tree` object with the given material.
+    ///
+    /// # Arguments
+    ///
+    /// * `material`: The material of the tree.
+    ///
+    /// # Returns
+    ///
+    /// A new `Tree` object with the given material.
+    #[must_use]
     pub fn new(material: &str) -> Self {
         Self {
             material: material.to_string(),
@@ -113,7 +124,11 @@ impl Tree {
     /// - Set any empty string to None.
     /// - Set any empty list to None.
     /// - Set any default values to None.
-    #[allow(clippy::too_many_lines)]
+    ///
+    /// # Returns
+    ///
+    /// A new `Tree` object with all the fields cleaned.
+    #[allow(clippy::too_many_lines, clippy::cognitive_complexity)]
     #[must_use]
     pub fn cleaned(&self) -> Self {
         let mut cleaned = self.clone();
@@ -246,8 +261,13 @@ impl Tree {
 
         cleaned
     }
-
-    #[allow(clippy::too_many_lines)]
+    /// Parse a new tag from the raw file into this raw object.
+    ///
+    /// # Arguments
+    ///
+    /// * `key`: The key of the tag. The first part of a tag, before the colon.
+    /// * `value`: The value of the tag. The second part of a tag, after the colon.
+    #[allow(clippy::too_many_lines, clippy::cognitive_complexity)]
     pub fn parse_tag(&mut self, key: &str, value: &str) {
         let Some(tag) = TREE_TOKENS.get(key) else {
             warn!(

@@ -1,7 +1,6 @@
 use serde::{Deserialize, Serialize};
 
-
-
+/// Tokens that can be found in an entity raw file.
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, Default, specta::Type)]
 pub enum EntityToken {
     /// Allows adventure mode for entities with sites.
@@ -768,14 +767,19 @@ pub enum EntityToken {
     /// Valid tokens are NEATLY_COMBED, BRAIDED, DOUBLE_BRAIDS, PONY_TAILS, CLEAN_SHAVEN and STANDARD_HAIR/BEARD/MOUSTACHE/SIDEBURNS_SHAPINGS.
     /// Presumably sets culturally preferred tissue shapings for selected tissue. Needs testing.
     TissueStylePreferredShaping,
+    /// An unknown token
     #[default]
     Unknown,
 
     // not yet tags, but they are used in some mods
+    /// Prefers wood
     WoodPref,
+    /// An undead candidate
     UndeadCandidate,
 
     // this needs separate handling.. later !Todo
+    /// Cut an existing entity
     CutEntity,
+    /// Select an entity to modify
     SelectEntity,
 }

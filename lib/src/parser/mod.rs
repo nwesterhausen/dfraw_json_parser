@@ -1,22 +1,42 @@
+/// A raw for a biome
 pub mod biome;
+/// A raw for a creature
 pub mod creature;
+/// A raw for a creature caste
 pub mod creature_caste;
+/// A raw for a creature effect
 pub mod creature_effect;
+/// A raw for a creature variation
 pub mod creature_variation;
+/// A raw for an entity
 pub mod entity;
+/// A raw for a graphic
 pub mod graphics;
+/// Helper functions for parsing raws
 pub mod helpers;
+/// A raw for an inorganic material
 pub mod inorganic;
+/// A raw for a material
 pub mod material;
+/// A raw for a material template
 pub mod material_template;
+/// A raw for a plant
 pub mod plant;
+/// A raw for a plant growth
 pub mod plant_growth;
+/// A raw for a position
 pub mod position;
+/// A raw for a seed material
 pub mod seed_material;
+/// A raw for a select creature definition
 pub mod select_creature;
+/// A raw for a shrub
 pub mod shrub;
+/// A raw for a syndrome
 pub mod syndrome;
+/// A raw for a tree
 pub mod tree;
+/// Represents a raw file that has not been processed yet
 pub mod unprocessed_raw;
 
 mod constants;

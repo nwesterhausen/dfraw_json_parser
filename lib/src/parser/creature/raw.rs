@@ -21,8 +21,6 @@ use super::{phf_table::CREATURE_TOKENS, tokens::CreatureTag};
 /// based on the properties of the creature they are applied to. But right now the application
 /// of those changes is not applied, in order to preserve the original creature. So instead,
 /// they are saved and can be applied later (at the consumer's discretion).
-
-
 #[derive(Serialize, Deserialize, Debug, Clone, Default, specta::Type)]
 #[serde(rename_all = "camelCase")]
 pub struct Creature {
@@ -106,11 +104,11 @@ pub struct Creature {
 impl Creature {
     /// Returns a `Creature` object with default values.
     ///
-    /// Returns:
+    /// # Returns
     ///
     /// An empty instance of `Creature`.
-    pub fn empty() -> Creature {
-        Creature {
+    pub fn empty() -> Self {
+        Self {
             metadata: Some(
                 RawMetadata::default()
                     .with_object_type(ObjectType::CreatureVariation)
@@ -120,24 +118,24 @@ impl Creature {
             population_number: Some([1, 1]),
             cluster_number: Some([1, 1]),
             frequency: Some(50),
-            ..Creature::default()
+            ..Self::default()
         }
     }
 
     /// Create a new instance of a `Creature` with the given identifier and metadata.
     ///
-    /// Arguments:
+    /// # Arguments
     ///
     /// * `identifier`: A string that represents the identifier of the creature. It is used to uniquely
     /// identify the creature.
     /// * `metadata`: The `metadata` parameter is of type `RawMetadata` and is used to provide
     /// additional information about the raws the `Creature` is found in.
     ///
-    /// Returns:
+    /// # Returns
     ///
     /// a `Creature` object.
     pub fn new(identifier: &str, metadata: &RawMetadata) -> Self {
-        Creature {
+        Self {
             identifier: String::from(identifier),
             metadata: Some(metadata.clone()),
             frequency: Some(50),
@@ -145,35 +143,38 @@ impl Creature {
             population_number: Some([1, 1]),
             cluster_number: Some([1, 1]),
             object_id: build_object_id_from_pieces(metadata, identifier, &ObjectType::Creature),
-            ..Creature::default()
+            ..Self::default()
         }
     }
 
     /// The function `get_copy_tags_from` returns a reference to the `copy_tags_from` field.
     ///
-    /// Returns:
+    /// # Returns
     ///
     /// The private field `copy_tags_from`.
     pub fn get_copy_tags_from(&self) -> &str {
-        if let Some(copy_tags_from) = &self.copy_tags_from {
-            copy_tags_from.as_str()
-        } else {
-            ""
-        }
+        self.copy_tags_from
+            .as_ref()
+            .map_or("", |copy_tags_from| copy_tags_from.as_str())
     }
 
     /// Get the identifiers of creature variations to apply.
+    ///
+    /// # Returns
+    ///
+    /// A slice of strings representing the identifiers of creature variations to apply.
+    #[must_use]
     pub fn get_variations_to_apply(&self) -> &[String] {
-        if let Some(apply_creature_variation) = &self.apply_creature_variation {
-            apply_creature_variation.as_slice()
-        } else {
-            &[]
-        }
+        self.apply_creature_variation
+            .as_ref()
+            .map_or(&[], |apply_creature_variation| {
+                apply_creature_variation.as_slice()
+            })
     }
 
     /// Adds a `SelectCreature` object to the internal `SelectCreature` vector.
     ///
-    /// Arguments:
+    /// # Arguments
     ///
     /// * `select_creature`: The parameter `select_creature` is of type `SelectCreature`.
     pub fn push_select_creature_variation(&mut self, select_creature: SelectCreature) {
@@ -193,7 +194,7 @@ impl Creature {
     /// Extends the internal `SelectCreature` vector with the elements from the `select_creature_vec`
     /// vector. This is a convenience function to enable bulk addition of `SelectCreature` objects.
     ///
-    /// Arguments:
+    /// # Arguments
     ///
     /// * `select_creature_vec`: A vector of `SelectCreature` objects.
     pub fn extend_select_creature_variation(&mut self, select_creature_vec: Vec<SelectCreature>) {
@@ -210,7 +211,7 @@ impl Creature {
     /// The function `add_caste` adds a new `Caste` object with the given name to a vector called
     /// `castes`.
     ///
-    /// Arguments:
+    /// # Arguments
     ///
     /// * `name`: The `name` parameter is a string that represents the name of the caste to add.
     pub fn add_caste(&mut self, name: &str) {
@@ -221,7 +222,7 @@ impl Creature {
     /// otherwise it adds a new caste with the given name. This essentially allows the other functions
     /// to assume that the caste they are working with is the last one in the list.
     ///
-    /// Arguments:
+    /// # Arguments
     ///
     /// * `name`: The `name` parameter is a string that represents the identifier of the caste to select.
     pub fn select_caste(&mut self, name: &str) {
@@ -254,11 +255,11 @@ impl Creature {
 
     /// Checks if a given name exists in the list of castes.
     ///
-    /// Arguments:
+    /// # Arguments
     ///
     /// * `name`: A string representing the `identifier` of the caste to check for.
     ///
-    /// Returns:
+    /// # Returns
     ///
     /// Returns true if there is a caste with the given name in this creature's caste list,
     /// and false otherwise.
@@ -275,34 +276,34 @@ impl Creature {
     /// it's the list of object IDs that have been added to this creature and then can be removed
     /// from the master raw list.
     ///
-    /// Returns:
+    /// # Returns
     ///
     /// Returns a vector of `object_id`s.
     pub fn get_child_object_ids(&self) -> Vec<&str> {
-        if let Some(select_creature_variation) = &self.select_creature_variation {
-            select_creature_variation
-                .iter()
-                .map(crate::RawObject::get_object_id)
-                .collect()
-        } else {
-            Vec::new()
-        }
+        self.select_creature_variation
+            .as_ref()
+            .map_or_else(Vec::new, |select_creature_variation| {
+                select_creature_variation
+                    .iter()
+                    .map(crate::RawObject::get_object_id)
+                    .collect()
+            })
     }
 
     /// Takes two `Creature` objects and creates a new `Creature` object
     /// by combining their tags and properties.
     ///
-    /// Arguments:
+    /// # Arguments
     ///
     /// * `creature`: A reference to the creature that will receive the copied tags.
     /// * `creature_to_copy_from`: A reference to the Creature object from which we want to copy the
     /// tags.
     ///
-    /// Returns:
+    /// # Returns
     ///
     /// A combined `Creature`, which is a combination of the original creature and the
     /// creature to copy from.
-    pub fn copy_tags_from(creature: &Creature, creature_to_copy_from: &Creature) -> Self {
+    pub fn copy_tags_from(creature: &Self, creature_to_copy_from: &Self) -> Self {
         // Because anything specified in our self will override the copied tags, first we need to clone the creature
         let mut combined_creature = creature_to_copy_from.clone();
         // Now apply any tags that exist for us but not for the one we copy.
@@ -397,7 +398,7 @@ impl Creature {
 
     /// The function `get_castes` returns a slice of `Caste` objects.
     ///
-    /// Returns:
+    /// # Returns
     ///
     /// The castes that belong to this creature.
     pub fn get_castes(&self) -> &[Caste] {
@@ -626,17 +627,18 @@ impl Creature {
 #[typetag::serde]
 impl RawObject for Creature {
     fn get_metadata(&self) -> RawMetadata {
-        if let Some(metadata) = &self.metadata {
-            metadata.clone()
-        } else {
-            warn!(
-                "Creature::get_metadata: ({}) metadata is None",
-                self.identifier
-            );
-            RawMetadata::default()
-                .with_object_type(ObjectType::Creature)
-                .with_hidden(true)
-        }
+        self.metadata.as_ref().map_or_else(
+            || {
+                warn!(
+                    "Creature::get_metadata: ({}) metadata is None",
+                    self.identifier
+                );
+                RawMetadata::default()
+                    .with_object_type(ObjectType::Creature)
+                    .with_hidden(true)
+            },
+            std::clone::Clone::clone,
+        )
     }
     fn get_identifier(&self) -> &str {
         &self.identifier
@@ -653,6 +655,7 @@ impl RawObject for Creature {
     #[allow(clippy::too_many_lines)]
     fn parse_tag(&mut self, key: &str, value: &str) {
         if CASTE_TOKENS.contains_key(key) {
+            #[allow(clippy::unwrap_used)]
             self.castes.last_mut().unwrap().parse_tag(key, value);
             return;
         }
@@ -776,6 +779,7 @@ impl CreatureVariationRequirements for Creature {
 
     fn remove_tag_and_value(&mut self, key: &str, value: &str) {
         if CASTE_TOKENS.contains_key(key) {
+            #[allow(clippy::unwrap_used)]
             self.castes
                 .last_mut()
                 .unwrap()

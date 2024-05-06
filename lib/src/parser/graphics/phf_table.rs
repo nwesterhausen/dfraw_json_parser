@@ -1,5 +1,6 @@
 use super::tokens::{Condition, GraphicType, GrowthToken, PlantGraphicTemplate, TilePageTag};
 
+/// Map of condition tags to their string representation.
 pub static CONDITION_TAGS: phf::Map<&'static str, Condition> = phf::phf_map! {
     "DEFAULT" => Condition::Default,
     "ANIMATED" => Condition::Animated,
@@ -119,6 +120,7 @@ pub static CONDITION_TAGS: phf::Map<&'static str, Condition> = phf::phf_map! {
     "DANCER" => Condition::Dancer,
 };
 
+/// Map of graphic type tags to their string representation.
 pub static CUSTOM_GRAPHIC_TAGS: phf::Map<&'static str, GraphicType> = phf::phf_map! {
     // [CUSTOM_EDGING:1] can be from 1 to 32, lower number is printed with higher priority,
     // all win out over regular grass
@@ -143,6 +145,7 @@ pub static CUSTOM_GRAPHIC_TAGS: phf::Map<&'static str, GraphicType> = phf::phf_m
     "CUSTOM_EDGE_SE" => GraphicType::CustomEdgeSE,
 };
 
+/// Map of graphic type tags to their string representation.
 pub static GRAPHIC_TYPE_TAGS: phf::Map<&'static str, GraphicType> = phf::phf_map! {
     "CREATURE_GRAPHICS" => GraphicType::Creature,
     "CREATURE_CASTE_GRAPHICS" => GraphicType::CreatureCaste,
@@ -373,6 +376,7 @@ pub static GRAPHIC_TYPE_TAGS: phf::Map<&'static str, GraphicType> = phf::phf_map
 
 };
 
+/// Map of growth token tags to their string representation.
 pub static GROWTH_TAGS: phf::Map<&'static str, GrowthToken> = phf::phf_map! {
     "GROWTH_FRUIT" => GrowthToken::Fruit,
     // [GROWTH_1:GRASS_FLOWERS:0:1]
@@ -385,6 +389,7 @@ pub static GROWTH_TAGS: phf::Map<&'static str, GrowthToken> = phf::phf_map! {
     "GROWTH_4" => GrowthToken::Growth4,
 };
 
+/// Map of tile page tags to their string representation.
 pub static TILE_PAGE_TAGS: phf::Map<&'static str, TilePageTag> = phf::phf_map! {
     "TILE_DIM" => TilePageTag::TileDim,
     "PAGE_DIM_PIXELS" => TilePageTag::PageDim,
@@ -392,6 +397,7 @@ pub static TILE_PAGE_TAGS: phf::Map<&'static str, TilePageTag> = phf::phf_map! {
     "FILE" => TilePageTag::File,
 };
 
+/// Map of plant graphic templates to their string representation.
 pub static PLANT_GRAPHIC_TEMPLATES: phf::Map<&'static str, PlantGraphicTemplate> = phf::phf_map! {
     "STANDARD_LEAVES" => PlantGraphicTemplate::StandardLeaves,
     "STANDARD_FLOWERS_1" => PlantGraphicTemplate::StandardFlowers1,

@@ -10,8 +10,7 @@ use crate::parser::{
 
 use super::{dimensions::Dimensions, phf_table::TILE_PAGE_TAGS, tokens::TilePageTag};
 
-
-
+/// A struct representing a `TilePage` object.
 #[allow(clippy::module_name_repetitions)]
 #[derive(Serialize, Deserialize, Debug, Clone, Default, specta::Type)]
 #[serde(rename_all = "camelCase")]
@@ -26,6 +25,12 @@ pub struct TilePage {
 }
 
 impl TilePage {
+    /// Function to create a new empty `TilePage`.
+    ///
+    /// # Returns
+    ///
+    /// * `TilePage` - The new empty `TilePage`.
+    #[must_use]
     pub fn empty() -> Self {
         Self {
             metadata: Some(
@@ -36,6 +41,17 @@ impl TilePage {
             ..Self::default()
         }
     }
+    /// Function to create a new `TilePage`.
+    ///
+    /// # Parameters
+    ///
+    /// * `identifier` - The identifier for the `TilePage`.
+    /// * `metadata` - The metadata for the `TilePage`.
+    ///
+    /// # Returns
+    ///
+    /// * `TilePage` - The new `TilePage`.
+    #[must_use]
     pub fn new(identifier: &str, metadata: &RawMetadata) -> Self {
         Self {
             identifier: String::from(identifier),
@@ -54,6 +70,10 @@ impl TilePage {
     /// - Set any empty string to None.
     /// - Set any empty list to None.
     /// - Set any default values to None.
+    ///
+    /// # Returns
+    ///
+    /// * `TilePage` - The cleaned `TilePage`.
     #[must_use]
     pub fn cleaned(&self) -> Self {
         let mut cleaned = self.clone();
@@ -71,14 +91,15 @@ impl TilePage {
 #[typetag::serde]
 impl RawObject for TilePage {
     fn get_metadata(&self) -> RawMetadata {
-        if let Some(metadata) = &self.metadata {
-            metadata.clone()
-        } else {
-            warn!("Metadata is missing for TilePage {}", self.get_object_id());
-            RawMetadata::default()
-                .with_object_type(ObjectType::TilePage)
-                .with_hidden(true)
-        }
+        self.metadata.as_ref().map_or_else(
+            || {
+                warn!("Metadata is missing for TilePage {}", self.get_object_id());
+                RawMetadata::default()
+                    .with_object_type(ObjectType::TilePage)
+                    .with_hidden(true)
+            },
+            std::clone::Clone::clone,
+        )
     }
     fn get_identifier(&self) -> &str {
         &self.identifier

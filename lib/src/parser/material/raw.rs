@@ -17,8 +17,7 @@ use super::{
     tokens::{FuelType, MaterialProperty, MaterialType, MaterialUsage},
 };
 
-
-
+/// A struct representing a material
 #[allow(clippy::module_name_repetitions)]
 #[derive(Serialize, Deserialize, Debug, Clone, Default, specta::Type)]
 #[serde(rename_all = "camelCase")]
@@ -81,45 +80,90 @@ pub struct Material {
 }
 
 impl Material {
-    pub fn new() -> Material {
-        Material {
+    /// Create a new material
+    ///
+    /// # Returns
+    ///
+    /// A new material
+    #[must_use]
+    pub fn new() -> Self {
+        Self {
             value: Some(1),
-            ..Material::default()
+            ..Self::default()
         }
     }
     /// This may not be correct. This should be for `\[USE_MATERIAL:XX:XX\]` but couldn't find an example for Plant.
-    pub fn use_material_from_value(value: &str) -> Material {
+    ///
+    /// # Arguments
+    ///
+    /// * `value` - The value of the material
+    ///
+    /// # Returns
+    ///
+    /// A new material
+    #[must_use]
+    pub fn use_material_from_value(value: &str) -> Self {
         // Start defining a new material with a name and properties of another local material
         let mut split = value.split(':');
 
         let material_name = split.next().unwrap_or_default();
         let parent_material_name = split.next().unwrap_or_default();
 
-        Material {
+        Self {
             name: Some(String::from(material_name)),
             template_identifier: Some(String::from(parent_material_name)),
             is_local_material: Some(true),
-            ..Material::new()
+            ..Self::new()
         }
     }
-    pub fn use_material_template_from_value(value: &str) -> Material {
+    /// Create a new material from a template
+    ///
+    /// # Arguments
+    ///
+    /// * `value` - The value of the material
+    ///
+    /// # Returns
+    ///
+    /// A new material
+    #[must_use]
+    pub fn use_material_template_from_value(value: &str) -> Self {
         // Start defining a new material with a name and properties of another local material
         let mut split = value.split(':');
 
         let material_name = split.next().unwrap_or_default();
         let template_material_name = split.next().unwrap_or_default();
 
-        Material {
+        Self {
             name: Some(String::from(material_name)),
             template_identifier: Some(String::from(template_material_name)),
             is_local_material: Some(true),
-            ..Material::new()
+            ..Self::new()
         }
     }
-    pub fn basic_material_from_value(value: &str) -> Material {
-        Material::from_value(value)
+    /// Create a new material from a basic material
+    ///
+    /// # Arguments
+    ///
+    /// * `value` - The value of the material
+    ///
+    /// # Returns
+    ///
+    /// A new material
+    #[must_use]
+    pub fn basic_material_from_value(value: &str) -> Self {
+        Self::from_value(value)
     }
-    pub fn from_value(value: &str) -> Material {
+    /// Create a new material from a material
+    ///
+    /// # Arguments
+    ///
+    /// * `value` - The value of the material
+    ///
+    /// # Returns
+    ///
+    /// A new material
+    #[must_use]
+    pub fn from_value(value: &str) -> Self {
         // Value is a string like "CREATURE_MAT:DWARF:SKIN" or "INORGANIC" or "STONE:MARBLE" or "LOCAL_PLANT_MAT:LEAF"
         // It's possible that the number of parts to the value str is 1, 2, or 3.
         let mut split = value.split(':');
@@ -132,14 +176,14 @@ impl Material {
                 "Material::from_value() was provided a value with an invalid material type: {}",
                 value
             );
-            return Material::new();
+            return Self::new();
         };
 
         // If there is only one part, then it is a special hardcoded material, like magma or water.
         if split_len == 1 {
-            return Material {
+            return Self {
                 material_type: Some(material_type.clone()),
-                ..Material::new()
+                ..Self::new()
             };
         }
         // If there are more than one parts, we can use a match and drill down further.
@@ -147,10 +191,10 @@ impl Material {
         match material_type {
             MaterialType::Inorganic | MaterialType::Stone | MaterialType::Metal => {
                 let material_name = split.next().unwrap_or_default();
-                Material {
+                Self {
                     material_type: Some(material_type.clone()),
                     name: Some(String::from(material_name)),
-                    ..Material::new()
+                    ..Self::new()
                 }
             }
             MaterialType::Coal => {
@@ -160,54 +204,54 @@ impl Material {
                         "Material::from_value() was provided a value with an invalid fuel type: {}",
                         value
                     );
-                    return Material {
+                    return Self {
                         material_type: Some(material_type.clone()),
-                        ..Material::new()
+                        ..Self::new()
                     };
                 };
-                Material {
+                Self {
                     material_type: Some(material_type.clone()),
                     fuel_type: Some(fuel_type.clone()),
-                    ..Material::new()
+                    ..Self::new()
                 }
             }
             MaterialType::LocalCreatureMaterial | MaterialType::LocalPlantMaterial => {
                 let material_name = split.next().unwrap_or_default();
-                Material {
+                Self {
                     material_type: Some(material_type.clone()),
                     name: Some(String::from(material_name)),
                     is_local_material: Some(true),
-                    ..Material::new()
+                    ..Self::new()
                 }
             }
             MaterialType::CreatureMaterial => {
                 let creature_identifier = split.next().unwrap_or_default();
                 let material_name = split.next().unwrap_or_default();
-                Material {
+                Self {
                     material_type: Some(material_type.clone()),
                     creature_identifier: Some(String::from(creature_identifier)),
                     name: Some(String::from(material_name)),
-                    ..Material::new()
+                    ..Self::new()
                 }
             }
             MaterialType::PlantMaterial => {
                 let plant_identifier = split.next().unwrap_or_default();
                 let material_name = split.next().unwrap_or_default();
-                Material {
+                Self {
                     material_type: Some(material_type.clone()),
                     plant_identifier: Some(String::from(plant_identifier)),
                     name: Some(String::from(material_name)),
-                    ..Material::new()
+                    ..Self::new()
                 }
             }
             MaterialType::GetMaterialFromReagent => {
                 let reagent_identifier = split.next().unwrap_or_default();
                 let reaction_product_identifier = split.next().unwrap_or_default();
-                Material {
+                Self {
                     material_type: Some(material_type.clone()),
                     reagent_identifier: Some(String::from(reagent_identifier)),
                     reaction_product_identifier: Some(String::from(reaction_product_identifier)),
-                    ..Material::new()
+                    ..Self::new()
                 }
             }
             _ => {
@@ -215,11 +259,17 @@ impl Material {
                     "Material::from_value() was provided a value with an invalid material type: {}",
                     value
                 );
-                Material::new()
+                Self::new()
             }
         }
     }
-    #[allow(clippy::too_many_lines)]
+    /// Parses a tag and value into the material
+    ///
+    /// # Arguments
+    ///
+    /// * `key` - The tag of the material
+    /// * `value` - The value of the material
+    #[allow(clippy::too_many_lines, clippy::cognitive_complexity)]
     pub fn parse_tag(&mut self, key: &str, value: &str) {
         // Determine if the key is a Property or Usage tag
         if MATERIAL_PROPERTY_TOKENS.contains_key(key) {
@@ -474,7 +524,11 @@ impl Material {
     /// - Set any empty string to None.
     /// - Set any empty list to None.
     /// - Set any default values to None.
-    #[allow(clippy::too_many_lines)]
+    ///
+    /// # Returns
+    ///
+    /// A new material with all empty or default values removed.
+    #[allow(clippy::too_many_lines, clippy::cognitive_complexity)]
     #[must_use]
     pub fn cleaned(&self) -> Self {
         let mut cleaned = self.clone();
@@ -634,12 +688,7 @@ impl Searchable for Material {
 
         // Syndromes
         if let Some(syndromes) = &self.syndromes {
-            vec.extend(
-                syndromes
-                    .iter()
-                    .flat_map(Searchable::get_search_vec)
-                    .collect::<Vec<String>>(),
-            );
+            vec.extend(syndromes.iter().flat_map(Searchable::get_search_vec));
         }
 
         // Reaction Classes (products)
@@ -652,12 +701,7 @@ impl Searchable for Material {
         }
         // Usage
         if let Some(usage) = &self.usage {
-            vec.extend(
-                usage
-                    .iter()
-                    .map(std::string::ToString::to_string)
-                    .collect::<Vec<String>>(),
-            );
+            vec.extend(usage.iter().map(std::string::ToString::to_string));
         }
         clean_search_vec(vec.as_slice())
     }

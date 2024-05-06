@@ -1,10 +1,6 @@
 use serde::{Deserialize, Serialize};
 use tracing::warn;
 
-
-
-#[derive(Serialize, Deserialize, Debug, Clone, Default, PartialEq, Eq, specta::Type)]
-#[serde(rename_all = "camelCase")]
 /// Gaits are a way to describe how a creature moves. Defined in the raws with:
 ///
 /// "GAIT:type:name:full speed:build up time:turning max:start speed:energy use"
@@ -27,6 +23,8 @@ use tracing::warn;
 ///    `[CV_NEW_TAG:GAIT:WALK:Walk:!ARG1:NO_BUILD_UP:0]`
 ///    `[CV_NEW_TAG:GAIT:WALK:Stroll:!ARG5:NO_BUILD_UP:0]`
 ///    `[CV_NEW_TAG:GAIT:WALK:Creep:!ARG6:NO_BUILD_UP:0]`
+#[derive(Serialize, Deserialize, Debug, Clone, Default, PartialEq, Eq, specta::Type)]
+#[serde(rename_all = "camelCase")]
 pub struct Gait {
     /// The type of gait
     gait_type: GaitType,
@@ -42,8 +40,7 @@ pub struct Gait {
     modifiers: Vec<Modifier>,
 }
 
-
-
+/// An enum representing a gait type.
 #[derive(Serialize, Deserialize, Debug, Clone, Default, PartialEq, Eq, specta::Type)]
 #[serde(rename_all = "camelCase")]
 #[allow(clippy::module_name_repetitions)]
@@ -70,8 +67,7 @@ pub enum GaitType {
     Unknown,
 }
 
-
-
+/// An enum representing a gait modifier.
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, specta::Type)]
 #[serde(rename_all = "camelCase")]
 pub enum Modifier {
@@ -114,7 +110,7 @@ impl Gait {
     ///
     /// The parsed gait
     pub fn from_value(value: &str) -> Self {
-        let mut gait = Gait::default();
+        let mut gait = Self::default();
         let mut parts = value.split(':');
         let mut has_build_up = false;
 

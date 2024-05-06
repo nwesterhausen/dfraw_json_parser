@@ -1,5 +1,6 @@
 use super::tokens::PlantTag;
 
+/// Mapping of plant tokens to strings
 pub static PLANT_TOKENS: phf::Map<&'static str, PlantTag> = phf::phf_map! {
     "NAME" => PlantTag::NameSingular,
     "NAME_PLURAL" => PlantTag::NamePlural,

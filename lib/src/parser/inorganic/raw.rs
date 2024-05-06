@@ -11,8 +11,7 @@ use super::{
     tokens::{EnvironmentClass, InclusionType, InorganicToken},
 };
 
-
-
+/// The raw representation of an inorganic object.
 #[derive(Serialize, Deserialize, Debug, Clone, Default, specta::Type)]
 #[serde(rename_all = "camelCase")]
 pub struct Inorganic {
@@ -33,6 +32,14 @@ pub struct Inorganic {
 }
 
 impl Inorganic {
+    /// Create a new empty Inorganic object.
+    ///
+    /// This is used for creating a new Inorganic object with the metadata set to hidden.
+    ///
+    /// # Returns
+    ///
+    /// A new Inorganic object with the metadata set to hidden.
+    #[must_use]
     pub fn empty() -> Self {
         Self {
             metadata: Some(
@@ -43,6 +50,19 @@ impl Inorganic {
             ..Self::default()
         }
     }
+    /// Create a new Inorganic object with the given identifier and metadata.
+    ///
+    /// The `object_id` is generated from the metadata's raw identifier and the identifier.
+    ///
+    /// # Arguments
+    ///
+    /// * `identifier` - The identifier for the inorganic object.
+    /// * `metadata` - The metadata for the inorganic object.
+    ///
+    /// # Returns
+    ///
+    /// A new Inorganic object with the given identifier and metadata.
+    #[must_use]
     pub fn new(identifier: &str, metadata: &RawMetadata) -> Self {
         Self {
             identifier: String::from(identifier),
@@ -66,6 +86,10 @@ impl Inorganic {
     /// - Set any empty string to None.
     /// - Set any empty list to None.
     /// - Set any default values to None.
+    ///
+    /// # Returns
+    ///
+    /// A new Inorganic object with all empty or default values set to None.
     #[must_use]
     pub fn cleaned(&self) -> Self {
         let mut cleaned = self.clone();
@@ -110,6 +134,10 @@ impl Inorganic {
     /// Add a tag to the inorganic raw.
     ///
     /// This handles making sure the tags vector is initialized.
+    ///
+    /// # Arguments
+    ///
+    /// * `tag` - The tag to add to the inorganic raw.
     pub fn add_tag(&mut self, tag: InorganicToken) {
         if self.tags.is_none() {
             self.tags = Some(Vec::new());
@@ -135,14 +163,15 @@ impl RawObject for Inorganic {
         &self.identifier
     }
     fn get_metadata(&self) -> RawMetadata {
-        if let Some(metadata) = &self.metadata {
-            metadata.clone()
-        } else {
-            tracing::warn!("Metadata is missing for Inorganic {}", self.get_object_id());
-            RawMetadata::default()
-                .with_object_type(ObjectType::Inorganic)
-                .with_hidden(true)
-        }
+        self.metadata.as_ref().map_or_else(
+            || {
+                tracing::warn!("Metadata is missing for Inorganic {}", self.get_object_id());
+                RawMetadata::default()
+                    .with_object_type(ObjectType::Inorganic)
+                    .with_hidden(true)
+            },
+            std::clone::Clone::clone,
+        )
     }
     fn is_empty(&self) -> bool {
         self.identifier.is_empty()
@@ -247,11 +276,7 @@ impl Searchable for Inorganic {
         vec.extend(self.material.get_search_vec());
         // Tags
         if let Some(tags) = &self.tags {
-            vec.extend(
-                tags.iter()
-                    .map(std::string::ToString::to_string)
-                    .collect::<Vec<String>>(),
-            );
+            vec.extend(tags.iter().map(std::string::ToString::to_string));
         }
         // Environment information
         if let Some(environment_class) = &self.environment_class {

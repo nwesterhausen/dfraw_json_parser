@@ -1,6 +1,8 @@
 use phf::phf_map;
 
 use super::tokens::TreeToken;
+
+/// The mapping of tree tokens to their string representation
 pub static TREE_TOKENS: phf::Map<&'static str, TreeToken> = phf_map! {
     "TREE" => TreeToken::Tree,
     "TRUNK_NAME" => TreeToken::TrunkName,

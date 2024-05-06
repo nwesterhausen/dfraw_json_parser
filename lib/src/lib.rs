@@ -76,14 +76,19 @@ use walkdir::{DirEntry, WalkDir};
 mod errors;
 mod legends_export;
 mod options;
+/// The parser module contains the functions for parsing raws and info files.
 pub mod parser;
 mod traits;
 
+/// The errors that may happen.
 pub use errors::ParserError;
 
+/// A parsing result that contains the parsed raws and info files.
 #[derive(serde::Serialize, serde::Deserialize)]
 pub struct ParseResult {
+    /// The parsed raw objects.
     pub raws: Vec<Box<dyn RawObject>>,
+    /// The parsed module info files.
     pub info_files: Vec<ModuleInfoFile>,
 }
 
@@ -150,6 +155,7 @@ use crate::{
 /// Other errors which are returned from the called functions within this function are not propagated, because the
 /// only "full" blocker is if the Dwarf Fortress directory is invalid.
 ///
+#[allow(clippy::cognitive_complexity)]
 pub fn parse(options: &ParserOptions) -> Result<ParseResult, ParserError> {
     // Guard against invalid paths
     let options = validate_options(options)?;
@@ -313,12 +319,13 @@ pub fn parse(options: &ParserOptions) -> Result<ParseResult, ParserError> {
         })
         .map(|c| clone_raw_object_box(&c))
         .filter_map(|c| {
-            if let Some(creature) = c.as_ref().as_any().downcast_ref::<Creature>() {
-                Some(creature.clone())
-            } else {
-                error!("Downcast failed for simple creature {}", c.get_identifier());
-                None
-            }
+            c.as_ref().as_any().downcast_ref::<Creature>().map_or_else(
+                || {
+                    error!("Downcast failed for simple creature {}", c.get_identifier());
+                    None
+                },
+                |creature| Some(creature.clone()),
+            )
         })
         .collect();
 
@@ -513,7 +520,10 @@ fn parse_location<P: AsRef<Path>>(
     info!(
         "Found {} raw modules in {:?}",
         raw_modules_in_location.len(),
-        options.locations_to_parse.first().unwrap(),
+        options
+            .locations_to_parse
+            .first()
+            .unwrap_or(&RawModuleLocation::Unknown)
     );
 
     // Loop over each module and parse it

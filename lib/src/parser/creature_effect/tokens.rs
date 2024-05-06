@@ -1,7 +1,6 @@
 use serde::{Deserialize, Serialize};
 
-
-
+/// An enum representing a creature effect token.
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, Default, specta::Type)]
 pub enum CreatureEffectToken {
     // Negative Effects
@@ -74,33 +73,52 @@ pub enum CreatureEffectToken {
     /// Causes missing body parts to regrow. SEV controls how quickly body parts are regrown.
     RegrowParts,
     // Special Effects
+    /// Add a tag
     AddTag,
+    /// Remove a tag
     RemoveTag,
+    /// Display name of the effect
     DisplayName,
+    /// Display tile of the effect
     DisplayTile,
+    /// Whether the tile flashes
     FlashTile,
+    /// Physical attribute change
     PhysAttChange,
+    /// Mental attribute change
     MentAttChange,
+    /// Speed change
     SpeedChange,
+    /// Skill roll adjustment
     SkillRollAdjust,
+    /// Body appearance modifier
     BodyAppearanceModifier,
+    /// Body part appearance modifier
     BodyPartAppearanceModifier,
+    /// Body transformation
     BodyTransformation,
+    /// Material force multiplier
     MaterialForceMultiplier,
+    /// Can do an interaction
     CanDoInteraction,
+    /// Can do a special attack interaction
     SpecialAttackInteraction,
+    /// Can do a body mat interaction
     BodyMatInteraction,
+    /// Can sense creatures of a class
     SenseCreatureClass,
+    /// Feel emotion
     FeelEmotion,
+    /// Changes the personality of the creature
     ChangePersonality,
+    /// Erratic behavior
     ErraticBehavior,
-    // Unknown
+    /// Unknown
     #[default]
     Unknown,
 }
 
-
-
+/// An enum representing a creature effect property.
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, Default, specta::Type)]
 pub enum CreatureEffectProperty {
     /// The severity of the effect. Higher values appear to be worse, with SEV:1000 CE_NECROSIS causing a part to near-instantly become rotten.

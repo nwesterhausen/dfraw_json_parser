@@ -1,4 +1,5 @@
 use super::tokens::CreatureTag;
+/// A map of creature tags to their respective enum values.
 pub static CREATURE_TOKENS: phf::Map<&'static str, CreatureTag> = phf::phf_map! {
     "ARTIFICIAL_HIVEABLE" => CreatureTag::ArtificialHiveable,
     "DOES_NOT_EXIST" => CreatureTag::DoesNotExist,

@@ -1,5 +1,6 @@
 use super::tokens::SyndromeToken;
 
+/// Mapping of syndrome tokens to strings
 pub static SYNDROME_TOKEN: phf::Map<&'static str, SyndromeToken> = phf::phf_map! {
     "SYN_NAME" => SyndromeToken::Name,
     "SYN_IDENTIFIER" => SyndromeToken::Identifier,

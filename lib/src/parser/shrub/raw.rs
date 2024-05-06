@@ -8,8 +8,7 @@ use crate::parser::Color;
 use super::phf_table::SHRUB_TOKENS;
 use super::tokens::{SeasonToken, ShrubToken};
 
-
-
+/// A shrub in the raws.
 #[derive(Serialize, Deserialize, Debug, Clone, Default, specta::Type)]
 #[serde(rename_all = "camelCase")]
 pub struct Shrub {
@@ -49,33 +48,39 @@ pub struct Shrub {
     // Todo: fix these with actual values (materials and seed)
     /// Names a drink made from the plant, allowing it to be used in entity resources.
     /// Previously also permitted brewing the plant into alcohol made of this material.
-    /// Now, a MATERIAL_REACTION_PRODUCT of type DRINK_MAT should be used on the proper plant material.
+    /// Now, a `MATERIAL_REACTION_PRODUCT` of type `DRINK_MAT` should be used on the proper plant material.
     drink: Option<String>,
     /// Permits milling the plant at a quern or millstone into a powder made of this material and allows its use in entity resources.
-    /// Said material should have \[POWDER_MISC_PLANT\] to permit proper stockpiling. This token makes the whole plant harvestable regardless
+    /// Said material should have `[POWDER_MISC_PLANT]` to permit proper stockpiling. This token makes the whole plant harvestable regardless
     /// of which material is designated for milling.
-    /// For plants with millable growths, use only MATERIAL_REACTION_PRODUCT or ITEM_REACTION_PRODUCT tokens to define the milling products.
+    /// For plants with millable growths, use only `MATERIAL_REACTION_PRODUCT` or `ITEM_REACTION_PRODUCT` tokens to define the milling products.
     mill: Option<String>,
     /// Permits processing the plant at a farmer's workshop to yield threads made of this material and allows its use in entity resources.
-    /// Said material should have \[THREAD_PLANT\] to permit proper stockpiling.
+    /// Said material should have `[THREAD_PLANT]` to permit proper stockpiling.
     thread: Option<String>,
     /// Causes the plant to yield plantable seeds made of this material and having these properties.
-    /// Said material should have \[SEED_MAT\] to permit proper stockpiling.
+    /// Said material should have `[SEED_MAT]` to permit proper stockpiling.
     seed: Option<SeedMaterial>,
     /// Permits processing the plant into a vial at a still to yield extract made of this material.
-    /// Said material should have \[EXTRACT_STORAGE:FLASK\].
+    /// Said material should have `[EXTRACT_STORAGE:FLASK]`.
     extract_still_vial: Option<String>,
     /// Permits processing the plant into a vial at a farmer's workshop to yield extract made of this material.
-    /// Said material should have \[EXTRACT_STORAGE:VIAL\].
+    /// Said material should have `[EXTRACT_STORAGE:VIAL]`.
     extract_vial: Option<String>,
     /// Permits processing the plant into a barrel at a farmer's workshop to yield extract made of this material.
-    /// Said material should have \[EXTRACT_STORAGE:BARREL\].
+    /// Said material should have `[EXTRACT_STORAGE:BARREL]`.
     extract_barrel: Option<String>,
 }
 
 impl Shrub {
-    pub fn new() -> Shrub {
-        Shrub {
+    /// Creates a new Shrub with default values.
+    ///
+    /// # Returns
+    ///
+    /// * `Shrub` - The default Shrub
+    #[must_use]
+    pub fn new() -> Self {
+        Self {
             grow_duration: Some(300),
             picked_tile: Some(231),
             dead_picked_tile: Some(169),
@@ -83,7 +88,7 @@ impl Shrub {
             dead_shrub_tile: Some(34),
             cluster_size: Some(5),
             shrub_drown_level: Some(4),
-            ..Shrub::default()
+            ..Self::default()
         }
     }
 
@@ -97,7 +102,12 @@ impl Shrub {
     /// - Set any empty string to None.
     /// - Set any empty list to None.
     /// - Set any default values to None.
+    ///
+    /// # Returns
+    ///
+    /// * `Shrub` - The cleaned Shrub
     #[must_use]
+    #[allow(clippy::cognitive_complexity)]
     pub fn cleaned(&self) -> Self {
         let mut cleaned = self.clone();
 
@@ -188,7 +198,12 @@ impl Shrub {
 
         cleaned
     }
-
+    /// Parses a tag and sets the appropriate field.
+    ///
+    /// # Arguments
+    ///
+    /// * `key` - The key of the tag
+    /// * `value` - The value of the tag
     #[allow(clippy::too_many_lines)]
     pub fn parse_tag(&mut self, key: &str, value: &str) {
         let Some(tag) = SHRUB_TOKENS.get(key) else {

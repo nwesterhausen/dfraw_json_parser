@@ -7,132 +7,132 @@ impl RawObjectToken for CasteTag {
     #[allow(clippy::too_many_lines)]
     fn get_complexity(&self) -> TokenComplexity {
         match self {
-          CasteTag::ApplyCreatureVariation { .. } |
-          CasteTag::Attack { .. } |
-          CasteTag::AttackTrigger { .. } |
-          CasteTag::BabyName {.. } |
-          CasteTag::Body { .. } |
-          CasteTag::Blood {..}|
-          CasteTag::BodyAppearanceModifier { .. }|
-          CasteTag::BodyDetailPlan { .. } |
-          CasteTag::BodyPartAppearanceModifier {..}|
-          CasteTag::BodySize {..}|
-            CasteTag::ChildName { .. } |
-            CasteTag::ClutchSize { .. } |
-            CasteTag::Color { .. } |
-            CasteTag::EggMaterial { .. } |
-            CasteTag::ExtraButcherObjectItem { .. } |
-            CasteTag::ExtraButcherObject { .. } |
-            CasteTag::GeneralMaterialForceMultiplier { .. } |
-            CasteTag::GlowColor { .. } |
-            CasteTag::GobbleVerminCreature { .. } |
-            CasteTag::InteractionDetail { .. } |
-            CasteTag::Lair { .. } |
-            CasteTag::LaysUnusualEggs {..}|
-            CasteTag::Ligaments { .. } |
-            CasteTag::LitterSize { .. } |
-            CasteTag::MannerismFingers { .. } |
-            CasteTag::MaxAge { .. } |
-            CasteTag::MentalAttributeCapPercentage { .. } |
-            CasteTag::MentalAttributeRange { .. } |
-            CasteTag::MentalAttributeRate { .. } |
-            CasteTag::Milkable { .. } |
-            CasteTag::Name { .. } |
-            CasteTag::NaturalSkill { .. } |
-            CasteTag::Orientation { .. } |
-            CasteTag::Personality { .. } |
-            CasteTag::PhysicalAttributeCapPercentage { .. } |
-            CasteTag::PhysicalAttributeRange { .. } |
-            CasteTag::PhysicalAttributeRate { .. } |
-            CasteTag::ProfessionName { .. } |
-            CasteTag::Pus { .. } |
-            CasteTag::RelativeSize { .. } |
-            CasteTag::Remains { .. } |
-            CasteTag::RetractIntoBodyPart { .. } |
-            CasteTag::RootAround { .. } |
-            CasteTag::Secretion { .. } |
-            CasteTag::SenseCreatureClass { .. } |
-            CasteTag::SetBodyPartGroup { .. } |
-            CasteTag::SkillLearnRate { .. } |
-            CasteTag::SkillRate { .. } |
-            CasteTag::SkillRates { .. } |
-            CasteTag::SkillRustRate { .. } |
-            CasteTag::SkillRustRates { .. } |
-            CasteTag::Sound { .. } |
-            CasteTag::SyndromeDilutionFactor { .. } |
-            CasteTag::Tendons { .. } |
-            CasteTag::TissueLayer { .. } |
-            CasteTag::TissueLayerUnder { .. } |
-            CasteTag::VerminBite { .. } |
-            CasteTag::VisionArc { .. }
+          Self::ApplyCreatureVariation { .. } |
+          Self::Attack { .. } |
+          Self::AttackTrigger { .. } |
+          Self::BabyName {.. } |
+          Self::Body { .. } |
+          Self::Blood {..}|
+          Self::BodyAppearanceModifier { .. }|
+          Self::BodyDetailPlan { .. } |
+          Self::BodyPartAppearanceModifier {..}|
+          Self::BodySize {..}|
+            Self::ChildName { .. } |
+            Self::ClutchSize { .. } |
+            Self::Color { .. } |
+            Self::EggMaterial { .. } |
+            Self::ExtraButcherObjectItem { .. } |
+            Self::ExtraButcherObject { .. } |
+            Self::GeneralMaterialForceMultiplier { .. } |
+            Self::GlowColor { .. } |
+            Self::GobbleVerminCreature { .. } |
+            Self::InteractionDetail { .. } |
+            Self::Lair { .. } |
+            Self::LaysUnusualEggs {..}|
+            Self::Ligaments { .. } |
+            Self::LitterSize { .. } |
+            Self::MannerismFingers { .. } |
+            Self::MaxAge { .. } |
+            Self::MentalAttributeCapPercentage { .. } |
+            Self::MentalAttributeRange { .. } |
+            Self::MentalAttributeRate { .. } |
+            Self::Milkable { .. } |
+            Self::Name { .. } |
+            Self::NaturalSkill { .. } |
+            Self::Orientation { .. } |
+            Self::Personality { .. } |
+            Self::PhysicalAttributeCapPercentage { .. } |
+            Self::PhysicalAttributeRange { .. } |
+            Self::PhysicalAttributeRate { .. } |
+            Self::ProfessionName { .. } |
+            Self::Pus { .. } |
+            Self::RelativeSize { .. } |
+            Self::Remains { .. } |
+            Self::RetractIntoBodyPart { .. } |
+            Self::RootAround { .. } |
+            Self::Secretion { .. } |
+            Self::SenseCreatureClass { .. } |
+            Self::SetBodyPartGroup { .. } |
+            Self::SkillLearnRate { .. } |
+            Self::SkillRate { .. } |
+            Self::SkillRates { .. } |
+            Self::SkillRustRate { .. } |
+            Self::SkillRustRates { .. } |
+            Self::Sound { .. } |
+            Self::SyndromeDilutionFactor { .. } |
+            Self::Tendons { .. } |
+            Self::TissueLayer { .. } |
+            Self::TissueLayerUnder { .. } |
+            Self::VerminBite { .. } |
+            Self::VisionArc { .. }
           => {
                 tracing::trace!("get_complexity: {self:?} is 'Complex'");
                 TokenComplexity::Complex
         }
-          CasteTag::AltTile { .. } |
-          CasteTag::Baby { .. } |
-          CasteTag::BeachFrequency { .. } |
-          CasteTag::BodyGloss { .. } |
-          CasteTag::BodyPartAddType { .. } |
-          CasteTag::BodyPartRemoveType { .. } |
-          CasteTag::BuildingDestroyer { .. } |
-          CasteTag::CanDoInteraction { .. } |
-          CasteTag::ChangeBodySizePercent { .. } |
-          CasteTag::Child { .. } |
-          CasteTag::CreatureClass { .. } |
-          CasteTag::CreatureVariationAddTag { .. } |
-          CasteTag::CreatureVariationRemoveTag { .. } |
-          CasteTag::Description { .. } |
-          CasteTag::ExtraButcherObjectShape { .. } |
-          CasteTag::EggSize { .. } |
-          CasteTag::Extract { .. } |
-          CasteTag::FixedTemp { .. } |
-          CasteTag::Gait { .. } | // This isn't really simple..
-          CasteTag::GlowTile { .. } |
-          CasteTag::Gnawer { .. } |
-          CasteTag::GobbleVerminClass { .. } |
-          CasteTag::GrassTrample { .. } |
-          CasteTag::GravitateBodySize { .. } |
-          CasteTag::Grazer { .. } |
-          CasteTag::Habit { ..}|
-          CasteTag::HabitNumber { .. } |
-          CasteTag::Homeotherm { .. } |
-          CasteTag::ItemCorpseQuality { .. }|
-          CasteTag::LairCharacteristic { .. }|
-          CasteTag::LairHunterSpeech { .. }|
-          CasteTag::LowLightVision {.. }|
-          CasteTag::MannerismArms { .. }|
-          CasteTag::MannerismCheek { .. }|
-          CasteTag::MannerismEar { .. }|
-          CasteTag::MannerismEyes { .. }|
-          CasteTag::MannerismFeet { .. }|
-          CasteTag::MannerismHair { .. }|
-          CasteTag::MannerismKnuckles {.. }|
-          CasteTag::MannerismLips { .. }|
-          CasteTag::MannerismHands { .. }|
-          CasteTag::MannerismHead { .. }|
-          CasteTag::MannerismLeg { .. }|
-          CasteTag::MannerismMouth { .. }|
-          CasteTag::MannerismNose { .. }|
-          CasteTag::MannerismTongue { .. }|
-          CasteTag::MannerismNails { .. }|
-          CasteTag::ModValue { .. }|
-          CasteTag::OdorLevel { .. }|
-          CasteTag::OdorString { .. }|
-          CasteTag::PenetratePower { .. }|
-          CasteTag::PetValue { .. }|
-          CasteTag::PetValueDivisor { .. }|
-          CasteTag::PopulationRatio { .. }|
-          CasteTag::ProneToRage { .. }|
-          CasteTag::RemainsColor { .. }|
-          CasteTag::SkillLearnRates { .. }|
-          CasteTag::SlainSpeech { .. }|
-          CasteTag::SoldierAltTile { .. }|
-          CasteTag::SoldierTile { .. }|
-          CasteTag::Tile { .. }|
-          CasteTag::TradeCapacity { .. }|
-          CasteTag::ViewRange { .. }|
-          CasteTag::Webber { .. } => {
+          Self::AltTile { .. } |
+          Self::Baby { .. } |
+          Self::BeachFrequency { .. } |
+          Self::BodyGloss { .. } |
+          Self::BodyPartAddType { .. } |
+          Self::BodyPartRemoveType { .. } |
+          Self::BuildingDestroyer { .. } |
+          Self::CanDoInteraction { .. } |
+          Self::ChangeBodySizePercent { .. } |
+          Self::Child { .. } |
+          Self::CreatureClass { .. } |
+          Self::CreatureVariationAddTag { .. } |
+          Self::CreatureVariationRemoveTag { .. } |
+          Self::Description { .. } |
+          Self::ExtraButcherObjectShape { .. } |
+          Self::EggSize { .. } |
+          Self::Extract { .. } |
+          Self::FixedTemp { .. } |
+          Self::Gait { .. } | // This isn't really simple..
+          Self::GlowTile { .. } |
+          Self::Gnawer { .. } |
+          Self::GobbleVerminClass { .. } |
+          Self::GrassTrample { .. } |
+          Self::GravitateBodySize { .. } |
+          Self::Grazer { .. } |
+          Self::Habit { ..}|
+          Self::HabitNumber { .. } |
+          Self::Homeotherm { .. } |
+          Self::ItemCorpseQuality { .. }|
+          Self::LairCharacteristic { .. }|
+          Self::LairHunterSpeech { .. }|
+          Self::LowLightVision {.. }|
+          Self::MannerismArms { .. }|
+          Self::MannerismCheek { .. }|
+          Self::MannerismEar { .. }|
+          Self::MannerismEyes { .. }|
+          Self::MannerismFeet { .. }|
+          Self::MannerismHair { .. }|
+          Self::MannerismKnuckles {.. }|
+          Self::MannerismLips { .. }|
+          Self::MannerismHands { .. }|
+          Self::MannerismHead { .. }|
+          Self::MannerismLeg { .. }|
+          Self::MannerismMouth { .. }|
+          Self::MannerismNose { .. }|
+          Self::MannerismTongue { .. }|
+          Self::MannerismNails { .. }|
+          Self::ModValue { .. }|
+          Self::OdorLevel { .. }|
+          Self::OdorString { .. }|
+          Self::PenetratePower { .. }|
+          Self::PetValue { .. }|
+          Self::PetValueDivisor { .. }|
+          Self::PopulationRatio { .. }|
+          Self::ProneToRage { .. }|
+          Self::RemainsColor { .. }|
+          Self::SkillLearnRates { .. }|
+          Self::SlainSpeech { .. }|
+          Self::SoldierAltTile { .. }|
+          Self::SoldierTile { .. }|
+          Self::Tile { .. }|
+          Self::TradeCapacity { .. }|
+          Self::ViewRange { .. }|
+          Self::Webber { .. } => {
                 tracing::trace!("get_complexity: {self:?} is 'Simple'");
                 TokenComplexity::Simple
           }

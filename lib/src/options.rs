@@ -42,7 +42,6 @@ use crate::parser::{ObjectType, RawModuleLocation};
 #[allow(clippy::struct_excessive_bools)]
 #[derive(Debug, Clone, Serialize, Deserialize, PartialEq, Eq, Hash)]
 #[serde(rename_all = "camelCase")]
-
 pub struct ParserOptions {
     /// Whether to attach a metadata field to the raws.
     /// If true, all raws will have a `metadata` field which shows information about the

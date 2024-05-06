@@ -14,8 +14,7 @@ use super::{
     tokens::GraphicType,
 };
 
-
-
+/// A struct representing a Graphic object.
 #[allow(clippy::module_name_repetitions)]
 #[derive(Serialize, Deserialize, Debug, Clone, Default, specta::Type)]
 #[serde(rename_all = "camelCase")]
@@ -39,6 +38,12 @@ pub struct Graphic {
 }
 
 impl Graphic {
+    /// Function to create a new empty Graphic.
+    ///
+    /// # Returns
+    ///
+    /// * `Graphic` - The new empty Graphic.
+    #[must_use]
     pub fn empty() -> Self {
         Self {
             metadata: Some(
@@ -49,6 +54,18 @@ impl Graphic {
             ..Default::default()
         }
     }
+    /// Function to create a new Graphic.
+    ///
+    /// # Parameters
+    ///
+    /// * `identifier` - The identifier for the Graphic.
+    /// * `metadata` - The metadata for the Graphic.
+    /// * `graphic_type` - The type of graphic.
+    ///
+    /// # Returns
+    ///
+    /// * `Graphic` - The new Graphic.
+    #[must_use]
     pub fn new(identifier: &str, metadata: &RawMetadata, graphic_type: GraphicType) -> Self {
         Self {
             identifier: String::from(identifier),
@@ -76,6 +93,7 @@ impl Graphic {
                 self.add_layer_if_not_exists(String::from("default"));
             }
             if let Some(layers) = self.layers.as_mut() {
+                #[allow(clippy::unwrap_used)]
                 layers.last_mut().unwrap().1.push(layer);
             }
         }
@@ -83,6 +101,7 @@ impl Graphic {
     fn parse_layer_condition_token(&mut self, key: &str, value: &str) {
         if let Some(layers) = self.layers.as_mut() {
             // Conditions get attached to the last layer in the last layer group
+            #[allow(clippy::unwrap_used)]
             if let Some(layer) = layers.last_mut().unwrap().1.last_mut() {
                 layer.parse_condition_token(key, value);
             } else {
@@ -98,10 +117,17 @@ impl Graphic {
             );
         }
     }
+    /// Parse a token from a tag into a `SpriteGraphic` and add it to the current sprite.
+    ///
+    /// # Parameters
+    ///
+    /// * `key` - The key of the token.
+    /// * `value` - The value of the token.
+    /// * `graphic_type` - The type of graphic.
     #[allow(clippy::too_many_lines)]
     pub fn parse_sprite_from_tag(&mut self, key: &str, value: &str, graphic_type: GraphicType) {
         // Check if key is LAYER_SET meaning a new layer group is starting
-        if let "LAYER_SET" = key {
+        if key == "LAYER_SET" {
             // Parse the value into a SpriteLayer
             self.parse_layer_set_from_value(value);
             self.layer_mode = true;
@@ -109,7 +135,7 @@ impl Graphic {
         }
 
         // Check if key is LAYER meaning a new layer should be added to the current layer group
-        if let "LAYER" = key {
+        if key == "LAYER" {
             // Parse the value into a SpriteLayer
             self.parse_layer_from_value(value);
             self.layer_mode = true;
@@ -117,22 +143,22 @@ impl Graphic {
         }
 
         // Layers can be defined in groups.. for now we just ignore it
-        if let "LAYER_GROUP" = key {
+        if key == "LAYER_GROUP" {
             self.layer_mode = true;
             return;
         }
-        if let "END_LAYER_GROUP" = key {
+        if key == "END_LAYER_GROUP" {
             self.layer_mode = false;
             return;
         }
 
         // Right now we don't handle TREE_TILE
-        if let "TREE_TILE" = key {
+        if key == "TREE_TILE" {
             return;
         }
 
         // Check if the key indicates a new growth.
-        if let "GROWTH" = key {
+        if key == "GROWTH" {
             if let Some(growths) = self.growths.as_mut() {
                 growths.push((String::from(value), Vec::new()));
             } else {
@@ -234,11 +260,21 @@ impl Graphic {
             );
         }
     }
-
-    pub fn get_graphic_type(&self) -> GraphicType {
+    /// Get the type of the Graphic.
+    ///
+    /// # Returns
+    ///
+    /// * `GraphicType` - The type of the Graphic.
+    #[must_use]
+    pub const fn get_graphic_type(&self) -> GraphicType {
         self.kind
     }
-
+    /// Get the tile page IDs for the Graphic.
+    ///
+    /// # Returns
+    ///
+    /// * `Vec<String>` - The tile page IDs for the Graphic.
+    #[must_use]
     pub fn get_tile_pages(&self) -> Vec<String> {
         let mut vec = Vec::new();
         if let Some(sprites) = &self.sprites {
@@ -265,6 +301,10 @@ impl Graphic {
     /// - Set any empty string to None.
     /// - Set any empty list to None.
     /// - Set any default values to None.
+    ///
+    /// # Returns
+    ///
+    /// * `Graphic` - The cleaned Graphic.
     #[must_use]
     pub fn cleaned(&self) -> Self {
         let mut cleaned = self.clone();
@@ -326,14 +366,15 @@ impl Graphic {
 #[typetag::serde]
 impl RawObject for Graphic {
     fn get_metadata(&self) -> RawMetadata {
-        if let Some(metadata) = &self.metadata {
-            metadata.clone()
-        } else {
-            warn!("Metadata is missing for {}", self.get_identifier());
-            RawMetadata::default()
-                .with_object_type(ObjectType::Graphics)
-                .with_hidden(true)
-        }
+        self.metadata.as_ref().map_or_else(
+            || {
+                warn!("Metadata is missing for {}", self.get_identifier());
+                RawMetadata::default()
+                    .with_object_type(ObjectType::Graphics)
+                    .with_hidden(true)
+            },
+            std::clone::Clone::clone,
+        )
     }
     fn get_identifier(&self) -> &str {
         &self.identifier

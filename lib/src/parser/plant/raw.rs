@@ -18,8 +18,7 @@ use crate::parser::{
 
 use super::{phf_table::PLANT_TOKENS, tokens::PlantTag};
 
-
-
+/// A struct representing a plant
 #[allow(clippy::module_name_repetitions)]
 #[derive(Serialize, Deserialize, Debug, Clone, Default, specta::Type)]
 #[serde(rename_all = "camelCase")]
@@ -53,19 +52,36 @@ pub struct Plant {
 }
 
 impl Plant {
-    pub fn empty() -> Plant {
-        Plant {
+    /// Create a new empty plant
+    ///
+    /// # Returns
+    ///
+    /// A new empty plant
+    #[must_use]
+    pub fn empty() -> Self {
+        Self {
             metadata: Some(
                 RawMetadata::default()
                     .with_object_type(ObjectType::Plant)
                     .with_hidden(true),
             ),
             frequency: Some(50),
-            ..Plant::default()
+            ..Self::default()
         }
     }
-    pub fn new(identifier: &str, metadata: &RawMetadata) -> Plant {
-        Plant {
+    /// Create a new plant based on an identifier and metadata
+    ///
+    /// # Arguments
+    ///
+    /// * `identifier` - The identifier of the plant
+    /// * `metadata` - The metadata of the plant
+    ///
+    /// # Returns
+    ///
+    /// A new plant
+    #[must_use]
+    pub fn new(identifier: &str, metadata: &RawMetadata) -> Self {
+        Self {
             identifier: String::from(identifier),
             metadata: Some(metadata.clone()),
             frequency: Some(50),
@@ -75,15 +91,19 @@ impl Plant {
                 "PLANT",
                 slugify(identifier)
             ),
-            ..Plant::default()
+            ..Self::default()
         }
     }
+    /// Get the biomes the plant can grow in
+    ///
+    /// # Returns
+    ///
+    /// A vector of biomes the plant can grow in
+    #[must_use]
     pub fn get_biomes(&self) -> Vec<biome::Token> {
-        if let Some(biomes) = &self.biomes {
-            biomes.clone()
-        } else {
-            Vec::new()
-        }
+        self.biomes
+            .as_ref()
+            .map_or_else(Vec::new, std::clone::Clone::clone)
     }
 
     /// Function to "clean" the raw. This is used to remove any empty list or strings,
@@ -96,6 +116,10 @@ impl Plant {
     /// - Set any empty string to None.
     /// - Set any empty list to None.
     /// - Set any default values to None.
+    ///
+    /// # Returns
+    ///
+    /// A new plant with all empty or default values removed.
     #[must_use]
     pub fn cleaned(&self) -> Self {
         let mut cleaned = self.clone();
@@ -156,6 +180,10 @@ impl Plant {
     /// Add a tag to the plant.
     ///
     /// This handles making sure the tags vector is initialized.
+    ///
+    /// # Arguments
+    ///
+    /// * `tag` - The tag to add to the plant
     pub fn add_tag(&mut self, tag: PlantTag) {
         if self.tags.is_none() {
             self.tags = Some(Vec::new());
@@ -174,17 +202,18 @@ impl Plant {
 #[typetag::serde]
 impl RawObject for Plant {
     fn get_metadata(&self) -> RawMetadata {
-        if let Some(metadata) = &self.metadata {
-            metadata.clone()
-        } else {
-            warn!(
-                "PlantParsing: Failed to get metadata for plant {}",
-                self.identifier
-            );
-            RawMetadata::default()
-                .with_object_type(ObjectType::Plant)
-                .with_hidden(true)
-        }
+        self.metadata.as_ref().map_or_else(
+            || {
+                warn!(
+                    "PlantParsing: Failed to get metadata for plant {}",
+                    self.identifier
+                );
+                RawMetadata::default()
+                    .with_object_type(ObjectType::Plant)
+                    .with_hidden(true)
+            },
+            std::clone::Clone::clone,
+        )
     }
     fn get_identifier(&self) -> &str {
         &self.identifier
@@ -202,7 +231,7 @@ impl RawObject for Plant {
     fn get_type(&self) -> &ObjectType {
         &ObjectType::Plant
     }
-    #[allow(clippy::too_many_lines)]
+    #[allow(clippy::too_many_lines, clippy::cognitive_complexity)]
     fn parse_tag(&mut self, key: &str, value: &str) {
         if (PROPERTY_TOKEN_MAP.contains_key(key) || USAGE_TOKEN_MAP.contains_key(key))
             && !key.eq("USE_MATERIAL_TEMPLATE")
@@ -225,6 +254,7 @@ impl RawObject for Plant {
             if self.tree_details.is_none() {
                 self.tree_details = Some(Tree::new(value));
             }
+            #[allow(clippy::unwrap_used)]
             let tree = self.tree_details.as_mut().unwrap();
             tree.parse_tag(key, value);
             return;

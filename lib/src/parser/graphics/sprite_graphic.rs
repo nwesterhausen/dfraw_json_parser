@@ -10,8 +10,7 @@ use super::{
     tokens::{ColorModification, Condition, GraphicType},
 };
 
-
-
+/// A struct representing a sprite graphic.
 #[allow(clippy::module_name_repetitions)]
 #[derive(Serialize, Deserialize, Debug, Clone, Default, specta::Type)]
 #[serde(rename_all = "camelCase")]
@@ -29,9 +28,26 @@ pub struct SpriteGraphic {
 }
 
 impl SpriteGraphic {
+    /// Get the tile page ID.
+    ///
+    /// # Returns
+    ///
+    /// A string slice containing the tile page ID.
     pub fn get_tile_page_id(&self) -> &str {
         self.tile_page_id.as_str()
     }
+    /// Create a new sprite graphic by parsing a token.
+    ///
+    /// # Arguments
+    ///
+    /// * `key` - A string slice containing the key.
+    /// * `value` - A string slice containing the value.
+    /// * `graphic_type` - The graphic type.
+    ///
+    /// # Returns
+    ///
+    /// An option containing the sprite graphic.
+    #[must_use]
     pub fn from_token(key: &str, value: &str, graphic_type: GraphicType) -> Option<Self> {
         // Recombine token for parsing
         let token = format!("{key}:{value}");
@@ -40,11 +56,11 @@ impl SpriteGraphic {
         match specific_graphic_type {
             GraphicType::Creature | GraphicType::CreatureCaste => {
                 // parse creature
-                SpriteGraphic::parse_creature_from_token(&token)
+                Self::parse_creature_from_token(&token)
             }
             GraphicType::Plant => {
                 // parse plant
-                SpriteGraphic::parse_plant_from_token(&token)
+                Self::parse_plant_from_token(&token)
             }
             GraphicType::ToolWood
             | GraphicType::ToolGlass
@@ -54,17 +70,13 @@ impl SpriteGraphic {
             | GraphicType::ToolGlassVariant
             | GraphicType::ToolMetalVariant
             | GraphicType::ToolStoneVariant
-            | GraphicType::ToolDamage => {
-                SpriteGraphic::parse_tile_with_color_pallet_from_value(value)
-            }
+            | GraphicType::ToolDamage => Self::parse_tile_with_color_pallet_from_value(value),
             GraphicType::ToolShape | GraphicType::ShapeLargeGem | GraphicType::ShapeSmallGem => {
-                SpriteGraphic::parse_tile_with_extra_descriptor_from_value(value)
+                Self::parse_tile_with_extra_descriptor_from_value(value)
             }
             GraphicType::StatueCreature
             | GraphicType::StatueCreatureCaste
-            | GraphicType::StatuesSurfaceGiant => {
-                SpriteGraphic::parse_creature_statue_from_token(&token)
-            }
+            | GraphicType::StatuesSurfaceGiant => Self::parse_creature_statue_from_token(&token),
             GraphicType::Template
             | GraphicType::CustomWorkshop
             | GraphicType::AddTool
@@ -80,7 +92,7 @@ impl SpriteGraphic {
             }
             _ => {
                 // Assume most are tiles
-                if let Some(v) = SpriteGraphic::parse_tile_from_value(value) {
+                if let Some(v) = Self::parse_tile_from_value(value) {
                     return Some(v);
                 }
                 warn!(
@@ -429,15 +441,13 @@ impl SpriteGraphic {
         };
 
         let primary_condition =
-            if let Some(parsed_condition) = Condition::from_token(condition.as_str()) {
-                parsed_condition
-            } else {
-                warn!(
-                "parse_creature_statue_from_token: Failed to parse {} as primary_condition in {}",
-                condition, token
-            );
-                Condition::None
-            };
+        Condition::from_token(condition.as_str()).map_or_else(|| {
+                             warn!(
+                             "parse_creature_statue_from_token: Failed to parse {} as primary_condition in {}",
+                             condition, token
+                         );
+                             Condition::None
+                         }, |parsed_condition| parsed_condition);
 
         Some(Self {
             primary_condition,
@@ -480,7 +490,7 @@ impl SpriteGraphic {
         let large_image = matches!(fourth_position_token.as_str(), "LARGE_IMAGE");
 
         if large_image {
-            return SpriteGraphic::parse_large_creature_with_split(
+            return Self::parse_large_creature_with_split(
                 condition.as_str(),
                 tile_page_id.as_str(),
                 split.collect::<Vec<&str>>().as_slice(),
@@ -515,33 +525,30 @@ impl SpriteGraphic {
             }
         };
 
-        let color = match split.next() {
-            Some(v) => ColorModification::from_token(v),
-            _ => ColorModification::AsIs,
-        };
+        let color = split.next().map_or(ColorModification::AsIs, |v| {
+            ColorModification::from_token(v)
+        });
 
-        let primary_condition =
-            if let Some(parsed_condition) = Condition::from_token(condition.as_str()) {
-                parsed_condition
-            } else {
+        let primary_condition = Condition::from_token(condition.as_str()).map_or_else(
+            || {
                 warn!(
                     "Failed to parse {} as primary_condition in {}",
                     condition, token
                 );
                 Condition::None
-            };
+            },
+            |parsed_condition| parsed_condition,
+        );
 
-        let secondary_condition = match split.next() {
-            Some(v) => {
-                if let Some(condition) = Condition::from_token(v) {
-                    condition
-                } else {
+        let secondary_condition = split.next().map_or(Condition::None, |v| {
+            Condition::from_token(v).map_or_else(
+                || {
                     warn!("Failed to parse {} as secondary_condition in {}", v, token);
                     Condition::None
-                }
-            }
-            _ => Condition::None,
-        };
+                },
+                |condition| condition,
+            )
+        });
 
         if primary_condition == Condition::None {
             warn!(
@@ -632,37 +639,35 @@ impl SpriteGraphic {
             }
         };
 
-        let color = match split.get(4) {
-            Some(v) => ColorModification::from_token(v),
-            _ => ColorModification::AsIs,
-        };
+        let color = split.get(4).map_or(ColorModification::AsIs, |v| {
+            ColorModification::from_token(v)
+        });
 
-        let primary_condition = if let Some(parsed_condition) = Condition::from_token(condition) {
-            parsed_condition
-        } else {
-            warn!(
-                "Failed to parse {} as primary_condition in {}",
-                condition,
-                split.join(":")
-            );
-            Condition::None
-        };
+        let primary_condition = Condition::from_token(condition).map_or_else(
+            || {
+                warn!(
+                    "Failed to parse {} as primary_condition in {}",
+                    condition,
+                    split.join(":")
+                );
+                Condition::None
+            },
+            |parsed_condition| parsed_condition,
+        );
 
-        let secondary_condition = match split.get(5) {
-            Some(v) => {
-                if let Some(condition) = Condition::from_token(v) {
-                    condition
-                } else {
+        let secondary_condition = split.get(5).map_or(Condition::None, |v| {
+            Condition::from_token(v).map_or_else(
+                || {
                     warn!(
                         "Failed to parse {} as secondary_condition in {}",
                         v,
                         split.join(":")
                     );
                     Condition::None
-                }
-            }
-            _ => Condition::None,
-        };
+                },
+                |condition| condition,
+            )
+        });
 
         if primary_condition == Condition::None {
             warn!(
@@ -694,6 +699,10 @@ impl SpriteGraphic {
     /// - Set any empty string to None.
     /// - Set any empty list to None.
     /// - Set any default values to None.
+    ///
+    /// # Returns
+    ///
+    /// A new sprite graphic with the cleaned values.
     #[must_use]
     pub fn cleaned(&self) -> Self {
         let mut cleaned = self.clone();

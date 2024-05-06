@@ -4,8 +4,7 @@ use crate::parser::serializer_helper;
 
 use super::tokens::CreatureEffectProperty;
 
-
-
+/// A creature effect.
 #[derive(Serialize, Deserialize, Debug, Clone, Default)]
 #[serde(rename_all = "camelCase")]
 pub struct CreatureEffect {

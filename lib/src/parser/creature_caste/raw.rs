@@ -9,8 +9,7 @@ use crate::parser::{
 
 use super::{phf_table::CASTE_TOKENS, tokens::CasteTag, Gait};
 
-
-
+/// A struct representing a creature caste.
 #[allow(clippy::module_name_repetitions)]
 #[derive(Serialize, Deserialize, Debug, Clone, Default, specta::Type)]
 #[serde(rename_all = "camelCase")]
@@ -51,26 +50,44 @@ pub struct Caste {
 }
 
 impl Caste {
-    pub fn new(name: &str) -> Caste {
-        Caste {
+    /// Function to create a new Caste.
+    ///
+    /// # Arguments
+    ///
+    /// * `name` - The name of the caste.
+    #[must_use]
+    pub fn new(name: &str) -> Self {
+        Self {
             identifier: String::from(name),
-            ..Caste::default()
+            ..Self::default()
         }
     }
+    /// Function to get the tags of the creature caste.
+    ///
+    /// # Returns
+    ///
+    /// * `&[CasteTag]` - The tags of the creature caste.
+    #[must_use]
     pub fn get_tags(&self) -> &[CasteTag] {
-        if let Some(tags) = &self.tags {
-            tags.as_slice()
-        } else {
-            &[]
-        }
+        self.tags.as_ref().map_or(&[], |tags| tags.as_slice())
     }
+    /// Function to get the milkable of the creature caste.
+    ///
+    /// # Returns
+    ///
+    /// * `Milkable` - The milkable of the creature caste.
+    #[must_use]
     pub fn get_milkable(&self) -> Milkable {
-        if let Some(milkable) = &self.milkable {
-            milkable.clone()
-        } else {
-            Milkable::default()
-        }
+        self.milkable
+            .as_ref()
+            .map_or_else(Milkable::default, std::clone::Clone::clone)
     }
+    /// Parse a tag and value into the creature caste
+    ///
+    /// # Arguments
+    ///
+    /// * `key` - The key of the tag to parse.
+    /// * `value` - The value of the tag to parse.
     #[allow(clippy::too_many_lines)]
     pub fn parse_tag(&mut self, key: &str, value: &str) {
         let Some(tag) = CASTE_TOKENS.get(key) else {
@@ -90,7 +107,7 @@ impl Caste {
             }
             return;
         }
-        if let TokenComplexity::None = tag.get_complexity() {
+        if matches!(tag.get_complexity(), TokenComplexity::None) {
             // If the tag is a TokenComplexity::None, then the value should be empty
             // So we should log the extra value before adding the tag to the last caste
             warn!(
@@ -119,7 +136,7 @@ impl Caste {
         }
 
         match tag_and_value {
-            CasteTag::Description { description } => self.description = Some(description.clone()),
+            CasteTag::Description { description } => self.description = Some(description),
             CasteTag::EggSize { size } => self.egg_size = Some(size),
             CasteTag::Baby { age } => self.baby = Some(age),
             CasteTag::Child { age } => self.child = Some(age),
@@ -134,9 +151,9 @@ impl Caste {
             CasteTag::MaxAge { min, max } => self.max_age = Some([min, max]),
             CasteTag::CreatureClass { class } => {
                 if let Some(creature_classes) = self.creature_class.as_mut() {
-                    creature_classes.push(class.clone());
+                    creature_classes.push(class);
                 } else {
-                    self.creature_class = Some(vec![class.clone()]);
+                    self.creature_class = Some(vec![class]);
                 }
             }
             CasteTag::BodySize { .. } => {
@@ -198,11 +215,20 @@ impl Caste {
             _ => {}
         }
     }
-
+    /// Function to get the identifier of the creature.
+    ///
+    /// # Returns
+    ///
+    /// * `&str` - The identifier of the creature.
     pub fn get_identifier(&self) -> &str {
         &self.identifier
     }
-
+    /// Function to remove a tag from the creature.
+    ///
+    /// # Arguments
+    ///
+    /// * `key` - The key of the tag to remove.
+    /// * `value` - The value of the tag to remove.
     #[allow(clippy::too_many_lines)]
     pub fn remove_tag_and_value(&mut self, key: &str, value: &str) {
         let Some(tag) = CASTE_TOKENS.get(key) else {
@@ -212,7 +238,7 @@ impl Caste {
             return;
         };
 
-        if let TokenComplexity::None = tag.get_complexity() {
+        if matches!(tag.get_complexity(), TokenComplexity::None) {
             // If the tag is a TokenComplexity::None, then the value should be empty
             // So we should log the extra value before adding the tag to the last caste
             if !value.is_empty() {
@@ -273,8 +299,17 @@ impl Caste {
                 }
             }
     }
-
-    pub fn overwrite_caste(&mut self, other: &Caste) {
+    /// Overwrites the values of self with the values of other.
+    ///
+    /// # Arguments
+    ///
+    /// * `other` - The other caste to overwrite self with.
+    ///
+    /// # Notes
+    ///
+    /// This function will overwrite any values in self with the values from other. If a value is default in other, it will not be overwritten.
+    #[allow(clippy::cognitive_complexity)]
+    pub fn overwrite_caste(&mut self, other: &Self) {
         // Include any tags from other that aren't in self
         if let Some(tags) = &other.tags {
             for tag in tags {
@@ -364,10 +399,21 @@ impl Caste {
             }
         }
     }
-
+    /// Returns true if the caste is an egg layer.
+    ///
+    /// # Returns
+    ///
+    /// True if the caste is an egg layer, false otherwise.
+    #[must_use]
     pub fn is_egg_layer(&self) -> bool {
         self.has_tag(&CasteTag::LaysEggs)
     }
+    /// Returns true if the caste is milkable.
+    ///
+    /// # Returns
+    ///
+    /// True if the caste is milkable, false otherwise.
+    #[must_use]
     pub fn is_milkable(&self) -> bool {
         self.has_tag(&CasteTag::Milkable {
             material: String::new(),
@@ -405,6 +451,7 @@ impl Caste {
     /// - Set any empty list to None.
     /// - Set any default values to None.
     #[must_use]
+    #[allow(clippy::cognitive_complexity)]
     pub fn cleaned(&self) -> Self {
         let mut cleaned = self.clone();
 

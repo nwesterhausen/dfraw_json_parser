@@ -5,8 +5,7 @@ use crate::parser::{
     clean_search_vec, material::Material, ObjectType, RawMetadata, RawObject, Searchable,
 };
 
-
-
+/// A struct representing a material template
 #[derive(Serialize, Deserialize, Debug, Clone, Default, specta::Type)]
 #[serde(rename_all = "camelCase")]
 pub struct MaterialTemplate {
@@ -17,6 +16,12 @@ pub struct MaterialTemplate {
 }
 
 impl MaterialTemplate {
+    /// Create a new empty material template
+    ///
+    /// # Returns
+    ///
+    /// A new empty material template
+    #[must_use]
     pub fn empty() -> Self {
         Self {
             metadata: Some(
@@ -27,8 +32,19 @@ impl MaterialTemplate {
             ..Self::default()
         }
     }
-    pub fn new(identifier: &str, metadata: &RawMetadata) -> MaterialTemplate {
-        MaterialTemplate {
+    /// Create a new material template
+    ///
+    /// # Arguments
+    ///
+    /// * `identifier`: The identifier of the material template
+    /// * `metadata`: The metadata of the material template
+    ///
+    /// # Returns
+    ///
+    /// A new material template
+    #[must_use]
+    pub fn new(identifier: &str, metadata: &RawMetadata) -> Self {
+        Self {
             identifier: String::from(identifier),
             metadata: Some(metadata.clone()),
             object_id: format!(
@@ -37,7 +53,7 @@ impl MaterialTemplate {
                 "MATERIAL_TEMPLATE",
                 slugify(identifier)
             ),
-            ..MaterialTemplate::default()
+            ..Self::default()
         }
     }
 
@@ -51,6 +67,10 @@ impl MaterialTemplate {
     /// - Set any empty string to None.
     /// - Set any empty list to None.
     /// - Set any default values to None.
+    ///
+    /// # Returns
+    ///
+    /// A new material template with all empty or default values removed.
     #[must_use]
     pub fn cleaned(&self) -> Self {
         let mut cleaned = self.clone();
@@ -78,17 +98,18 @@ impl RawObject for MaterialTemplate {
     }
 
     fn get_metadata(&self) -> RawMetadata {
-        if let Some(metadata) = &self.metadata {
-            metadata.clone()
-        } else {
-            tracing::warn!(
-                "Metadata is missing for MaterialTemplate {}",
-                self.get_object_id()
-            );
-            RawMetadata::default()
-                .with_object_type(ObjectType::MaterialTemplate)
-                .with_hidden(true)
-        }
+        self.metadata.as_ref().map_or_else(
+            || {
+                tracing::warn!(
+                    "Metadata is missing for MaterialTemplate {}",
+                    self.get_object_id()
+                );
+                RawMetadata::default()
+                    .with_object_type(ObjectType::MaterialTemplate)
+                    .with_hidden(true)
+            },
+            std::clone::Clone::clone,
+        )
     }
 
     fn get_object_id(&self) -> &str {

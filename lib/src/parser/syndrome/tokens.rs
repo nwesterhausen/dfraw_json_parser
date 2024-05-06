@@ -1,19 +1,20 @@
 use serde::{Deserialize, Serialize};
 
+/// Represents the tokens that can be used in a syndrome definition.
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, Default, specta::Type)]
 pub enum SyndromeToken {
     /// Used to specify the name of the syndrome as it appears in-game. Names don't have to be unique;
     /// It's perfectly acceptable to have multiple syndromes with identical names.
     Name,
-    /// Can be included to create a syndrome class and assign the syndrome to it, for use with the IT_CANNOT_HAVE_SYNDROME_CLASS
+    /// Can be included to create a syndrome class and assign the syndrome to it, for use with the `IT_CANNOT_HAVE_SYNDROME_CLASS`
     /// interaction token. Can be specified more than once to assign the syndrome to multiple classes.
     ///
     /// Other syndromes can also be assigned to the same class.
     Class,
     /// If the syndrome is tied to a material, the injection of this material into a creature's bloodstream will cause it to contract
-    /// the syndrome if this token is included. Injection can be carried out as part of a creature attack via SPECIALATTACK_INJECT_EXTRACT,
+    /// the syndrome if this token is included. Injection can be carried out as part of a creature attack via `SPECIALATTACK_INJECT_EXTRACT`,
     /// or by piercing the flesh of a creature with an item that has been contaminated with the material. Thus, this token can be used as a
-    /// more specific alternative to SYN_CONTACT for syndromes intended to be administered by envenomed weapons.
+    /// more specific alternative to `SYN_CONTACT` for syndromes intended to be administered by envenomed weapons.
     Injected,
     /// If the syndrome is tied to a material, creatures who come into contact with this material will contract the syndrome
     /// if this token is included in the syndrome definition. Methods of getting a material contaminant onto a creature's body include:
@@ -27,8 +28,8 @@ pub enum SyndromeToken {
     /// - being struck with a contaminated item
     Contact,
     ///If the syndrome is tied to a material, creatures who inhale the material will contract the syndrome if this token is included.
-    /// Materials can only be inhaled in their gaseous state, which is attainable by boiling, or in the form of a TRAILING_GAS_FLOW,
-    /// UNDIRECTED_GAS or WEATHER_CREEPING_GAS. Creatures can also be made to leak gaseous tissue when damaged.
+    /// Materials can only be inhaled in their gaseous state, which is attainable by boiling, or in the form of a `TRAILING_GAS_FLOW`,
+    /// `UNDIRECTED_GAS` or `WEATHER_CREEPING_GAS`. Creatures can also be made to leak gaseous tissue when damaged.
     Inhaled,
     /// If the syndrome is tied to a material, creatures who eat or drink substances comprising, containing or contaminated with this
     /// material will contract the syndrome if this token is included. This includes prepared meals when any of the constituent
@@ -38,7 +39,7 @@ pub enum SyndromeToken {
     /// its constituent materials.
     Ingested,
     /// If this is included, only creatures which belong to the specified creature class (as well as creatures which pass the
-    /// SYN_AFFECTED_CREATURE check if this is included) will be able to contract the syndrome. This token can be specified multiple times
+    /// `SYN_AFFECTED_CREATURE` check if this is included) will be able to contract the syndrome. This token can be specified multiple times
     /// per syndrome, in which case creatures which have at least one matching class will be considered susceptible.
     ///
     /// If SYN_IMMUNE_CLASS and/or SYN_IMMUNE_CREATURE are included, creatures which fail these checks will be unable to contract the syndrome
@@ -46,7 +47,7 @@ pub enum SyndromeToken {
     AffectedClass,
     /// If this is included, creatures which belong to the specified creature class will be unable to contract the syndrome. This token can be
     /// specified multiple times per syndrome, in which case creatures with at least one matching class will be considered immune
-    /// (unless overridden by SYN_AFFECTED_CREATURE).
+    /// (unless overridden by `SYN_AFFECTED_CREATURE`).
     ImmuneClass,
     /// If this is included, only the specified creature (and, if `SYN_AFFECTED_CLASS` is included, also creatures which pass this check as explained above)
     /// will be able to contract the syndrome. This token can be used multiple times per syndrome. If used alongside `SYN_IMMUNE_CLASS`, the specified

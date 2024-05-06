@@ -7,87 +7,87 @@ impl RawObjectToken for CreatureTag {
         // Implement the logic for getting the complexity of the token.
         // Return the appropriate `TokenComplexity` variant.
         match self {
-          CreatureTag::ApplyCurrentCreatureVariation |
-          CreatureTag::ArtificialHiveable |
-          CreatureTag::DoesNotExist |
-          CreatureTag::EquipmentWagon |
-          CreatureTag::Evil |
-          CreatureTag::Fanciful |
-          CreatureTag::Generated |
-          CreatureTag::Good |
-          CreatureTag::GoToEnd |
-          CreatureTag::GoToStart |
-          CreatureTag::LargeRoaming |
-          CreatureTag::LocalPopsControllable |
-          CreatureTag::LocalPopsProduceHeroes |
-          CreatureTag::LooseClusters |
-          CreatureTag::Mundane |
-          CreatureTag::Savage |
-          CreatureTag::Ubiquitous |
-          CreatureTag::Utterances |
-          CreatureTag::VerminEater |
-          CreatureTag::VerminFish |
-          CreatureTag::VerminGrounder |
-          CreatureTag::VerminRotter |
-          CreatureTag::VerminSoil |
-          CreatureTag::VerminSoilColony |
+          Self::ApplyCurrentCreatureVariation |
+          Self::ArtificialHiveable |
+          Self::DoesNotExist |
+          Self::EquipmentWagon |
+          Self::Evil |
+          Self::Fanciful |
+          Self::Generated |
+          Self::Good |
+          Self::GoToEnd |
+          Self::GoToStart |
+          Self::LargeRoaming |
+          Self::LocalPopsControllable |
+          Self::LocalPopsProduceHeroes |
+          Self::LooseClusters |
+          Self::Mundane |
+          Self::Savage |
+          Self::Ubiquitous |
+          Self::Utterances |
+          Self::VerminEater |
+          Self::VerminFish |
+          Self::VerminGrounder |
+          Self::VerminRotter |
+          Self::VerminSoil |
+          Self::VerminSoilColony |
           // Other tags
-          CreatureTag::Unknown |
-          CreatureTag::AllCastesAlive |
-          CreatureTag::Equipment |
-          CreatureTag::MatesToBreed |
-          CreatureTag::OccursAsEntityRace |
-          CreatureTag::SmallRace |
-          CreatureTag::TwoGenders
+          Self::Unknown |
+          Self::AllCastesAlive |
+          Self::Equipment |
+          Self::MatesToBreed |
+          Self::OccursAsEntityRace |
+          Self::SmallRace |
+          Self::TwoGenders
           => {
                 tracing::trace!("get_complexity: {self:?} is 'None'");
                 TokenComplexity::None
         }
-          CreatureTag::AltTile{..} |
-          CreatureTag::Biome {..} |
-          CreatureTag::Caste {..} |
-          CreatureTag::ChangeFrequencyPercent {..} |
-          CreatureTag::CopyTagsFrom {..} |
-          CreatureTag::CreatureSoldierTile {..} |
-          CreatureTag::CreatureTile {..} |
-          CreatureTag::Frequency { .. } |
-          CreatureTag::GlowTile {..} |
-          CreatureTag::GoToTag {..} |
-          CreatureTag::PlusMaterial {..} |
-          CreatureTag::PrefString {..} |
-          CreatureTag::RemoveMaterial {..} |
-          CreatureTag::RemoveTissue {..} |
-          CreatureTag::SelectAdditionalCaste {..} |
-          CreatureTag::SelectCaste {..} |
-          CreatureTag::SelectMaterial {..} |
-          CreatureTag::SelectTissue {..} |
-          CreatureTag::SlainSpeech {..} |
-          CreatureTag::SmellTrigger {..} |
-          CreatureTag::SoldierAltTile {..} |
-          CreatureTag::SourceHfid {..} |
-          CreatureTag::Sphere {..} |
-          CreatureTag::Tissue {..}
+          Self::AltTile{..} |
+          Self::Biome {..} |
+          Self::Caste {..} |
+          Self::ChangeFrequencyPercent {..} |
+          Self::CopyTagsFrom {..} |
+          Self::CreatureSoldierTile {..} |
+          Self::CreatureTile {..} |
+          Self::Frequency { .. } |
+          Self::GlowTile {..} |
+          Self::GoToTag {..} |
+          Self::PlusMaterial {..} |
+          Self::PrefString {..} |
+          Self::RemoveMaterial {..} |
+          Self::RemoveTissue {..} |
+          Self::SelectAdditionalCaste {..} |
+          Self::SelectCaste {..} |
+          Self::SelectMaterial {..} |
+          Self::SelectTissue {..} |
+          Self::SlainSpeech {..} |
+          Self::SmellTrigger {..} |
+          Self::SoldierAltTile {..} |
+          Self::SourceHfid {..} |
+          Self::Sphere {..} |
+          Self::Tissue {..}
           => {
                 tracing::trace!("get_complexity: {self:?} is 'Simple'");
                 TokenComplexity::Simple
         }
-          CreatureTag::ApplyCreatureVariation{..} |
-          CreatureTag::ClusterNumber {..} |
-          CreatureTag::Color {..} |
-          CreatureTag::GlowColor {..} |
-          CreatureTag::GeneralBabyName {..} |
-          CreatureTag::GeneralChildName {..} |
-          CreatureTag::HarvestProduct {..} |
-          CreatureTag::Name {..} |
-          CreatureTag::PopulationNumber {..} |
-          CreatureTag::ProfessionName {..} |
-CreatureTag::TriggerableGroup { .. } |
-          CreatureTag::UndergroundDepth {..} |
-          CreatureTag::UseCaste {..} |
-          CreatureTag::UseMaterial {..} |
-          CreatureTag::UseMaterialTemplate {..} |
-          CreatureTag::UseTissue {..} |
-          CreatureTag::UseTissueTemplate {..}
+          Self::ApplyCreatureVariation{..} |
+          Self::ClusterNumber {..} |
+          Self::Color {..} |
+          Self::GlowColor {..} |
+          Self::GeneralBabyName {..} |
+          Self::GeneralChildName {..} |
+          Self::HarvestProduct {..} |
+          Self::Name {..} |
+          Self::PopulationNumber {..} |
+          Self::ProfessionName {..} |
+Self::TriggerableGroup { .. } |
+          Self::UndergroundDepth {..} |
+          Self::UseCaste {..} |
+          Self::UseMaterial {..} |
+          Self::UseMaterialTemplate {..} |
+          Self::UseTissue {..} |
+          Self::UseTissueTemplate {..}
           => {
                 tracing::trace!("get_complexity: {self:?} is 'Complex'");
                 TokenComplexity::Complex

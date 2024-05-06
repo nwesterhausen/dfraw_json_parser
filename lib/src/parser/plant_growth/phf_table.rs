@@ -4,6 +4,7 @@ use super::tokens::GrowthTag;
 use super::tokens::GrowthType;
 use super::tokens::PlantPart;
 
+/// Mapping of growth tokens to strings
 pub static GROWTH_TOKENS: phf::Map<&'static str, GrowthTag> = phf_map! {
     "GROWTH" => GrowthTag::Growth,
     "GROWTH_NAME" => GrowthTag::GrowthName,
@@ -18,6 +19,7 @@ pub static GROWTH_TOKENS: phf::Map<&'static str, GrowthTag> = phf_map! {
     "GROWTH_DROPS_OFF_NO_CLOUD" => GrowthTag::GrowthDropsOffNoCloud,
 };
 
+/// Mapping of growth type tokens to strings
 pub static GROWTH_TYPE_TOKENS: phf::Map<&'static str, GrowthType> = phf_map! {
     "LEAVES" => GrowthType::Leaves,
     "SPATHES" => GrowthType::Spathes,
@@ -35,6 +37,7 @@ pub static GROWTH_TYPE_TOKENS: phf::Map<&'static str, GrowthType> = phf_map! {
     "NONE" => GrowthType::None,
 };
 
+/// Mapping of plant part tokens to strings
 pub static PLANT_PART_TOKENS: phf::Map<&'static str, PlantPart> = phf_map! {
     "TWIGS" => PlantPart::Twigs,
     "BRANCHES" => PlantPart::Branches,

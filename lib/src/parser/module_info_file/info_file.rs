@@ -16,9 +16,9 @@ use crate::{
 
 use super::steam_data::SteamData;
 
+/// Represents the `info.txt` file for a raw module
 #[derive(Serialize, Deserialize, Default, Clone, Debug, specta::Type)]
 #[serde(rename_all = "camelCase")]
-/// Represents the `info.txt` file for a raw module
 pub struct InfoFile {
     identifier: String,
     object_id: String,
@@ -41,8 +41,19 @@ pub struct InfoFile {
 
 impl InfoFile {
     /// Creates a new `InfoFile` with the passed identifier, location, and parent directory
+    ///
+    /// # Arguments
+    ///
+    /// * `id` - The identifier for the `InfoFile`
+    /// * `location` - The location the `InfoFile` was parsed from
+    /// * `parent_directory` - The directory the `InfoFile` was parsed from
+    ///
+    /// # Returns
+    ///
+    /// * The `InfoFile`
+    #[must_use]
     pub fn new(id: &str, location: RawModuleLocation, parent_directory: &str) -> Self {
-        InfoFile {
+        Self {
             identifier: String::from(id),
             location,
             parent_directory: String::from(parent_directory),
@@ -51,8 +62,13 @@ impl InfoFile {
         }
     }
     /// Creates a new empty `InfoFile`
+    ///
+    /// # Returns
+    ///
+    /// * The empty `InfoFile`
+    #[must_use]
     pub fn empty() -> Self {
-        InfoFile::default()
+        Self::default()
     }
     /// Creates a new `InfoFile` from the passed `info.txt` file path
     ///
@@ -78,15 +94,14 @@ impl InfoFile {
         let parent_directory = full_path
             .as_ref()
             .parent()
-            .unwrap_or(Path::new(""))
+            .unwrap_or_else(|| Path::new(""))
             .parent()
-            .unwrap_or(Path::new(""))
+            .unwrap_or_else(|| Path::new(""))
             .to_string_lossy()
             .to_string();
         let info_file_path = Path::new(parent_directory.as_str()).join("info.txt");
         Self::parse(&info_file_path)
     }
-    #[allow(clippy::too_many_lines)]
     /// Parses the `info.txt` file at the passed path
     ///
     /// # Arguments
@@ -101,6 +116,7 @@ impl InfoFile {
     ///
     /// * `ParserError::FileNotFound` - If the passed file path does not exist
     /// * `ParserError::IOError` - If there is an error reading the file
+    #[allow(clippy::cognitive_complexity, clippy::too_many_lines)]
     pub fn parse<P: AsRef<Path>>(info_file_path: &P) -> Result<Self, ParserError> {
         let parent_dir = get_parent_dir_name(info_file_path);
         let location = RawModuleLocation::from_info_text_file_path(info_file_path);
@@ -122,7 +138,7 @@ impl InfoFile {
         let reader = BufReader::new(decoding_reader);
 
         // info.txt details
-        let mut info_file_data: InfoFile = InfoFile::new("", location, &parent_dir);
+        let mut info_file_data: Self = Self::new("", location, &parent_dir);
 
         for (index, line) in reader.lines().enumerate() {
             if line.is_err() {
@@ -161,7 +177,7 @@ impl InfoFile {
                     // SECTION FOR MATCHING info.txt DATA
                     "ID" => {
                         // the [ID:identifier] tag should be the top of the info.txt file
-                        info_file_data = InfoFile::new(captured_value, location, &parent_dir);
+                        info_file_data = Self::new(captured_value, location, &parent_dir);
                     }
                     "NUMERIC_VERSION" => match captured_value.parse() {
                         Ok(n) => info_file_data.numeric_version = n,
@@ -381,7 +397,7 @@ impl InfoFile {
         String::from(&self.identifier)
     }
     /// Returns the location the `InfoFile` was parsed from
-    pub fn get_location(&self) -> RawModuleLocation {
+    pub const fn get_location(&self) -> RawModuleLocation {
         self.location
     }
     /// Returns the description for the `InfoFile`

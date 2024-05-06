@@ -5,8 +5,7 @@ use crate::parser::{
     ObjectType, {clean_search_vec, Searchable}, {RawMetadata, RawObject},
 };
 
-
-
+/// A struct representing a creature selection
 #[derive(Serialize, Deserialize, Debug, Clone, Default, specta::Type)]
 #[serde(rename_all = "camelCase")]
 pub struct SelectCreature {
@@ -17,8 +16,19 @@ pub struct SelectCreature {
     tags: Vec<String>,
 }
 impl SelectCreature {
-    pub fn new(identifier: &str, metadata: &RawMetadata) -> SelectCreature {
-        SelectCreature {
+    /// Create a new `SelectCreature`
+    ///
+    /// # Arguments
+    ///
+    /// * `identifier` - The identifier of the creature
+    /// * `metadata` - The metadata of the creature
+    ///
+    /// # Returns
+    ///
+    /// A new `SelectCreature`
+    #[must_use]
+    pub fn new(identifier: &str, metadata: &RawMetadata) -> Self {
+        Self {
             identifier: String::from(identifier),
             metadata: Some(metadata.clone()),
             object_id: build_object_id_from_pieces(
@@ -26,10 +36,15 @@ impl SelectCreature {
                 identifier,
                 &ObjectType::SelectCreature,
             ),
-            ..SelectCreature::default()
+            ..Self::default()
         }
     }
-
+    /// Create a new empty `SelectCreature`
+    ///
+    /// # Returns
+    ///
+    /// A new empty `SelectCreature`
+    #[must_use]
     pub fn empty() -> Self {
         Self {
             metadata: Some(
@@ -51,6 +66,10 @@ impl SelectCreature {
     /// - Set any empty string to None.
     /// - Set any empty list to None.
     /// - Set any default values to None.
+    ///
+    /// # Returns
+    ///
+    /// A cleaned `SelectCreature`
     #[must_use]
     pub fn cleaned(&self) -> Self {
         let mut cleaned = self.clone();
@@ -68,17 +87,18 @@ impl SelectCreature {
 #[typetag::serde]
 impl RawObject for SelectCreature {
     fn get_metadata(&self) -> RawMetadata {
-        if let Some(metadata) = &self.metadata {
-            metadata.clone()
-        } else {
-            tracing::warn!(
-                "Metadata is missing for SelectCreature: {}",
-                self.identifier
-            );
-            RawMetadata::default()
-                .with_object_type(ObjectType::SelectCreature)
-                .with_hidden(true)
-        }
+        self.metadata.as_ref().map_or_else(
+            || {
+                tracing::warn!(
+                    "Metadata is missing for SelectCreature: {}",
+                    self.identifier
+                );
+                RawMetadata::default()
+                    .with_object_type(ObjectType::SelectCreature)
+                    .with_hidden(true)
+            },
+            std::clone::Clone::clone,
+        )
     }
     fn clean_self(&mut self) {
         *self = self.cleaned();

@@ -90,7 +90,24 @@ pub fn parse_raw_file<P: AsRef<Path>>(
     parse_raw_file_with_info(raw_file_path, &mod_info_file, options)
 }
 
-#[allow(clippy::too_many_lines)]
+/// Parse a raw file into a list of parsed raws and a list of unprocessed raws.
+///
+/// # Arguments
+///
+/// * `raw_file_path` - The path to the raw file to parse.
+/// * `mod_info_file` - The module info file for the raw file.
+/// * `options` - The parser options to use when parsing the raw file.
+///
+/// # Returns
+///
+/// * `Result<FileParseResults, ParserError>` - The results of parsing the raw file.
+///
+/// # Errors
+///
+/// * `ParserError::InvalidRawFile` - If the raw file is invalid.
+/// * `ParserError::IOError` - If there is an error reading the raw file.
+/// * `ParserError::ModuleInfoFileError` - If there is an error reading the module info file.
+#[allow(clippy::too_many_lines, clippy::cognitive_complexity)]
 pub fn parse_raw_file_with_info<P: AsRef<Path>>(
     raw_file_path: &P,
     mod_info_file: &ModuleInfoFile,

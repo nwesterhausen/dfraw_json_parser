@@ -10,8 +10,7 @@ use crate::parser::{
 
 use super::{phf_table::ENTITY_TOKENS, tokens::EntityToken};
 
-
-
+/// A struct representing an Entity object.
 #[derive(Serialize, Deserialize, Debug, Clone, Default, specta::Type)]
 #[serde(rename_all = "camelCase")]
 pub struct Entity {
@@ -97,8 +96,14 @@ pub struct Entity {
 }
 
 impl Entity {
+    /// Function to create a new empty Entity.
+    ///
+    /// # Returns
+    ///
+    /// * `Entity` - The new empty Entity.
+    #[must_use]
     pub fn empty() -> Self {
-        Entity {
+        Self {
             // Default values which aren't rust defaults
             max_pop_number: Some(500),
             max_site_pop_number: Some(50),
@@ -107,8 +112,19 @@ impl Entity {
             ..Default::default()
         }
     }
+    /// Function to create a new Entity.
+    ///
+    /// # Parameters
+    ///
+    /// * `identifier` - The identifier for the Entity.
+    /// * `metadata` - The metadata for the Entity.
+    ///
+    /// # Returns
+    ///
+    /// * `Entity` - The new Entity.
+    #[must_use]
     pub fn new(identifier: &str, metadata: &RawMetadata) -> Self {
-        Entity {
+        Self {
             identifier: String::from(identifier),
             metadata: Some(metadata.clone()),
             object_id: build_object_id_from_pieces(metadata, identifier, &ObjectType::Entity),
@@ -130,7 +146,11 @@ impl Entity {
     /// - Set any empty string to None.
     /// - Set any empty list to None.
     /// - Set any default values to None.
-    #[allow(clippy::too_many_lines)]
+    ///
+    /// # Returns
+    ///
+    /// * `Entity` - The cleaned Entity.
+    #[allow(clippy::too_many_lines, clippy::cognitive_complexity)]
     #[must_use]
     pub fn cleaned(&self) -> Self {
         let mut cleaned = self.clone();
@@ -348,14 +368,15 @@ impl RawObject for Entity {
         self.object_id.as_str()
     }
     fn get_metadata(&self) -> RawMetadata {
-        if let Some(metadata) = &self.metadata {
-            metadata.clone()
-        } else {
-            warn!("Entity::get_metadata: no metadata for {}", self.identifier);
-            RawMetadata::default()
-                .with_object_type(ObjectType::Entity)
-                .with_hidden(true)
-        }
+        self.metadata.as_ref().map_or_else(
+            || {
+                warn!("Entity::get_metadata: no metadata for {}", self.identifier);
+                RawMetadata::default()
+                    .with_object_type(ObjectType::Entity)
+                    .with_hidden(true)
+            },
+            std::clone::Clone::clone,
+        )
     }
     fn get_identifier(&self) -> &str {
         &self.identifier
@@ -372,7 +393,7 @@ impl RawObject for Entity {
     fn clean_self(&mut self) {
         *self = self.cleaned();
     }
-    #[allow(clippy::too_many_lines)]
+    #[allow(clippy::too_many_lines, clippy::cognitive_complexity)]
     fn parse_tag(&mut self, key: &str, value: &str) {
         if let Some(position_token) = POSITION_TOKEN_MAP.get(key) {
             if self.positions.is_none() {

@@ -8,10 +8,11 @@ use crate::parser::{
 
 use super::{phf_table::SYNDROME_TOKEN, tokens::SyndromeToken};
 
+/// A struct representing a syndrome
 #[derive(Serialize, Deserialize, Debug, Clone, Default, specta::Type)]
 #[serde(rename_all = "camelCase")]
 pub struct Syndrome {
-    /// Seen the \[SYN_IDENTIFIER:INEBRIATION\] tag in material_templates.txt
+    /// Seen the `[SYN_IDENTIFIER:INEBRIATION]` tag in `material_templates.txt`
     identifier: Option<String>,
     name: Option<String>,
 
@@ -21,7 +22,7 @@ pub struct Syndrome {
     immune_creatures: Option<Vec<(String, String)>>,
     classes: Option<Vec<String>>,
 
-    /// Seen the \[SYN_CONCENTRATION_ADDED:100:1000\] tag in material_templates.txt
+    /// Seen the `[SYN_CONCENTRATION_ADDED:100:1000]` tag in `material_templates.txt`
     /// default is 0:0
     concentration_added: Option<[u32; 2]>,
 
@@ -31,9 +32,25 @@ pub struct Syndrome {
 }
 
 impl Syndrome {
+    /// Creates a new Syndrome struct
+    ///
+    /// # Returns
+    ///
+    /// * `Syndrome` - The new Syndrome struct
+    #[must_use]
     pub fn new() -> Self {
         Self::default()
     }
+    /// Creates a new Syndrome struct with the given name
+    ///
+    /// # Arguments
+    ///
+    /// * `name` - The name of the syndrome
+    ///
+    /// # Returns
+    ///
+    /// * `Syndrome` - The new Syndrome struct
+    #[must_use]
     pub fn from_name(name: &str) -> Self {
         Self {
             name: Some(String::from(name)),
@@ -106,8 +123,13 @@ impl Syndrome {
 
         cleaned
     }
-
-    #[allow(clippy::too_many_lines)]
+    /// Parses a tag into the Syndrome struct
+    ///
+    /// # Arguments
+    ///
+    /// * `key` - The key of the tag
+    /// * `value` - The value of the tag
+    #[allow(clippy::too_many_lines, clippy::cognitive_complexity)]
     pub fn parse_tag(&mut self, key: &str, value: &str) {
         if CREATURE_EFFECT_TOKENS.contains_key(key) {
             if self.conditions.is_none() {

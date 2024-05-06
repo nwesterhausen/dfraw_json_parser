@@ -108,10 +108,9 @@ pub fn parse_legends_export<P: AsRef<Path>>(
             },
             Ok(Event::Text(e)) => {
                 if parent_tag != Parent::None {
-                    tag_txt = match e.unescape() {
-                        Ok(tag) => tag.into_owned(),
-                        Err(_) => String::new(),
-                    };
+                    tag_txt = e
+                        .unescape()
+                        .map_or_else(|_| String::new(), std::borrow::Cow::into_owned);
                 }
                 match parent_tag {
                     Parent::Creature => match current_tag {
@@ -136,10 +135,10 @@ pub fn parse_legends_export<P: AsRef<Path>>(
             }
 
             Ok(Event::Empty(e)) => {
-                let tag_name = match reader.decoder().decode(e.name().as_ref()) {
-                    Ok(tag) => tag.into_owned(),
-                    Err(_) => String::new(),
-                };
+                let tag_name = reader
+                    .decoder()
+                    .decode(e.name().as_ref())
+                    .map_or_else(|_| String::new(), std::borrow::Cow::into_owned);
                 if parent_tag == Parent::Creature {
                     temp_creature.add_tag(&tag_name);
                 }
@@ -172,11 +171,11 @@ pub fn parse_legends_export<P: AsRef<Path>>(
         results.push(Box::new(creature.into_creature(&legend_metadata)));
     }
 
-    // let legend_metadata = legends_metadata(input_path.as_ref(), &ObjectType::Entity);
+    let legend_metadata = legends_metadata(input_path.as_ref(), &ObjectType::Entity, options);
 
-    // for entity in entities {
-    //     results.push(Box::new(entity.into_entity(&legend_metadata)));
-    // }
+    for entity in entities {
+        results.push(Box::new(entity.into_entity(&legend_metadata)));
+    }
 
     Ok(results)
 }

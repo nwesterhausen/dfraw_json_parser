@@ -3,13 +3,11 @@ use crate::parser::{material::PropertyToken, serializer_helper};
 use serde::{Deserialize, Serialize};
 use tracing::warn;
 
-
-
+/// Represents the specific yield, fracture, and elasticity of a material for the various
+/// types of mechanical stress.
 #[allow(clippy::module_name_repetitions)]
 #[derive(Serialize, Deserialize, Debug, Clone, Default, specta::Type)]
 #[serde(rename_all = "camelCase", rename = "MaterialMechanics")]
-/// Represents the specific yield, fracture, and elasticity of a material for the various
-/// types of mechanical stress.
 pub struct Mechanics {
     impact: Option<Properties>,
     compressive: Option<Properties>,
@@ -24,10 +22,22 @@ pub struct Mechanics {
 }
 
 impl Mechanics {
+    /// Creates a new `Mechanics` struct with default values.
+    ///
+    /// # Returns
+    ///
+    /// * The new `Mechanics` struct.
+    #[must_use]
     pub fn new() -> Self {
         Self::default()
     }
-    pub fn is_empty(&self) -> bool {
+    /// Returns whether the `Mechanics` struct is empty.
+    ///
+    /// # Returns
+    ///
+    /// * `true` if the `Mechanics` struct is empty, `false` otherwise.
+    #[must_use]
+    pub const fn is_empty(&self) -> bool {
         self.impact.is_none()
             && self.compressive.is_none()
             && self.tensile.is_none()
@@ -35,7 +45,13 @@ impl Mechanics {
             && self.shear.is_none()
             && self.bending.is_none()
     }
-    #[allow(clippy::too_many_lines)]
+    /// Parses a tag and value into the `Mechanics` struct.
+    ///
+    /// # Arguments
+    ///
+    /// * `key` - The tag to parse.
+    /// * `value` - The value to parse.
+    #[allow(clippy::too_many_lines, clippy::cognitive_complexity)]
     pub fn parse_tag(&mut self, key: &PropertyToken, value: &str) {
         match key {
             PropertyToken::ImpactYield => {

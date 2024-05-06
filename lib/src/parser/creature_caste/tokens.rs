@@ -1,9 +1,7 @@
 use serde::{Deserialize, Serialize};
 
-
-
-#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, Default, specta::Type)]
 /// Tokens that can be found in a creature's caste definitions.
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, Default, specta::Type)]
 pub enum CasteTag {
     /// Prevents tamed creature from being made available for adoption, instead allowing it to automatically adopt whoever it wants.
     /// The basic requirements for adoption are intact, and the creature will only adopt individuals who have a preference for their species.
@@ -863,97 +861,114 @@ pub enum CasteTag {
     ///
     /// Appears as `MANNERISM_FINGERS:SomeFinger:SomeFingers`
     MannerismFingers {
+        /// The finger mannerism to add
         finger: String,
+        /// The fingers mannerism to add
         fingers: String,
     },
     /// Adds a possible mannerism to the creature's profile. These are not defined in raws but hardcoded.
     ///
     /// Appears as `MANNERISM_NOSE:SomeNose`
     MannerismNose {
+        /// The nose mannerism to add
         nose: String,
     },
     /// Adds a possible mannerism to the creature's profile. These are not defined in raws but hardcoded.
     ///
     /// Appears as `MANNERISM_EAR:SomeEar`
     MannerismEar {
+        /// The ear mannerism to add
         ear: String,
     },
     /// Adds a possible mannerism to the creature's profile. These are not defined in raws but hardcoded.
     ///
     /// Appears as `MANNERISM_HEAD:SomeHead`
     MannerismHead {
+        /// The head mannerism to add
         head: String,
     },
     /// Adds a possible mannerism to the creature's profile. These are not defined in raws but hardcoded.
     ///
     /// Appears as `MANNERISM_EYES:SomeEyes`
     MannerismEyes {
+        /// The eyes mannerism to add
         eyes: String,
     },
     /// Adds a possible mannerism to the creature's profile. These are not defined in raws but hardcoded.
     ///
     /// Appears as `MANNERISM_MOUTH:SomeMouth`
     MannerismMouth {
+        /// The mouth mannerism to add
         mouth: String,
     },
     /// Adds a possible mannerism to the creature's profile. These are not defined in raws but hardcoded.
     ///
     /// Appears as `MANNERISM_HAIR:SomeHair`
     MannerismHair {
+        /// The hair mannerism to add
         hair: String,
     },
     /// Adds a possible mannerism to the creature's profile. These are not defined in raws but hardcoded.
     ///
     /// Appears as `MANNERISM_KNUCKLES:SomeKnuckles`
     MannerismKnuckles {
+        /// The knuckles mannerism to add
         knuckles: String,
     },
     /// Adds a possible mannerism to the creature's profile. These are not defined in raws but hardcoded.
     ///
     /// Appears as `MANNERISM_LIPS:SomeLips`
     MannerismLips {
+        /// The lips mannerism to add
         lips: String,
     },
     /// Adds a possible mannerism to the creature's profile. These are not defined in raws but hardcoded.
     ///
     /// Appears as `MANNERISM_CHEEK:SomeCheek`
     MannerismCheek {
+        /// The cheek mannerism to add
         cheek: String,
     },
     /// Adds a possible mannerism to the creature's profile. These are not defined in raws but hardcoded.
     ///
     /// Appears as `MANNERISM_NAILS:SomeNails`
     MannerismNails {
+        /// The nails mannerism to add
         nails: String,
     },
     /// Adds a possible mannerism to the creature's profile. These are not defined in raws but hardcoded.
     ///
     /// Appears as `MANNERISM_FEET:SomeFeet`
     MannerismFeet {
+        /// The feet mannerism to add
         feet: String,
     },
     /// Adds a possible mannerism to the creature's profile. These are not defined in raws but hardcoded.
     ///
     /// Appears as `MANNERISM_ARMS:SomeArms`
     MannerismArms {
+        /// The arms mannerism to add
         arms: String,
     },
     /// Adds a possible mannerism to the creature's profile. These are not defined in raws but hardcoded.
     ///
     /// Appears as `MANNERISM_HANDS:SomeHands`
     MannerismHands {
+        /// The hands mannerism to add
         hands: String,
     },
     /// Adds a possible mannerism to the creature's profile. These are not defined in raws but hardcoded. Appears to be unused.
     ///
     /// Appears as `MANNERISM_TONGUE:SomeTongue`
     MannerismTongue {
+        /// The tongue mannerism to add
         tongue: String,
     },
     /// Adds a possible mannerism to the creature's profile. These are not defined in raws but hardcoded. Appears to be unused.
     ///
     /// Appears as `MANNERISM_LEG:SomeLeg`
     MannerismLeg {
+        /// The leg mannerism to add
         leg: String,
     },
     /// Sets the creature to be active at dawn in adventurer mode.
@@ -2151,16 +2166,26 @@ pub enum CasteTag {
     ///
     /// Appears as `WEBIMMUNE`
     WebImmune,
+    /// An unknown token.
     #[default]
     Unknown,
     // Tokens found in the XML exports..
+    /// A night creature
     NightCreature,
+    /// Not fire immune
     NotFireImmune,
+    /// Has blood
     HasBlood,
+    /// Can grasp
     Grasp,
+    /// The gait of the race
     RaceGait,
+    /// Cannot breathe water
     CannotBreatheWater,
+    /// Is a natural animal
     NaturalAnimal,
+    /// Is a curious beast
     CuriousBeast,
+    /// Is a flying curious beast
     CannotBreatheAir,
 }

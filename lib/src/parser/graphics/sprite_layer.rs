@@ -3,8 +3,7 @@ use tracing::warn;
 
 use super::{dimensions::Dimensions, phf_table::CONDITION_TAGS, tokens::Condition};
 
-
-
+/// A struct representing a `SpriteLayer` object.
 #[allow(clippy::module_name_repetitions)]
 #[derive(Serialize, Deserialize, Debug, Clone, Default, specta::Type)]
 #[serde(rename_all = "camelCase")]
@@ -18,9 +17,20 @@ pub struct SpriteLayer {
 }
 
 impl SpriteLayer {
+    /// Returns the `tile_page_id` of the `SpriteLayer`.
+    ///
+    /// # Returns
+    ///
+    /// * `&str` - The `tile_page_id` of the `SpriteLayer`.
     pub fn get_tile_page_id(&self) -> &str {
         self.tile_page_id.as_str()
     }
+    /// Parse a condition token into a `LayerCondition`.
+    ///
+    /// # Parameters
+    ///
+    /// * `key` - The key of the condition token.
+    /// * `value` - The value of the condition token.
     pub fn parse_condition_token(&mut self, key: &str, value: &str) {
         // Condition is the key, and it should match a value in LAYER_CONDITION_TAGS
         if let Some(condition) = CONDITION_TAGS.get(key) {
@@ -43,6 +53,16 @@ impl SpriteLayer {
             );
         }
     }
+    /// Parse a layer value into a `SpriteLayer`.
+    ///
+    /// # Parameters
+    ///
+    /// * `value` - The value to parse.
+    ///
+    /// # Returns
+    ///
+    /// * `Option<SpriteLayer>` - The parsed `SpriteLayer`.
+    #[must_use]
     pub fn parse_layer_from_value(value: &str) -> Option<Self> {
         // ...BODY:CREATURES_DOMESTIC:0:21]
         let mut split = value.split(':');
@@ -113,12 +133,23 @@ impl SpriteLayer {
             ..Self::default()
         })
     }
-
+    /// Parse a large layer value into a `SpriteLayer`.
+    ///
+    /// # Parameters
+    ///
+    /// * `layer_name` - The name of the layer.
+    /// * `tile_page_id` - The `tile_page_id` of the layer.
+    /// * `split` - The split of the value.
+    ///
+    /// # Returns
+    ///
+    /// * `Option<SpriteLayer>` - The parsed `SpriteLayer`.
+    #[must_use]
     fn parse_large_layer_with_split(
         layer_name: &str,
         tile_page_id: &str,
         split: &[&str],
-    ) -> Option<SpriteLayer> {
+    ) -> Option<Self> {
         let x1: i32 = match split.first() {
             Some(v) => match v.parse() {
                 Ok(n) => n,
@@ -202,6 +233,10 @@ impl SpriteLayer {
     /// - Set any empty string to None.
     /// - Set any empty list to None.
     /// - Set any default values to None.
+    ///
+    /// # Returns
+    ///
+    /// * `SpriteLayer` - The cleaned `SpriteLayer`.
     #[must_use]
     pub fn cleaned(&self) -> Self {
         let mut cleaned = self.clone();

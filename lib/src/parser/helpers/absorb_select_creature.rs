@@ -8,6 +8,23 @@ use crate::{
     util::get_only_select_creatures_from_raws,
 };
 
+/// Function to absorb `SELECT_CREATURE` records into the Creature records.
+///
+/// # Parameters
+///
+/// * `all_raws` - The raw objects to absorb the `SELECT_CREATURE` records into.
+///
+/// # Panics
+///
+/// This function will panic if the raw object is not a Creature.
+///
+/// # Notes
+///
+/// This function will remove the `SELECT_CREATURE` records from the raws after applying them to the Creature records.
+///
+/// # Side Effects
+///
+/// This function will modify the `all_raws` parameter.
 #[allow(clippy::too_many_lines)]
 pub fn absorb_select_creature(all_raws: &mut Vec<Box<dyn RawObject>>) {
     let all_select_creatures = { get_only_select_creatures_from_raws(all_raws) };
@@ -67,8 +84,7 @@ pub fn absorb_select_creature(all_raws: &mut Vec<Box<dyn RawObject>>) {
     object_ids_to_purge.extend(
         new_creatures
             .iter()
-            .flat_map(Creature::get_child_object_ids)
-            .collect::<Vec<&str>>(),
+            .flat_map(Creature::get_child_object_ids),
     );
 
     let mut new_raws: Vec<Box<dyn RawObject>> =

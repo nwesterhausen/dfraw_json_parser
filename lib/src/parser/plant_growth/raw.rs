@@ -8,8 +8,7 @@ use super::{
     tokens::{GrowthTag, GrowthType, PlantPart},
 };
 
-
-
+/// A struct representing a plant growth
 #[allow(clippy::module_name_repetitions)]
 #[derive(Serialize, Deserialize, Debug, Clone, Default, specta::Type)]
 #[serde(rename_all = "camelCase")]
@@ -17,13 +16,13 @@ pub struct PlantGrowth {
     /// Plant growths are not given an identifier, since they are just supporting
     /// data for the plant definition. They are defined instead by the type of growth.
     growth_type: GrowthType,
-    /// The name of the growth. This is actually defined with "GROWTH_NAME" key in the raws.
+    /// The name of the growth. This is actually defined with `GROWTH_NAME` key in the raws.
     name: SingPlurName,
-    /// The item grown by this growth. This is actually defined with "GROWTH_ITEM" key in the raws.
+    /// The item grown by this growth. This is actually defined with `GROWTH_ITEM` key in the raws.
     /// This is a string until we make a proper item structure. Technically there are 2 arguments:
-    /// 1. item token, 2: material token. Generally the item type should be PLANT_GROWTH:NONE.
+    /// 1. item token, 2: material token. Generally the item type should be `PLANT_GROWTH:NONE`.
     item: String,
-    /// Specifies on which part of the plant this growth grows. This is defined with "GROWTH_HOST_TILE" key.
+    /// Specifies on which part of the plant this growth grows. This is defined with `GROWTH_HOST_TILE` key.
     /// This can be unused, like in the case of crops where the plant is the growth (I think?).
     host_tiles: Option<Vec<PlantPart>>,
     /// Controls the height on the trunk above which the growth begins to appear.
@@ -35,23 +34,39 @@ pub struct PlantGrowth {
     trunk_height_percentage: Option<[i32; 2]>,
     /// Currently has no effect.
     density: Option<u32>,
-    /// Specifies the appearance of the growth. This is defined with "GROWTH_PRINT" key.
+    /// Specifies the appearance of the growth. This is defined with `GROWTH_PRINT` key.
     /// This is a string until we make a proper print structure.
     print: Option<String>,
     /// Specifies at which part of the year the growth appears. Default is all year round.
-    /// Minimum: 0, Maximum: 402_200. This is defined with "GROWTH_TIMING" key.
+    /// Minimum: 0, Maximum: `402_200`. This is defined with `GROWTH_TIMING` key.
     timing: Option<[u32; 2]>,
     /// Where we gather some of the growth's tags.
     tags: Option<Vec<GrowthTag>>,
 }
 
 impl PlantGrowth {
-    pub fn new(growth_type: GrowthType) -> PlantGrowth {
-        PlantGrowth {
+    /// Create a new plant growth based on a growth type
+    ///
+    /// # Arguments
+    ///
+    /// * `growth_type` - The type of growth
+    ///
+    /// # Returns
+    ///
+    /// A new plant growth
+    #[must_use]
+    pub fn new(growth_type: GrowthType) -> Self {
+        Self {
             growth_type,
-            ..PlantGrowth::default()
+            ..Self::default()
         }
     }
+    /// Parses a tag and value into the plant growth
+    ///
+    /// # Arguments
+    ///
+    /// * `key` - The tag of the growth
+    /// * `value` - The value of the growth
     #[allow(clippy::too_many_lines)]
     pub fn parse_tag(&mut self, key: &str, value: &str) {
         let Some(tag) = GROWTH_TOKENS.get(key) else {
@@ -173,6 +188,10 @@ impl PlantGrowth {
     /// - Set any empty string to None.
     /// - Set any empty list to None.
     /// - Set any default values to None.
+    ///
+    /// # Returns
+    ///
+    /// A new plant growth with all empty or default values removed.
     #[must_use]
     pub fn cleaned(&self) -> Self {
         let mut cleaned = self.clone();

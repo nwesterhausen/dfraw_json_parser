@@ -1,7 +1,6 @@
 use serde::{Deserialize, Serialize};
 
-
-
+/// An enum representing a creature tag.
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, Default, specta::Type)]
 pub enum CreatureTag {
     /// If set, the creature will blink between its [Tile] and its [AltTile].
@@ -533,14 +532,21 @@ pub enum CreatureTag {
     ///
     /// Appears as `VERMIN_SOIL_COLONY`
     VerminSoilColony,
+    /// An unknown tag.
     #[default]
     Unknown,
     // Tokens found in the legends xml exports but not in the raws
+    /// Mates to breed
     MatesToBreed,
+    /// Has two genders
     TwoGenders,
+    /// All castes are alive
     AllCastesAlive,
+    /// Is a small race
     SmallRace,
+    /// Occurs as an entity
     OccursAsEntityRace,
+    /// Equipment used
     Equipment,
 }
 

@@ -1,5 +1,5 @@
 use super::tokens::CasteTag;
-
+/// A map of caste tokens to their respective strings.
 pub static CASTE_TOKENS: phf::Map<&'static str, CasteTag> = phf::phf_map! {
     "ADOPTS_OWNER" => CasteTag::AdoptsOwner,
     "ALCOHOL_DEPENDENT" => CasteTag::AlcoholDependent,

@@ -3,8 +3,7 @@ use tracing::warn;
 
 use super::tokens::GraphicType;
 
-
-
+/// A custom graphic extension.
 #[allow(clippy::module_name_repetitions)]
 #[derive(Serialize, Deserialize, Debug, Clone, Default, specta::Type)]
 #[serde(rename_all = "camelCase")]
@@ -16,6 +15,17 @@ pub struct CustomGraphicExtension {
 }
 
 impl CustomGraphicExtension {
+    /// Create a new custom graphic extension.
+    ///
+    /// # Arguments
+    ///
+    /// * `extension_type` - The type of the extension.
+    /// * `value` - The value of the extension.
+    ///
+    /// # Returns
+    ///
+    /// A new custom graphic extension.
+    #[must_use]
     pub fn from_value(extension_type: GraphicType, value: &str) -> Option<Self> {
         // 2 Options:
         // [CUSTOM_EDGING:          4]

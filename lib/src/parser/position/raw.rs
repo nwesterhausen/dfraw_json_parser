@@ -4,8 +4,7 @@ use crate::parser::{serializer_helper, Color, SingPlurName};
 
 use super::tokens::PositionToken;
 
-
-
+/// Represents a position in the government of an entity
 #[derive(Serialize, Deserialize, Debug, Clone, Default, specta::Type)]
 #[serde(rename_all = "camelCase")]
 pub struct Position {
@@ -53,6 +52,12 @@ pub struct Position {
 }
 
 impl Position {
+    /// Creates a new Position struct with the given identifier
+    ///
+    /// # Arguments
+    ///
+    /// * `identifier` - The identifier of the position
+    #[must_use]
     pub fn new(identifier: String) -> Self {
         Self {
             identifier,
@@ -70,7 +75,7 @@ impl Position {
     /// - Set any empty string to None.
     /// - Set any empty list to None.
     /// - Set any default values to None.
-    #[allow(clippy::too_many_lines)]
+    #[allow(clippy::too_many_lines, clippy::cognitive_complexity)]
     #[must_use]
     pub fn cleaned(&self) -> Self {
         let mut cleaned = self.clone();
@@ -221,6 +226,12 @@ impl Position {
 
         cleaned
     }
+    /// Parses a tag and value into the position
+    ///
+    /// # Arguments
+    ///
+    /// * `key` - The tag to parse
+    /// * `value` - The value to parse
     pub fn parse_tag(&mut self, key: &PositionToken, value: &str) {
         match key {
             PositionToken::AllowedClass => {

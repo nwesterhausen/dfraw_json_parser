@@ -76,12 +76,10 @@ pub fn subdirectories(directory: PathBuf) -> Result<Vec<walkdir::DirEntry>, Pars
 ///
 /// A String
 pub fn get_parent_dir_name<P: AsRef<Path>>(full_path: &P) -> String {
-    match full_path.as_ref().parent() {
-        Some(parent_dir) => {
-            String::from(parent_dir.file_name().unwrap_or_default().to_string_lossy())
-        }
-        None => String::from("!Unavailable!"),
-    }
+    full_path.as_ref().parent().map_or_else(
+        || String::from("!Unavailable!"),
+        |parent_dir| String::from(parent_dir.file_name().unwrap_or_default().to_string_lossy()),
+    )
 }
 
 /// "Given a path to a game directory, return a `PathBuf` to that directory if it exists and is a
@@ -325,7 +323,9 @@ pub fn validate_options(options: &ParserOptions) -> Result<ParserOptions, Parser
             )));
         }
 
-        validated_options.dwarf_fortress_directory = target_path.clone();
+        validated_options
+            .dwarf_fortress_directory
+            .clone_from(&target_path);
     }
 
     // Validate any raw file paths

@@ -1,4 +1,5 @@
 use super::tokens::{FuelType, MaterialProperty, MaterialType, MaterialUsage};
+/// Mapping of material type tokens to strings
 pub static MATERIAL_TYPE_TOKENS: phf::Map<&'static str, MaterialType> = phf::phf_map! {
     "INORGANIC" => MaterialType::Inorganic,
     "STONE" => MaterialType::Stone,
@@ -30,12 +31,14 @@ pub static MATERIAL_TYPE_TOKENS: phf::Map<&'static str, MaterialType> = phf::phf
     "GRIME" => MaterialType::Grime,
 };
 
+/// Mapping of fuel type tokens to strings
 pub static FUEL_TYPE_TOKENS: phf::Map<&'static str, FuelType> = phf::phf_map! {
     "COAL" => FuelType::Charcoal,
     "COKE" => FuelType::Coke,
     "NO_MATGLOSS" => FuelType::NoMaterialGloss,
 };
 
+/// Mapping of material usage tokens to strings
 pub static MATERIAL_USAGE_TOKENS: phf::Map<&'static str, MaterialUsage> = phf::phf_map! {
     "IMPLIES_ANIMAL_KILL" => MaterialUsage::ImpliesAnimalKill,
     "ALCOHOL_PLANT" => MaterialUsage::AlcoholPlant,
@@ -114,6 +117,7 @@ pub static MATERIAL_USAGE_TOKENS: phf::Map<&'static str, MaterialUsage> = phf::p
     "ITEMS_QUERN" => MaterialUsage::ItemsQuern,
 };
 
+/// Mapping of material property tokens to strings
 pub static MATERIAL_PROPERTY_TOKENS: phf::Map<&'static str, MaterialProperty> = phf::phf_map! {
     "USE_MATERIAL_TEMPLATE" => MaterialProperty::UseMaterialTemplate,
     "PREFIX" => MaterialProperty::Prefix,

@@ -41,6 +41,7 @@ pub trait RawObject: RawObjectToAny + Send + Sync + Searchable {
 /// used to be able to downcast a raw object to `Any`, so it can be downcast to
 /// a specific raw object type.
 pub trait RawObjectToAny: 'static {
+    /// Get the raw object as `Any`.
     fn as_any(&self) -> &dyn Any;
 }
 
@@ -51,6 +52,7 @@ pub trait RawObjectToAny: 'static {
 /// Make sure that the raw object reports to you the correct `ObjectType` that is
 /// expected for the downcast.
 impl<T: 'static> RawObjectToAny for T {
+    /// Get the raw object as `Any`.
     fn as_any(&self) -> &dyn Any {
         self
     }
