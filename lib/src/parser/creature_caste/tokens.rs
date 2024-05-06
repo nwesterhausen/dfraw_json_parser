@@ -20,14 +20,14 @@ pub enum CasteTag {
     ///
     /// Appears as `ALL_ACTIVE`
     AllActive,
-    /// Caste-specific version of [Creature::AltTile]. Requires [Tile].
+    /// Caste-specific version of `[Creature::AltTile]`. Requires `[Tile]`.
     ///
     /// Appears as `CASTE_ALTTILE:SomeTile`
     AltTile {
         /// The tile to use
         tile: String,
     },
-    /// Found on [LargePredator]s who ambush their prey. Instead of charging relentlessly at prey, the predator will wait till the prey is
+    /// Found on `[LargePredator]`s who ambush their prey. Instead of charging relentlessly at prey, the predator will wait till the prey is
     /// within a few squares before charging. May or may not work on other creatures.
     ///
     /// Appears as `AMBUSHPREDATOR`
@@ -36,7 +36,7 @@ pub enum CasteTag {
     ///
     /// Appears as `AMPHIBIOUS`
     Amphibious,
-    /// Applies the specified creature variation with the given arguments to the creature. See [ApplyCreatureVariation] for more information.
+    /// Applies the specified creature variation with the given arguments to the creature. See `[ApplyCreatureVariation]` for more information.
     ///
     /// Appears as `APPLY_CREATURE_VARIATION:SOME_VARIATION` or `APPLY_CREATURE_VARIATION:SOME_VARIATION:ARG1:ARG2:ARG3`
     ApplyCreatureVariation {
@@ -89,7 +89,7 @@ pub enum CasteTag {
         /// The age at which the creature is considered a child
         age: u32,
     },
-    /// Defines a new name for a creature in baby state at the caste level. For non-caste-specific baby names, see [CreatureToken::GeneralBabyName].
+    /// Defines a new name for a creature in baby state at the caste level. For non-caste-specific baby names, see `[CreatureToken::GeneralBabyName]`.
     ///
     /// Appears as `BABYNAME:SomeName:SomeNames`
     BabyName {
@@ -107,7 +107,7 @@ pub enum CasteTag {
         frequency: u32,
     },
     /// The creature is non-aggressive by default, and will never automatically be engaged by companions or soldiers, running away from any creatures
-    /// that are not friendly to it, and will only defend itself if it becomes enraged. Can be thought of as the counterpoint of the [LargePredator] tag.
+    /// that are not friendly to it, and will only defend itself if it becomes enraged. Can be thought of as the counterpoint of the `[LargePredator]` tag.
     /// When tamed, animals with this tag will be useless for fortress defense.
     ///
     /// Appears as `BENIGN`
@@ -133,8 +133,8 @@ pub enum CasteTag {
         /// Body parts arguments
         body_parts: Vec<String>,
     },
-    /// These body modifiers give individual creatures different characteristics. In the case of HEIGHT, BROADNESS and LENGTH, the modifier is also a percentage change to
-    /// the BODY_SIZE of the individual creature. The seven numbers afterward give a distribution of ranges. Each interval has an equal chance of occurring.
+    /// These body modifiers give individual creatures different characteristics. In the case of `HEIGHT`, `BROADNESS` and `LENGTH`, the modifier is also a percentage change to
+    /// the `BODY_SIZE` of the individual creature. The seven numbers afterward give a distribution of ranges. Each interval has an equal chance of occurring.
     ///
     /// Example: `BODY_APPEARANCE_MODIFIER:HEIGHT:90:95:98:100:102:105:110`
     ///
@@ -146,7 +146,7 @@ pub enum CasteTag {
         /// Range of values, spread from lowest to median to highest
         values: [i32; 7],
     },
-    /// Loads a plan from listed OBJECT:BODY_DETAIL_PLAN files, such as b_detail_plan_default.txt. Mass applies USE_MATERIAL_TEMPLATE, mass alters RELSIZE, alters
+    /// Loads a plan from listed `OBJECT:BODY_DETAIL_PLAN` files, such as `b_detail_plan_default.txt`. Mass applies `USE_MATERIAL_TEMPLATE`, mass alters RELSIZE, alters
     /// body part positions, and will allow tissue layers to be defined. Tissue layers are defined in order of skin to bone here.
     ///
     /// Example: `BODY_DETAIL_PLAN:VERTEBRATE_TISSUE_LAYERS:SKIN:FAT:MUSCLE:BONE:CARTILAGE`
@@ -171,7 +171,7 @@ pub enum CasteTag {
         /// Size in cubic centimeters
         size: u32,
     },
-    /// Substitutes body part text with replacement text. Draws gloss information from OBJECT:BODY files (such as body_default.txt)
+    /// Substitutes body part text with replacement text. Draws gloss information from `OBJECT:BODY`files (such as `body_default.txt`)
     ///
     /// Appears as `BODYGLOSS:SomeGloss`
     BodyGloss {
@@ -182,23 +182,23 @@ pub enum CasteTag {
     ///
     /// Appears as `BONECARN`
     BoneCarn,
-    /// Adds a type to a body part - used with [SetBodyPartGroup]. In vanilla DF, this is used for adding the type [Geldable] to the lower body of certain creatures.
+    /// Adds a type to a body part - used with `[SetBodyPartGroup]`. In vanilla DF, this is used for adding the type `[Geldable]` to the lower body of certain creatures.
     ///
     /// Appears as `BP_ADD_TYPE:SomeBodyPartType`
     BodyPartAddType {
         /// The body part type to add
         body_part_type: String,
     },
-    /// Sets up the breadth of possibilities for appearance qualities for a selected BP group. EG.
+    /// Sets up the breadth of possibilities for appearance qualities for a selected `BP` group. e.g.:
     ///
-    /// * Eyes (CLOSE_SET, DEEP_SET, ROUND_VS_NARROW, LARGE_IRIS)
-    /// * Lips (THICKNESS)
-    /// * Nose (BROADNESS, LENGTH, UPTURNED, CONVEX)
-    /// * Ear (SPLAYED_OUT, HANGING_LOBES, BROADNESS, HEIGHT)
-    /// * Tooth (GAPS)
-    /// * Skull (HIGH_CHEEKBONES, BROAD_CHIN, JUTTING CHIN, SQUARE_CHIN)
-    /// * Neck (DEEP_VOICE, RASPY_VOICE)
-    /// * Head (BROADNESS, HEIGHT)
+    /// * Eyes (`CLOSE_SET`, `DEEP_SET`, `ROUND_VS_NARROW`, `LARGE_IRIS`)
+    /// * Lips (`THICKNESS`)
+    /// * Nose (`BROADNESS`, `LENGTH`, `UPTURNED`, `CONVEX`)
+    /// * Ear (`SPLAYED_OUT`, `HANGING_LOBES`, `BROADNESS`, `HEIGHT`)
+    /// * Tooth (`GAPS`)
+    /// * Skull (`HIGH_CHEEKBONES`, `BROAD_CHIN`, `JUTTING CHIN`, `SQUARE_CHIN`)
+    /// * Neck (`DEEP_VOICE`, `RASPY_VOICE`)
+    /// * Head (`BROADNESS`, `HEIGHT`)
     ///
     /// Appears as `BP_APPEARANCE_MODIFIER:SomeQuality:0:0:0:0:0:0:0`
     BodyPartAppearanceModifier {
@@ -207,7 +207,7 @@ pub enum CasteTag {
         /// The spread of the quality, from lowest to median to highest
         spread: [i32; 7],
     },
-    /// Removes a type from a body part. Used with [SetBodyPartGroup].
+    /// Removes a type from a body part. Used with `[SetBodyPartGroup]`.
     ///
     /// Appears as `BP_REMOVE_TYPE:SomeBodyPartType`
     BodyPartRemoveType {
@@ -247,7 +247,7 @@ pub enum CasteTag {
     ///
     /// Appears as `CANNOT_JUMP`
     CannotJump,
-    /// Acts like [NotLiving], except that [OpposedToLife] creatures will attack them.
+    /// Acts like `[NotLiving]`, except that `[OpposedToLife]` creatures will attack them.
     ///
     /// Appears as `CANNOT_UNDEAD`
     CannotUndead,
@@ -280,7 +280,7 @@ pub enum CasteTag {
         /// The age at which the creature is considered an adult
         age: u32,
     },
-    /// Defines a name for the creature in child state at the caste level. For non-caste-specific child names, see [CreatureToken::GeneralChildName].
+    /// Defines a name for the creature in child state at the caste level. For non-caste-specific child names, see `[CreatureToken::GeneralChildName]`.
     ///
     /// Appears as `CHILDNAME:SomeName:SomeNames`
     ChildName {
@@ -315,14 +315,14 @@ pub enum CasteTag {
         /// The brightness of the color
         brightness: u32,
     },
-    /// When combined with any of [Pet], [PackAnimal], [WagonPuller] and/or [Mount], the creature is guaranteed to be domesticated by any civilization with
-    /// [EntityToken::CommonDomesticPet], [EntityToken::CommonDomesticPackAnimal], [EntityToken::CommonDomesticWagonPuller] and/or [EntityToken::CommonDomesticMount]
-    /// respectively. Such civilizations will always have access to the creature, even in the absence of wild populations. This token is invalid on [CreatureToken::Fanciful] creatures.
+    /// When combined with any of `[Pet]`, `[PackAnimal]`, `[WagonPuller]` and/or `[Mount]`, the creature is guaranteed to be domesticated by any civilization with
+    /// `[EntityToken::CommonDomesticPet]`, `[EntityToken::CommonDomesticPackAnimal]`, `[EntityToken::CommonDomesticWagonPuller]` and/or `[EntityToken::CommonDomesticMount]`
+    /// respectively. Such civilizations will always have access to the creature, even in the absence of wild populations. This token is invalid on `[CreatureToken::Fanciful]` creatures.
     ///
     /// Appears as `COMMON_DOMESTIC`
     CommonDomestic,
-    /// Creatures of this caste's species with the [SpouseConverter] and [NightCreatureHunter] tokens will kidnap [SpouseConversionTarget]s of an appropriate
-    /// sex and convert them into castes with CONVERTED_SPOUSE.
+    /// Creatures of this caste's species with the `[SpouseConverter]` and `[NightCreatureHunter]` tokens will kidnap `[SpouseConversionTarget]`s of an appropriate
+    /// sex and convert them into castes with `CONVERTED_SPOUSE`.
     ///
     /// Appears as `CONVERTED_SPOUSE`
     ConvertedSpouse,
@@ -336,7 +336,7 @@ pub enum CasteTag {
     /// Appears as `CRAZED`
     Crazed,
     /// An arbitrary creature classification. Can be set to anything, but the only vanilla uses are `GENERAL_POISON` (used in syndromes), `EDIBLE_GROUND_BUG`
-    /// (used as targets for [GobbleVerminClass]), `MAMMAL`, and `POISONOUS` (both used for kobold pet eligibility). A single creature can have multiple classes.
+    /// (used as targets for `[GobbleVerminClass]`), `MAMMAL`, and `POISONOUS` (both used for kobold pet eligibility). A single creature can have multiple classes.
     ///
     /// Appears as `CREATURE_CLASS:SomeClass`
     CreatureClass {
@@ -403,11 +403,11 @@ pub enum CasteTag {
     ///
     /// Appears as `DIURNAL`
     Diurnal,
-    /// The creature hunts vermin by diving from the air. On tame creatures, it has the same effect as [HuntsVermin]. Found on peregrine falcons.
+    /// The creature hunts vermin by diving from the air. On tame creatures, it has the same effect as `[HuntsVermin]`. Found on peregrine falcons.
     ///
     /// Appears as `DIVE_HUNTS_VERMIN`
     DiveHuntsVermin,
-    /// Defines the item that the creature drops upon being butchered. Used with [ExtraButcherObject].
+    /// Defines the item that the creature drops upon being butchered. Used with `[ExtraButcherObject]`.
     ///
     /// Appears as `EBO_ITEM:SomeItem:SomeMaterial`
     ExtraButcherObjectItem {
@@ -416,15 +416,15 @@ pub enum CasteTag {
         /// The material of the item
         material: String,
     },
-    /// The shape of the creature's extra butchering drop. Used with [ExtraButcherObject].
+    /// The shape of the creature's extra butchering drop. Used with `[ExtraButcherObject]`.
     ///
     /// Appears as `EBO_SHAPE:SomeShape`
     ExtraButcherObjectShape {
         /// The shape to add
         shape: String,
     },
-    /// Defines the material composition of eggs laid by the creature. Egg-laying creatures in the default game define this 3 times, using LOCAL_CREATURE_MAT:EGGSHELL,
-    /// LOCAL_CREATURE_MAT:EGG_WHITE, and then LOCAL_CREATURE_MAT:EGG_YOLK. Eggs will be made out of eggshell. Edibility is determined by tags on whites or yolk,
+    /// Defines the material composition of eggs laid by the creature. Egg-laying creatures in the default game define this 3 times, using `LOCAL_CREATURE_MAT:EGGSHELL`,
+    /// `LOCAL_CREATURE_MAT:EGG_WHITE`, and then `LOCAL_CREATURE_MAT:EGG_YOLK`. Eggs will be made out of eggshell. Edibility is determined by tags on whites or yolk,
     /// but they otherwise do not exist.
     ///
     /// Appears as `EGG_MATERIAL:SomeMaterial:SomeState`
@@ -445,8 +445,8 @@ pub enum CasteTag {
     ///
     /// Appears as `EQUIPS`
     Equips,
-    /// The creature drops an additional object when butchered, as defined by [ExtraButcherObjectItem] and [ExtraButcherObjectShape].
-    /// Used for gizzard stones in default creatures. For some materials, needs to be defined after caste definitions with SELECT_CASTE:ALL
+    /// The creature drops an additional object when butchered, as defined by `[ExtraButcherObjectItem]` and `[ExtraButcherObjectShape]`.
+    /// Used for gizzard stones in default creatures. For some materials, needs to be defined after caste definitions with `SELECT_CASTE:ALL`
     ///
     /// Appears as `EXTRA_BUTCHER_OBJECT`
     ExtraButcherObject {
@@ -472,9 +472,9 @@ pub enum CasteTag {
     /// Appears as `FEATURE_ATTACK_GROUP`
     FeatureAttackGroup,
     /// Found on forgotten beasts. Presumably makes it act as such, initiating underground attacks on fortresses, or leads to the pop-up message upon encountering one.
-    /// Hides the creature from displaying in a world_sites_and_pops file. Does not create historical figures like generated forgotten beasts do.
+    /// Hides the creature from displaying in a `world_sites_and_pops.txt` file. Does not create historical figures like generated forgotten beasts do.
     ///
-    /// Requires specifying a [Biome] in which the creature will live, and both surface and subterranean biomes are allowed. Does not stack with [LargeRoaming] and if
+    /// Requires specifying a `[Biome]` in which the creature will live, and both surface and subterranean biomes are allowed. Does not stack with `[LargeRoaming]` and if
     /// both are used the creature will not spawn. Appears to be incompatible with [Demon] even if used in separate castes.
     ///
     /// Appears as `FEATURE_BEAST`
@@ -489,15 +489,15 @@ pub enum CasteTag {
     ///
     /// Appears as `FIREIMMUNE`
     FireImmune,
-    /// Like [FireImmune], but also renders the creature immune to DRAGONFIRE attacks.
+    /// Like `[FireImmune]`, but also renders the creature immune to `DRAGONFIRE` attacks.
     ///
     /// Appears as `FIREIMMUNE_SUPER`
     FireImmuneSuper,
-    /// The creature's corpse is a single FISH_RAW food item that needs to be cleaned (into a FISH item) at a fishery to become edible. Before being cleaned the item is
+    /// The creature's corpse is a single `FISH_RAW` food item that needs to be cleaned (into a FISH item) at a fishery to become edible. Before being cleaned the item is
     /// referred to as "raw". The food item is categorized under "fish" on the food and stocks screens, and when uncleaned it is sorted under "raw fish" in the stocks
     /// (but does not show up on the food screen).
     ///
-    /// Without this or [CookableLive], fished vermin will turn into food the same way as non-vermin creatures, resulting in multiple units of food (meat, brain, lungs,
+    /// Without this or `[CookableLive]`, fished vermin will turn into food the same way as non-vermin creatures, resulting in multiple units of food (meat, brain, lungs,
     /// eyes, spleen etc.) from a single fished vermin. These units of food are categorized as meat by the game.
     ///
     /// Appears as `FISHITEM`
@@ -535,8 +535,8 @@ pub enum CasteTag {
         /// The value of the token
         gait: String,
     },
-    /// Has the same function as [MaterialForceMultiplier], but applies to all attacks instead of just those involving a specific material. Appears to be overridden by
-    /// [MaterialForceMultiplier] (werebeasts, for example, use both tokens to provide resistance to all materials, with one exception to which they are especially vulnerable).
+    /// Has the same function as `[MaterialForceMultiplier]`, but applies to all attacks instead of just those involving a specific material. Appears to be overridden by
+    /// `[MaterialForceMultiplier]` (werebeasts, for example, use both tokens to provide resistance to all materials, with one exception to which they are especially vulnerable).
     ///
     /// When struck with a weapon made of the any material, the force exerted will be multiplied by A/B.
     ///
@@ -622,7 +622,7 @@ pub enum CasteTag {
     },
     /// The creature is a grazer - if tamed in fortress mode, it needs a pasture to survive. The higher the number, the less frequently it needs to eat in order to live.
     ///
-    /// Not used since 0.40.12, replaced by [StandardGrazer] to fix Bug 4113.
+    /// Not used since 0.40.12, replaced by `[StandardGrazer]` to fix Bug 4113.
     ///
     /// Appears as `GRAZER:100`
     Grazer {
@@ -631,25 +631,25 @@ pub enum CasteTag {
     },
     /// Defines certain behaviors for the creature. The habit types are:
     ///
-    /// * COLLECT_TROPHIES
-    /// * COOK_PEOPLE
-    /// * COOK_VERMIN
-    /// * GRIND_VERMIN
-    /// * COOK_BLOOD
-    /// * GRIND_BONE_MEAL
-    /// * EAT_BONE_PORRIDGE
-    /// * USE_ANY_MELEE_WEAPON
-    /// * GIANT_NEST
-    /// * COLLECT_WEALTH
+    /// * `COLLECT_TROPHIES`
+    /// * `COOK_PEOPLE`
+    /// * `COOK_VERMIN`
+    /// * `GRIND_VERMIN`
+    /// * `COOK_BLOOD`
+    /// * `GRIND_BONE_MEAL`
+    /// * `EAT_BONE_PORRIDGE`
+    /// * `USE_ANY_MELEE_WEAPON`
+    /// * `GIANT_NEST`
+    /// * `COLLECT_WEALTH`
     ///
-    /// These require the creature to have a [Lair] to work properly, and also don't seem to work on creatures who are not a [SemiMegabeast], [Megabeast], or [NightCreatureHunter].
+    /// These require the creature to have a [Lair] to work properly, and also don't seem to work on creatures who are not a `[SemiMegabeast]`, `[Megabeast]`, or `[NightCreatureHunter]`.
     ///
     /// Appears as `HABIT:SomeHabit`
     Habit {
         /// The habit to add
         habit: String,
     },
-    /// "If you set HABIT_NUM to a number, it should give you that exact number of habits according to the weights.". All lists of HABITs are preceded by `[HABIT_NUM:TEST_ALL]`
+    /// "If you set `HABIT_NUM` to a number, it should give you that exact number of habits according to the weights.". All lists of `HABIT`s are preceded by `[HABIT_NUM:TEST_ALL]`
     ///
     /// Appears as `HABIT_NUM:2` or `HABIT_NUM:TEST_ALL`
     HabitNumber {
@@ -672,7 +672,7 @@ pub enum CasteTag {
         /// The temperature of the creature, as number or `NONE` which is the default
         temperature: Option<u32>,
     },
-    /// Creature hunts and kills nearby vermin, randomly walking between places with food laying on the ground or in stockpiles, to check for possible [VerminEater] vermin,
+    /// Creature hunts and kills nearby vermin, randomly walking between places with food laying on the ground or in stockpiles, to check for possible `[VerminEater]` vermin,
     /// but they'll kill any other vermin too.
     HuntsVermin,
     /// The creature cannot move. Found on sponges. Will also stop a creature from breeding in fortress mode (MALE and FEMALE are affected, if one is IMMOBILE no breeding will happen).
@@ -688,11 +688,11 @@ pub enum CasteTag {
     ///
     /// Appears as `IMMOLATE`
     Immolate,
-    /// Alias for [CanSpeak] + [CanLearn].
+    /// Alias for `[CanSpeak]` + `[CanLearn]`.
     ///
     /// Appears as `INTELLIGENT`
     Intelligent,
-    /// Specifies interaction details following a [CanDoInteraction] token.
+    /// Specifies interaction details following a `[CanDoInteraction]` token.
     ///
     /// Appears as `CDI:SomeArgs:etc`
     InteractionDetail {
@@ -717,11 +717,11 @@ pub enum CasteTag {
     },
     /// Found on megabeasts, semimegabeasts, and night creatures. The creature will seek out sites of this type and take them as lairs. The lair types are:
     ///
-    /// * SIMPLE_BURROW
-    /// * SIMPLE_MOUND
-    /// * WILDERNESS_LOCATION
-    /// * SHRINE
-    /// * LABYRINTH
+    /// * `SIMPLE_BURROW`
+    /// * `SIMPLE_MOUND`
+    /// * `WILDERNESS_LOCATION`
+    /// * `SHRINE`
+    /// * `LABYRINTH`
     ///
     /// Appears as `LAIR:SomeLair:Probability`
     Lair {
@@ -730,7 +730,7 @@ pub enum CasteTag {
         /// The probability of the lair
         probability: u32,
     },
-    /// Defines certain features of the creature's lair. The only valid characteristic is HAS_DOORS.
+    /// Defines certain features of the creature's lair. The only valid characteristic is `HAS_DOORS`.
     ///
     /// Appears as `LAIR_CHARACTERISTIC:SomeCharacteristic`
     LairCharacteristic {
@@ -768,7 +768,7 @@ pub enum CasteTag {
         /// The material of the item
         material: String,
     },
-    /// The creature has ligaments in its [CONNECTIVE_TISSUE_ANCHOR] tissues (bone or chitin by default). Cutting the bone/chitin tissue severs the ligaments,
+    /// The creature has ligaments in its `[CONNECTIVE_TISSUE_ANCHOR]` tissues (bone or chitin by default). Cutting the bone/chitin tissue severs the ligaments,
     /// disabling motor function if the target is a limb.
     ///
     /// Appears as `LIGAMENTS:SomeMaterial:HealingRate`
@@ -783,7 +783,7 @@ pub enum CasteTag {
     /// Appears as `LIGHT_GEN`
     LightGen,
     /// The creature will attack enemies rather than flee from them. This tag has the same effect on player-controlled creatures - including modded dwarves.
-    /// Retired as of v0.40.14 in favor of [LargePredator].
+    /// Retired as of v0.40.14 in favor of `[LargePredator]`.
     ///
     /// Appears as `LIKES_FIGHTING`
     LikesFighting,
@@ -812,7 +812,7 @@ pub enum CasteTag {
         /// The vision value
         vision: u32,
     },
-    /// According to Toady One, this is completely interchangeable with [AtPeaceWithWildlife] and might have been used in very early versions of the game by
+    /// According to Toady One, this is completely interchangeable with `[AtPeaceWithWildlife]` and might have been used in very early versions of the game by
     /// wandering wizards or the ent-type tree creatures that used to be animated by elves.
     ///
     /// Appears as `MAGICAL`
@@ -979,7 +979,7 @@ pub enum CasteTag {
     /// predetermined date (calculated down to the exact tick!) between these values, at which it is destined to die of old age, should it live long enough. Note that the
     /// probability of death at any given age does not increase as the creature gets older [3].
     ///
-    /// Creatures which lack this token are naturally immortal. The NO_AGING syndrome tag will prevent death by old age from occurring. Also note that, among civilized creatures,
+    /// Creatures which lack this token are naturally immortal. The `NO_AGING` syndrome tag will prevent death by old age from occurring. Also note that, among civilized creatures,
     /// castes which lack this token will refuse to marry others with it, and vice versa.
     ///
     /// Appears as `MAXAGE:100:150`
@@ -989,7 +989,7 @@ pub enum CasteTag {
         /// The maximum age of the creature
         max: u32,
     },
-    /// Makes the creature slowly stroll around, unless it's in combat or performing a job. If combined with [CanLearn], will severely impact their pathfinding and lead the creature
+    /// Makes the creature slowly stroll around, unless it's in combat or performing a job. If combined with `[CanLearn]`, will severely impact their pathfinding and lead the creature
     /// to move extremely slowly when not performing any task. Problematically applies to animal people based on the animal and war trained animals.
     ///
     /// Appears as `MEANDERER`
@@ -998,7 +998,7 @@ pub enum CasteTag {
     /// and they will occasionally go on rampages, potentially leading to worship if they attack the same place multiple times. Their presence and number will also influence age names.
     /// When appearing in fortress mode, they will have a pop-up message announcing their arrival. They will remain hostile to military even after being tamed.
     ///
-    /// Requires specifying a [Biome] in which the creature will live. Subterranean biomes appear to not be allowed. Does stack with [LargeRoaming] and if both are used the creature will spawn
+    /// Requires specifying a `[Biome]` in which the creature will live. Subterranean biomes appear to not be allowed. Does stack with `[LargeRoaming]` and if both are used the creature will spawn
     /// as both historical bosses and as wild animals.
     ///
     /// Appears as `MEGABEAST`
@@ -1116,7 +1116,7 @@ pub enum CasteTag {
         /// The adjective form of the caste
         adjective: String,
     },
-    /// Animal is considered to be natural. NATURAL animals will not engage creatures tagged with [AtPeaceWitHWildlife] in combat unless they are
+    /// Animal is considered to be natural. NATURAL animals will not engage creatures tagged with `[AtPeaceWitHWildlife]` in combat unless they are
     /// members of a hostile entity and vice-versa.
     ///
     /// Appears as `NATURAL` or `NATURAL_ANIMAL`
@@ -1144,7 +1144,7 @@ pub enum CasteTag {
     /// Appears as `NIGHT_CREATURE_BOGEYMAN`
     NightCreatureBogeyman,
     /// Found on some necromancers. Creatures with this tag may periodically "perform horrible experiments" offscreen, during which they can use creature-targeting
-    /// interactions with an [I_SOURCE:EXPERIMENT] tag on living creatures in their area. Worlds are generated with a list of procedurally-generated experiments,
+    /// interactions with an `[I_SOURCE:EXPERIMENT]` tag on living creatures in their area. Worlds are generated with a list of procedurally-generated experiments,
     /// allowing necromancers to turn living people and animals into ghouls and other experimental creatures, and these will automatically be available to all experimenters;
     /// it does not appear possible to prevent this. You can mod in your own custom experiment interactions, but these are used very infrequently due to the large number
     /// of generated experiments.
@@ -1156,11 +1156,11 @@ pub enum CasteTag {
     /// mode except for the aforementioned aggression, and doesn't prevent the creature from fleeing the battles it started. It also removes the creature's materials from stockpile
     /// settings list, making them be stored there regardless of settings.
     ///
-    /// Does stack with [LARGE_ROAMING] and if both are used the creature will spawn as both historical hunters and as wild animals; this requires specifying a [BIOME] in which the
+    /// Does stack with `[LARGE_ROAMING]` and if both are used the creature will spawn as both historical hunters and as wild animals; this requires specifying a [BIOME] in which the
     /// creature will live, and subterranean biomes are allowed.
     ///
     /// This tag causes the usual behaviour of werebeasts in worldgen, that is, fleeing towns upon being cursed and conducting raids from a lair. If this tag is absent from a deity
-    /// curse, the accursed will simply be driven out of towns in a similar manner to vampires. When paired with SPOUSE_CONVERTER, a very small population of the creature will be
+    /// curse, the accursed will simply be driven out of towns in a similar manner to vampires. When paired with `SPOUSE_CONVERTER`, a very small population of the creature will be
     /// created during worldgen (sometimes only a single individual will be created), and their histories will be tracked (that is, they will not spawn spontaneously later, they must
     /// either have children or convert other creatures to increase their numbers). The creature will settle in a lair and go on rampages during worldgen. It will actively attempt to
     /// seek out potential conversion targets to abduct, convert, and have children with (if possible).
@@ -1300,7 +1300,7 @@ pub enum CasteTag {
     /// Appears as `NOT_BUTCHERABLE`
     NotButcherable,
     /// Cannot be raised from the dead by necromancers or evil clouds. Implies the creature is not a normal living being. Used by vampires, mummies and
-    /// inorganic creatures like the amethyst man and bronze colossus. Creatures who are [OPPOSED_TO_LIFE] (undead) will be docile towards creatures with this token.
+    /// inorganic creatures like the amethyst man and bronze colossus. Creatures who are `[OPPOSED_TO_LIFE]` (undead) will be docile towards creatures with this token.
     ///
     /// Appears as `NOT_LIVING`
     NotLiving,
@@ -1325,7 +1325,7 @@ pub enum CasteTag {
         odor_string: String,
     },
     /// Is hostile to all creatures except undead and other non-living ones and will show Opposed to life in the unit list. Used by undead in the vanilla game.
-    /// Functions without the [NOT_LIVING] token, and seems to imply said token as well. Undead will not be hostile to otherwise-living creatures given this token.
+    /// Functions without the `[NOT_LIVING]` token, and seems to imply said token as well. Undead will not be hostile to otherwise-living creatures given this token.
     /// Living creatures given this token will attack living creatures that lack it, while ignoring other living creatures that also have this token.
     ///
     /// Appears as `OPPOSED_TO_LIFE`
@@ -1359,7 +1359,7 @@ pub enum CasteTag {
     OutsiderControllable,
     /// Allows the creature to be used as a pack animal. Used by merchants without wagons and adventurers. Also prevents creature from dropping hauled items on its own
     ///
-    /// Note: do not use for player-controllable creatures! May lead to the creature being domesticated during worldgen, even if it doesn't have [COMMON_DOMESTIC].
+    /// Note: do not use for player-controllable creatures! May lead to the creature being domesticated during worldgen, even if it doesn't have `[COMMON_DOMESTIC]`.
     ///
     /// Appears as `PACK_ANIMAL`
     PackAnimal,
@@ -1448,8 +1448,8 @@ pub enum CasteTag {
         /// The ranges from lowest to highest with 7 steps
         ranges: [u32; 7],
     },
-    /// Physical attribute gain/decay rates. Lower numbers in the last three slots make decay occur faster. Defaults for STRENGTH, AGILITY, TOUGHNESS, and ENDURANCE
-    /// are 500:3:4:3, while RECUPERATION and DISEASE_RESISTANCE default to 500:NONE:NONE:NONE.
+    /// Physical attribute gain/decay rates. Lower numbers in the last three slots make decay occur faster. Defaults for `STRENGTH`, `AGILITY`, `TOUGHNESS`, and `ENDURANCE`
+    /// are `500:3:4:3`, while `RECUPERATION` and `DISEASE_RESISTANCE` default to `500:NONE:NONE:NONE`.
     ///
     /// Arguments:
     ///
@@ -1472,7 +1472,7 @@ pub enum CasteTag {
         /// The decay rate of the attribute when it is demoted
         decay_rate_demotion: u32,
     },
-    /// Adds a body part group to selected body part group. Presumably used immediately after [SET_BP_GROUP].
+    /// Adds a body part group to selected body part group. Presumably used immediately after `[SET_BP_GROUP]`.
     ///
     /// Arguments:
     ///
@@ -1494,7 +1494,7 @@ pub enum CasteTag {
         pop_ratio: u32,
     },
     /// Allows the being to represent itself as a deity, allowing it to become the leader of a civilized group. Used by unique demons in the vanilla game.
-    /// Requires [CAN_SPEAK] to actually do anything more than settle at a location (e.g. write books, lead armies, profane temples). Doesn't appear to do anything
+    /// Requires `[CAN_SPEAK]` to actually do anything more than settle at a location (e.g. write books, lead armies, profane temples). Doesn't appear to do anything
     /// for creatures that are already civilized. Once the creature ascends to a position of leadership, it will proceed to act as a standard ruler for their
     /// entity and fulfill the same functions (hold tournaments, tame creatures, etc.).
     ///
@@ -1572,7 +1572,7 @@ pub enum CasteTag {
         /// The color of the remains
         remains_color: String,
     },
-    /// Goes with [VERMIN_BITE] and [DIE_WHEN_VERMIN_BITE], the vermin creature will leave remains on death when biting.
+    /// Goes with `[VERMIN_BITE]` and `[DIE_WHEN_VERMIN_BITE]`, the vermin creature will leave remains on death when biting.
     /// Leaving this tag out will cause the creature to disappear entirely after it bites.
     ///
     /// Appears as `REMAINS_ON_VERMIN_BITE_DEATH`
@@ -1581,11 +1581,11 @@ pub enum CasteTag {
     ///
     /// Appears as `REMAINS_UNDETERMINED`
     RemainsUndetermined,
-    /// The creature will retract into the specified body part(s) when threatened. It will be unable to move or attack, but enemies will only be able to attack the specified body part(s). When one of the specified body part is severed off, the creature automatically unretracts and cannot retract anymore. More than one body part can be selected by using BY_TYPE or BY_CATEGORY.
+    /// The creature will retract into the specified body part(s) when threatened. It will be unable to move or attack, but enemies will only be able to attack the specified body part(s). When one of the specified body part is severed off, the creature automatically unretracts and cannot retract anymore. More than one body part can be selected by using `BY_TYPE` or `BY_CATEGORY`.
     ///
-    /// Second-person descriptions are used for adventurer mode natural ability. "<pro_pos>" can be used in the descriptions, being replaced with the proper pronoun (or lack thereof) in-game.
+    /// Second-person descriptions are used for adventurer mode natural ability. `"<pro_pos>"` can be used in the descriptions, being replaced with the proper pronoun (or lack thereof) in-game.
     ///
-    /// Undead curled up creatures are buggy, specifically those that retract into their upper bodies: echidnas, hedgehogs and pangolins.Bug:11463Bug:10519 The upper body is prevented from collapsing by a separate body part (the middle spine), which cannot be attacked when the creature is retracted. See [PREVENTS_PARENT_COLLAPSE]. Living creatures eventually succumb to blood loss, but undead creatures do not. Giant creatures also take a very long time to bleed out.
+    /// Undead curled up creatures are buggy, specifically those that retract into their upper bodies: echidnas, hedgehogs and pangolins. The upper body is prevented from collapsing by a separate body part (the middle spine), which cannot be attacked when the creature is retracted. See `[PREVENTS_PARENT_COLLAPSE]`. Living creatures eventually succumb to blood loss, but undead creatures do not. Giant creatures also take a very long time to bleed out.
     ///
     /// Arguments:
     ///
@@ -1611,7 +1611,7 @@ pub enum CasteTag {
         /// Description using "it" and "its" when the creature is no longer retracted
         third_person_cancel: String,
     },
-    /// Cat behavior. If it kills a vermin creature and has an owner, it carries the remains in its mouth and drops them at their feet. Requires [HUNTS_VERMIN].
+    /// Cat behavior. If it kills a vermin creature and has an owner, it carries the remains in its mouth and drops them at their feet. Requires `[HUNTS_VERMIN]`.
     ///
     /// Appears as `RETURNS_VERMIN_KILLS_TO_OWNER`
     ReturnsVerminKillsToOwner,
@@ -1641,9 +1641,9 @@ pub enum CasteTag {
     },
     /// Causes the specified tissue layer(s) of the indicated body part(s) to secrete the designated material. A size 100 ('covering') contaminant is created over the affected body part(s) in its specified material state (and at the temperature appropriate to this state) when the trigger condition is met, as long as one of the secretory tissue layers is still intact. Valid triggers are:
     ///
-    /// * CONTINUOUS: Secretion occurs once every 40 ticks in fortress mode, and every tick in adventurer mode.
-    /// * EXERTION: Secretion occurs continuously (at the rate described above) whilst the creature is at minimum Tired following physical exertion. Note that this cannot occur if the creature has [NOEXERT].
-    /// * EXTREME_EMOTION:  Secretion occurs continuously (as above) whilst the creature is distressed. Cannot occur in creatures with [NOEMOTION].
+    /// * `CONTINUOUS`: Secretion occurs once every 40 ticks in fortress mode, and every tick in adventurer mode.
+    /// * `EXERTION`: Secretion occurs continuously (at the rate described above) whilst the creature is at minimum Tired following physical exertion. Note that this cannot occur if the creature has [NOEXERT].
+    /// * `EXTREME_EMOTION`:  Secretion occurs continuously (as above) whilst the creature is distressed. Cannot occur in creatures with [NOEMOTION].
     ///
     /// Arguments:
     ///
@@ -1652,7 +1652,7 @@ pub enum CasteTag {
     /// * `body_part_selector`: The body part selector to use
     /// * `body_part`: The body part to use
     /// * `tissue_layer`: The tissue layer to use
-    /// * `trigger`: The trigger to use (CONTINUOUS, EXERTION, EXTREME_EMOTION)
+    /// * `trigger`: The trigger to use (`CONTINUOUS`, `EXERTION`, `EXTREME_EMOTION`)
     ///
     /// Appears as `SECRETION:SomeMaterial:SomeMaterialState:SomeBodyPartSelector:SomeBodyPart:SomeTissueLayer:SomeTrigger`
     Secretion {
@@ -1666,7 +1666,7 @@ pub enum CasteTag {
         body_part: String,
         /// The tissue layer to use
         tissue_layer: String,
-        /// The trigger to use (CONTINUOUS, EXERTION, EXTREME_EMOTION)
+        /// The trigger to use (`CONTINUOUS`, `EXERTION`, `EXTREME_EMOTION`)
         trigger: String,
     },
     /// Essentially the same as [MEGABEAST], but more of them are created during worldgen. See the semi-megabeast page for details.
@@ -1700,17 +1700,17 @@ pub enum CasteTag {
     ///
     /// Arguments:
     ///
-    /// * `body_part_selector`: The body part selector to use (BY_TYPE, BY_CATEGORY, BY_TOKEN)
+    /// * `body_part_selector`: The body part selector to use (`BY_TYPE`, `BY_CATEGORY`, `BY_TOKEN`)
     /// * `body_part`: The body part to use (via category, type or token)
     ///
     /// Appears as `SET_BP_GROUP:SomeBodyPartSelector:SomeBodyPart`
     SetBodyPartGroup {
-        /// The body part selector to use (BY_TYPE, BY_CATEGORY, BY_TOKEN)
+        /// The body part selector to use (`BY_TYPE`, `BY_CATEGORY`, `BY_TOKEN`)
         body_part_selector: String,
         /// The body part to use (via category, type or token)
         body_part: String,
     },
-    /// The rate at which this creature learns this skill. Requires [CAN_LEARN] or [INTELLIGENT] to function.
+    /// The rate at which this creature learns this skill. Requires `[CAN_LEARN]` or `[INTELLIGENT]` to function.
     ///
     /// Arguments:
     ///
@@ -1724,7 +1724,7 @@ pub enum CasteTag {
         /// The rate to modify the skill by
         rate: u32,
     },
-    /// The rate at which this creature learns all skills. Requires [CAN_LEARN] or [INTELLIGENT] to function.
+    /// The rate at which this creature learns all skills. Requires `[CAN_LEARN]` or `[INTELLIGENT]` to function.
     ///
     /// Arguments:
     ///
@@ -1735,7 +1735,7 @@ pub enum CasteTag {
         /// The rate to modify the skill by
         rate: u32,
     },
-    /// Like [SKILL_RATES], but applies to individual skills instead. Requires [CAN_LEARN] or [INTELLIGENT] to function.
+    /// Like `[SKILL_RATES]`, but applies to individual skills instead. Requires `[CAN_LEARN]` or `[INTELLIGENT]` to function.
     ///
     /// Arguments:
     ///
@@ -1758,10 +1758,10 @@ pub enum CasteTag {
         /// The decay rate of the skill when it is demoted
         decay_rate_demotion: u32,
     },
-    /// Affects skill gain and decay. Lower numbers in the last three slots make decay occur faster ([SKILL_RATES:100:1:1:1] would cause rapid decay).
+    /// Affects skill gain and decay. Lower numbers in the last three slots make decay occur faster (`[SKILL_RATES:100:1:1:1]` would cause rapid decay).
     /// The counter (decay) rates may also be replaced with NONE.
     ///
-    /// Default is [SKILL_RATES:100:8:16:16]. Requires [CAN_LEARN] or [INTELLIGENT] to function.
+    /// Default is `[SKILL_RATES:100:8:16:16]`. Requires `[CAN_LEARN]` or `[INTELLIGENT]` to function.
     ///
     /// Arguments:
     ///
@@ -1781,7 +1781,7 @@ pub enum CasteTag {
         /// The decay rate of the skill when it is demoted
         decay_rate_demotion: u32,
     },
-    /// The rate at which this skill decays. Lower values cause the skill to decay faster. Requires [CAN_LEARN] or [INTELLIGENT] to function.
+    /// The rate at which this skill decays. Lower values cause the skill to decay faster. Requires `[CAN_LEARN]` or `[INTELLIGENT]` to function.
     ///
     /// Arguments:
     ///
@@ -1801,7 +1801,7 @@ pub enum CasteTag {
         /// The decay rate of the skill when it is demoted
         decay_rate_demotion: u32,
     },
-    /// The rate at which all skills decay. Lower values cause the skills to decay faster. Requires [CAN_LEARN] or [INTELLIGENT] to function.
+    /// The rate at which all skills decay. Lower values cause the skills to decay faster. Requires `[CAN_LEARN]` or `[INTELLIGENT]` to function.
     ///
     /// Arguments:
     ///
@@ -1818,14 +1818,14 @@ pub enum CasteTag {
         /// The decay rate of the skill when it is demoted
         decay_rate_demotion: u32,
     },
-    /// Caste-specific [SLAIN_SPEECH].
+    /// Caste-specific `[SLAIN_SPEECH]`.
     ///
     /// Appears as `SLAIN_CASTE_SPEECH:SomeSpeechSet`
     SlainSpeech {
         /// The speech set to use
         speech_file: String,
     },
-    /// Shorthand for [CAN_LEARN] + [SKILL_LEARN_RATES:50].[Verify] Used by a number of 'primitive' creatures (like ogres, giants and troglodytes) in the vanilla game.
+    /// Shorthand for `[CAN_LEARN]` + `[SKILL_LEARN_RATES:50]`. Used by a number of 'primitive' creatures (like ogres, giants and troglodytes) in the vanilla game.
     /// Applicable to player races. Prevents a player from recruiting nobility, even basic ones. Subterranean creatures with this token combined with [EVIL] will become
     /// servants of goblins in their civilizations, in the style of trolls.
     ///
@@ -1859,7 +1859,7 @@ pub enum CasteTag {
     ///
     /// Arguments:
     ///
-    /// * `sound_type`: The sound type to use (ALERT or PEACEFUL_INTERMITTENT)
+    /// * `sound_type`: The sound type to use (`ALERT` or `PEACEFUL_INTERMITTENT`)
     /// * `sound_range`: The range of the sound (in tiles)
     /// * `sound_interval`: A delay before the sound is produced again (in ticks)
     /// * `requires_breathing`: Whether the creature needs to breathe to make the sound
@@ -1869,7 +1869,7 @@ pub enum CasteTag {
     ///
     /// Appears as `SOUND:SomeSoundType:100:1000:SomeFirstPerson:SomeThirdPerson:SomeOutOfSight`
     Sound {
-        /// The sound type to use (ALERT or PEACEFUL_INTERMITTENT)
+        /// The sound type to use (`ALERT` or `PEACEFUL_INTERMITTENT`)
         sound_type: String,
         /// The range of the sound (in tiles)
         sound_range: u32,
@@ -1899,12 +1899,12 @@ pub enum CasteTag {
         /// The identifier of the required plant or creature
         identifier: String,
     },
-    /// This creature can be converted by a night creature with [SPOUSE_CONVERTER].
+    /// This creature can be converted by a night creature with `[SPOUSE_CONVERTER]`.
     ///
     /// Appears as `SPOUSE_CONVERSION_TARGET`
     SpouseConversionTarget,
-    /// If the creature has the [NIGHT_CREATURE_HUNTER] tag, it will kidnap [SPOUSE_CONVERSION_TARGET]s and transform them into the caste of its species
-    /// with the [CONVERTED_SPOUSE] tag during worldgen. It may also start families this way.
+    /// If the creature has the `[NIGHT_CREATURE_HUNTER]` tag, it will kidnap `[SPOUSE_CONVERSION_TARGET]`s and transform them into the caste of its species
+    /// with the `[CONVERTED_SPOUSE]` tag during worldgen. It may also start families this way.
     ///
     /// Appears as `SPOUSE_CONVERTER`
     SpouseConverter,
@@ -1918,7 +1918,7 @@ pub enum CasteTag {
     ///
     /// Appears as `STANCE_CLIMBER`
     StanceClimber,
-    /// Acts as [GRAZER] but set to 20000*G*(max size)^(-3/4), where G defaults to 100 but can be set in d_init, and the whole thing is trapped between 150 and 3 million.
+    /// Acts as [GRAZER] but set to 20000*G*(max size)^(-3/4), where G defaults to 100 but can be set in `d_init`, and the whole thing is trapped between 150 and 3 million.
     /// Used for all grazers in the default creature raws.
     ///
     /// Appears as `STANDARD_GRAZER`
@@ -1927,12 +1927,12 @@ pub enum CasteTag {
     ///
     /// Appears as `STRANGE_MOODS`
     StrangeMoods,
-    /// Gives the creature knowledge of any secrets with [SUPERNATURAL_LEARNING_POSSIBLE] that match its spheres and also prevents it from becoming a vampire or werebeast.
+    /// Gives the creature knowledge of any secrets with `[SUPERNATURAL_LEARNING_POSSIBLE]` that match its spheres and also prevents it from becoming a vampire or werebeast.
     /// Other effects are unknown.
     ///
     /// Appears as `SUPERNATURAL`
     Supernatural,
-    /// The creature naturally knows how to swim perfectly and does not use the swimmer skill, as opposed to [SWIMS_LEARNED] below.
+    /// The creature naturally knows how to swim perfectly and does not use the swimmer skill, as opposed to `[SWIMS_LEARNED]` below.
     /// However, Fortress mode AI never paths into water anyway, so it's less useful there.
     ///
     /// Appears as `SWIMS_INNATE`
@@ -1955,7 +1955,7 @@ pub enum CasteTag {
         /// The percentage to modify the syndrome by
         percentage: u32,
     },
-    /// The creature has tendons in its [CONNECTIVE_TISSUE_ANCHOR] tissues (bone or chitin by default).
+    /// The creature has tendons in its `[CONNECTIVE_TISSUE_ANCHOR]` tissues (bone or chitin by default).
     /// Cutting the bone/chitin tissue severs the tendons, disabling motor function if the target is a limb.
     ///
     /// Arguments:
@@ -1987,15 +1987,15 @@ pub enum CasteTag {
     ///
     /// Arguments:
     ///
-    /// * `body_part_selector`: The body part selector to use (BY_TYPE, BY_CATEGORY, BY_TOKEN)
+    /// * `body_part_selector`: The body part selector to use (`BY_TYPE`, `BY_CATEGORY`, `BY_TOKEN`)
     /// * `body_part`: The body part to use (via category, type or token)
     /// * `tissue`: The name of the tissue to use
-    /// * `location`: The location to use (FRONT, RIGHT, LEFT, TOP, BOTTOM) or with an additional argument, (AROUND, CLEANS) with a body part and a percentage
+    /// * `location`: The location to use (`FRONT`, `RIGHT`, `LEFT`, `TOP`, `BOTTOM`) or with an additional argument, (`AROUND`, `CLEANS`) with a body part and a percentage
     ///
-    /// Appears as `TISSUE_LAYER:SomeBodyPartSelector:SomeBodyPart:SomeTissue:SomeLocation` or `TISSUE_LAYER:SomeBodyPartSelector:SomeBodyPart:SomeTissue:SomeLocation:SomeBodyPart:100`
-    /// ALSO appears as `TISSUE_LAYER_OVER:SomeBodyPartSelector:SomeBodyPart:SomeTissue:SomeLocation` or `TISSUE_LAYER_OVER:SomeBodyPartSelector:SomeBodyPart:SomeTissue:SomeLocation:SomeBodyPart:100
+    /// Appears as `[TISSUE_LAYER:SomeBodyPartSelector:SomeBodyPart:SomeTissue:SomeLocation]` or `[TISSUE_LAYER:SomeBodyPartSelector:SomeBodyPart:SomeTissue:SomeLocation:SomeBodyPart:100]`
+    /// ALSO appears as `[TISSUE_LAYER_OVER:SomeBodyPartSelector:SomeBodyPart:SomeTissue:SomeLocation]` or `[TISSUE_LAYER_OVER:SomeBodyPartSelector:SomeBodyPart:SomeTissue:SomeLocation:SomeBodyPart:100]`
     TissueLayer {
-        /// The body part selector to use (BY_TYPE, BY_CATEGORY, BY_TOKEN)
+        /// The body part selector to use (`BY_TYPE`, `BY_CATEGORY`, `BY_TOKEN`)
         body_part_selector: String,
         /// The body part to use (via category, type or token)
         body_part: String,
@@ -2006,23 +2006,23 @@ pub enum CasteTag {
     },
     /// Adds the tissue layer under a given part.
     ///
-    /// For example, an iron man has a gaseous poison within, and this tissue (GAS is its name) has the token [TISSUE_LEAKS] and its state is GAS, so when you puncture the iron outside and
+    /// For example, an iron man has a gaseous poison within, and this tissue (GAS is its name) has the token `[TISSUE_LEAKS]` and its state is GAS, so when you puncture the iron outside and
     /// damage this tissue it leaks gas (can have a syndrome by using a previous one in the creature sample.)
     /// `[TISSUE_LAYER_UNDER:BY_CATEGORY:ALL:{tissue}]`
     ///
-    /// `{tissue}` is what will be under the TISSUE_LAYER; here is an example Tissue from the Iron Man:
+    /// `{tissue}` is what will be under the `TISSUE_LAYER`; here is an example Tissue from the Iron Man:
     ///
     /// `[TISSUE:GAS] [TISSUE_NAME:gas:NP] [TISSUE_MATERIAL:LOCAL_CREATURE_MAT:GAS] [TISSUE_MAT_STATE:GAS] [RELATIVE_THICKNESS:50] [TISSUE_LEAKS] [TISSUE_SHAPE:LAYER]`
     ///
     /// Arguments:
     ///
-    /// * `body_part_selector`: The body part selector to use (BY_TYPE, BY_CATEGORY, BY_TOKEN)
+    /// * `body_part_selector`: The body part selector to use (`BY_TYPE`, `BY_CATEGORY`, `BY_TOKEN`)
     /// * `body_part`: The body part to use (via category, type or token)
     /// * `tissue`: The name of the tissue to use
     ///
     /// Appears as `TISSUE_LAYER_UNDER:SomeBodyPartSelector:SomeBodyPart:SomeTissue`
     TissueLayerUnder {
-        /// The body part selector to use (BY_TYPE, BY_CATEGORY, BY_TOKEN)
+        /// The body part selector to use (`BY_TYPE`, `BY_CATEGORY`, `BY_TOKEN`)
         body_part_selector: String,
         /// The body part to use (via category, type or token)
         body_part: String,
@@ -2033,7 +2033,7 @@ pub enum CasteTag {
     ///
     /// Appears as `TITAN`
     Titan,
-    /// How much the creature can carry when used by merchants. 1000 by default. If a civilization uses a custom pack animal via ALWAYS_PACK, you must manually add a capacity to the raws of that
+    /// How much the creature can carry when used by merchants. 1000 by default. If a civilization uses a custom pack animal via `ALWAYS_PACK`, you must manually add a capacity to the raws of that
     /// creature itself. Capacity defaults to null leading to empty caravans.
     ///
     /// Arguments:
@@ -2045,7 +2045,7 @@ pub enum CasteTag {
         /// The capacity of the creature
         capacity: u32,
     },
-    /// Shortcut for [TRAINABLE_HUNTING] + [TRAINABLE_WAR].
+    /// Shortcut for `[TRAINABLE_HUNTING]` + `[TRAINABLE_WAR]`.
     ///
     /// Appears as `TRAINABLE`
     Trainable,
@@ -2075,11 +2075,11 @@ pub enum CasteTag {
     ///
     /// Appears as `UNIQUE_DEMON`
     UniqueDemon,
-    /// Like [AT_PEACE_WITH_WILDLIFE], but also makes the creature more valued in artwork by civilisations with the PLANT sphere. [5] Used by grimelings in the vanilla game.
+    /// Like `[AT_PEACE_WITH_WILDLIFE]`, but also makes the creature more valued in artwork by civilisations with the PLANT sphere. [5] Used by grimelings in the vanilla game.
     ///
     /// Appears as `VEGETATION`
     Vegetation,
-    /// Enables vermin to bite other creatures, injecting the specified material. See [SPECIALATTACK_INJECT_EXTRACT] for details about injection - this token presumably works in a similar manner.
+    /// Enables vermin to bite other creatures, injecting the specified material. See `[SPECIALATTACK_INJECT_EXTRACT]` for details about injection - this token presumably works in a similar manner.
     ///
     /// Arguments:
     ///
@@ -2119,7 +2119,7 @@ pub enum CasteTag {
     ///
     /// Appears as `VERMIN_NOTRAP`
     VerminNoTrap,
-    /// Old shorthand for "does cat stuff". Contains [AT_PEACE_WITH_WILDLIFE] + [RETURNS_VERMIN_KILLS_TO_OWNER] + [HUNTS_VERMIN] + [ADOPTS_OWNER].
+    /// Old shorthand for "does cat stuff". Contains `[AT_PEACE_WITH_WILDLIFE]` + `[RETURNS_VERMIN_KILLS_TO_OWNER]` + `[HUNTS_VERMIN]` + `[ADOPTS_OWNER]`.
     ///
     /// Appears as `VERMINHUNTER`
     VerminHunter,

@@ -345,7 +345,7 @@ pub enum GraphicType {
     CustomEdgeSW,
     /// The tile is custom corner (SE)
     CustomEdgeSE,
-    /// THe tile is a custom workshop
+    /// The tile is a custom workshop
     CustomWorkshop,
     /// The tile is a list icon
     ListIcon,

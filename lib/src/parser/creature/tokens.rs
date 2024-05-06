@@ -3,7 +3,7 @@ use serde::{Deserialize, Serialize};
 /// An enum representing a creature tag.
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, Default, specta::Type)]
 pub enum CreatureTag {
-    /// If set, the creature will blink between its [Tile] and its [AltTile].
+    /// If set, the creature will blink between its `[Tile]` and its `[AltTile]`.
     ///
     /// Arguments:
     ///
@@ -14,7 +14,7 @@ pub enum CreatureTag {
         /// The character or tile number
         character: u32,
     },
-    /// Applies the specified creature variation with the given arguments to the creature. See [ApplyCreatureVariation] for more information.
+    /// Applies the specified creature variation with the given arguments to the creature. See `[ApplyCreatureVariation]` for more information.
     ///
     /// Appears as `APPLY_CREATURE_VARIATION:SOME_VARIATION` or `APPLY_CREATURE_VARIATION:SOME_VARIATION:ARG1:ARG2:ARG3`
     ApplyCreatureVariation {
@@ -63,7 +63,7 @@ pub enum CreatureTag {
         max: u32,
     },
     /// Copies another specified creature. This will override any definitions made before it; essentially, it makes this creature identical to the other one, which can then
-    /// be modified. Often used in combination with [APPLY_CREATURE_VARIATION] to import standard variations from a file. The vanilla giant animals and animal peoples are
+    /// be modified. Often used in combination with `[APPLY_CREATURE_VARIATION]` to import standard variations from a file. The vanilla giant animals and animal peoples are
     /// examples of this token combination.
     ///
     /// Arguments:
@@ -113,31 +113,31 @@ pub enum CreatureTag {
     ///
     /// Appears as `DOES_NOT_EXIST`
     DoesNotExist,
-    /// Makes the creature appear as a large 3x3 wagon responsible for carrying trade goods, pulled by two [WAGON_PULLER] creatures and driven by a merchant.
+    /// Makes the creature appear as a large 3x3 wagon responsible for carrying trade goods, pulled by two `[WAGON_PULLER]` creatures and driven by a merchant.
     ///
     /// Appears as `EQUIPMENT_WAGON`
     EquipmentWagon,
-    /// The creature is considered evil and will only show up in evil biomes. Civilizations with [EntityToken::UseEvilAnimals] can domesticate them
+    /// The creature is considered evil and will only show up in evil biomes. Civilizations with `[EntityToken::UseEvilAnimals]` can domesticate them
     /// regardless of exotic status. Has no effect on cavern creatures except to restrict taming. A civilization with evil creatures can colonize evil areas.
     ///
     /// Appears as `EVIL`
     Evil,
     /// The creature is a thing of legend and known to all civilizations. Its materials cannot be requested or preferred. The tag also adds some art value modifiers.
-    /// Used by a number of creatures. Conflicts with [CasteToken::CommonDomestic].
+    /// Used by a number of creatures. Conflicts with `[CasteToken::CommonDomestic]`.
     Fanciful,
     /// Determines the chances of a creature appearing within its environment, with higher values resulting in more frequent appearance. Also affects the chance of a
     /// creature being brought in a caravan for trading. The game effectively considers all creatures that can possibly appear and uses the FREQUENCY value as a weight
     ///
     /// For example, if there are three creatures with frequencies 10/25/50, the creature with [FREQUENCY:50] will appear approximately 58.8% of the time.
     ///
-    /// Defaults to 50 if not specified. Not to be confused with [PopulationRatio].
+    /// Defaults to 50 if not specified. Not to be confused with `[PopulationRatio]`.
     ///
     /// Appears as `FREQUENCY:50`
     Frequency {
         /// The frequency of the creature, a number between 0 and 100 (inclusive)
         frequency: u32,
     },
-    /// Name of the creatures baby form. Applies to all castes but can be overridden by [CasteToken::BabyName].
+    /// Name of the creatures baby form. Applies to all castes but can be overridden by `[CasteToken::BabyName]`.
     ///
     /// Appears as `GENERAL_BABY_NAME:BabyName:BabyNames`
     GeneralBabyName {
@@ -146,7 +146,7 @@ pub enum CreatureTag {
         /// The plural name of the baby
         plural: String,
     },
-    /// Name of the creatures child form. Applies to all castes but can be overridden by [CasteToken::ChildName].
+    /// Name of the creatures child form. Applies to all castes but can be overridden by `[CasteToken::ChildName]`.
     ///
     /// Appears as `GENERAL_CHILD_NAME:ChildName:ChildNames`
     GeneralChildName {
@@ -187,7 +187,7 @@ pub enum CreatureTag {
         /// The character or tile number
         character: u32,
     },
-    /// Creature is considered good and will only show up in good biomes - unicorns, for example. Civilizations with [EntityToken::UseGoodAnimals] can
+    /// Creature is considered good and will only show up in good biomes - unicorns, for example. Civilizations with `[EntityToken::UseGoodAnimals]` can
     /// domesticate them regardless of exotic status. Has no effect on cavern creatures except to restrict taming. A civilization that has good
     /// creatures can colonize good areas in world-gen.
     ///
@@ -232,9 +232,9 @@ pub enum CreatureTag {
     /// This is the core requisite tag allowing the creature to spawn as a wild animal in the appropriate biomes. Requires specifying a [Biome] in which the creature will spawn.
     /// Does not require specifying a frequency, population number, or cluster number.
     ///
-    /// This tag stacks with [CasteToken::Megabeast], [CasteToken::SemiMegabeast], or [CasteToken::NightCreatureHunter]; if used with one of these tags, the creature will spawn
-    /// as both a boss and as a wild animal. This tag does not stack with [CasteToken::FeatureBeast] and if both are used the creature will not spawn. This tag is unaffected by
-    /// [CasteToken::Demon].
+    /// This tag stacks with `[CasteToken::Megabeast]`, `[CasteToken::SemiMegabeast]`, or `[CasteToken::NightCreatureHunter]`; if used with one of these tags, the creature will spawn
+    /// as both a boss and as a wild animal. This tag does not stack with `[CasteToken::FeatureBeast]` and if both are used the creature will not spawn. This tag is unaffected by
+    /// `[CasteToken::Demon]`.
     ///
     /// Appears as `LARGE_ROAMING`
     LargeRoaming,
@@ -252,7 +252,7 @@ pub enum CreatureTag {
     LooseClusters,
     /// Marks if the creature is an actual real-life creature. Only used for age-names at present.
     Mundane,
-    /// The generic name for any creature of this type - will be used when distinctions between caste are unimportant. For names for specific castes, use [CASTE_NAME] instead.
+    /// The generic name for any creature of this type - will be used when distinctions between caste are unimportant. For names for specific castes, use `[CASTE_NAME]` instead.
     /// If left undefined, the creature will be labeled as "nothing" by the game.
     ///
     /// Appears as `NAME:Name:Names:NameAdj`
@@ -264,7 +264,7 @@ pub enum CreatureTag {
         /// The adjective form of the creature's name
         adjective: String,
     },
-    /// Adds a material to selected materials. Used immediately after [SELECT_MATERIAL].
+    /// Adds a material to selected materials. Used immediately after `[SELECT_MATERIAL]`.
     ///
     /// Appears as `PLUS_MATERIAL:Material`
     PlusMaterial {
@@ -292,7 +292,7 @@ pub enum CreatureTag {
         pref_string: String,
     },
     /// The generic name for members of this profession, at the creature level. In order to give members of specific castes different names for professions,
-    /// use [CASTE_PROFESSION_NAME] instead.
+    /// use `[CASTE_PROFESSION_NAME]` instead.
     ///
     /// Appears as `PROFESSION_NAME:ProfessionId:ProfessionName:ProfessionNames`
     ProfessionName {
@@ -321,7 +321,7 @@ pub enum CreatureTag {
     ///
     /// Appears as `SAVAGE`
     Savage,
-    /// Adds an additional previously defined caste to the selection. Used after [SELECT_CASTE].
+    /// Adds an additional previously defined caste to the selection. Used after `[SELECT_CASTE]`.
     ///
     /// Appears as `SELECT_ADDITIONAL_CASTE:Caste`
     SelectAdditionalCaste {
@@ -349,7 +349,7 @@ pub enum CreatureTag {
         /// The tissue to select
         tissue: String,
     },
-    /// Boasting speeches relating to killing this creature. Examples include text_dwarf.txt and text_elf.txt in data\vanilla\vanilla_creatures\objects.
+    /// Boasting speeches relating to killing this creature. Examples include `text_dwarf.txt` and `text_elf.txt` in `data\vanilla\vanilla_creatures\objects`.
     ///
     /// Appears as `SLAIN_CASTE:SomeSpeechSet`
     SlainSpeech {
@@ -487,7 +487,7 @@ pub enum CreatureTag {
         /// The name of the original tissue to copy
         original_tissue: String,
     },
-    /// Loads a tissue template listed in OBJECT:TISSUE_TEMPLATE files, such as tissue_template_default.txt.
+    /// Loads a tissue template listed in `OBJECT:TISSUE_TEMPLATE` files, such as `tissue_template_default.txt`.
     ///
     /// Arguments:
     ///
@@ -506,7 +506,7 @@ pub enum CreatureTag {
     ///
     /// Appears as `UTTERNANCES`
     Utterances,
-    /// The vermin creature will attempt to eat exposed food. See [PENETRATEPOWER]. Distinct from [VERMIN_ROTTER].
+    /// The vermin creature will attempt to eat exposed food. See `[PENETRATEPOWER]`. Distinct from `[VERMIN_ROTTER]`.
     ///
     /// Appears as `VERMIN_EATER`
     VerminEater,
@@ -523,7 +523,7 @@ pub enum CreatureTag {
     ///
     /// Appears as `VERMIN_ROTTER`
     VerminRotter,
-    /// The creature randomly appears near dirt or mud, and may be uncovered by creatures that have the [ROOT_AROUND] interaction such as geese and chickens.
+    /// The creature randomly appears near dirt or mud, and may be uncovered by creatures that have the `[ROOT_AROUND]` interaction such as geese and chickens.
     /// Dwarves will ignore the creature when given the "Capture live land animal" task.
     ///
     /// Appears as `VERMIN_SOIL`

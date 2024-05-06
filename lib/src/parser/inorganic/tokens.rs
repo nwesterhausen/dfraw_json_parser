@@ -47,7 +47,7 @@ pub enum InorganicToken {
     Lava,
     /// Prevents the material from showing up in certain places. AI-controlled entities won't use the material to make items and don't bring it in caravans,
     /// though the player can use it as normal. Also, inorganic generated creatures (forgotten beasts, titans, demons) will never be composed of this material.
-    /// Explicitly set by all evil weather materials and implied by \[DEEP_SURFACE\] and \[DEEP_SPECIAL\].
+    /// Explicitly set by all evil weather materials and implied by `[DEEP_SURFACE]` and `[DEEP_SPECIAL]`.
     Special,
     /// Indicates that this is a generated material. Cannot be specified in user-defined raws.
     Generated,

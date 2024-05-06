@@ -1,6 +1,7 @@
 use crate::{creature, creature_caste, RawObject};
 
 pub trait RawObjectToken<T: RawObject> {
+    #[allow(dead_code)]
     fn is_within(&self, object: &T) -> bool;
 }
 

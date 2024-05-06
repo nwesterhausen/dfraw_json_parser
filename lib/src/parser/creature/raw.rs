@@ -55,7 +55,7 @@ pub struct Creature {
     ///
     /// Minimum value is 0, maximum value is 100.
     ///
-    /// Note: not to be confused with [POP_RATIO].
+    /// Note: not to be confused with `[POP_RATIO]`.
     frequency: Option<u32>,
     /// The minimum/maximum numbers of how many creatures per spawned cluster. Vermin fish with this token in combination with
     /// temperate ocean and river biome tokens will perform seasonal migrations.
@@ -97,7 +97,7 @@ pub struct Creature {
     ///
     /// This field is always serialized.
     object_id: String,
-    /// Various SELECT_CREATURE modifications.
+    /// Various `SELECT_CREATUR` modifications.
     select_creature_variation: Option<Vec<SelectCreature>>,
 }
 
@@ -310,11 +310,13 @@ impl Creature {
         // So we need to go through all our properties and castes and overwrite what exists on the combined creature.
 
         // our metadata is preserved
-        combined_creature.metadata = creature.metadata.clone();
+        combined_creature.metadata.clone_from(&creature.metadata);
         // our identifier is preserved
-        combined_creature.identifier = creature.identifier.clone();
-        // our object_id is preserved
-        combined_creature.object_id = creature.object_id.clone();
+        combined_creature
+            .identifier
+            .clone_from(&creature.identifier);
+        // our `object_id` is preserved
+        combined_creature.object_id.clone_from(&creature.object_id);
 
         // Clean the "creature" to remove any empty lists or strings for comparison
         let creature = creature.cleaned();
@@ -381,16 +383,20 @@ impl Creature {
             combined_creature.underground_depth = creature.underground_depth;
         }
         if creature.general_baby_name.is_some() {
-            combined_creature.general_baby_name = creature.general_baby_name.clone();
+            combined_creature
+                .general_baby_name
+                .clone_from(&creature.general_baby_name);
         }
         if creature.general_child_name.is_some() {
-            combined_creature.general_child_name = creature.general_child_name.clone();
+            combined_creature
+                .general_child_name
+                .clone_from(&creature.general_child_name);
         }
         if !creature.name.is_empty() {
             combined_creature.name = creature.name.clone();
         }
         if creature.tile.is_some() {
-            combined_creature.tile = creature.tile.clone();
+            combined_creature.tile.clone_from(&creature.tile);
         }
 
         combined_creature

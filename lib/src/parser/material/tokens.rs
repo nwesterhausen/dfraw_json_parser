@@ -300,7 +300,7 @@ pub enum MaterialProperty {
     TileColor,
     /// The color of objects made of this material which use only the foreground color, including workshops, floors and boulders, and smoothed walls. Defaults to `7:1` (white).
     BasicColor,
-    /// Determines the color of the material at the specified state. See below for a list of valid material states. Color comes from descriptor_color_standard.txt.
+    /// Determines the color of the material at the specified state. See below for a list of valid material states. Color comes from `descriptor_color_standard.txt`.
     /// The nearest color value is used to display contaminants and body parts made of this material in ASCII and to color items and constructions made from this
     /// material with graphics.
     /// Example:`STATE_COLOR:ALL_SOLID:GRAY`
@@ -420,7 +420,7 @@ pub enum MaterialProperty {
     /// The material forms "wafers" instead of "bars".
     Wafers,
     /// Used with reaction raws to associate a reagent material with a product material. The first argument is used by `HAS_MATERIAL_REACTION_PRODUCT` and `GET_MATERIAL_FROM_REAGENT` in reaction raws.
-    /// The remainder is a material reference, generally `LOCAL_CREATURE_MAT:SUBTYPE` or `LOCAL_PLANT_MAT:SUBTYPE`` or `INORGANIC:STONETYPE`.
+    /// The remainder is a material reference, generally `LOCAL_CREATURE_MAT:SUBTYPE` or `LOCAL_PLANT_MAT:SUBTYPE` or `INORGANIC:STONETYPE`.
     /// `MATERIAL_REACTION_PRODUCT:TAN_MAT:LOCAL_CREATURE_MAT:LEATHER`
     MaterialReactionProduct,
     /// Used with reaction raws to associate a reagent material with a complete item. The first argument is used by `HAS_ITEM_REACTION_PRODUCT` and `GET_ITEM_DATA_FROM_REAGENT` in reaction raws.
