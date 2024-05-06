@@ -2,6 +2,9 @@
 //
 /// lib/dfraw_json_parser library
 
+/**
+ * An enum representing a biome.
+ */
 export type Biome =
   | "Mountain"
   | "Mountains"
@@ -120,6 +123,9 @@ export type Creature = {
   selectCreatureVariation: SelectCreature[] | null;
 };
 
+/**
+ * An enum representing a creature tag.
+ */
 export type CreatureTag =
   | { AltTile: { character: number } }
   | { ApplyCreatureVariation: { id: string; args: string[] } }
@@ -228,6 +234,9 @@ export type Gait = {
   modifiers: Modifier[];
 };
 
+/**
+ * An enum representing a gait type.
+ */
 export type GaitType =
   | "walk"
   | "crawl"
@@ -237,6 +246,9 @@ export type GaitType =
   | { other: string }
   | "unknown";
 
+/**
+ * An enum representing a gait modifier.
+ */
 export type Modifier =
   | "layersSlow"
   | "strength"
@@ -686,6 +698,9 @@ export type CasteTag =
   | "CuriousBeast"
   | "CannotBreatheAir";
 
+/**
+ * A struct representing a creature caste.
+ */
 export type Caste = {
   identifier: string;
   tags: CasteTag[] | null;
@@ -713,6 +728,9 @@ export type Caste = {
   gaits: Gait[] | null;
 };
 
+/**
+ * An enum representing a creature effect property.
+ */
 export type CreatureEffectProperty =
   | "Severity"
   | "Probability"
@@ -736,6 +754,9 @@ export type CreatureEffectProperty =
   | "CanBeHidden"
   | "Unknown";
 
+/**
+ * An enum representing a creature effect token.
+ */
 export type CreatureEffectToken =
   | "Pain"
   | "Swelling"
@@ -788,6 +809,9 @@ export type CreatureEffectToken =
   | "ErraticBehavior"
   | "Unknown";
 
+/**
+ * A creature variation.
+ */
 export type CreatureVariation = {
   metadata: Metadata | null;
   identifier: string;
@@ -796,6 +820,9 @@ export type CreatureVariation = {
   argumentCount: string;
 };
 
+/**
+ * A variation rule for a creature.
+ */
 export type CreatureVariationRule =
   | "Unknown"
   | { RemoveTag: { tag: string; value: string | null } }
@@ -842,6 +869,9 @@ export type CreatureVariationRule =
       };
     };
 
+/**
+ * An enum representing a creature variation tag.
+ */
 export type CVTag =
   | "NewTag"
   | "AddTag"
@@ -856,6 +886,9 @@ export type CVTag =
   | "ConditionalConvertTag"
   | "Unknown";
 
+/**
+ * A struct representing an Entity object.
+ */
 export type Entity = {
   metadata: Metadata | null;
   identifier: string;
@@ -922,6 +955,9 @@ export type Entity = {
   sourceHfid: number | null;
 };
 
+/**
+ * Tokens that can be found in an entity raw file.
+ */
 export type EntityToken =
   | "AllMainPopsControllable"
   | "SiteControllable"
@@ -1082,6 +1118,9 @@ export type EntityToken =
   | "CutEntity"
   | "SelectEntity";
 
+/**
+ * A struct representing a Graphic object.
+ */
 export type Graphic = {
   metadata: Metadata | null;
   identifier: string;
@@ -1095,6 +1134,9 @@ export type Graphic = {
   tags: string[] | null;
 };
 
+/**
+ * A struct representing a sprite graphic.
+ */
 export type SpriteGraphic = {
   primaryCondition: Condition;
   tilePageId: string;
@@ -1108,6 +1150,9 @@ export type SpriteGraphic = {
   extraDescriptor: string | null;
 };
 
+/**
+ * A struct representing a `SpriteLayer` object.
+ */
 export type SpriteLayer = {
   layerName: string;
   tilePageId: string;
@@ -1117,6 +1162,9 @@ export type SpriteLayer = {
   conditions: [Condition, string][] | null;
 };
 
+/**
+ * A struct representing a `TilePage` object.
+ */
 export type TilePage = {
   metadata: Metadata | null;
   identifier: string;
@@ -1126,8 +1174,14 @@ export type TilePage = {
   pageDim: Dimensions;
 };
 
+/**
+ * The color modification of the tile
+ */
 export type ColorModification = "asIs";
 
+/**
+ * A condition that can be applied to a tile/entity
+ */
 export type Condition =
   | "none"
   | "condition"
@@ -1243,6 +1297,9 @@ export type Condition =
   | "bard"
   | "dancer";
 
+/**
+ * The graphic type of the tile
+ */
 export type GraphicType =
   | "creature"
   | "creatureCaste"
@@ -1365,6 +1422,9 @@ export type GraphicType =
   | "weaponUpright9B"
   | "weaponUpright10B";
 
+/**
+ * The growth token of the tile
+ */
 export type GrowthToken =
   | "fruit"
   | "growth1"
@@ -1373,6 +1433,9 @@ export type GrowthToken =
   | "growth4"
   | "asIs";
 
+/**
+ * The graphic of the tile
+ */
 export type PlantGraphicTemplate =
   | "standardLeaves"
   | "standardFruit1"
@@ -1384,8 +1447,14 @@ export type PlantGraphicTemplate =
   | "standardFlowers3"
   | "standardFlowers4";
 
+/**
+ * The tokens used to define the tile page
+ */
 export type TilePageTag = "tileDim" | "pageDim" | "file" | "unknown";
 
+/**
+ * The raw representation of an inorganic object.
+ */
 export type Inorganic = {
   identifier: string;
   metadata: Metadata | null;
@@ -1400,6 +1469,9 @@ export type Inorganic = {
   tags: InorganicToken[] | null;
 };
 
+/**
+ * The class of environment that the stone appears in.
+ */
 export type EnvironmentClass =
   | "AllStone"
   | "IgneousAll"
@@ -1413,6 +1485,9 @@ export type EnvironmentClass =
   | "Alluvial"
   | "None";
 
+/**
+ * The type of inclusion that the stone has.
+ */
 export type InclusionType =
   | "Cluster"
   | "ClusterSmall"
@@ -1420,6 +1495,9 @@ export type InclusionType =
   | "Vein"
   | "None";
 
+/**
+ * Tokens that can be used in inorganic raws.
+ */
 export type InorganicToken =
   | "Wafers"
   | "DeepSpecial"
@@ -1445,6 +1523,9 @@ export type InorganicToken =
   | "Sphere"
   | "Unknown";
 
+/**
+ * A struct representing a material
+ */
 export type Material = {
   materialType: MaterialType | null;
   name: string | null;
@@ -1473,8 +1554,14 @@ export type Material = {
   itemSymbol: string | null;
 };
 
+/**
+ * A material fuel type that can be set in a material definition.
+ */
 export type FuelType = "Charcoal" | "Coke" | "NoMaterialGloss" | "None";
 
+/**
+ * A material property that can be set in a material definition.
+ */
 export type MaterialProperty =
   | "UseMaterialTemplate"
   | "Prefix"
@@ -1554,6 +1641,9 @@ export type MaterialProperty =
   | "MeatCategory"
   | "Unknown";
 
+/**
+ * A material state that can be set in a material definition.
+ */
 export type MaterialState =
   | "Solid"
   | "Liquid"
@@ -1565,6 +1655,9 @@ export type MaterialState =
   | "All"
   | "AllSolid";
 
+/**
+ * A material template
+ */
 export type MaterialType =
   | "Inorganic"
   | "Stone"
@@ -1594,6 +1687,9 @@ export type MaterialType =
   | "Grime"
   | "Unknown";
 
+/**
+ * A material usage that can be set in a material definition.
+ */
 export type MaterialUsage =
   | "ImpliesAnimalKill"
   | "AlcoholPlant"
@@ -1671,6 +1767,9 @@ export type MaterialUsage =
   | "ItemsQuern"
   | "Unknown";
 
+/**
+ * A struct representing a material template
+ */
 export type MaterialTemplate = {
   identifier: string;
   metadata: Metadata | null;
@@ -1678,6 +1777,9 @@ export type MaterialTemplate = {
   material: Material;
 };
 
+/**
+ * A struct representing a plant
+ */
 export type Plant = {
   metadata: Metadata | null;
   identifier: string;
@@ -1694,6 +1796,9 @@ export type Plant = {
   materials: Material[] | null;
 };
 
+/**
+ * The tags of a plant
+ */
 export type PlantTag =
   | "Dry"
   | "Evil"
@@ -1714,6 +1819,9 @@ export type PlantTag =
   | "NameSingular"
   | "Unknown";
 
+/**
+ * A struct representing a plant growth
+ */
 export type PlantGrowth = {
   growthType: GrowthType;
   name: SingPlurName;
@@ -1726,6 +1834,9 @@ export type PlantGrowth = {
   tags: GrowthTag[] | null;
 };
 
+/**
+ * The growth tag of a plant
+ */
 export type GrowthTag =
   | "Growth"
   | "GrowthName"
@@ -1740,6 +1851,9 @@ export type GrowthTag =
   | "GrowthDropsOffNoCloud"
   | "Unknown";
 
+/**
+ * The types of growths
+ */
 export type GrowthType =
   | "Leaves"
   | "Spathes"
@@ -1756,6 +1870,9 @@ export type GrowthType =
   | "Pod"
   | "None";
 
+/**
+ * Parts of a plant
+ */
 export type PlantPart =
   | "Twigs"
   | "Branches"
@@ -1769,6 +1886,9 @@ export type PlantPart =
   | "Sapling"
   | "Unknown";
 
+/**
+ * Represents a position in the government of an entity
+ */
 export type Position = {
   identifier: string;
   allowedClasses: string[] | null;
@@ -1808,6 +1928,9 @@ export type Position = {
   tags: PositionToken[];
 };
 
+/**
+ * Represents a position token
+ */
 export type PositionToken =
   | "AccountExempt"
   | "AllowedClass"
@@ -1867,12 +1990,18 @@ export type PositionToken =
   | "Succession"
   | "Unknown";
 
+/**
+ * A struct representing a seed material
+ */
 export type SeedMaterial = {
   name: SingPlurName;
   color: Color;
   material: string;
 };
 
+/**
+ * A struct representing a creature selection
+ */
 export type SelectCreature = {
   metadata: Metadata | null;
   identifier: string;
@@ -1880,12 +2009,18 @@ export type SelectCreature = {
   tags: string[];
 };
 
+/**
+ * The rules for selecting a creature
+ */
 export type SelectRules =
   | { selectCaste: string }
   | { selectMaterial: string }
   | { selectTissue: string }
   | { selectAdditionalCaste: string };
 
+/**
+ * A shrub in the raws.
+ */
 export type Shrub = {
   growingSeason: SeasonToken[] | null;
   growDuration: number | null;
@@ -1909,8 +2044,14 @@ export type Shrub = {
   extractBarrel: string | null;
 };
 
+/**
+ * The tokens for the seasons
+ */
 export type SeasonToken = "Spring" | "Summer" | "Autumn" | "Winter" | "Unknown";
 
+/**
+ * The tokens for the shrubs
+ */
 export type ShrubToken =
   | "Spring"
   | "Summer"
@@ -1937,6 +2078,9 @@ export type ShrubToken =
   | "ExtractBarrel"
   | "Unknown";
 
+/**
+ * A struct representing a syndrome
+ */
 export type Syndrome = {
   identifier: string | null;
   name: string | null;
@@ -1950,6 +2094,9 @@ export type Syndrome = {
   conditions: string[] | null;
 };
 
+/**
+ * Represents the tokens that can be used in a syndrome definition.
+ */
 export type SyndromeToken =
   | "Name"
   | "Class"
@@ -1966,6 +2113,9 @@ export type SyndromeToken =
   | "Identifier"
   | "Unknown";
 
+/**
+ * A struct representing a tree.
+ */
 export type Tree = {
   material: string;
   trunkName: Name | null;
@@ -2001,6 +2151,9 @@ export type Tree = {
   tags: TreeToken[] | null;
 };
 
+/**
+ * The tokens for the tree parser
+ */
 export type TreeToken =
   | "Tree"
   | "TrunkName"
@@ -2046,6 +2199,9 @@ export type TreeToken =
   | "Sapling"
   | "Unknown";
 
+/**
+ * The placement of twigs on a tree
+ */
 export type TwigPlacement =
   | "SideBranches"
   | "AboveBranches"
@@ -2058,6 +2214,9 @@ export type TwigPlacement =
   | "BelowTrunk"
   | "Unknown";
 
+/**
+ * An unprocessed raw object
+ */
 export type UnprocessedRaw = {
   rawType: ObjectType;
   modifications: Modification[];
@@ -2065,6 +2224,9 @@ export type UnprocessedRaw = {
   identifier: string;
 };
 
+/**
+ * A struct representing a modification to a creature
+ */
 export type Modification =
   | { copyTagsFrom: { identifier: string } }
   | { applyCreatureVariation: { identifier: string } }
@@ -2182,6 +2344,9 @@ export type Name = { singular: string; plural: string; adjective: string };
  */
 export type SingPlurName = { singular: string; plural: string };
 
+/**
+ * The object types that can be parsed by the parser.
+ */
 export type ObjectType =
   | "Creature"
   | "Inorganic"
@@ -2238,8 +2403,14 @@ export type RawModuleLocation =
   | "Unknown"
   | "LegendsExport";
 
+/**
+ * A struct representing a body size in the format `years:days:size_cm3`
+ */
 export type BodySize = { years: number; days: number; sizeCm3: number };
 
+/**
+ * A struct representing a color in the format "foreground:background:brightness".
+ */
 export type Color = {
   foreground: number;
   background: number;
@@ -2275,8 +2446,14 @@ export type Tile = {
   glowColor: Color | null;
 };
 
+/**
+ * A struct representing a Dimensions object.
+ */
 export type Dimensions = { x: number; y: number };
 
+/**
+ * A custom graphic extension.
+ */
 export type CustomGraphicExtension = {
   extensionType: GraphicType;
   tilePageId: string | null;
