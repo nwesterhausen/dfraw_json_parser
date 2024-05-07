@@ -108,7 +108,7 @@ jobs:
 
       - name: Vanilla Raws Cache
         id: vanilla-raws-cache
-        uses: actions/cache@v3
+        uses: actions/cache@e12d46a63a90f2fae62d114769bbf2a179198b5c # v3
         with:
           key: vanilla-raws-${{ vars.DF_VERSION }}
           path: /home/runner/vanilla-raws
