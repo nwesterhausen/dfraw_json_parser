@@ -112,6 +112,8 @@ impl ProgressHelper {
     }
     /// Send an update to the Tauri frontend with the current progress.
     pub fn send_update(&mut self) {
+        use tauri::Manager;
+
         self.tauri_window
             .emit("progress", self.progress_cache.clone())
             .unwrap_or_else(|e| tracing::debug!("Tauri window emit error {:?}", e));
@@ -144,6 +146,8 @@ impl ProgressHelper {
         &self,
         summary: &std::collections::HashMap<crate::ObjectType, usize>,
     ) {
+        use tauri::Manager;
+
         self.tauri_window
             .emit("SUMMARY", summary.clone())
             .unwrap_or_else(|e| tracing::debug!("Tauri window emit error {:?}", e));
