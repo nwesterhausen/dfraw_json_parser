@@ -1,8 +1,8 @@
 on:
   - push
   - pull_request
-name: Clippy Check
-
+name: Test Suite
+permissions: read-all
 env:
   CARGO_TERM_COLOR: always
   # sccache enablement
@@ -11,7 +11,7 @@ env:
 
 jobs:
   clippy_check:
-    name: Clippy Check Nightly
+    name: Clippy Check
     runs-on: ubuntu-latest
     steps:
       - name: Harden Runner
