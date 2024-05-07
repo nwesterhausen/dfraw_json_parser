@@ -2,6 +2,19 @@ use tracing::{debug, warn};
 
 use crate::{creature::Creature, creature_variation::CreatureVariation, ObjectType, RawObject};
 
+/// Apply creature variations to creatures.
+///
+/// # Arguments
+///
+/// * `all_raws` - The list of all raw objects.
+///
+/// # Side Effects
+///
+/// Updates the list of raw objects with the applied creature variations.
+///
+/// # Notes
+///
+/// This function is called after all raw objects have been parsed and before any other processing is done.
 pub fn apply_creature_variations(all_raws: &mut [Box<dyn RawObject>]) {
     let creature_variations: Vec<CreatureVariation> = all_raws
         .iter()
@@ -51,6 +64,18 @@ pub fn apply_creature_variations(all_raws: &mut [Box<dyn RawObject>]) {
     }
 }
 
+/// Apply a single creature variation to a creature.
+///
+/// # Arguments
+///
+/// * `creature` - The creature to apply the variation to.
+/// * `variation` - The variation to apply.
+/// * `creature_variations` - The list of creature variations to apply.
+///
+/// # Returns
+///
+/// The updated creature if the variation was successfully applied, otherwise None.
+#[must_use]
 pub fn singularly_apply_creature_variation(
     creature: &Creature,
     variation: &str,

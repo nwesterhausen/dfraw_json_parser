@@ -5,15 +5,13 @@ use crate::{helpers::build_object_id_from_pieces, ObjectType, RawMetadata, RawOb
 
 use super::{Rule, Token, TOKEN_MAP};
 
-#[derive(ts_rs::TS)]
-#[ts(export)]
+/// A creature variation.
 #[allow(clippy::module_name_repetitions)]
-#[derive(Serialize, Deserialize, Debug, Clone, Default)]
+#[derive(Serialize, Deserialize, Debug, Clone, Default, specta::Type)]
 #[serde(rename_all = "camelCase")]
 pub struct CreatureVariation {
     /// Common Raw file Things
-    #[serde(skip_serializing_if = "RawMetadata::is_hidden")]
-    metadata: RawMetadata,
+    metadata: Option<RawMetadata>,
     identifier: String,
     object_id: String,
 
@@ -43,7 +41,7 @@ impl CreatureVariation {
     /// A new creature variation with the given identifier.
     pub fn new(identifier: &str, metadata: &RawMetadata) -> Self {
         Self {
-            metadata: metadata.clone(),
+            metadata: Some(metadata.clone()),
             identifier: identifier.to_string(),
             object_id: build_object_id_from_pieces(
                 metadata,
@@ -54,21 +52,40 @@ impl CreatureVariation {
             argument_count: 0,
         }
     }
-
+    /// Whether the creature variation is empty.
+    ///
+    /// # Returns
+    ///
+    /// `true` if the creature variation is empty, `false` otherwise.
+    #[must_use]
     pub fn empty() -> Self {
         Self {
-            metadata: RawMetadata::default(),
+            metadata: Some(
+                RawMetadata::default()
+                    .with_object_type(ObjectType::CreatureVariation)
+                    .with_hidden(true),
+            ),
             identifier: String::new(),
             object_id: String::new(),
             rules: Vec::new(),
             argument_count: 0,
         }
     }
-
-    pub fn get_rules(&self) -> &Vec<Rule> {
+    /// Get the rules for the creature variation.
+    ///
+    /// # Returns
+    ///
+    /// `&Vec<Rule>` - The rules for the creature variation.
+    #[must_use]
+    pub const fn get_rules(&self) -> &Vec<Rule> {
         &self.rules
     }
-
+    /// Get the conversion rules for the creature variation.
+    ///
+    /// # Returns
+    ///
+    /// `Vec<&Rule>` - The conversion rules for the creature variation.
+    #[must_use]
     pub fn get_convert_rules(&self) -> Vec<&Rule> {
         self.rules
             .iter()
@@ -80,12 +97,48 @@ impl CreatureVariation {
             })
             .collect()
     }
+
+    /// Function to "clean" the creature. This is used to remove any empty list or strings,
+    /// and to remove any default values. By "removing" it means setting the value to None.
+    ///
+    /// This also will remove the metadata if `is_metadata_hidden` is true.
+    ///
+    /// Steps for all "Option" fields:
+    /// - Set any metadata to None if `is_metadata_hidden` is true.
+    /// - Set any empty string to None.
+    /// - Set any empty list to None.
+    /// - Set any default values to None.
+    ///
+    /// # Returns
+    ///
+    /// A new creature variation with all empty values set to None.
+    #[must_use]
+    pub fn cleaned(&self) -> Self {
+        let mut cleaned = self.clone();
+
+        // Set metadata to None if it's hidden
+        if let Some(metadata) = &cleaned.metadata {
+            if metadata.is_hidden() {
+                cleaned.metadata = None;
+            }
+        }
+
+        cleaned
+    }
 }
 
 #[typetag::serde]
 impl RawObject for CreatureVariation {
-    fn get_metadata(&self) -> &RawMetadata {
-        &self.metadata
+    fn get_metadata(&self) -> RawMetadata {
+        self.metadata.as_ref().map_or_else(
+            || {
+                warn!("Metadata is missing for {}", self.get_identifier());
+                RawMetadata::default()
+                    .with_object_type(ObjectType::CreatureVariation)
+                    .with_hidden(true)
+            },
+            std::clone::Clone::clone,
+        )
     }
 
     fn get_identifier(&self) -> &str {
@@ -98,6 +151,10 @@ impl RawObject for CreatureVariation {
 
     fn get_type(&self) -> &ObjectType {
         &ObjectType::CreatureVariation
+    }
+
+    fn clean_self(&mut self) {
+        *self = self.cleaned();
     }
 
     #[allow(clippy::too_many_lines)]
@@ -185,7 +242,7 @@ impl RawObject for CreatureVariation {
                 let value = if value.is_empty() { None } else { Some(value) };
 
                 self.rules.push(Rule::ConditionalRemoveTag {
-                    tag: tag.to_string(),
+                    tag,
                     value,
                     argument_index,
                     argument_requirement,
@@ -331,8 +388,7 @@ impl Searchable for CreatureVariation {
                     | Rule::ConditionalConvertTag { tag, .. } => tag.clone(),
                     Rule::Unknown => String::new(),
                 })
-                .filter(|s| !s.is_empty())
-                .collect::<Vec<String>>(),
+                .filter(|s| !s.is_empty()),
         );
 
         vec

@@ -32,11 +32,18 @@ slug = "0.1"
 tracing = "0.1.40"
 typetag = "0.2"
 walkdir = "2"
-# Tauri feature dependency needs tauri lib
-tauri = { version = "1.6", optional = true }
 xmlparser = "0.13.6"
 quick-xml = "0.31.0"
 thiserror = "1.0.58"
+
+# Tauri feature dependency needs tauri lib
+[dependencies.tauri]
+version = "2.0.0-beta"
+optional = true
+
+[dependencies.specta]
+version = "1.0.5"
+features = ["typescript", "export"]
 
 [dependencies.phf]
 version = "0.11.2"
@@ -47,8 +54,3 @@ features = ["macros"]
 version = "1.0"
 default-features = true
 features = ["derive"]
-
-[dependencies.ts-rs]
-version = "7.1.1"
-default-features = true
-features = ["serde-compat"]

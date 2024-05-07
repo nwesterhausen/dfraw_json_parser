@@ -3,10 +3,9 @@ use tracing::warn;
 
 use crate::parser::{Color, SingPlurName};
 
-#[derive(ts_rs::TS)]
-#[ts(export)]
+/// A struct representing a seed material
 #[allow(clippy::module_name_repetitions)]
-#[derive(Serialize, Deserialize, Debug, Clone, Default)]
+#[derive(Serialize, Deserialize, Debug, Clone, Default, specta::Type)]
 #[serde(rename_all = "camelCase")]
 pub struct SeedMaterial {
     name: SingPlurName,
@@ -15,10 +14,26 @@ pub struct SeedMaterial {
 }
 
 impl SeedMaterial {
+    /// Whether the seed material is empty
+    ///
+    /// # Returns
+    ///
+    /// * `true` if the seed material is empty
+    #[must_use]
     pub fn is_empty(&self) -> bool {
         self.name.is_empty() && self.color.is_default() && self.material.is_empty()
     }
-    pub fn from_value(value: &str) -> SeedMaterial {
+    /// Create a new seed material based on a value
+    ///
+    /// # Arguments
+    ///
+    /// * `value` - The value to create the seed material from
+    ///
+    /// # Returns
+    ///
+    /// A new seed material
+    #[must_use]
+    pub fn from_value(value: &str) -> Self {
         // Example seed tag:
         // [SEED:apricot pit:apricot pits:6:0:0:LOCAL_PLANT_MAT:SEED]
         // Leaving value to be "apricot pit:apricot pits:6:0:0:LOCAL_PLANT_MAT:SEED"
@@ -31,7 +46,7 @@ impl SeedMaterial {
                 "SeedMaterial::from_value() was provided a value with less than 7 parts: {}",
                 value
             );
-            return SeedMaterial::default();
+            return Self::default();
         }
 
         // The name uses the first two parts
@@ -49,7 +64,7 @@ impl SeedMaterial {
         ));
         // The material uses the remaining parts
         let material = parts.collect::<Vec<&str>>().join(":");
-        SeedMaterial {
+        Self {
             name,
             color,
             material,

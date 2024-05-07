@@ -1,0 +1,12 @@
+[files]
+ignore-hidden = true
+ignore_files = true
+ignore_dot = true
+ignore_vcs = true
+
+[default]
+binary = false
+check_filename = true
+check_file = true
+unicode = true
+locale = "en-us"

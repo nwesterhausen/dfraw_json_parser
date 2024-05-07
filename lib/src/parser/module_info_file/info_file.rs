@@ -16,11 +16,9 @@ use crate::{
 
 use super::steam_data::SteamData;
 
-#[derive(Serialize, Deserialize, Default, Clone, Debug)]
-#[serde(rename_all = "camelCase")]
-#[derive(ts_rs::TS)]
-#[ts(export, rename = "ModuleInfoFile")]
 /// Represents the `info.txt` file for a raw module
+#[derive(Serialize, Deserialize, Default, Clone, Debug, specta::Type)]
+#[serde(rename_all = "camelCase")]
 pub struct InfoFile {
     identifier: String,
     object_id: String,
@@ -33,22 +31,29 @@ pub struct InfoFile {
     author: String,
     name: String,
     description: String,
-    #[serde(skip_serializing_if = "Vec::is_empty")]
-    requires_ids: Vec<String>,
-    #[serde(skip_serializing_if = "Vec::is_empty")]
-    conflicts_with_ids: Vec<String>,
-    #[serde(skip_serializing_if = "Vec::is_empty")]
-    requires_ids_before: Vec<String>,
-    #[serde(skip_serializing_if = "Vec::is_empty")]
-    requires_ids_after: Vec<String>,
-    #[serde(skip_serializing_if = "SteamData::is_empty")]
-    steam_data: SteamData,
+
+    requires_ids: Option<Vec<String>>,
+    conflicts_with_ids: Option<Vec<String>>,
+    requires_ids_before: Option<Vec<String>>,
+    requires_ids_after: Option<Vec<String>>,
+    steam_data: Option<SteamData>,
 }
 
 impl InfoFile {
     /// Creates a new `InfoFile` with the passed identifier, location, and parent directory
+    ///
+    /// # Arguments
+    ///
+    /// * `id` - The identifier for the `InfoFile`
+    /// * `location` - The location the `InfoFile` was parsed from
+    /// * `parent_directory` - The directory the `InfoFile` was parsed from
+    ///
+    /// # Returns
+    ///
+    /// * The `InfoFile`
+    #[must_use]
     pub fn new(id: &str, location: RawModuleLocation, parent_directory: &str) -> Self {
-        InfoFile {
+        Self {
             identifier: String::from(id),
             location,
             parent_directory: String::from(parent_directory),
@@ -57,8 +62,13 @@ impl InfoFile {
         }
     }
     /// Creates a new empty `InfoFile`
+    ///
+    /// # Returns
+    ///
+    /// * The empty `InfoFile`
+    #[must_use]
     pub fn empty() -> Self {
-        InfoFile::default()
+        Self::default()
     }
     /// Creates a new `InfoFile` from the passed `info.txt` file path
     ///
@@ -84,15 +94,14 @@ impl InfoFile {
         let parent_directory = full_path
             .as_ref()
             .parent()
-            .unwrap_or(Path::new(""))
+            .unwrap_or_else(|| Path::new(""))
             .parent()
-            .unwrap_or(Path::new(""))
+            .unwrap_or_else(|| Path::new(""))
             .to_string_lossy()
             .to_string();
         let info_file_path = Path::new(parent_directory.as_str()).join("info.txt");
         Self::parse(&info_file_path)
     }
-    #[allow(clippy::too_many_lines)]
     /// Parses the `info.txt` file at the passed path
     ///
     /// # Arguments
@@ -107,6 +116,7 @@ impl InfoFile {
     ///
     /// * `ParserError::FileNotFound` - If the passed file path does not exist
     /// * `ParserError::IOError` - If there is an error reading the file
+    #[allow(clippy::cognitive_complexity, clippy::too_many_lines)]
     pub fn parse<P: AsRef<Path>>(info_file_path: &P) -> Result<Self, ParserError> {
         let parent_dir = get_parent_dir_name(info_file_path);
         let location = RawModuleLocation::from_info_text_file_path(info_file_path);
@@ -128,7 +138,7 @@ impl InfoFile {
         let reader = BufReader::new(decoding_reader);
 
         // info.txt details
-        let mut info_file_data: InfoFile = InfoFile::new("", location, &parent_dir);
+        let mut info_file_data: Self = Self::new("", location, &parent_dir);
 
         for (index, line) in reader.lines().enumerate() {
             if line.is_err() {
@@ -167,7 +177,7 @@ impl InfoFile {
                     // SECTION FOR MATCHING info.txt DATA
                     "ID" => {
                         // the [ID:identifier] tag should be the top of the info.txt file
-                        info_file_data = InfoFile::new(captured_value, location, &parent_dir);
+                        info_file_data = Self::new(captured_value, location, &parent_dir);
                     }
                     "NUMERIC_VERSION" => match captured_value.parse() {
                         Ok(n) => info_file_data.numeric_version = n,
@@ -230,57 +240,109 @@ impl InfoFile {
                         info_file_data.description = String::from(captured_value);
                     }
                     "REQUIRES_ID" => {
-                        info_file_data
-                            .requires_ids
-                            .push(String::from(captured_value));
+                        if info_file_data.requires_ids.is_none() {
+                            info_file_data.requires_ids = Some(Vec::new());
+                        }
+
+                        if let Some(requires_ids) = info_file_data.requires_ids.as_mut() {
+                            requires_ids.push(String::from(captured_value));
+                        }
                     }
                     "CONFLICTS_WITH_ID" => {
-                        info_file_data
-                            .conflicts_with_ids
-                            .push(String::from(captured_value));
+                        if info_file_data.conflicts_with_ids.is_none() {
+                            info_file_data.conflicts_with_ids = Some(Vec::new());
+                        }
+
+                        if let Some(conflicts_with_ids) = info_file_data.conflicts_with_ids.as_mut()
+                        {
+                            conflicts_with_ids.push(String::from(captured_value));
+                        }
                     }
                     "REQUIRES_ID_BEFORE_ME" => {
-                        info_file_data
-                            .requires_ids_before
-                            .push(String::from(captured_value));
+                        if info_file_data.requires_ids_before.is_none() {
+                            info_file_data.requires_ids_before = Some(Vec::new());
+                        }
+
+                        if let Some(requires_ids_before) =
+                            info_file_data.requires_ids_before.as_mut()
+                        {
+                            requires_ids_before.push(String::from(captured_value));
+                        }
                     }
                     "REQUIRES_ID_AFTER_ME" => {
-                        info_file_data
-                            .requires_ids_after
-                            .push(String::from(captured_value));
+                        if info_file_data.requires_ids_after.is_none() {
+                            info_file_data.requires_ids_after = Some(Vec::new());
+                        }
+
+                        if let Some(requires_ids_after) = info_file_data.requires_ids_after.as_mut()
+                        {
+                            requires_ids_after.push(String::from(captured_value));
+                        }
                     }
                     "STEAM_TITLE" => {
-                        info_file_data
-                            .steam_data
-                            .set_title(&String::from(captured_value));
+                        if info_file_data.steam_data.is_none() {
+                            info_file_data.steam_data = Some(SteamData::default());
+                        }
+
+                        if let Some(steam_data) = info_file_data.steam_data.as_mut() {
+                            steam_data.set_title(&String::from(captured_value));
+                        }
                     }
                     "STEAM_DESCRIPTION" => {
-                        info_file_data
-                            .steam_data
-                            .set_description(&String::from(captured_value));
+                        if info_file_data.steam_data.is_none() {
+                            info_file_data.steam_data = Some(SteamData::default());
+                        }
+
+                        if let Some(steam_data) = info_file_data.steam_data.as_mut() {
+                            steam_data.set_description(&String::from(captured_value));
+                        }
                     }
                     "STEAM_TAG" => {
-                        info_file_data
-                            .steam_data
-                            .add_tag(&String::from(captured_value));
+                        if info_file_data.steam_data.is_none() {
+                            info_file_data.steam_data = Some(SteamData::default());
+                        }
+
+                        if let Some(steam_data) = info_file_data.steam_data.as_mut() {
+                            steam_data.add_tag(&String::from(captured_value));
+                        }
                     }
                     "STEAM_KEY_VALUE_TAG" => {
-                        info_file_data
-                            .steam_data
-                            .add_key_value_tag(&String::from(captured_value));
+                        if info_file_data.steam_data.is_none() {
+                            info_file_data.steam_data = Some(SteamData::default());
+                        }
+
+                        if let Some(steam_data) = info_file_data.steam_data.as_mut() {
+                            steam_data.add_key_value_tag(&String::from(captured_value));
+                        }
                     }
                     "STEAM_METADATA" => {
-                        info_file_data
-                            .steam_data
-                            .add_metadata(&String::from(captured_value));
+                        if info_file_data.steam_data.is_none() {
+                            info_file_data.steam_data = Some(SteamData::default());
+                        }
+
+                        if let Some(steam_data) = info_file_data.steam_data.as_mut() {
+                            steam_data.add_metadata(&String::from(captured_value));
+                        }
                     }
                     "STEAM_CHANGELOG" => {
-                        info_file_data
-                            .steam_data
-                            .set_changelog(&String::from(captured_value));
+                        if info_file_data.steam_data.is_none() {
+                            info_file_data.steam_data = Some(SteamData::default());
+                        }
+
+                        if let Some(steam_data) = info_file_data.steam_data.as_mut() {
+                            steam_data.set_changelog(&String::from(captured_value));
+                        }
                     }
                     "STEAM_FILE_ID" => match captured_value.parse() {
-                        Ok(n) => info_file_data.steam_data.set_file_id(n),
+                        Ok(n) => {
+                            if info_file_data.steam_data.is_none() {
+                                info_file_data.steam_data = Some(SteamData::default());
+                            }
+
+                            if let Some(steam_data) = info_file_data.steam_data.as_mut() {
+                                steam_data.set_file_id(n);
+                            }
+                        }
                         Err(_e) => {
                             warn!(
                                 "ModuleInfoFile::parse: 'STEAM_FILE_ID' should be integer, was {} in {}",
@@ -291,7 +353,15 @@ impl InfoFile {
                             let digits_only =
                                 NON_DIGIT_RE.replace_all(captured_value, "").to_string();
                             match digits_only.parse() {
-                                Ok(n) => info_file_data.steam_data.set_file_id(n),
+                                Ok(n) => {
+                                    if info_file_data.steam_data.is_none() {
+                                        info_file_data.steam_data = Some(SteamData::default());
+                                    }
+
+                                    if let Some(steam_data) = info_file_data.steam_data.as_mut() {
+                                        steam_data.set_file_id(n);
+                                    }
+                                }
                                 Err(_e) => {
                                     debug!(
                                         "ModuleInfoFile::parse: Unable to parse any numbers from {} for STEAM_FILE_ID",
@@ -327,7 +397,7 @@ impl InfoFile {
         String::from(&self.identifier)
     }
     /// Returns the location the `InfoFile` was parsed from
-    pub fn get_location(&self) -> RawModuleLocation {
+    pub const fn get_location(&self) -> RawModuleLocation {
         self.location
     }
     /// Returns the description for the `InfoFile`

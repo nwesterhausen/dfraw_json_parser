@@ -1,11 +1,9 @@
 use serde::{Deserialize, Serialize};
 use std::fmt::Debug;
 
-#[derive(ts_rs::TS)]
-#[ts(export)]
-#[derive(Serialize, Deserialize, Debug, Clone, Default)]
-#[serde(rename_all = "camelCase", rename = "StateName")]
 /// Represents the name of a materials 3 states (solid, liquid, gas)
+#[derive(Serialize, Deserialize, Debug, Clone, Default, specta::Type)]
+#[serde(rename_all = "camelCase", rename = "StateName")]
 pub struct Name {
     solid: String,
     liquid: String,
@@ -13,18 +11,44 @@ pub struct Name {
 }
 
 impl Name {
+    /// Returns whether the name is empty
+    ///
+    /// # Returns
+    ///
+    /// * `true` if the name is empty, `false` otherwise.
+    #[must_use]
     pub fn is_empty(&self) -> bool {
         self.solid.is_empty() && self.liquid.is_empty() && self.gas.is_empty()
     }
+    /// Sets the solid name
+    ///
+    /// # Arguments
+    ///
+    /// * `name` - The name to set
     pub fn set_solid(&mut self, name: &str) {
         self.solid = String::from(name);
     }
+    /// Sets the liquid name
+    ///
+    /// # Arguments
+    ///
+    /// * `name` - The name to set
     pub fn set_liquid(&mut self, name: &str) {
         self.liquid = String::from(name);
     }
+    /// Sets the gas name
+    ///
+    /// # Arguments
+    ///
+    /// * `name` - The name to set
     pub fn set_gas(&mut self, name: &str) {
         self.gas = String::from(name);
     }
+    /// Adds a name from a value
+    ///
+    /// # Arguments
+    ///
+    /// * `value` - The value to add (e.g. `ALL_SOLID:STONE`)
     pub fn add_from_value(&mut self, value: &str) {
         // Split the value into a descriptor and value
         let split = value.split(':').collect::<Vec<&str>>();
@@ -59,6 +83,12 @@ impl Name {
             _ => (),
         }
     }
+    /// Returns the state names as a vector of strings
+    ///
+    /// # Returns
+    ///
+    /// * `Vec<String>` - The state names as a vector of strings
+    #[must_use]
     pub fn as_vec(&self) -> Vec<String> {
         let mut vec = Vec::new();
         if !self.solid.is_empty() {

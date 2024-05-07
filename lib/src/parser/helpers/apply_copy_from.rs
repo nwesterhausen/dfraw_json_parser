@@ -7,6 +7,19 @@ use crate::parser::{
     ObjectType, RawObject,
 };
 
+/// Apply copy tags from one creature to another.
+///
+/// # Arguments
+///
+/// * `all_raws` - The list of all raw objects.
+///
+/// # Side Effects
+///
+/// Updates the list of raw objects with the applied copy tags.
+///
+/// # Notes
+///
+/// This function is called after all raw objects have been parsed and before any other processing is done.
 #[allow(clippy::too_many_lines)]
 pub fn apply_copy_tags_from(all_raws: &mut Vec<Box<dyn RawObject>>) {
     let untouched_raws: Vec<_> = all_raws
@@ -90,12 +103,7 @@ pub fn apply_copy_tags_from(all_raws: &mut Vec<Box<dyn RawObject>>) {
 
     let mut object_ids_to_purge: Vec<&str> = Vec::new();
 
-    object_ids_to_purge.extend(
-        new_creatures
-            .iter()
-            .map(RawObject::get_object_id)
-            .collect::<Vec<&str>>(),
-    );
+    object_ids_to_purge.extend(new_creatures.iter().map(RawObject::get_object_id));
 
     let mut new_raws: Vec<Box<dyn RawObject>> =
         with_purge(all_raws, object_ids_to_purge.as_slice());

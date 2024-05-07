@@ -1,5 +1,5 @@
 use super::tokens::CVTag;
-
+/// A map of all the creature variation tags to strings
 pub static CV_TOKENS: phf::Map<&'static str, CVTag> = phf::phf_map! {
     "CV_NEW_TAG" => CVTag::NewTag,
     "CV_ADD_TAG" => CVTag::AddTag,

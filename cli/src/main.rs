@@ -1,3 +1,12 @@
+//! The CLI for the `dfraw-json-parser` crate.
+//!
+//! This crate is a command-line interface for the `dfraw-json-parser` crate, which parses Dwarf Fortress raw files and exports them as JSON.
+//!
+//! # Usage
+//!
+//! ```sh
+//! dfraw-json-parser [OPTIONS] <dwarf-fortress-path>
+//! ```
 use dfraw_json_parser::{ObjectType, ParserOptions, RawModuleLocation};
 
 use std::path::{Path, PathBuf};

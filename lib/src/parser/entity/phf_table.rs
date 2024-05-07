@@ -1,4 +1,5 @@
 use super::tokens::EntityToken;
+/// A map of all the entity tokens to strings
 pub static ENTITY_TOKENS: phf::Map<&'static str, EntityToken> = phf::phf_map! {
     "ALL_MAIN_POPS_CONTROLLABLE" => EntityToken::AllMainPopsControllable,
     "SITE_CONTROLLABLE" => EntityToken::SiteControllable,

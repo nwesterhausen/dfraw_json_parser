@@ -6,61 +6,103 @@ use std::{
 use serde::{Deserialize, Serialize};
 use tracing::warn;
 
-#[derive(ts_rs::TS)]
-#[ts(export)]
-#[derive(Serialize, Debug, Deserialize, Clone, Copy, PartialEq, Eq, Default, Hash)]
 /// Raws are part of modules since 50.xx. Raw modules are loaded from 3 common locations:
 /// `{df_directory}/data/vanilla`, `{df_directory}/mods`, and `{df_directory/data/installed_mods}`
+#[derive(
+    Serialize, Debug, Deserialize, Clone, Copy, PartialEq, Eq, Default, Hash, specta::Type,
+)]
 pub enum RawModuleLocation {
+    /// The "installed" mods directory
     InstalledMods,
+    /// The "downloaded" mods directory
     Mods,
+    /// The vanilla data file location
     Vanilla,
+    /// An unknown location
     #[default]
     Unknown,
+    /// Used for handling legends exported files
     LegendsExport,
 }
 
 impl RawModuleLocation {
+    /// Returns the path of the raw module location
+    ///
+    /// # Returns
+    ///
+    /// * A `PathBuf` representing the path of the raw module location
+    #[must_use]
     pub fn get_path(self) -> PathBuf {
         match self {
-            RawModuleLocation::Mods => PathBuf::from("mods"),
-            RawModuleLocation::InstalledMods => ["data", "installed_mods"].iter().collect(),
-            RawModuleLocation::Vanilla => ["data", "vanilla"].iter().collect(),
-            RawModuleLocation::Unknown => PathBuf::from("unknown"),
-            RawModuleLocation::LegendsExport => PathBuf::from("."),
+            Self::Mods => PathBuf::from("mods"),
+            Self::InstalledMods => ["data", "installed_mods"].iter().collect(),
+            Self::Vanilla => ["data", "vanilla"].iter().collect(),
+            Self::Unknown => PathBuf::from("unknown"),
+            Self::LegendsExport => PathBuf::from("."),
         }
     }
+    /// Returns a `RawModuleLocation` from a path
+    ///
+    /// # Arguments
+    ///
+    /// * `df_directory` - The path to the Dwarf Fortress directory
+    ///
+    /// # Returns
+    ///
+    /// * A `RawModuleLocation` representing the path
+    #[must_use]
     pub fn from_path<P: AsRef<Path>>(path: &P) -> Self {
-        match path.as_ref().file_name() {
-            Some(file_name) => match file_name.to_string_lossy().as_ref() {
-                "mods" => RawModuleLocation::Mods,
-                "installed_mods" => RawModuleLocation::InstalledMods,
-                "vanilla" => RawModuleLocation::Vanilla,
-                _ => {
-                    warn!(
-                        "RawModuleLocation - Unable to match source directory \"{dir}\"",
-                        dir = file_name.to_string_lossy()
-                    );
-                    RawModuleLocation::Unknown
+        path.as_ref()
+            .file_name()
+            .map_or(Self::Unknown, |file_name| {
+                match file_name.to_string_lossy().as_ref() {
+                    "mods" => Self::Mods,
+                    "installed_mods" => Self::InstalledMods,
+                    "vanilla" => Self::Vanilla,
+                    _ => {
+                        warn!(
+                            "RawModuleLocation - Unable to match source directory \"{dir}\"",
+                            dir = file_name.to_string_lossy()
+                        );
+                        Self::Unknown
+                    }
                 }
-            },
-            None => RawModuleLocation::Unknown,
-        }
+            })
     }
+    /// Returns a `RawModuleLocation` from a sourced directory
+    ///
+    /// # Arguments
+    ///
+    /// * `sourced_directory` - The sourced directory
+    ///
+    /// # Returns
+    ///
+    /// * A `RawModuleLocation` representing the sourced directory
+    #[must_use]
     pub fn from_sourced_directory(sourced_directory: &str) -> Self {
         match sourced_directory {
-            "mods" => RawModuleLocation::Mods,
-            "vanilla" => RawModuleLocation::Vanilla,
-            "installed_mods" => RawModuleLocation::InstalledMods,
+            "mods" => Self::Mods,
+            "vanilla" => Self::Vanilla,
+            "installed_mods" => Self::InstalledMods,
             _ => {
                 warn!(
                     "RawModuleLocation - Unable to match source directory \"{dir}\"",
                     dir = sourced_directory
                 );
-                RawModuleLocation::Unknown
+                Self::Unknown
             }
         }
     }
+    /// Returns a `RawModuleLocation` from an info.txt file path
+    ///
+    /// # Arguments
+    ///
+    /// * `full_path` - The full path to the info.txt file
+    ///
+    /// # Returns
+    ///
+    /// * A `RawModuleLocation` representing the info.txt file path
+    #[must_use]
     pub fn from_info_text_file_path<P: AsRef<Path>>(full_path: &P) -> Self {
         // info.txt is relative by 2 parents from our module location
         // <MODULE LOCATION>/<RAW MODULE>/info.txt
@@ -75,9 +117,9 @@ impl RawModuleLocation {
                     );
                     return Self::from_sourced_directory(path_string.as_str());
                 }
-                None => RawModuleLocation::Unknown,
+                None => Self::Unknown,
             },
-            None => RawModuleLocation::Unknown,
+            None => Self::Unknown,
         }
     }
 }

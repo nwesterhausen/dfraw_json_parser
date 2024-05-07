@@ -1,4 +1,5 @@
 use super::tokens::PositionToken;
+/// Mapping of position tokens to strings
 pub static POSITION_TOKENS: phf::Map<&'static str, PositionToken> = phf::phf_map! {
     "ACCOUNT_EXEMPT" => PositionToken::AccountExempt,
     "ALLOWED_CLASS" => PositionToken::AllowedClass,

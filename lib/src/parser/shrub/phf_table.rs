@@ -1,5 +1,6 @@
 use super::tokens::ShrubToken;
 
+/// The mappping of shrub tokens to their string representation
 pub static SHRUB_TOKENS: phf::Map<&'static str, ShrubToken> = phf::phf_map! {
     "SPRING" => ShrubToken::Spring,
     "SUMMER" => ShrubToken::Summer,

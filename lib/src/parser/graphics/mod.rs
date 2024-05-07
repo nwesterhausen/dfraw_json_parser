@@ -22,6 +22,6 @@ pub use tile_page::TilePage;
 pub use tokens::ColorModification as ColorModificationToken;
 pub use tokens::Condition as ConditionToken;
 pub use tokens::GraphicType as GraphicTypeToken;
-pub use tokens::GrowthTag as GrowthToken;
+pub use tokens::GrowthToken;
 pub use tokens::PlantGraphicTemplate as PlantGraphicTemplateToken;
 pub use tokens::TilePageTag as TilePageToken;

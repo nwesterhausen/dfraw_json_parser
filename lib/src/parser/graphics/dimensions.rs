@@ -1,9 +1,8 @@
 use serde::{Deserialize, Serialize};
 use tracing::{error, warn};
 
-#[derive(ts_rs::TS)]
-#[ts(export)]
-#[derive(Serialize, Deserialize, Copy, Clone, Debug, Default)]
+/// A struct representing a Dimensions object.
+#[derive(Serialize, Deserialize, Copy, Clone, Debug, Default, specta::Type)]
 pub struct Dimensions {
     x: i32,
     y: i32,
@@ -11,15 +10,42 @@ pub struct Dimensions {
 
 #[allow(dead_code)] // Until we add graphics parsing
 impl Dimensions {
-    pub fn zero() -> Self {
+    /// Function to create a new Dimensions object with x and y set to 0.
+    ///
+    /// # Returns
+    ///
+    /// * `Dimensions` - The new Dimensions object with x and y set to 0.
+    #[must_use]
+    pub const fn zero() -> Self {
         Self { x: 0, y: 0 }
     }
-    pub fn from_xy(x: i32, y: i32) -> Self {
+    /// Function to create a new Dimensions object with given x and y values.
+    ///
+    /// # Parameters
+    ///
+    /// * `x` - The x value for the new Dimensions object.
+    /// * `y` - The y value for the new Dimensions object.
+    ///
+    /// # Returns
+    ///
+    /// * `Dimensions` - The new Dimensions object with the given x and y values.
+    #[must_use]
+    pub const fn from_xy(x: i32, y: i32) -> Self {
         Self { x, y }
     }
+    /// Function to create a new Dimensions object from a token.
+    ///
+    /// # Parameters
+    ///
+    /// * `token` - The token to parse.
+    ///
+    /// # Returns
+    ///
+    /// * `Dimensions` - The new Dimensions object parsed from the token.
+    #[must_use]
     pub fn from_token(token: &str) -> Self {
         let split = token.split(':').collect::<Vec<&str>>();
-        //	[TILE_DIM:32:32]
+        //  [TILE_DIM:32:32]
 
         let Some(dim_x) = split.first() else {
             error!(
@@ -53,18 +79,40 @@ impl Dimensions {
 
         Self { x, y }
     }
-    pub fn empty() -> Self {
-        Dimensions::zero()
+    /// Returns an empty Dimensions object.
+    ///
+    /// # Returns
+    ///
+    /// * `Dimensions` - The empty Dimensions object.
+    #[must_use]
+    pub const fn empty() -> Self {
+        Self::zero()
     }
-    pub fn new() -> Self {
-        Dimensions::zero()
+    /// Create a new Dimensions object.
+    ///
+    /// # Returns
+    ///
+    /// * `Dimensions` - The new Dimensions object.
+    #[must_use]
+    pub const fn new() -> Self {
+        Self::zero()
     }
-    pub fn is_default(self) -> bool {
+    /// Whether the Dimensions object is the default.
+    ///
+    /// # Returns
+    ///
+    /// * `true` - If the Dimensions object is the default.
+    #[must_use]
+    pub const fn is_default(self) -> bool {
         self.x == 0 && self.y == 0
     }
-    /// Used in serialization
-    #[allow(clippy::trivially_copy_pass_by_ref)]
-    pub fn is_empty(&self) -> bool {
+    /// Whether the Dimensions object is empty.
+    ///
+    /// # Returns
+    ///
+    /// * `true` - If the Dimensions object is empty.
+    #[must_use]
+    pub const fn is_empty(&self) -> bool {
         self.is_default()
     }
 }

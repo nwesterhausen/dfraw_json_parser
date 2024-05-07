@@ -1,5 +1,6 @@
 use super::tokens::{EnvironmentClass, InclusionType, InorganicToken};
 
+/// Map of inorganic tokens to their string representation.
 pub static INORGANIC_TOKENS: phf::Map<&'static str, InorganicToken> = phf::phf_map! {
     "WAFERS" => InorganicToken::Wafers,
     "DEEP_SPECIAL" => InorganicToken::DeepSpecial,
@@ -25,6 +26,7 @@ pub static INORGANIC_TOKENS: phf::Map<&'static str, InorganicToken> = phf::phf_m
     "SPHERE" => InorganicToken::Sphere,
 };
 
+/// Map of environment classes to their string representation.
 pub static ENVIRONMENT_CLASS_TOKENS: phf::Map<&'static str, EnvironmentClass> = phf::phf_map! {
     "ALL_STONE" => EnvironmentClass::AllStone,
     "IGNEOUS_ALL" => EnvironmentClass::IgneousAll,
@@ -38,6 +40,7 @@ pub static ENVIRONMENT_CLASS_TOKENS: phf::Map<&'static str, EnvironmentClass> = 
     "ALLUVIAL" => EnvironmentClass::Alluvial,
 };
 
+/// Map of inclusion types to their string representation.
 pub static INCLUSION_TYPE_TOKENS: phf::Map<&'static str, InclusionType> = phf::phf_map! {
     "CLUSTER" => InclusionType::Cluster,
     "CLUSTER_SMALL" => InclusionType::ClusterSmall,

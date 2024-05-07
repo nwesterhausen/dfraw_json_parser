@@ -1,5 +1,6 @@
-use super::tokens::{Condition, GraphicType, GrowthTag, PlantGraphicTemplate, TilePageTag};
+use super::tokens::{Condition, GraphicType, GrowthToken, PlantGraphicTemplate, TilePageTag};
 
+/// Map of condition tags to their string representation.
 pub static CONDITION_TAGS: phf::Map<&'static str, Condition> = phf::phf_map! {
     "DEFAULT" => Condition::Default,
     "ANIMATED" => Condition::Animated,
@@ -119,6 +120,7 @@ pub static CONDITION_TAGS: phf::Map<&'static str, Condition> = phf::phf_map! {
     "DANCER" => Condition::Dancer,
 };
 
+/// Map of graphic type tags to their string representation.
 pub static CUSTOM_GRAPHIC_TAGS: phf::Map<&'static str, GraphicType> = phf::phf_map! {
     // [CUSTOM_EDGING:1] can be from 1 to 32, lower number is printed with higher priority,
     // all win out over regular grass
@@ -143,6 +145,7 @@ pub static CUSTOM_GRAPHIC_TAGS: phf::Map<&'static str, GraphicType> = phf::phf_m
     "CUSTOM_EDGE_SE" => GraphicType::CustomEdgeSE,
 };
 
+/// Map of graphic type tags to their string representation.
 pub static GRAPHIC_TYPE_TAGS: phf::Map<&'static str, GraphicType> = phf::phf_map! {
     "CREATURE_GRAPHICS" => GraphicType::Creature,
     "CREATURE_CASTE_GRAPHICS" => GraphicType::CreatureCaste,
@@ -237,7 +240,7 @@ pub static GRAPHIC_TYPE_TAGS: phf::Map<&'static str, GraphicType> = phf::phf_map
     "TOOL_GRAPHICS_HIVE_BLD" => GraphicType::ToolHiveBuilding,
     // [TOOL_GRAPHICS_GLASS:1:ITEM_BOOKCASE:0:3]
     "TOOL_GRAPHICS_GLASS" => GraphicType::ToolGlass,
-    // 	[TOOL_GRAPHICS_SHAPE:PLATONIC_CUBE:TOOLS:1:29]
+    // [TOOL_GRAPHICS_SHAPE:PLATONIC_CUBE:TOOLS:1:29]
     "TOOL_GRAPHICS_SHAPE" => GraphicType::ToolShape,
     // [TOOL_GRAPHICS_GLASS_VARIANT:3:ITEM_BOOKCASE:9:3]
     "TOOL_GRAPHICS_GLASS_VARIANT" => GraphicType::ToolGlassVariant,
@@ -373,18 +376,20 @@ pub static GRAPHIC_TYPE_TAGS: phf::Map<&'static str, GraphicType> = phf::phf_map
 
 };
 
-pub static GROWTH_TAGS: phf::Map<&'static str, GrowthTag> = phf::phf_map! {
-    "GROWTH_FRUIT" => GrowthTag::Fruit,
+/// Map of growth token tags to their string representation.
+pub static GROWTH_TAGS: phf::Map<&'static str, GrowthToken> = phf::phf_map! {
+    "GROWTH_FRUIT" => GrowthToken::Fruit,
     // [GROWTH_1:GRASS_FLOWERS:0:1]
-    "GROWTH_1" => GrowthTag::Growth1,
+    "GROWTH_1" => GrowthToken::Growth1,
     // [GROWTH_2:GRASS_FLOWERS:1:1]
-    "GROWTH_2" => GrowthTag::Growth2,
+    "GROWTH_2" => GrowthToken::Growth2,
     // [GROWTH_3:GRASS_FLOWERS:2:1]
-    "GROWTH_3" => GrowthTag::Growth3,
+    "GROWTH_3" => GrowthToken::Growth3,
     // [GROWTH_4:GRASS_FLOWERS:3:1]
-    "GROWTH_4" => GrowthTag::Growth4,
+    "GROWTH_4" => GrowthToken::Growth4,
 };
 
+/// Map of tile page tags to their string representation.
 pub static TILE_PAGE_TAGS: phf::Map<&'static str, TilePageTag> = phf::phf_map! {
     "TILE_DIM" => TilePageTag::TileDim,
     "PAGE_DIM_PIXELS" => TilePageTag::PageDim,
@@ -392,6 +397,7 @@ pub static TILE_PAGE_TAGS: phf::Map<&'static str, TilePageTag> = phf::phf_map! {
     "FILE" => TilePageTag::File,
 };
 
+/// Map of plant graphic templates to their string representation.
 pub static PLANT_GRAPHIC_TEMPLATES: phf::Map<&'static str, PlantGraphicTemplate> = phf::phf_map! {
     "STANDARD_LEAVES" => PlantGraphicTemplate::StandardLeaves,
     "STANDARD_FLOWERS_1" => PlantGraphicTemplate::StandardFlowers1,

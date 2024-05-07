@@ -58,28 +58,6 @@ pub struct FileParseResults {
 ///
 /// * `Result<FileParseResults, ParserError>` - The results of parsing the raw file.
 ///
-/// # Examples
-///
-/// `parse_raw_file` is called by `parse` when parsing to get the actual raw data.
-///
-/// ```
-/// use std::path::PathBuf;
-/// use dfraw_json_parser::{ObjectType, parse, ParserOptions, ParseResult};
-///
-/// let mut options = ParserOptions::default();
-///
-/// let amphibian_raw = PathBuf::from("./tests/data/creature_amphibians.txt");
-/// let c_variation_raw = PathBuf::from("./tests/data/c_variation_default.txt");
-///
-/// options.add_raw_file_to_parse(&amphibian_raw);
-/// options.add_raw_file_to_parse(&c_variation_raw); // Required to resolve the `apply_creature_variation` tags
-///
-/// let results: ParseResult = parse(&options).unwrap();
-///
-/// // Should have parsed 3 amphibians and 32 creature variations (total of 35 raws)
-/// assert_eq!(results.raws.len(), 35);
-/// ```
-///
 /// # Errors
 ///
 /// * `ParserError::InvalidRawFile` - If the raw file is invalid.
@@ -112,7 +90,24 @@ pub fn parse_raw_file<P: AsRef<Path>>(
     parse_raw_file_with_info(raw_file_path, &mod_info_file, options)
 }
 
-#[allow(clippy::too_many_lines)]
+/// Parse a raw file into a list of parsed raws and a list of unprocessed raws.
+///
+/// # Arguments
+///
+/// * `raw_file_path` - The path to the raw file to parse.
+/// * `mod_info_file` - The module info file for the raw file.
+/// * `options` - The parser options to use when parsing the raw file.
+///
+/// # Returns
+///
+/// * `Result<FileParseResults, ParserError>` - The results of parsing the raw file.
+///
+/// # Errors
+///
+/// * `ParserError::InvalidRawFile` - If the raw file is invalid.
+/// * `ParserError::IOError` - If there is an error reading the raw file.
+/// * `ParserError::ModuleInfoFileError` - If there is an error reading the module info file.
+#[allow(clippy::too_many_lines, clippy::cognitive_complexity)]
 pub fn parse_raw_file_with_info<P: AsRef<Path>>(
     raw_file_path: &P,
     mod_info_file: &ModuleInfoFile,

@@ -2,6 +2,7 @@ use std::fmt::{Debug, Display};
 
 use serde::{Deserialize, Serialize};
 
+/// A map of the object tokens to their respective object types.
 pub static OBJECT_TOKEN_MAP: phf::Map<&'static str, ObjectType> = phf::phf_map! {
     "CREATURE" => ObjectType::Creature,
     "INORGANIC" => ObjectType::Inorganic,
@@ -45,53 +46,95 @@ pub static OBJECT_TOKEN_MAP: phf::Map<&'static str, ObjectType> = phf::phf_map! 
     "INTERACTION" => ObjectType::Interaction,
 };
 
-#[derive(ts_rs::TS)]
-#[ts(export)]
-#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize, Default, Hash)]
+/// The object types that can be parsed by the parser.
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize, Default, Hash, specta::Type)]
 pub enum ObjectType {
+    /// A creature
     Creature,
+    /// An inorganic material
     Inorganic,
+    /// A plant
     Plant,
+    /// An item
     Item,
+    /// An item of type ammo
     ItemAmmo,
+    /// An item of type armor
     ItemArmor,
+    /// An item of type food
     ItemFood,
+    /// An item of type gloves
     ItemGloves,
+    /// An item of type helm
     ItemHelm,
+    /// An item of type instrument
     ItemInstrument,
+    /// An item of type pants
     ItemPants,
+    /// An item of type shield
     ItemShield,
+    /// An item of type shoes
     ItemShoes,
+    /// An item of type siege ammo
     ItemSiegeAmmo,
+    /// An item of type tool
     ItemTool,
+    /// An item of type toy
     ItemToy,
+    /// An item of type trap component
     ItemTrapComponent,
+    /// An item of type weapon
     ItemWeapon,
+    /// A building
     Building,
+    /// A workshop building
     BuildingWorkshop,
+    /// A furnace building
     BuildingFurnace,
+    /// A reaction
     Reaction,
+    /// Graphics
     Graphics,
+    /// A material template
     MaterialTemplate,
+    /// A body detail plan
     BodyDetailPlan,
+    /// A body
     Body,
+    /// An entity
     Entity,
+    /// A language
     Language,
+    /// A translation
     Translation,
+    /// A tissue template
     TissueTemplate,
+    /// A creature variation
     CreatureVariation,
+    /// A text set
     TextSet,
+    /// A tile page
     TilePage,
+    /// A descriptor color
     DescriptorColor,
+    /// A descriptor pattern
     DescriptorPattern,
+    /// A descriptor shape
     DescriptorShape,
+    /// A palette
     Palette,
+    /// Music
     Music,
+    /// Sound
     Sound,
+    /// An interaction
     Interaction,
+    /// An unknown object type
     #[default]
     Unknown,
+    /// `SelectCreature` tag
     SelectCreature,
+    /// A creature caste
     CreatureCaste,
 }
 

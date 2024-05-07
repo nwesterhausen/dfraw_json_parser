@@ -4,10 +4,6 @@ use serde::{Deserialize, Serialize};
 
 use crate::{ModuleInfoFile, ObjectType, RawModuleLocation};
 
-#[derive(Serialize, Deserialize, Clone, Debug, Default)]
-#[serde(rename_all = "camelCase")]
-#[derive(ts_rs::TS)]
-#[ts(export, rename = "RawMetadata")]
 /// The `RawMetadata` struct represents metadata about a raw module in Rust, including its name,
 /// version, file path, identifier, object type, module location, and visibility status.
 ///
@@ -31,6 +27,8 @@ use crate::{ModuleInfoFile, ObjectType, RawModuleLocation};
 /// * `hidden`: The `hidden` property is a boolean value that indicates whether the raw metadata should
 /// be hidden or not when exporting. By default, it is set to `true`, meaning that the raw metadata will
 /// be hidden unless specified in the `ParsingOptions` struct.
+#[derive(Serialize, Deserialize, Clone, Debug, Default, specta::Type)]
+#[serde(rename_all = "camelCase")]
 pub struct Metadata {
     // The object_id of the raw module
     module_object_id: String,
@@ -55,6 +53,20 @@ pub struct Metadata {
 }
 
 impl Metadata {
+    /// Create a new `RawMetadata` instance.
+    ///
+    /// # Arguments
+    ///
+    /// * `module_info` - The `ModuleInfoFile` instance containing the module information.
+    /// * `object_type` - The `ObjectType` of the raw data.
+    /// * `raw_identifier` - The identifier of the raw data.
+    /// * `raw_file_path` - The path to the raw file.
+    /// * `attach_metadata_to_raws` - Whether to attach metadata to raws.
+    ///
+    /// # Returns
+    ///
+    /// A new `RawMetadata` instance.
+    #[must_use]
     pub fn new<P: AsRef<Path>>(
         module_info: &ModuleInfoFile,
         object_type: &ObjectType,
@@ -74,35 +86,152 @@ impl Metadata {
         }
     }
     /// (Hidden from export) Used only for serialization
-    pub fn is_hidden(&self) -> bool {
+    ///
+    /// # Returns
+    ///
+    /// * `true` if the metadata is hidden, `false` otherwise.
+    #[must_use]
+    pub const fn is_hidden(&self) -> bool {
         self.hidden
     }
     /// Get the identifier of the raw file the raw is from.
+    ///
+    /// # Returns
+    ///
+    /// * The identifier of the raw file as a `&str`
     pub fn get_raw_identifier(&self) -> &str {
         &self.raw_identifier
     }
     /// Get the name of the module the raw is from.
+    ///
+    /// # Returns
+    ///
+    /// * The name of the module as a `&str`
     pub fn get_module_name(&self) -> &str {
         &self.module_name
     }
     /// Get the (numeric) version of the module the raw is from.
+    ///
+    /// # Returns
+    ///
+    /// * The version of the module as a `&str`
     pub fn get_module_numerical_version(&self) -> &str {
         &self.module_version
     }
     /// Get the (string) version of the module the raw is from.
+    ///
+    /// # Returns
+    ///
+    /// * The version of the module as a `&str`
     pub fn get_module_version(&self) -> &str {
         &self.module_version
     }
     /// Get the full path to the raw file the raw is from.
+    ///
+    /// # Returns
+    ///
+    /// * The full path to the raw file as a `&str`
     pub fn get_raw_file_path(&self) -> &str {
         &self.raw_file_path
     }
     /// Get the location of the owning raw module.
-    pub fn get_location(&self) -> &RawModuleLocation {
+    ///
+    /// # Returns
+    ///
+    /// * `RawModuleLocation` - The location of the owning raw module
+    pub const fn get_location(&self) -> &RawModuleLocation {
         &self.raw_module_location
     }
     /// Get the `object_id` of the owning raw module.
+    ///
+    /// # Returns
+    ///
+    /// * The `object_id` of the owning raw module as a `&str`
     pub fn get_module_object_id(&self) -> &str {
         &self.module_object_id
+    }
+
+    /// Set the `object_type` of the metadata at creation.
+    ///
+    /// # Arguments
+    ///
+    /// * `object_type` - The `ObjectType` to set
+    #[must_use]
+    pub const fn with_object_type(mut self, object_type: ObjectType) -> Self {
+        self.object_type = object_type;
+        self
+    }
+    /// Set the `raw_module_location` of the metadata at creation.
+    ///
+    /// # Arguments
+    ///
+    /// * `raw_module_location` - The `RawModuleLocation` to set
+    #[must_use]
+    pub const fn with_raw_module_location(
+        mut self,
+        raw_module_location: RawModuleLocation,
+    ) -> Self {
+        self.raw_module_location = raw_module_location;
+        self
+    }
+    /// Set the `hidden` status of the metadata at creation.
+    ///
+    /// # Arguments
+    ///
+    /// * `hidden` - The hidden status to set
+    #[must_use]
+    pub const fn with_hidden(mut self, hidden: bool) -> Self {
+        self.hidden = hidden;
+        self
+    }
+    /// Set the `raw_identifier` of the metadata at creation.
+    ///
+    /// # Arguments
+    ///
+    /// * `raw_identifier` - The raw identifier to set
+    #[must_use]
+    pub fn with_raw_identifier(mut self, raw_identifier: String) -> Self {
+        self.raw_identifier = raw_identifier;
+        self
+    }
+    /// Set the `raw_file_path` of the metadata at creation.
+    ///
+    /// # Arguments
+    ///
+    /// * `raw_file_path` - The raw file path to set
+    #[must_use]
+    pub fn with_raw_file_path(mut self, raw_file_path: String) -> Self {
+        self.raw_file_path = raw_file_path;
+        self
+    }
+    /// Set the `module_name` of the metadata at creation.
+    ///
+    /// # Arguments
+    ///
+    /// * `module_name` - The module name to set
+    #[must_use]
+    pub fn with_module_name(mut self, module_name: String) -> Self {
+        self.module_name = module_name;
+        self
+    }
+    /// Set the `module_version` of the metadata at creation.
+    ///
+    /// # Arguments
+    ///
+    /// * `module_version` - The module version to set
+    #[must_use]
+    pub fn with_module_version(mut self, module_version: String) -> Self {
+        self.module_version = module_version;
+        self
+    }
+    /// Set the `module_object_id` of the metadata at creation.
+    ///
+    /// # Arguments
+    ///
+    /// * `module_object_id` - The module object ID to set
+    #[must_use]
+    pub fn with_module_object_id(mut self, module_object_id: String) -> Self {
+        self.module_object_id = module_object_id;
+        self
     }
 }

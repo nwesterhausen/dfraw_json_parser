@@ -1,81 +1,108 @@
 use serde::{Deserialize, Serialize};
 
-#[derive(ts_rs::TS)]
-#[ts(export)]
-#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, Default)]
+/// A material template
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, Default, specta::Type)]
 pub enum MaterialType {
+    /// An inorganic material
     Inorganic,
+    /// A stone material
     Stone,
+    /// A metal material
     Metal,
+    /// A coal material
     Coal,
+    /// A creature material
     CreatureMaterial,
+    /// A creature material for the current creature token only
     LocalCreatureMaterial,
+    /// A plant material
     PlantMaterial,
+    /// A plant material for the current plant token only
     LocalPlantMaterial,
+    /// A material from a reaction
     GetMaterialFromReagent,
     // Special "Hardcoded" Materials
     // Inorganic -> Magma
+    /// Amber
     Amber,
+    /// Coral
     Coral,
+    /// Green Glass
     GlassGreen,
+    /// Clear Glass
     GlassClear,
+    /// Crystal Glass
     GlassCrystal,
+    /// Water
     Water,
     // Coal -> Coal
+    /// Potash
     Potash,
+    /// Ash
     Ash,
+    /// Pearl Ash
     PearlAsh,
+    /// Lye
     Lye,
+    /// Mud
     Mud,
+    /// Vomit
     Vomit,
+    /// Salt
     Salt,
     /// Brown Filth
     FilthB,
     /// Yellow Filth
     FilthY,
+    /// Unnknown Substance
     UnknownSubstance,
+    /// Grime
     Grime,
+    /// An unknown token
     #[default]
     Unknown,
 }
 
-#[derive(ts_rs::TS)]
-#[ts(export)]
-#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, Default)]
+/// A material fuel type that can be set in a material definition.
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, Default, specta::Type)]
 pub enum FuelType {
+    /// Charcoal or coal
     Charcoal,
+    /// Coal coke
     Coke,
+    /// No glass furnace fuel
     NoMaterialGloss,
     /// None is an invalid option, so its a hint that this is not set.
     #[default]
     None,
 }
 
-#[derive(ts_rs::TS)]
-#[ts(export)]
-#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, Default)]
+/// A material state that can be set in a material definition.
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, Default, specta::Type)]
 pub enum MaterialState {
+    /// Solid state of the material
     Solid,
+    /// Liquid state of the material
     Liquid,
+    /// Gas state of the material
     Gas,
-    /// POWDER or SOLID_POWDER
+    /// `POWDER` or `SOLID_POWDER`
     Powder,
-    /// PASTE or SOLID_PASTE
+    /// `PASTE` or `SOLID_PASTE`
     Paste,
-    /// PRESSED or SOLID_PRESSED
+    /// `PRESSED` or `SOLID_PRESSED`
     Pressed,
     /// Default value is invalid, so its a hint that this is not set.
     #[default]
     Unknown,
     /// Denotes all possible material states
     All,
-    /// Denotes 'Solid', 'Powder', 'Paste', and 'Pressed'
+    /// Denotes '`Solid`', '`Powder`', '`Paste`', and '`Pressed`'
     AllSolid,
 }
 
-#[derive(ts_rs::TS)]
-#[ts(export)]
-#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, Default)]
+/// A material usage that can be set in a material definition.
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, Default, specta::Type)]
 pub enum MaterialUsage {
     /// Lets the game know that an animal was likely killed in the production of this item.
     /// Entities opposed to killing animals (Elves in vanilla) will refuse to accept these items in trade.
@@ -84,13 +111,13 @@ pub enum MaterialUsage {
     AlcoholPlant,
     /// Classifies the material as animal-based alcohol, allowing its storage in food stockpiles under "Drink (Animal)".
     AlcoholCreature,
-    /// Classifies the material as generic alcohol. Implied by both ALCOHOL_PLANT and ALCOHOL_CREATURE. Exact behavior unknown, possibly vestigial.
+    /// Classifies the material as generic alcohol. Implied by both `ALCOHOL_PLANT` and `ALCOHOL_CREATURE`. Exact behavior unknown, possibly vestigial.
     Alcohol,
     /// Classifies the material as plant-based cheese, allowing its storage in food stockpiles under "Cheese (Plant)".
     CheesePlant,
     /// Classifies the material as animal-based cheese, allowing its storage in food stockpiles under "Cheese (Animal)".
     CheeseCreature,
-    /// Classifies the material as generic cheese. Implied by both CHEESE_PLANT and CHEESE_CREATURE. Exact behavior unknown, possibly vestigial.
+    /// Classifies the material as generic cheese. Implied by both `CHEESE_PLANT` and `CHEESE_CREATURE`. Exact behavior unknown, possibly vestigial.
     Cheese,
     /// Classifies the material as plant powder, allowing its storage in food stockpiles under "Milled Plant".
     PowderMiscPlant,
@@ -98,11 +125,11 @@ pub enum MaterialUsage {
     /// Unlike milled plants, such as sugar and flour, "Bone Meal" barrels or pots may not contain bags.
     /// Custom reactions using this product better use buckets or jugs instead.
     PowderMiscCreature,
-    /// Classifies the material as generic powder. Implied by both POWDER_MISC_PLANT and POWDER_MISC_CREATURE.
+    /// Classifies the material as generic powder. Implied by both `POWDER_MISC_PLANT` and `POWDER_MISC_CREATURE`.
     /// Exact behavior unknown, possibly vestigial.
     PowderMisc,
     /// Permits globs of the material in solid form to be stored in food stockpiles under "Fat" - without it,
-    /// dwarves will come by and "clean" the items, destroying them (unless \[DO_NOT_CLEAN_GLOB\] is also included).
+    /// dwarves will come by and "clean" the items, destroying them (unless `DO_NOT_CLEAN_GLOB` is also included).
     StockpileGlobOrStockpileGlobSolid,
     /// Classifies the material as milled paste, allowing its storage in food stockpiles under "Paste".
     StockpileGlobPaste,
@@ -116,7 +143,7 @@ pub enum MaterialUsage {
     LiquidMiscCreature,
     /// Classifies the material as a miscellaneous liquid, allowing its storage in food stockpiles under "Misc. Liquid" along with lye.
     LiquidMiscOther,
-    /// Classifies the material as a generic liquid. Implied by LIQUID_MISC_PLANT, LIQUID_MISC_CREATURE, and LIQUID_MISC_OTHER. Exact behavior unknown, possibly vestigial.
+    /// Classifies the material as a generic liquid. Implied by `LIQUID_MISC_PLANT`, `LIQUID_MISC_CREATURE`, and `LIQUID_MISC_OTHER`. Exact behavior unknown, possibly vestigial.
     LiquidMisc,
     /// Classifies the material as a plant, allowing its storage in food stockpiles under "Plants".
     StructuralPlantMat,
@@ -185,11 +212,11 @@ pub enum MaterialUsage {
     NoStoneStockpile,
     /// The material can be made into minecarts, wheelbarrows, and stepladders at the metalsmith's forge.
     ItemsMetal,
-    /// Equivalent to ITEMS_HARD. Given to bone.
+    /// Equivalent to `ITEMS_HARD`. Given to bone.
     ItemsBarred,
-    /// Equivalent to ITEMS_HARD. Given to shell.
+    /// Equivalent to `ITEMS_HARD`. Given to shell.
     ItemsScaled,
-    /// Equivalent to ITEMS_SOFT. Given to leather.
+    /// Equivalent to `ITEMS_SOFT`. Given to leather.
     ItemsLeather,
     /// The material can be made into clothing, amulets, bracelets, earrings, backpacks, and quivers, contingent
     /// on which workshops accept the material. Given to plant fiber, silk and wool.
@@ -212,7 +239,7 @@ pub enum MaterialUsage {
     StockpileThreadMetal,
     /// Defines the material as being metal, allowing it to be used at forges.
     IsMetal,
-    /// Used internally by green glass, clear glass, and crystal glass. Appears to only affect the \[GLASS_MATERIAL\] reaction token. Does not cause the game
+    /// Used internally by green glass, clear glass, and crystal glass. Appears to only affect the `GLASS_MATERIAL` reaction token. Does not cause the game
     /// to treat the material like glass, i.e being referred to as "raw" instead of "rough" in its raw form or being displayed in the "glass" trade/embark category.
     IsGlass,
     /// Can be used in the production of crystal glass.
@@ -229,33 +256,33 @@ pub enum MaterialUsage {
     ItemsDigger,
     /// Armor can be made out of this material.
     ItemsArmor,
-    /// Used internally by amber and coral. Functionally equivalent to ITEMS_HARD.
+    /// Used internally by amber and coral. Functionally equivalent to `ITEMS_HARD`.
     ItemsDelicate,
     /// Siege engine parts can be made out of this material. Does not appear to work.
     ItemsSiegeEngine,
     /// Querns and millstones can be made out of this material. Does not appear to work.
     ItemsQuern,
+    /// An unknown token
     #[default]
     Unknown,
 }
 
-#[derive(ts_rs::TS)]
-#[ts(export)]
-#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, Default)]
+/// A material property that can be set in a material definition.
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, Default, specta::Type)]
 pub enum MaterialProperty {
     /// Imports the properties of the specified preexisting material template.
     UseMaterialTemplate,
-    /// Applies a prefix to all items made from the material. For PLANT and CREATURE materials, this defaults to the plant/creature name.
+    /// Applies a prefix to all items made from the material. For `PLANT` and `CREATURE` materials, this defaults to the plant/creature name.
     /// Not permitted in material template definitions.
     Prefix,
-    /// Overrides the name of BOULDER items (i.e. mined-out stones) made of the material (used for native copper/silver/gold/platinum
+    /// Overrides the name of `BOULDER` items (i.e. mined-out stones) made of the material (used for native copper/silver/gold/platinum
     /// to make them be called "nuggets" instead of "boulders").
     StoneName,
     /// Used to indicate that said material is a gemstone - when tiles are mined out, rough gems will be yielded instead of boulders.
-    /// Plural can be "STP" to automatically append an "s" to the singular form, and OVERWRITE_SOLID will override the relevant STATE_NAME and STATE_ADJ values.
+    /// Plural can be "STP" to automatically append an "s" to the singular form, and `OVERWRITE_SOLID` will override the relevant `STATE_NAME` and `STATE_ADJ` values.
     IsGem,
     /// Specifies what the material should be treated as when drinking water contaminated by it, for generating unhappy thoughts.
-    /// Valid values are BLOOD, SLIME, VOMIT, ICHOR, PUS, GOO, GRIME, and FILTH.
+    /// Valid values are `BLOOD`, `SLIME`, `VOMIT`, `ICHOR`, `PUS`, `GOO`, `GRIME`, and `FILTH`.
     TempDietInfo,
     /// Allows the material to be used as dye, and defines color of dyed items.
     PowderDye,
@@ -263,128 +290,128 @@ pub enum MaterialProperty {
     Tile,
     /// Specifies the tile that will be used to represent BOULDER items made of this material. Generally only used with stones. Defaults to 7 ('•').
     ItemSymbol,
-    /// The on-screen color of the material. Uses a standard 3-digit color token. Equivalent to \[TILE_COLOR:a:b:c\],
-    /// \[BUILD_COLOR:b:a:X\] (X = 1 if 'a' equals 'b', 0 otherwise), and \[BASIC_COLOR:a:c\]
+    /// The on-screen color of the material. Uses a standard 3-digit color token. Equivalent to `TILE_COLOR:a:b:c`,
+    /// `BUILD_COLOR:b:a:X` (X = 1 if 'a' equals 'b', 0 otherwise), and `BASIC_COLOR:a:c`
     DisplayColor,
     /// The color of objects made of this material which use both the foreground and background color: doors, floodgates, hatch covers, bins, barrels, and cages.
-    /// Defaults to 7:7:1 (white).
+    /// Defaults to `7:7:1` (white).
     BuildColor,
-    /// The color of unmined tiles containing this material (for stone and soil), as well as engravings in this material. Defaults to 7:7:1 (white).
+    /// The color of unmined tiles containing this material (for stone and soil), as well as engravings in this material. Defaults to `7:7:1` (white).
     TileColor,
-    /// The color of objects made of this material which use only the foreground color, including workshops, floors and boulders, and smoothed walls. Defaults to 7:1 (white).
+    /// The color of objects made of this material which use only the foreground color, including workshops, floors and boulders, and smoothed walls. Defaults to `7:1` (white).
     BasicColor,
-    /// Determines the color of the material at the specified state. See below for a list of valid material states. Color comes from descriptor_color_standard.txt.
+    /// Determines the color of the material at the specified state. See below for a list of valid material states. Color comes from `descriptor_color_standard.txt`.
     /// The nearest color value is used to display contaminants and body parts made of this material in ASCII and to color items and constructions made from this
     /// material with graphics.
-    /// Example:\[STATE_COLOR:ALL_SOLID:GRAY\]
+    /// Example:`STATE_COLOR:ALL_SOLID:GRAY`
     StateColor,
-    /// Determines the name of the material at the specified state, as displayed in-game. \[STATE_NAME:ALL_SOLID:stone\]
+    /// Determines the name of the material at the specified state, as displayed in-game. `STATE_NAME:ALL_SOLID:stone`
     StateName,
-    /// Like STATE_NAME, but used in different situations. Equipment made from the material uses the state adjective and not the state name.
+    /// Like `STATE_NAME`, but used in different situations. Equipment made from the material uses the state adjective and not the state name.
     StateAdjective,
-    /// Sets both STATE_NAME and STATE_ADJ at the same time.
+    /// Sets both `STATE_NAME` and `STATE_ADJ` at the same time.
     StateNameAdjective,
     /// The material's tendency to absorb liquids. Containers made of materials with nonzero absorption cannot hold liquids unless they have been glazed.
     /// Defaults to 0.
     Absorption,
     /// Specifies how hard of an impact (in kilopascals) the material can withstand before it will start deforming permanently.
-    /// Used for blunt-force combat. Defaults to 10000.
+    /// Used for blunt-force combat. Defaults to `10_000`.
     ImpactYield,
-    /// Specifies how hard of an impact the material can withstand before it will fail entirely. Used for blunt-force combat. Defaults to 10000.
+    /// Specifies how hard of an impact the material can withstand before it will fail entirely. Used for blunt-force combat. Defaults to `10_000`.
     ImpactFracture,
-    /// Specifies how much the material will have given (in parts-per-100000) when the yield point is reached. Used for blunt-force combat. Defaults to 0.
-    /// Apparently affects in combat whether the corresponding tissue is bruised (value >= 50000), torn (value between 25000 and 49999), or fractured (value <= 24999)
+    /// Specifies how much the material will have given (in parts-per-`100_000`) when the yield point is reached. Used for blunt-force combat. Defaults to 0.
+    /// Apparently affects in combat whether the corresponding tissue is bruised (`value >= 50_000`), torn (value between `25_000` and `49_999`), or fractured (`value <= 24_999`)
     ImpactElasticity,
     /// Specifies how hard the material can be compressed before it will start deforming permanently. Determines a tissue's resistance to pinching and response to strangulation.
-    /// Defaults to 10000.
+    /// Defaults to `10_000`.
     CompressiveYield,
     /// Specifies how hard the material can be compressed before it will fail entirely. Determines a tissue's resistance to pinching and response to strangulation.
-    /// Defaults to 10000.
+    /// Defaults to `10_000`.
     CompressiveFracture,
     /// Specifies how much the material will have given when it has been compressed to its yield point. Determines a tissue's resistance to pinching and
     /// response to strangulation. Defaults to 0.
     CompressiveElasticity,
     /// Specifies how hard the material can be stretched before it will start deforming permanently. Determines a tissue's resistance to a latching and tearing bite.
-    /// Defaults to 10000.
+    /// Defaults to `10_000`.
     TensileYield,
-    /// Specifies how hard the material can be stretched before it will fail entirely. Determines a tissue's resistance to a latching and tearing bite. Defaults to 10000.
+    /// Specifies how hard the material can be stretched before it will fail entirely. Determines a tissue's resistance to a latching and tearing bite. Defaults to `10_000`.
     TensileFracture,
     /// Specifies how much the material will have given when it is stretched to its yield point. Determines a tissue's resistance to a latching and tearing bite.
     /// Defaults to 0.
     TensileElasticity,
     /// Specifies how hard the material can be twisted before it will start deforming permanently. Used for latching and shaking with a blunt attack
-    /// (no default creature has such an attack, but they can be modded in). Defaults to 10000.
+    /// (no default creature has such an attack, but they can be modded in). Defaults to `10_000`.
     TorsionYield,
     /// Specifies how hard the material can be twisted before it will fail entirely. Used for latching and shaking with a blunt attack
-    /// (no default creature has such an attack, but they can be modded in). Defaults to 10000.
+    /// (no default creature has such an attack, but they can be modded in). Defaults to `10_000`.
     TorsionFracture,
     /// Specifies how much the material will have given when it is twisted to its yield point. Used for latching and shaking with a blunt attack
     /// (no default creature has such an attack, but they can be modded in). Defaults to 0.
     TorsionElasticity,
-    /// Specifies how hard the material can be sheared before it will start deforming permanently. Used for cutting calculations. Defaults to 10000.
+    /// Specifies how hard the material can be sheared before it will start deforming permanently. Used for cutting calculations. Defaults to `10_000`.
     ShearYield,
-    /// Specifies how hard the material can be sheared before it will fail entirely. Used for cutting calculations. Defaults to 10000.
+    /// Specifies how hard the material can be sheared before it will fail entirely. Used for cutting calculations. Defaults to `10_000`.
     ShearFracture,
     /// Specifies how much the material will have given when sheared to its yield point. Used for cutting calculations. Defaults to 0.
     ShearElasticity,
     /// Specifies how hard the material can be bent before it will start deforming permanently. Determines a tissue's resistance to being mangled with a joint lock.
-    /// Defaults to 10000.
+    /// Defaults to `10_000`.
     BendingYield,
-    /// Specifies how hard the material can be bent before it will fail entirely. Determines a tissue's resistance to being mangled with a joint lock. Defaults to 10000.
+    /// Specifies how hard the material can be bent before it will fail entirely. Determines a tissue's resistance to being mangled with a joint lock. Defaults to `10_000`.
     BendingFracture,
     /// Specifies how much the material will have given when bent to its yield point. Determines a tissue's resistance to being mangled with a joint lock. Defaults to 0.
     BendingElasticity,
-    /// How sharp the material is. Used in cutting calculations. Applying a value of at least 10000 to a stone will allow weapons to be made from that stone. Defaults to 10000.
+    /// How sharp the material is. Used in cutting calculations. Applying a value of at least `10_000` to a stone will allow weapons to be made from that stone. Defaults to `10_000`.
     MaxEdge,
     /// Value modifier for the material. Defaults to 1. This number can be made negative by placing a "-" in front, resulting in things that you are paid to buy and
     /// must pay to sell.
     MaterialValue,
     /// Multiplies the value of the material. Not permitted in material template definitions.
     MultiplyValue,
-    /// Rate at which the material heats up or cools down (in joules/kilogram-kelvin). If set to NONE, the temperature will be fixed at its initial value.
-    /// Defaults to NONE.
+    /// Rate at which the material heats up or cools down (in joules/kilogram-kelvin). If set to `NONE`, the temperature will be fixed at its initial value.
+    /// Defaults to `NONE`.
     SpecificHeat,
-    /// Temperature above which the material takes damage from heat. Defaults to NONE.
+    /// Temperature above which the material takes damage from heat. Defaults to `NONE`.
     /// If the material has an ignite point but no heatdam point, it will burn for a very long time (9 months and 16.8 days).
     HeatDamagePoint,
-    /// Temperature below which the material takes damage from cold. Defaults to NONE.
+    /// Temperature below which the material takes damage from cold. Defaults to `NONE`.
     ColdDamagePoint,
-    /// Temperature at which the material will catch fire. Defaults to NONE.
+    /// Temperature at which the material will catch fire. Defaults to `NONE`.
     IgnitionPoint,
-    /// Temperature at which the material melts. Defaults to NONE.
+    /// Temperature at which the material melts. Defaults to `NONE`.
     MeltingPoint,
-    /// Temperature at which the material boils. Defaults to NONE.
+    /// Temperature at which the material boils. Defaults to `NONE`.
     BoilingPoint,
     /// Items composed of this material will initially have this temperature.
-    /// Used in conjunction with \[SPEC_HEAT:NONE\] to make material's temperature fixed at the specified value.
-    /// Defaults to NONE.
+    /// Used in conjunction with `SPEC_HEAT:NONE` to make material's temperature fixed at the specified value.
+    /// Defaults to `NONE`.
     MaterialFixedTemperature,
-    /// Changes a material's HEATDAM_POINT, but only if it was not set to NONE. Not permitted in material template definitions.
+    /// Changes a material's `HEATDAM_POINT`, but only if it was not set to `NONE`. Not permitted in material template definitions.
     IfExistsSetHeatDamagePoint,
-    /// Changes a material's COLDDAM_POINT, but only if it was not set to NONE. Not permitted in material template definitions.
+    /// Changes a material's `COLDDAM_POINT`, but only if it was not set to `NONE`. Not permitted in material template definitions.
     IfExistsSetColdDamagePoint,
-    /// Changes a material's IGNITE_POINT, but only if it was not set to NONE. Not permitted in material template definitions.
+    /// Changes a material's `IGNITE_POINT`, but only if it was not set to `NONE`. Not permitted in material template definitions.
     IfExistsSetIgnitePoint,
-    /// Changes a material's MELTING_POINT, but only if it was not set to NONE. Not permitted in material template definitions.
+    /// Changes a material's `MELTING_POINT`, but only if it was not set to `NONE`. Not permitted in material template definitions.
     IfExistsSetMeltingPoint,
-    /// Changes a material's BOILING_POINT, but only if it was not set to NONE. Not permitted in material template definitions.
+    /// Changes a material's `BOILING_POINT`, but only if it was not set to `NONE`. Not permitted in material template definitions.
     IfExistsSetBoilingPoint,
-    /// Changes a material's MAT_FIXED_TEMP, but only if it was not set to NONE. Not permitted in material template definitions.
+    /// Changes a material's `MAT_FIXED_TEMP`, but only if it was not set to `NONE`. Not permitted in material template definitions.
     IfExistsSetMatFixedTemp,
     /// Specifies the density (in kilograms per cubic meter) of the material when in solid form. Also affects combat calculations;
-    /// affects blunt-force damage and ability of weak-in-impact-yield blunt attacks to pierce armor. Defaults to NONE.
+    /// affects blunt-force damage and ability of weak-in-impact-yield blunt attacks to pierce armor. Defaults to `NONE`.
     SolidDensity,
-    /// Specifies the density of the material when in liquid form. Defaults to NONE. Also affects combat calculations;
-    /// affects blunt force damage like SOLID_DENSITY, but only for attacks made by liquids (e.g. forgotten beasts made of water).
+    /// Specifies the density of the material when in liquid form. Defaults to `NONE`. Also affects combat calculations;
+    /// affects blunt force damage like `SOLID_DENSITY`, but only for attacks made by liquids (e.g. forgotten beasts made of water).
     LiquidDensity,
     /// Specifies (in kg/mol) the molar mass of the material in gaseous form. Also affects combat calculations like the densities,
     /// but only for attacks made by gases (e.g. forgotten beasts made of steam).
     MolarMass,
-    /// Specifies the type of container used to store the material. Used in conjunction with the \[EXTRACT_BARREL\], \[EXTRACT_VIAL\],
-    /// or \[EXTRACT_STILL_VIAL\] plant tokens.
-    /// Defaults to BARREL.
+    /// Specifies the type of container used to store the material. Used in conjunction with the `EXTRACT_BARREL`, `EXTRACT_VIAL`,
+    /// or `EXTRACT_STILL_VIAL` plant tokens.
+    /// Defaults to `BARREL`.
     ExtractStorage,
-    /// Specifies the item type used for butchering results made of this material. Stock raws use GLOB:NONE for fat and MEAT:NONE for other meat materials.
+    /// Specifies the item type used for butchering results made of this material. Stock raws use `GLOB:NONE` for fat and `MEAT:NONE` for other meat materials.
     ButcherSpecial,
     /// When a creature is butchered, meat yielded from organs made from this material will be named via this token.
     MeatName,
@@ -392,13 +419,13 @@ pub enum MaterialProperty {
     BlockName,
     /// The material forms "wafers" instead of "bars".
     Wafers,
-    /// Used with reaction raws to associate a reagent material with a product material. The first argument is used by HAS_MATERIAL_REACTION_PRODUCT and GET_MATERIAL_FROM_REAGENT in reaction raws.
-    /// The remainder is a material reference, generally LOCAL_CREATURE_MAT:SUBTYPE or LOCAL_PLANT_MAT:SUBTYPE or INORGANIC:STONETYPE.
-    /// \[MATERIAL_REACTION_PRODUCT:TAN_MAT:LOCAL_CREATURE_MAT:LEATHER\]
+    /// Used with reaction raws to associate a reagent material with a product material. The first argument is used by `HAS_MATERIAL_REACTION_PRODUCT` and `GET_MATERIAL_FROM_REAGENT` in reaction raws.
+    /// The remainder is a material reference, generally `LOCAL_CREATURE_MAT:SUBTYPE` or `LOCAL_PLANT_MAT:SUBTYPE` or `INORGANIC:STONETYPE`.
+    /// `MATERIAL_REACTION_PRODUCT:TAN_MAT:LOCAL_CREATURE_MAT:LEATHER`
     MaterialReactionProduct,
-    /// Used with reaction raws to associate a reagent material with a complete item. The first argument is used by HAS_ITEM_REACTION_PRODUCT and GET_ITEM_DATA_FROM_REAGENT in reaction raws.
+    /// Used with reaction raws to associate a reagent material with a complete item. The first argument is used by `HAS_ITEM_REACTION_PRODUCT` and `GET_ITEM_DATA_FROM_REAGENT` in reaction raws.
     /// The rest refers to the type of item, then its material.
-    /// \[ITEM_REACTION_PRODUCT:BAG_ITEM:PLANT_GROWTH:LEAVES:LOCAL_PLANT_MAT:LEAF\]
+    /// `ITEM_REACTION_PRODUCT:BAG_ITEM:PLANT_GROWTH:LEAVES:LOCAL_PLANT_MAT:LEAF`
     ItemReactionProduct,
     /// "Used to classify all items made of the material, so that reactions can use them as generic reagents.In default raws, the following are used:
     /// `FAT`, `TALLOW`, `SOAP`, `PARCHMENT`, `PAPER_PLANT`, `PAPER_SLURRY`, `MILK`, `CHEESE`, `WAX`.
@@ -407,16 +434,16 @@ pub enum MaterialProperty {
     /// `GYPSUM` - can be processed into gypsum plaster.
     /// `CALCIUM_CARBONATE` - can be used in production of quicklime."
     ReactionClass,
-    /// "Makes BOULDER acceptable as a reagent in reactions that require ""METAL_ORE:MATERIAL_NAME"", as well as smelting directly into metal bars.
-    /// Places the material under ""Metal Ores"" in Stone stockpiles." The specified value determines the probability for this product (see Tetrahedrite or Galena for details).
+    /// Makes `BOULDER` acceptable as a reagent in reactions that require `METAL_ORE:MATERIAL_NAME`, as well as smelting directly into metal bars.
+    /// Places the material under Metal Ores in Stone stockpiles. The specified value determines the probability for this product (see Tetrahedrite or Galena for details).
     MetalOre,
-    /// Makes BOULDER items made of the material acceptable for strand extraction into threads; see also STOCKPILE_THREAD_METAL.
+    /// Makes `BOULDER` items made of the material acceptable for strand extraction into threads; see also `STOCKPILE_THREAD_METAL`.
     /// Value presumably determines the probability of this product extracted.
     ThreadMetal,
     /// Allows the material to be used to make casts.
     HardensWithWater,
     /// Determines effectiveness of soap - if the amount of grime on a body part is more than 3-SOAP_LEVEL, it sets it to 3-SOAP_LEVEL; as such setting it above 3 is bad.
-    /// Soap has \[SOAP_LEVEL:2\]. Defaults to 0.
+    /// Soap has `[SOAP_LEVEL:2]`. Defaults to 0.
     SoapLevel,
     /// Begins defining a syndrome applied by the material. Multiple syndromes can be specified. See Syndrome token.
     Syndrome,
@@ -424,13 +451,21 @@ pub enum MaterialProperty {
     Antler,
 
     // Additional tokens from 50.x
+    /// Hair material
     Hair,
+    /// Feather material
     Feather,
+    /// Scale material
     Scale,
+    /// Hoof material
     Hoof,
+    /// Chitin material
     Chitin,
+    /// Cartilage material
     Cartilage,
+    /// Nervous tissue
     NervousTissue,
+    /// Category of meat
     MeatCategory,
     /// For default value, use unknown.
     #[default]
@@ -438,48 +473,58 @@ pub enum MaterialProperty {
 }
 
 impl FuelType {
-    /// Used just to help serialization
-    pub fn is_default(&self) -> bool {
-        matches!(self, FuelType::None)
+    /// Returns true if the fuel type is the default value
+    ///
+    /// # Returns
+    ///
+    /// * `true` if the fuel type is `FuelType::None`
+    #[must_use]
+    pub const fn is_default(&self) -> bool {
+        matches!(self, Self::None)
     }
 }
 impl MaterialType {
-    /// Used just to help serialization
-    pub fn is_default(&self) -> bool {
-        matches!(self, MaterialType::Unknown)
+    /// Returns true if the material type is the default value
+    ///
+    /// # Returns
+    ///
+    /// * `true` if the material type is `Self::Unknown`
+    #[must_use]
+    pub const fn is_default(&self) -> bool {
+        matches!(self, Self::Unknown)
     }
 }
 
 impl std::fmt::Display for MaterialType {
     fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
         match self {
-            MaterialType::Inorganic => write!(f, "Inorganic"),
-            MaterialType::Stone => write!(f, "Stone"),
-            MaterialType::Metal => write!(f, "Metal"),
-            MaterialType::Coal => write!(f, "Coal"),
-            MaterialType::CreatureMaterial => write!(f, "CreatureMaterial"),
-            MaterialType::LocalCreatureMaterial => write!(f, "LocalCreatureMaterial"),
-            MaterialType::PlantMaterial => write!(f, "PlantMaterial"),
-            MaterialType::LocalPlantMaterial => write!(f, "LocalPlantMaterial"),
-            MaterialType::GetMaterialFromReagent => write!(f, "GetMaterialFromReagent"),
-            MaterialType::Amber => write!(f, "Amber"),
-            MaterialType::Coral => write!(f, "Coral"),
-            MaterialType::GlassGreen => write!(f, "GlassGreen"),
-            MaterialType::GlassClear => write!(f, "GlassClear"),
-            MaterialType::GlassCrystal => write!(f, "GlassCrystal"),
-            MaterialType::Water => write!(f, "Water"),
-            MaterialType::Potash => write!(f, "Potash"),
-            MaterialType::Ash => write!(f, "Ash"),
-            MaterialType::PearlAsh => write!(f, "PearlAsh"),
-            MaterialType::Lye => write!(f, "Lye"),
-            MaterialType::Mud => write!(f, "Mud"),
-            MaterialType::Vomit => write!(f, "Vomit"),
-            MaterialType::Salt => write!(f, "Salt"),
-            MaterialType::FilthB => write!(f, "FilthB"),
-            MaterialType::FilthY => write!(f, "FilthY"),
-            MaterialType::UnknownSubstance => write!(f, "UnknownSubstance"),
-            MaterialType::Grime => write!(f, "Grime"),
-            MaterialType::Unknown => write!(f, "Unknown"),
+            Self::Inorganic => write!(f, "Inorganic"),
+            Self::Stone => write!(f, "Stone"),
+            Self::Metal => write!(f, "Metal"),
+            Self::Coal => write!(f, "Coal"),
+            Self::CreatureMaterial => write!(f, "CreatureMaterial"),
+            Self::LocalCreatureMaterial => write!(f, "LocalCreatureMaterial"),
+            Self::PlantMaterial => write!(f, "PlantMaterial"),
+            Self::LocalPlantMaterial => write!(f, "LocalPlantMaterial"),
+            Self::GetMaterialFromReagent => write!(f, "GetMaterialFromReagent"),
+            Self::Amber => write!(f, "Amber"),
+            Self::Coral => write!(f, "Coral"),
+            Self::GlassGreen => write!(f, "GlassGreen"),
+            Self::GlassClear => write!(f, "GlassClear"),
+            Self::GlassCrystal => write!(f, "GlassCrystal"),
+            Self::Water => write!(f, "Water"),
+            Self::Potash => write!(f, "Potash"),
+            Self::Ash => write!(f, "Ash"),
+            Self::PearlAsh => write!(f, "PearlAsh"),
+            Self::Lye => write!(f, "Lye"),
+            Self::Mud => write!(f, "Mud"),
+            Self::Vomit => write!(f, "Vomit"),
+            Self::Salt => write!(f, "Salt"),
+            Self::FilthB => write!(f, "FilthB"),
+            Self::FilthY => write!(f, "FilthY"),
+            Self::UnknownSubstance => write!(f, "UnknownSubstance"),
+            Self::Grime => write!(f, "Grime"),
+            Self::Unknown => write!(f, "Unknown"),
         }
     }
 }
@@ -487,83 +532,83 @@ impl std::fmt::Display for MaterialType {
 impl std::fmt::Display for MaterialUsage {
     fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
         match self {
-            MaterialUsage::ImpliesAnimalKill => write!(f, "ImpliesAnimalKill"),
-            MaterialUsage::AlcoholPlant => write!(f, "AlcoholPlant"),
-            MaterialUsage::AlcoholCreature => write!(f, "AlcoholCreature"),
-            MaterialUsage::Alcohol => write!(f, "Alcohol"),
-            MaterialUsage::CheesePlant => write!(f, "CheesePlant"),
-            MaterialUsage::CheeseCreature => write!(f, "CheeseCreature"),
-            MaterialUsage::Cheese => write!(f, "Cheese"),
-            MaterialUsage::PowderMiscPlant => write!(f, "PowderMiscPlant"),
-            MaterialUsage::PowderMiscCreature => write!(f, "PowderMiscCreature"),
-            MaterialUsage::PowderMisc => write!(f, "PowderMisc"),
-            MaterialUsage::StockpileGlobOrStockpileGlobSolid => {
+            Self::ImpliesAnimalKill => write!(f, "ImpliesAnimalKill"),
+            Self::AlcoholPlant => write!(f, "AlcoholPlant"),
+            Self::AlcoholCreature => write!(f, "AlcoholCreature"),
+            Self::Alcohol => write!(f, "Alcohol"),
+            Self::CheesePlant => write!(f, "CheesePlant"),
+            Self::CheeseCreature => write!(f, "CheeseCreature"),
+            Self::Cheese => write!(f, "Cheese"),
+            Self::PowderMiscPlant => write!(f, "PowderMiscPlant"),
+            Self::PowderMiscCreature => write!(f, "PowderMiscCreature"),
+            Self::PowderMisc => write!(f, "PowderMisc"),
+            Self::StockpileGlobOrStockpileGlobSolid => {
                 write!(f, "StockpileGlobOrStockpileGlobSolid")
             }
-            MaterialUsage::StockpileGlobPaste => write!(f, "StockpileGlobPaste"),
-            MaterialUsage::StockpileGlobPressed => write!(f, "StockpileGlobPressed"),
-            MaterialUsage::StockpilePlantGrowth => write!(f, "StockpilePlantGrowth"),
-            MaterialUsage::LiquidMiscPlant => write!(f, "LiquidMiscPlant"),
-            MaterialUsage::LiquidMiscCreature => write!(f, "LiquidMiscCreature"),
-            MaterialUsage::LiquidMiscOther => write!(f, "LiquidMiscOther"),
-            MaterialUsage::LiquidMisc => write!(f, "LiquidMisc"),
-            MaterialUsage::StructuralPlantMat => write!(f, "StructuralPlantMat"),
-            MaterialUsage::SeedMat => write!(f, "SeedMat"),
-            MaterialUsage::Bone => write!(f, "Bone"),
-            MaterialUsage::Wood => write!(f, "Wood"),
-            MaterialUsage::ThreadPlant => write!(f, "ThreadPlant"),
-            MaterialUsage::Tooth => write!(f, "Tooth"),
-            MaterialUsage::Horn => write!(f, "Horn"),
-            MaterialUsage::Hair => write!(f, "Hair"),
-            MaterialUsage::Pearl => write!(f, "Pearl"),
-            MaterialUsage::Shell => write!(f, "Shell"),
-            MaterialUsage::Leather => write!(f, "Leather"),
-            MaterialUsage::Silk => write!(f, "Silk"),
-            MaterialUsage::Soap => write!(f, "Soap"),
-            MaterialUsage::GeneratesMiasma => write!(f, "GeneratesMiasma"),
-            MaterialUsage::Meat => write!(f, "Meat"),
-            MaterialUsage::Rots => write!(f, "Rots"),
-            MaterialUsage::NervousTissue => write!(f, "NervousTissue"),
-            MaterialUsage::BloodMapDescriptor => write!(f, "BloodMapDescriptor"),
-            MaterialUsage::IchorMapDescriptor => write!(f, "IchorMapDescriptor"),
-            MaterialUsage::GooMapDescriptor => write!(f, "GooMapDescriptor"),
-            MaterialUsage::SlimeMapDescriptor => write!(f, "SlimeMapDescriptor"),
-            MaterialUsage::PusMapDescriptor => write!(f, "PusMapDescriptor"),
-            MaterialUsage::SweatMapDescriptor => write!(f, "SweatMapDescriptor"),
-            MaterialUsage::TearsMapDescriptor => write!(f, "TearsMapDescriptor"),
-            MaterialUsage::SpitMapDescriptor => write!(f, "SpitMapDescriptor"),
-            MaterialUsage::Evaporates => write!(f, "Evaporates"),
-            MaterialUsage::EntersBlood => write!(f, "EntersBlood"),
-            MaterialUsage::EdibleVermin => write!(f, "EdibleVermin"),
-            MaterialUsage::EdibleRaw => write!(f, "EdibleRaw"),
-            MaterialUsage::EdibleCooked => write!(f, "EdibleCooked"),
-            MaterialUsage::DoNotCleanGlob => write!(f, "DoNotCleanGlob"),
-            MaterialUsage::NoStoneStockpile => write!(f, "NoStoneStockpile"),
-            MaterialUsage::ItemsMetal => write!(f, "ItemsMetal"),
-            MaterialUsage::ItemsBarred => write!(f, "ItemsBarred"),
-            MaterialUsage::ItemsScaled => write!(f, "ItemsScaled"),
-            MaterialUsage::ItemsLeather => write!(f, "ItemsLeather"),
-            MaterialUsage::ItemsSoft => write!(f, "ItemsSoft"),
-            MaterialUsage::ItemsHard => write!(f, "ItemsHard"),
-            MaterialUsage::IsStone => write!(f, "IsStone"),
-            MaterialUsage::IsCeramic => write!(f, "IsCeramic"),
-            MaterialUsage::Undiggable => write!(f, "Undiggable"),
-            MaterialUsage::DisplayUnglazed => write!(f, "DisplayUnglazed"),
-            MaterialUsage::Yarn => write!(f, "Yarn"),
-            MaterialUsage::StockpileThreadMetal => write!(f, "StockpileThreadMetal"),
-            MaterialUsage::IsMetal => write!(f, "IsMetal"),
-            MaterialUsage::IsGlass => write!(f, "IsGlass"),
-            MaterialUsage::CrystalGlassable => write!(f, "CrystalGlassable"),
-            MaterialUsage::ItemsWeapon => write!(f, "ItemsWeapon"),
-            MaterialUsage::ItemsWeaponRanged => write!(f, "ItemsWeaponRanged"),
-            MaterialUsage::ItemsAnvil => write!(f, "ItemsAnvil"),
-            MaterialUsage::ItemsAmmo => write!(f, "ItemsAmmo"),
-            MaterialUsage::ItemsDigger => write!(f, "ItemsDigger"),
-            MaterialUsage::ItemsArmor => write!(f, "ItemsArmor"),
-            MaterialUsage::ItemsDelicate => write!(f, "ItemsDelicate"),
-            MaterialUsage::ItemsSiegeEngine => write!(f, "ItemsSiegeEngine"),
-            MaterialUsage::ItemsQuern => write!(f, "ItemsQuern"),
-            MaterialUsage::Unknown => write!(f, "Unknown"),
+            Self::StockpileGlobPaste => write!(f, "StockpileGlobPaste"),
+            Self::StockpileGlobPressed => write!(f, "StockpileGlobPressed"),
+            Self::StockpilePlantGrowth => write!(f, "StockpilePlantGrowth"),
+            Self::LiquidMiscPlant => write!(f, "LiquidMiscPlant"),
+            Self::LiquidMiscCreature => write!(f, "LiquidMiscCreature"),
+            Self::LiquidMiscOther => write!(f, "LiquidMiscOther"),
+            Self::LiquidMisc => write!(f, "LiquidMisc"),
+            Self::StructuralPlantMat => write!(f, "StructuralPlantMat"),
+            Self::SeedMat => write!(f, "SeedMat"),
+            Self::Bone => write!(f, "Bone"),
+            Self::Wood => write!(f, "Wood"),
+            Self::ThreadPlant => write!(f, "ThreadPlant"),
+            Self::Tooth => write!(f, "Tooth"),
+            Self::Horn => write!(f, "Horn"),
+            Self::Hair => write!(f, "Hair"),
+            Self::Pearl => write!(f, "Pearl"),
+            Self::Shell => write!(f, "Shell"),
+            Self::Leather => write!(f, "Leather"),
+            Self::Silk => write!(f, "Silk"),
+            Self::Soap => write!(f, "Soap"),
+            Self::GeneratesMiasma => write!(f, "GeneratesMiasma"),
+            Self::Meat => write!(f, "Meat"),
+            Self::Rots => write!(f, "Rots"),
+            Self::NervousTissue => write!(f, "NervousTissue"),
+            Self::BloodMapDescriptor => write!(f, "BloodMapDescriptor"),
+            Self::IchorMapDescriptor => write!(f, "IchorMapDescriptor"),
+            Self::GooMapDescriptor => write!(f, "GooMapDescriptor"),
+            Self::SlimeMapDescriptor => write!(f, "SlimeMapDescriptor"),
+            Self::PusMapDescriptor => write!(f, "PusMapDescriptor"),
+            Self::SweatMapDescriptor => write!(f, "SweatMapDescriptor"),
+            Self::TearsMapDescriptor => write!(f, "TearsMapDescriptor"),
+            Self::SpitMapDescriptor => write!(f, "SpitMapDescriptor"),
+            Self::Evaporates => write!(f, "Evaporates"),
+            Self::EntersBlood => write!(f, "EntersBlood"),
+            Self::EdibleVermin => write!(f, "EdibleVermin"),
+            Self::EdibleRaw => write!(f, "EdibleRaw"),
+            Self::EdibleCooked => write!(f, "EdibleCooked"),
+            Self::DoNotCleanGlob => write!(f, "DoNotCleanGlob"),
+            Self::NoStoneStockpile => write!(f, "NoStoneStockpile"),
+            Self::ItemsMetal => write!(f, "ItemsMetal"),
+            Self::ItemsBarred => write!(f, "ItemsBarred"),
+            Self::ItemsScaled => write!(f, "ItemsScaled"),
+            Self::ItemsLeather => write!(f, "ItemsLeather"),
+            Self::ItemsSoft => write!(f, "ItemsSoft"),
+            Self::ItemsHard => write!(f, "ItemsHard"),
+            Self::IsStone => write!(f, "IsStone"),
+            Self::IsCeramic => write!(f, "IsCeramic"),
+            Self::Undiggable => write!(f, "Undiggable"),
+            Self::DisplayUnglazed => write!(f, "DisplayUnglazed"),
+            Self::Yarn => write!(f, "Yarn"),
+            Self::StockpileThreadMetal => write!(f, "StockpileThreadMetal"),
+            Self::IsMetal => write!(f, "IsMetal"),
+            Self::IsGlass => write!(f, "IsGlass"),
+            Self::CrystalGlassable => write!(f, "CrystalGlassable"),
+            Self::ItemsWeapon => write!(f, "ItemsWeapon"),
+            Self::ItemsWeaponRanged => write!(f, "ItemsWeaponRanged"),
+            Self::ItemsAnvil => write!(f, "ItemsAnvil"),
+            Self::ItemsAmmo => write!(f, "ItemsAmmo"),
+            Self::ItemsDigger => write!(f, "ItemsDigger"),
+            Self::ItemsArmor => write!(f, "ItemsArmor"),
+            Self::ItemsDelicate => write!(f, "ItemsDelicate"),
+            Self::ItemsSiegeEngine => write!(f, "ItemsSiegeEngine"),
+            Self::ItemsQuern => write!(f, "ItemsQuern"),
+            Self::Unknown => write!(f, "Unknown"),
         }
     }
 }

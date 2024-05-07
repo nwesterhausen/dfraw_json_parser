@@ -2,58 +2,93 @@ use crate::{creature::Creature, RawObject, VARIATION_ARGUMENT_RE};
 
 use super::Requirements;
 
-#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, Default, ts_rs::TS)]
-#[ts(export)]
+/// A variation rule for a creature.
+#[derive(
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, Default, specta::Type,
+)]
 pub enum CreatureVariationRule {
+    /// An unknown rule.
     #[default]
     Unknown,
+    /// Removes a tag from a creature.
     RemoveTag {
+        /// The tag to remove.
         tag: String,
+        /// The value to remove.
         value: Option<String>,
     },
+    /// Adds a new tag to a creature.
     NewTag {
+        /// The tag to add.
         tag: String,
+        /// The value to add.
         value: Option<String>,
     },
+    /// Adds a new tag to a creature.
     AddTag {
+        /// The tag to add.
         tag: String,
+        /// The value to add.
         value: Option<String>,
     },
+    /// Converts a tag on a creature.
     ConvertTag {
+        /// The tag to convert.
         tag: String,
+        /// The target value to convert.
         target: Option<String>,
+        /// The replacement value to convert to.
         replacement: Option<String>,
     },
+    /// Adds a new tag to a creature if a condition is met.
     ConditionalNewTag {
+        /// The tag to add.
         tag: String,
+        /// The value to add.
         value: Option<String>,
+        /// The index of the argument to check.
         argument_index: usize,
+        /// The requirement for the argument.
         argument_requirement: String,
     },
+    /// Adds a new tag to a creature if a condition is met.
     ConditionalAddTag {
+        /// The tag to add.
         tag: String,
+        /// The value to add.
         value: Option<String>,
+        /// The index of the argument to check.
         argument_index: usize,
+        /// The requirement for the argument.
         argument_requirement: String,
     },
+    /// Removes a tag from a creature if a condition is met.
     ConditionalRemoveTag {
+        /// The tag to remove.
         tag: String,
+        /// The value to remove.
         value: Option<String>,
+        /// The index of the argument to check.
         argument_index: usize,
+        /// The requirement for the argument.
         argument_requirement: String,
     },
+    /// Converts a tag on a creature if a condition is met.
     ConditionalConvertTag {
+        /// The tag to convert.
         tag: String,
+        /// The target value to convert.
         target: Option<String>,
+        /// The replacement value to convert to.
         replacement: Option<String>,
+        /// The index of the argument to check.
         argument_index: usize,
+        /// The requirement for the argument.
         argument_requirement: String,
     },
 }
 
 impl CreatureVariationRule {
-    #[allow(clippy::too_many_lines)]
-    #[must_use]
     /// Apply a set of arguments to the rule and get a rule that has the arguments applied.
     /// This will replace all instances of `!ARGn` with the corresponding argument.
     ///
@@ -67,6 +102,8 @@ impl CreatureVariationRule {
     /// ## Returns
     ///
     /// * `CreatureVariationRule` - The rule with the arguments applied.
+    #[must_use]
+    #[allow(clippy::too_many_lines)]
     pub fn with_args(&self, args: &[&str]) -> Self {
         // Short circuit if there are no arguments to replace.
         if args.is_empty() {
@@ -74,32 +111,31 @@ impl CreatureVariationRule {
         }
         // We simply replace all instances of `!ARGn` with the corresponding argument.
         match self {
-            CreatureVariationRule::RemoveTag { tag, value } => {
+            Self::RemoveTag { tag, value } => {
                 // Only have the tag to replace.
-                CreatureVariationRule::RemoveTag {
+                Self::RemoveTag {
                     tag: replace_args_in_string(tag, args),
                     value: value
                         .as_ref()
                         .map(|value| replace_args_in_string(value, args)),
                 }
             }
-            CreatureVariationRule::NewTag { tag, value }
-            | CreatureVariationRule::AddTag { tag, value } => {
+            Self::NewTag { tag, value } | Self::AddTag { tag, value } => {
                 // Have both the tag and the value to replace.
-                CreatureVariationRule::NewTag {
+                Self::NewTag {
                     tag: replace_args_in_string(tag, args),
                     value: value
                         .as_ref()
                         .map(|value| replace_args_in_string(value, args)),
                 }
             }
-            CreatureVariationRule::ConvertTag {
+            Self::ConvertTag {
                 tag,
                 target,
                 replacement,
             } => {
                 // Have the tag, target, and replacement to replace.
-                CreatureVariationRule::ConvertTag {
+                Self::ConvertTag {
                     tag: replace_args_in_string(tag, args),
                     target: target
                         .as_ref()
@@ -109,14 +145,14 @@ impl CreatureVariationRule {
                         .map(|value| replace_args_in_string(value, args)),
                 }
             }
-            CreatureVariationRule::ConditionalRemoveTag {
+            Self::ConditionalRemoveTag {
                 tag,
                 value,
                 argument_requirement,
                 argument_index,
             } => {
                 // Have the tag and the argument requirement to replace.
-                CreatureVariationRule::ConditionalRemoveTag {
+                Self::ConditionalRemoveTag {
                     tag: replace_args_in_string(tag, args),
                     value: value
                         .as_ref()
@@ -130,20 +166,20 @@ impl CreatureVariationRule {
                     argument_index: *argument_index,
                 }
             }
-            CreatureVariationRule::ConditionalNewTag {
+            Self::ConditionalNewTag {
                 tag,
                 value,
                 argument_requirement,
                 argument_index,
             }
-            | CreatureVariationRule::ConditionalAddTag {
+            | Self::ConditionalAddTag {
                 tag,
                 value,
                 argument_requirement,
                 argument_index,
             } => {
                 // Have the tag, value, and argument requirement to replace.
-                CreatureVariationRule::ConditionalNewTag {
+                Self::ConditionalNewTag {
                     tag: replace_args_in_string(tag, args),
                     value: value
                         .as_ref()
@@ -157,7 +193,7 @@ impl CreatureVariationRule {
                     argument_index: *argument_index,
                 }
             }
-            CreatureVariationRule::ConditionalConvertTag {
+            Self::ConditionalConvertTag {
                 tag,
                 target,
                 replacement,
@@ -165,7 +201,7 @@ impl CreatureVariationRule {
                 argument_requirement,
             } => {
                 // Have the tag, target, replacement, and argument requirement to replace.
-                CreatureVariationRule::ConditionalConvertTag {
+                Self::ConditionalConvertTag {
                     tag: replace_args_in_string(tag, args),
                     target: target
                         .as_ref()
@@ -182,33 +218,43 @@ impl CreatureVariationRule {
                     argument_index: *argument_index,
                 }
             }
-            CreatureVariationRule::Unknown => {
+            Self::Unknown => {
                 // Unknown rules don't have anything to replace.
-                CreatureVariationRule::Unknown
+                Self::Unknown
             }
         }
     }
+    /// Apply the rule to a creature. This will apply the rule to the creature based on the arguments
+    /// provided.
+    ///
+    /// # Arguments
+    ///
+    /// * `creature` - The creature to apply the rule to.
+    /// * `args` - The arguments to apply to the rule.
+    ///
+    /// # Side Effects
+    ///
+    /// This will modify the creature provided.
     pub fn apply(&self, creature: &mut Creature, args: &[&str]) {
         match self.with_args(args) {
-            CreatureVariationRule::RemoveTag { tag, .. } => {
+            Self::RemoveTag { tag, .. } => {
                 remove_tag(creature, &tag);
             }
-            CreatureVariationRule::NewTag { tag, value }
-            | CreatureVariationRule::AddTag { tag, value } => {
+            Self::NewTag { tag, value } | Self::AddTag { tag, value } => {
                 apply_new_tag(creature, &tag, value.as_deref());
             }
-            CreatureVariationRule::ConvertTag {
+            Self::ConvertTag {
                 tag,
                 target,
                 replacement,
             } => convert_tag(creature, &tag, target.as_deref(), replacement.as_deref()),
-            CreatureVariationRule::ConditionalNewTag {
+            Self::ConditionalNewTag {
                 tag,
                 value,
                 argument_index,
                 argument_requirement,
             }
-            | CreatureVariationRule::ConditionalAddTag {
+            | Self::ConditionalAddTag {
                 tag,
                 value,
                 argument_index,
@@ -230,7 +276,7 @@ impl CreatureVariationRule {
                     }
                 }
             }
-            CreatureVariationRule::ConditionalRemoveTag {
+            Self::ConditionalRemoveTag {
                 tag,
                 argument_index,
                 argument_requirement,
@@ -252,7 +298,7 @@ impl CreatureVariationRule {
                     }
                 }
             }
-            CreatureVariationRule::ConditionalConvertTag {
+            Self::ConditionalConvertTag {
                 tag,
                 target,
                 replacement,
@@ -275,7 +321,7 @@ impl CreatureVariationRule {
                     }
                 }
             }
-            CreatureVariationRule::Unknown => {}
+            Self::Unknown => {}
         }
     }
 }
@@ -336,14 +382,21 @@ fn convert_tag(
                 replacement,
                 creature.get_identifier()
             );
+            // Convert the tag to the target value.
+            (creature as &mut dyn Requirements).remove_tag_and_value(tag, target);
+            (creature as &mut dyn Requirements).add_tag_and_value(tag, replacement);
         } else {
             tracing::trace!(
-                "Converting tag {}:{} to {} on creature {}",
+                "Converting tag {}:{} to {}:{} on creature {}",
                 tag,
                 target,
-                tag,
-                creature.get_identifier()
+                replacement.unwrap_or_default(),
+                target,
+                creature.get_identifier(),
             );
+            // Convert the tag to the target value.
+            (creature as &mut dyn Requirements).remove_tag_and_value(tag, target);
+            (creature as &mut dyn Requirements).add_tag_and_value(tag, target);
         }
     } else {
         tracing::trace!(
@@ -352,6 +405,9 @@ fn convert_tag(
             replacement.unwrap_or_default(),
             creature.get_identifier()
         );
+        // Convert the tag to the replacement value.
+        (creature as &mut dyn Requirements).remove_tag(tag);
+        (creature as &mut dyn Requirements).add_tag(replacement.unwrap_or_default());
     }
 }
 

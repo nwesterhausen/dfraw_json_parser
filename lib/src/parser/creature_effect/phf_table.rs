@@ -1,5 +1,5 @@
 use super::tokens::{CreatureEffectProperty, CreatureEffectToken};
-
+/// A map of creature effect tokens to their strings.
 pub static CREATURE_EFFECT_TOKENS: phf::Map<&'static str, CreatureEffectToken> = phf::phf_map! {
     "CE_PAIN" => CreatureEffectToken::Pain,
     "CE_SWELLING" => CreatureEffectToken::Swelling,
@@ -55,6 +55,7 @@ pub static CREATURE_EFFECT_TOKENS: phf::Map<&'static str, CreatureEffectToken> =
     "CE_ERRATIC_BEHAVIOR" => CreatureEffectToken::ErraticBehavior,
 };
 
+/// A map of creature effect properties to their strings.
 #[allow(dead_code)]
 pub static CREATURE_EFFECT_PROPERTY_TOKENS: phf::Map<&'static str, CreatureEffectProperty> = phf::phf_map! {
     "SEV" => CreatureEffectProperty::Severity,

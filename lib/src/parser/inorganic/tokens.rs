@@ -1,8 +1,7 @@
 use serde::{Deserialize, Serialize};
 
-#[derive(ts_rs::TS)]
-#[ts(export)]
-#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, Default)]
+/// Tokens that can be used in inorganic raws.
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, Default, specta::Type)]
 pub enum InorganicToken {
     /// Used on metals, causes the metal to be made into wafers instead of bars.
     Wafers,
@@ -48,7 +47,7 @@ pub enum InorganicToken {
     Lava,
     /// Prevents the material from showing up in certain places. AI-controlled entities won't use the material to make items and don't bring it in caravans,
     /// though the player can use it as normal. Also, inorganic generated creatures (forgotten beasts, titans, demons) will never be composed of this material.
-    /// Explicitly set by all evil weather materials and implied by \[DEEP_SURFACE\] and \[DEEP_SPECIAL\].
+    /// Explicitly set by all evil weather materials and implied by `[DEEP_SURFACE]` and `[DEEP_SPECIAL]`.
     Special,
     /// Indicates that this is a generated material. Cannot be specified in user-defined raws.
     Generated,
@@ -61,9 +60,8 @@ pub enum InorganicToken {
     Unknown,
 }
 
-#[derive(ts_rs::TS)]
-#[ts(export)]
-#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, Default)]
+/// The class of environment that the stone appears in.
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, Default, specta::Type)]
 pub enum EnvironmentClass {
     /// Will appear in every stone.
     AllStone,
@@ -90,9 +88,8 @@ pub enum EnvironmentClass {
     None,
 }
 
-#[derive(ts_rs::TS)]
-#[ts(export)]
-#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, Default)]
+/// The type of inclusion that the stone has.
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, Default, specta::Type)]
 pub enum InclusionType {
     /// Large ovoids that occupy their entire 48x48 embark tile. Microcline is an example. When mined, stone has a 25% yield (as with layer stones).
     Cluster,
@@ -108,23 +105,35 @@ pub enum InclusionType {
 }
 
 impl EnvironmentClass {
+    /// Whether the environment class is the default value.
+    ///
+    /// # Returns
+    ///
+    /// True if the environment class is the default value, false otherwise.
+    #[must_use]
     pub fn is_default(&self) -> bool {
-        *self == EnvironmentClass::None
+        *self == Self::None
     }
 }
 impl InclusionType {
+    /// Whether the inclusion type is the default value.
+    ///
+    /// # Returns
+    ///
+    /// True if the inclusion type is the default value, false otherwise.
+    #[must_use]
     pub fn is_default(&self) -> bool {
-        *self == InclusionType::None
+        *self == Self::None
     }
 }
 impl std::fmt::Display for InclusionType {
     fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
         match self {
-            InclusionType::Cluster => write!(f, "Cluster"),
-            InclusionType::ClusterSmall => write!(f, "ClusterSmall"),
-            InclusionType::ClusterOne => write!(f, "ClusterOne"),
-            InclusionType::Vein => write!(f, "Vein"),
-            InclusionType::None => write!(f, "None"),
+            Self::Cluster => write!(f, "Cluster"),
+            Self::ClusterSmall => write!(f, "ClusterSmall"),
+            Self::ClusterOne => write!(f, "ClusterOne"),
+            Self::Vein => write!(f, "Vein"),
+            Self::None => write!(f, "None"),
         }
     }
 }
@@ -132,17 +141,17 @@ impl std::fmt::Display for InclusionType {
 impl std::fmt::Display for EnvironmentClass {
     fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
         match self {
-            EnvironmentClass::AllStone => write!(f, "AllStone"),
-            EnvironmentClass::IgneousAll => write!(f, "IgneousAll"),
-            EnvironmentClass::IgneousExtrusive => write!(f, "IgneousExtrusive"),
-            EnvironmentClass::IgneousIntrusive => write!(f, "IgneousIntrusive"),
-            EnvironmentClass::Soil => write!(f, "Soil"),
-            EnvironmentClass::SoilSand => write!(f, "SoilSand"),
-            EnvironmentClass::SoilOcean => write!(f, "SoilOcean"),
-            EnvironmentClass::Sedimentary => write!(f, "Sedimentary"),
-            EnvironmentClass::Metamorphic => write!(f, "Metamorphic"),
-            EnvironmentClass::Alluvial => write!(f, "Alluvial"),
-            EnvironmentClass::None => write!(f, "None"),
+            Self::AllStone => write!(f, "AllStone"),
+            Self::IgneousAll => write!(f, "IgneousAll"),
+            Self::IgneousExtrusive => write!(f, "IgneousExtrusive"),
+            Self::IgneousIntrusive => write!(f, "IgneousIntrusive"),
+            Self::Soil => write!(f, "Soil"),
+            Self::SoilSand => write!(f, "SoilSand"),
+            Self::SoilOcean => write!(f, "SoilOcean"),
+            Self::Sedimentary => write!(f, "Sedimentary"),
+            Self::Metamorphic => write!(f, "Metamorphic"),
+            Self::Alluvial => write!(f, "Alluvial"),
+            Self::None => write!(f, "None"),
         }
     }
 }
@@ -150,29 +159,29 @@ impl std::fmt::Display for EnvironmentClass {
 impl std::fmt::Display for InorganicToken {
     fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
         match self {
-            InorganicToken::Wafers => write!(f, "Wafers"),
-            InorganicToken::DeepSpecial => write!(f, "DeepSpecial"),
-            InorganicToken::MetalOre => write!(f, "MetalOre"),
-            InorganicToken::ThreadMetal => write!(f, "ThreadMetal"),
-            InorganicToken::DeepSurface => write!(f, "DeepSurface"),
-            InorganicToken::Aquifer => write!(f, "Aquifer"),
-            InorganicToken::Metamorphic => write!(f, "Metamorphic"),
-            InorganicToken::Sedimentary => write!(f, "Sedimentary"),
-            InorganicToken::Soil => write!(f, "Soil"),
-            InorganicToken::SoilOcean => write!(f, "SoilOcean"),
-            InorganicToken::SoilSand => write!(f, "SoilSand"),
-            InorganicToken::SedimentaryOceanShallow => write!(f, "SedimentaryOceanShallow"),
-            InorganicToken::SedimentaryOceanDeep => write!(f, "SedimentaryOceanDeep"),
-            InorganicToken::IgneousExtrusive => write!(f, "IgneousExtrusive"),
-            InorganicToken::IgneousIntrusive => write!(f, "IgneousIntrusive"),
-            InorganicToken::Environment => write!(f, "Environment"),
-            InorganicToken::EnvironmentSpecific => write!(f, "EnvironmentSpecific"),
-            InorganicToken::Lava => write!(f, "Lava"),
-            InorganicToken::Special => write!(f, "Special"),
-            InorganicToken::Generated => write!(f, "Generated"),
-            InorganicToken::Divine => write!(f, "Divine"),
-            InorganicToken::Sphere => write!(f, "Sphere"),
-            InorganicToken::Unknown => write!(f, "Unknown"),
+            Self::Wafers => write!(f, "Wafers"),
+            Self::DeepSpecial => write!(f, "DeepSpecial"),
+            Self::MetalOre => write!(f, "MetalOre"),
+            Self::ThreadMetal => write!(f, "ThreadMetal"),
+            Self::DeepSurface => write!(f, "DeepSurface"),
+            Self::Aquifer => write!(f, "Aquifer"),
+            Self::Metamorphic => write!(f, "Metamorphic"),
+            Self::Sedimentary => write!(f, "Sedimentary"),
+            Self::Soil => write!(f, "Soil"),
+            Self::SoilOcean => write!(f, "SoilOcean"),
+            Self::SoilSand => write!(f, "SoilSand"),
+            Self::SedimentaryOceanShallow => write!(f, "SedimentaryOceanShallow"),
+            Self::SedimentaryOceanDeep => write!(f, "SedimentaryOceanDeep"),
+            Self::IgneousExtrusive => write!(f, "IgneousExtrusive"),
+            Self::IgneousIntrusive => write!(f, "IgneousIntrusive"),
+            Self::Environment => write!(f, "Environment"),
+            Self::EnvironmentSpecific => write!(f, "EnvironmentSpecific"),
+            Self::Lava => write!(f, "Lava"),
+            Self::Special => write!(f, "Special"),
+            Self::Generated => write!(f, "Generated"),
+            Self::Divine => write!(f, "Divine"),
+            Self::Sphere => write!(f, "Sphere"),
+            Self::Unknown => write!(f, "Unknown"),
         }
     }
 }

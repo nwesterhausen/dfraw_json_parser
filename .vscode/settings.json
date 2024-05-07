@@ -62,6 +62,7 @@
     "powf",
     "PREFSTRING",
     "PUZZLEBOX",
+    "runtimes",
     "SEMIMEGABEAST",
     "SIEGEAMMO",
     "SIEGER",
@@ -70,6 +71,7 @@
     "THICKWEB",
     "TRAPAVOID",
     "TRAPCOMP",
+    "Triggerable",
     "typetag",
     "untameable",
     "VAMPCURSE",
@@ -81,5 +83,13 @@
   "rust-analyzer.cargo.features": ["tauri"],
   "conventionalCommits.scopes": ["deps"],
   "rust-analyzer.check.command": "clippy",
-  "rust-analyzer.check.extraArgs": ["--", "-W", "clippy::pedantic", "-W", "clippy::cargo", "-W", "clippy::indexing_slicing"]
+  "rust-analyzer.check.extraArgs": [
+    "--",
+    "-W",
+    "clippy::pedantic",
+    "-W",
+    "clippy::cargo",
+    "-W",
+    "clippy::indexing_slicing"
+  ]
 }

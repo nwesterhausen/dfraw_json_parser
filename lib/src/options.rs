@@ -42,8 +42,6 @@ use crate::parser::{ObjectType, RawModuleLocation};
 #[allow(clippy::struct_excessive_bools)]
 #[derive(Debug, Clone, Serialize, Deserialize, PartialEq, Eq, Hash)]
 #[serde(rename_all = "camelCase")]
-#[derive(ts_rs::TS)]
-#[ts(export)]
 pub struct ParserOptions {
     /// Whether to attach a metadata field to the raws.
     /// If true, all raws will have a `metadata` field which shows information about the
@@ -67,7 +65,7 @@ pub struct ParserOptions {
     pub skip_apply_creature_variations: bool,
     /// What types of raws to parse. If this is left empty, all parsable raws will be parsed.
     ///
-    /// Default: [Creature, CreatureVariation, Entity, Plant, Inorganic, MaterialTemplate, Graphics, TilePage]
+    /// Default: `[Creature, CreatureVariation, Entity, Plant, Inorganic, MaterialTemplate, Graphics, TilePage]`
     pub object_types_to_parse: Vec<ObjectType>,
     /// What locations to parse raws from. If this is left empty, no locations will be parsed.
     ///
@@ -82,7 +80,7 @@ pub struct ParserOptions {
     ///
     /// Default: ""
     pub dwarf_fortress_directory: PathBuf,
-    /// Optionally specify one or more legends_plus exports to parse in addition to the raws.
+    /// Optionally specify one or more `legends_plus` exports to parse in addition to the raws.
     /// These exports include information about generated creatures which are not included in the
     /// raws.
     ///

@@ -2,44 +2,106 @@ use serde::{Deserialize, Serialize};
 
 use crate::parser::{
     helpers::build_object_id_from_pieces,
-    serializer_helper, ObjectType, {clean_search_vec, Searchable}, {RawMetadata, RawObject},
+    ObjectType, {clean_search_vec, Searchable}, {RawMetadata, RawObject},
 };
 
-#[derive(ts_rs::TS)]
-#[ts(export)]
-#[derive(Serialize, Deserialize, Debug, Clone, Default)]
+/// A struct representing a creature selection
+#[derive(Serialize, Deserialize, Debug, Clone, Default, specta::Type)]
 #[serde(rename_all = "camelCase")]
 pub struct SelectCreature {
-    #[serde(skip_serializing_if = "serializer_helper::is_metadata_hidden")]
-    metadata: RawMetadata,
+    metadata: Option<RawMetadata>,
     identifier: String,
     object_id: String,
 
     tags: Vec<String>,
 }
 impl SelectCreature {
-    pub fn new(identifier: &str, metadata: &RawMetadata) -> SelectCreature {
-        SelectCreature {
+    /// Create a new `SelectCreature`
+    ///
+    /// # Arguments
+    ///
+    /// * `identifier` - The identifier of the creature
+    /// * `metadata` - The metadata of the creature
+    ///
+    /// # Returns
+    ///
+    /// A new `SelectCreature`
+    #[must_use]
+    pub fn new(identifier: &str, metadata: &RawMetadata) -> Self {
+        Self {
             identifier: String::from(identifier),
-            metadata: metadata.clone(),
+            metadata: Some(metadata.clone()),
             object_id: build_object_id_from_pieces(
                 metadata,
                 identifier,
                 &ObjectType::SelectCreature,
             ),
-            ..SelectCreature::default()
+            ..Self::default()
+        }
+    }
+    /// Create a new empty `SelectCreature`
+    ///
+    /// # Returns
+    ///
+    /// A new empty `SelectCreature`
+    #[must_use]
+    pub fn empty() -> Self {
+        Self {
+            metadata: Some(
+                RawMetadata::default()
+                    .with_object_type(ObjectType::SelectCreature)
+                    .with_hidden(true),
+            ),
+            ..Self::default()
         }
     }
 
-    pub fn empty() -> Self {
-        Self::default()
+    /// Function to "clean" the raw. This is used to remove any empty list or strings,
+    /// and to remove any default values. By "removing" it means setting the value to None.
+    ///
+    /// This also will remove the metadata if `is_metadata_hidden` is true.
+    ///
+    /// Steps for all "Option" fields:
+    /// - Set any metadata to None if `is_metadata_hidden` is true.
+    /// - Set any empty string to None.
+    /// - Set any empty list to None.
+    /// - Set any default values to None.
+    ///
+    /// # Returns
+    ///
+    /// A cleaned `SelectCreature`
+    #[must_use]
+    pub fn cleaned(&self) -> Self {
+        let mut cleaned = self.clone();
+
+        if let Some(metadata) = &cleaned.metadata {
+            if metadata.is_hidden() {
+                cleaned.metadata = None;
+            }
+        }
+
+        cleaned
     }
 }
 
 #[typetag::serde]
 impl RawObject for SelectCreature {
-    fn get_metadata(&self) -> &RawMetadata {
-        &self.metadata
+    fn get_metadata(&self) -> RawMetadata {
+        self.metadata.as_ref().map_or_else(
+            || {
+                tracing::warn!(
+                    "Metadata is missing for SelectCreature: {}",
+                    self.identifier
+                );
+                RawMetadata::default()
+                    .with_object_type(ObjectType::SelectCreature)
+                    .with_hidden(true)
+            },
+            std::clone::Clone::clone,
+        )
+    }
+    fn clean_self(&mut self) {
+        *self = self.cleaned();
     }
     fn get_identifier(&self) -> &str {
         &self.identifier

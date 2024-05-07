@@ -2,9 +2,16 @@ on:
   - push
   - pull_request
 name: Clippy Check
+
+env:
+  CARGO_TERM_COLOR: always
+  # sccache enablement
+  SCCACHE_GHA_ENABLED: true
+  RUSTC_WRAPPER: sccache
+
 jobs:
   clippy_check:
-    name: 'Clippy Check Nightly'
+    name: Clippy Check Nightly
     runs-on: ubuntu-latest
     steps:
       - name: Harden Runner
@@ -49,7 +56,7 @@ jobs:
       - name: Run clippy
         run: cargo clippy -- -D warnings
   verify_bindings:
-    name: 'Verify Type Bindings'
+    name: Verify Type Bindings
     needs: clippy_check
     runs-on: ubuntu-latest
     steps:
@@ -83,8 +90,49 @@ jobs:
           toolchain: stable
       - name: Generate Type Bindings
         run: |
+          cargo build
           cargo test --all-features
           npx prettier --write lib/bindings/*.ts
       - name: Check for changes
         run: |
           git diff --exit-code
+  test_parsing:
+    name: Test Parsing
+    needs: clippy_check
+    runs-on: ubuntu-latest
+    steps:
+      - name: Harden Runner
+        uses: step-security/harden-runner@eb238b55efaa70779f274895e782ed17c84f2895 # v2.6.1
+        with:
+          egress-policy: audit
+
+      - name: Vanilla Raws Cache
+        id: vanilla-raws-cache
+        uses: actions/cache@v3
+        with:
+          key: vanilla-raws-${{ vars.DF_VERSION }}
+          path: /home/runner/vanilla-raws
+      - name: Download Vanilla Raws Bundle
+        if: ${{ steps.vanilla-raws-cache.outputs.cache-hit != 'true' }}
+        run: |
+          wget -O vanilla-raws.zip https://build-deps.ci.nwest.one/dwarffortress/vanilla_${{ vars.DF_VERSION }}.zip
+          unzip -d /home/runner/vanilla-raws vanilla-raws.zip
+
+      - uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11 # v4.1.1
+      - name: Run sccache-cache
+        uses: mozilla-actions/sccache-action@2e7f9ec7921547d4b46598398ca573513895d0bd # 0.0.4
+      - uses: dtolnay/rust-toolchain@be73d7920c329f220ce78e0234b8f96b7ae60248 # master
+        with:
+          toolchain: stable
+
+      - name: Build CLI
+        run: cargo build
+
+      # TODO: Add various parsing scenarios (e.g. a single raw, an entire module, all vanilla, the info.txt files, etc.)
+      # The idea being the logs from the parsing tests will be useful for reference
+      # `cargo run` will run the cli automatically
+
+      - name: Parse creature_birds.txt with creature variation support
+        run:
+          cargo run -- -r /home/runner/vanilla-raws/vanilla_creatures/objects/creature_birds.txt -r
+          /home/runner/vanilla-raws/vanilla_creatures/objects/c_variation_default.txt

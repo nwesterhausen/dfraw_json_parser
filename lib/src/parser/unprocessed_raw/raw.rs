@@ -8,9 +8,8 @@ use crate::{
 
 use super::Modification;
 
-#[derive(ts_rs::TS)]
-#[ts(export)]
-#[derive(Serialize, Deserialize, Debug, Clone, Default)]
+/// An unprocessed raw object
+#[derive(Serialize, Deserialize, Debug, Clone, Default, specta::Type)]
 #[serde(rename_all = "camelCase")]
 #[allow(clippy::module_name_repetitions)]
 pub struct UnprocessedRaw {
@@ -37,6 +36,16 @@ pub struct UnprocessedRaw {
 
 impl UnprocessedRaw {
     /// Creates a new unprocessed raw object
+    ///
+    /// # Arguments
+    ///
+    /// * `raw_type` - The raw type of the object
+    /// * `metadata` - Metadata to be passed on to the final object
+    ///
+    /// # Returns
+    ///
+    /// A new unprocessed raw object
+    #[must_use]
     pub fn new(raw_type: &ObjectType, metadata: &RawMetadata, identifier: &str) -> Self {
         Self {
             raw_type: raw_type.clone(),
@@ -47,11 +56,21 @@ impl UnprocessedRaw {
     }
 
     /// Gets the raw type of the object. This is to tell us what to parse it into.
+    ///
+    /// # Returns
+    ///
+    /// The raw type of the object
+    #[must_use]
     pub fn raw_type(&self) -> ObjectType {
         self.raw_type.clone()
     }
 
     /// Check if there is nothing to parse
+    ///
+    /// # Returns
+    ///
+    /// * `true` if there is nothing to parse
+    #[must_use]
     pub fn is_empty(&self) -> bool {
         self.identifier.is_empty() && self.modifications.is_empty()
     }
@@ -71,6 +90,11 @@ impl UnprocessedRaw {
     ///
     /// This is used to determine if we can parse the raws into the object without having to do any
     /// parsing against other creatures (which may be the result of `resolve`ing the raws)
+    ///
+    /// # Returns
+    ///
+    /// * `true` if the raws are simple
+    #[must_use]
     pub fn is_simple(&self) -> bool {
         self.modifications.iter().all(|m| {
             matches!(
@@ -95,6 +119,11 @@ impl UnprocessedRaw {
     ///
     /// So when the raws are parsed from this into the actual object, we can apply these modifications
     /// in order to get the final object.
+    ///
+    /// # Returns
+    ///
+    /// The modifications to apply to the object
+    #[must_use]
     pub fn modifications(&self) -> &[Modification] {
         &self.modifications
     }
@@ -118,7 +147,7 @@ impl UnprocessedRaw {
                         // Check if the tags are the same
                         if &tag == last_tag {
                             // They are the same, so we can combine them
-                            last_raws.extend(raws.clone());
+                            last_raws.extend(raws);
                             return;
                         }
                     }
@@ -129,7 +158,7 @@ impl UnprocessedRaw {
                 if let Some(last_modification) = self.modifications.last_mut() {
                     if let Modification::AddToBeginning { raws: last_raws } = last_modification {
                         // They are the same, so we can combine them
-                        last_raws.extend(raws.clone());
+                        last_raws.extend(raws);
                         return;
                     }
                 }
@@ -139,7 +168,7 @@ impl UnprocessedRaw {
                 if let Some(last_modification) = self.modifications.last_mut() {
                     if let Modification::AddToEnding { raws: last_raws } = last_modification {
                         // They are the same, so we can combine them
-                        last_raws.extend(raws.clone());
+                        last_raws.extend(raws);
                         return;
                     }
                 }
@@ -149,7 +178,7 @@ impl UnprocessedRaw {
                 if let Some(last_modification) = self.modifications.last_mut() {
                     if let Modification::MainRawBody { raws: last_raws } = last_modification {
                         // They are the same, so we can combine them
-                        last_raws.extend(raws.clone());
+                        last_raws.extend(raws);
                         return;
                     }
                 }

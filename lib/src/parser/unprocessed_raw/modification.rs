@@ -1,8 +1,7 @@
 use serde::{Deserialize, Serialize};
 
-#[derive(ts_rs::TS)]
-#[ts(export)]
-#[derive(Serialize, Deserialize, Debug, Clone, Eq, PartialEq)]
+/// A struct representing a modification to a creature
+#[derive(Serialize, Deserialize, Debug, Clone, Eq, PartialEq, specta::Type)]
 #[serde(rename_all = "camelCase")]
 pub enum Modification {
     /// `COPY_TAGS_FROM` tag
@@ -47,6 +46,7 @@ pub enum Modification {
         /// This should be the entire raw in order to apply.
         raws: Vec<String>,
     },
+    /// The main body of the object
     MainRawBody {
         /// The set of raws that make up the object. This is usually defined first unless
         /// its specified to be added to the end or beginning (or before a tag)
@@ -57,12 +57,17 @@ pub enum Modification {
 }
 
 impl Modification {
+    /// Adds a raw to the modification
+    ///
+    /// # Arguments
+    ///
+    /// * `format` - The raw to add
     pub(crate) fn add_raw(&mut self, format: String) {
         match self {
-            Modification::AddToEnding { raws }
-            | Modification::AddToBeginning { raws }
-            | Modification::AddBeforeTag { raws, .. }
-            | Modification::MainRawBody { raws } => raws.push(format),
+            Self::AddToEnding { raws }
+            | Self::AddToBeginning { raws }
+            | Self::AddBeforeTag { raws, .. }
+            | Self::MainRawBody { raws } => raws.push(format),
             _ => {}
         }
     }
