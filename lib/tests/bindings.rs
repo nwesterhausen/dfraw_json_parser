@@ -647,6 +647,14 @@ fn generate_ts_bindings() {
                 String::new()
             }
         },
+        match export::<dfraw_json_parser::ParserOptions>(&config) {
+            Ok(x) => x,
+            Err(e) => {
+                eprintln!("Failed to export parser::graphics::CustomGraphicExtension");
+                eprintln!("{e:?}");
+                String::new()
+            }
+        },
     ];
 
     let missed = bindings.iter().filter(|x| x.is_empty()).collect::<Vec<_>>();
