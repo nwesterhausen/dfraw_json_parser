@@ -23,59 +23,84 @@ use super::{
 #[serde(rename_all = "camelCase")]
 pub struct Material {
     /// The type of the material is also the trigger to start tracking a material
+    #[serde(skip_serializing_if = "Option::is_none")]
     material_type: Option<MaterialType>,
     /// The material might have a name, but its more likely that there is only an identifier to
     /// refer to another creature/plant/reaction, which are listed elsewhere.
     /// If there is no name provided, then it is a special hardcoded case, e.g. magma or green glass.
+    #[serde(skip_serializing_if = "Option::is_none")]
     name: Option<String>,
     /// For the coal tag, it specifies the type of fuel that can be used. It will never be None.
+    #[serde(skip_serializing_if = "Option::is_none")]
     fuel_type: Option<FuelType>,
     /// Linked creature identifier (and then `material_name` might be "skin", like for "`CREATURE_MAT:DWARF:SKIN`")
+    #[serde(skip_serializing_if = "Option::is_none")]
     creature_identifier: Option<String>,
     /// Linked plant identifier (and then `material_name` might be "leaf", like for "`PLANT_MAT:BUSH_QUARRY:LEAF`")
+    #[serde(skip_serializing_if = "Option::is_none")]
     plant_identifier: Option<String>,
     /// If a material is defined within a creature itself, it will use `LOCAL_CREATURE_MAT` tag, which implies
     /// that the material is only used by that creature. This is also true for plants and `LOCAL_PLANT_MAT`.
     // skip if false
+    #[serde(skip_serializing_if = "Option::is_none")]
     is_local_material: Option<bool>,
     /// Within a reaction, there can be special material definitions. Todo: Figure this out.
+    #[serde(skip_serializing_if = "Option::is_none")]
     reagent_identifier: Option<String>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     reaction_product_identifier: Option<String>,
     /// If material is defined from a template, we need a way to refer to that
+    #[serde(skip_serializing_if = "Option::is_none")]
     template_identifier: Option<String>,
 
     /// Usage tags
+    #[serde(skip_serializing_if = "Option::is_none")]
     usage: Option<Vec<MaterialUsage>>,
 
+    #[serde(skip_serializing_if = "Option::is_none")]
     value: Option<u32>,
 
+    #[serde(skip_serializing_if = "Option::is_none")]
     color: Option<Color>,
 
+    #[serde(skip_serializing_if = "Option::is_none")]
     state_names: Option<StateName>,
 
+    #[serde(skip_serializing_if = "Option::is_none")]
     state_adjectives: Option<StateName>,
 
+    #[serde(skip_serializing_if = "Option::is_none")]
     state_colors: Option<StateName>,
 
+    #[serde(skip_serializing_if = "Option::is_none")]
     temperatures: Option<Temperatures>,
 
     /// Catch-all for remaining tags we identify but don't do anything with... yet.
+    #[serde(skip_serializing_if = "Option::is_none")]
     properties: Option<Vec<String>>,
 
     // Syndromes attached to materials..
+    #[serde(skip_serializing_if = "Option::is_none")]
     syndromes: Option<Vec<Syndrome>>,
     // Material Mechanical Properties
+    #[serde(skip_serializing_if = "Option::is_none")]
     mechanical_properties: Option<MaterialMechanics>,
     // Technically, the material mechanics wouldn't apply to liquid or gaseous forms
+    #[serde(skip_serializing_if = "Option::is_none")]
     liquid_density: Option<i32>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     molar_mass: Option<i32>,
 
     // Colors
+    #[serde(skip_serializing_if = "Option::is_none")]
     build_color: Option<Color>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     display_color: Option<Color>,
 
     // Display
+    #[serde(skip_serializing_if = "Option::is_none")]
     tile: Option<Tile>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     item_symbol: Option<String>,
 }
 

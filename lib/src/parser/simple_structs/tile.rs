@@ -8,9 +8,13 @@ use super::color::Color;
 /// Representation of a character tile (literally a single character) that is used in DF Classic
 pub struct Tile {
     character: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
     alt_character: Option<String>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     color: Option<Color>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     glow_character: Option<String>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     glow_color: Option<Color>,
 }
 

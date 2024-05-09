@@ -14,84 +14,144 @@ use super::{phf_table::ENTITY_TOKENS, tokens::EntityToken};
 #[derive(Serialize, Deserialize, Debug, Clone, Default, specta::Type)]
 #[serde(rename_all = "camelCase")]
 pub struct Entity {
+    #[serde(skip_serializing_if = "Option::is_none")]
     metadata: Option<RawMetadata>,
     identifier: String,
     object_id: String,
 
     tags: Vec<EntityToken>,
 
+    #[serde(skip_serializing_if = "Option::is_none")]
     creature: Option<String>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     translation: Option<String>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     exclusive_start_biome: Option<String>,
 
+    #[serde(skip_serializing_if = "Option::is_none")]
     biome_support: Option<Vec<(String, u32)>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     settlement_biome: Option<Vec<String>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     start_biome: Option<Vec<String>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     likes_sites: Option<Vec<String>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     tolerates_sites: Option<Vec<String>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     world_constructions: Option<Vec<String>>,
 
+    #[serde(skip_serializing_if = "Option::is_none")]
     max_pop_number: Option<u32>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     max_site_pop_number: Option<u32>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     max_starting_civ_number: Option<u32>,
 
+    #[serde(skip_serializing_if = "Option::is_none")]
     permitted_buildings: Option<Vec<String>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     permitted_jobs: Option<Vec<String>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     permitted_reactions: Option<Vec<String>>,
 
+    #[serde(skip_serializing_if = "Option::is_none")]
     currency: Option<Vec<(String, u32)>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     art_facet_modifier: Option<Vec<(String, u32)>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     art_image_element_modifier: Option<Vec<(String, u32)>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     item_improvement_modifier: Option<Vec<(String, u32)>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     select_symbols: Option<Vec<(String, String)>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     subselect_symbols: Option<Vec<(String, String)>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     cull_symbols: Option<Vec<(String, String)>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     friendly_color: Option<Color>,
 
+    #[serde(skip_serializing_if = "Option::is_none")]
     religion: Option<String>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     religion_spheres: Option<Vec<String>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     sphere_alignments: Option<Vec<String>>,
 
+    #[serde(skip_serializing_if = "Option::is_none")]
     positions: Option<Vec<Position>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     land_holder_trigger: Option<String>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     site_variable_positions: Option<Vec<String>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     variable_positions: Option<Vec<String>>,
 
+    #[serde(skip_serializing_if = "Option::is_none")]
     ethics: Option<Vec<(String, String)>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     values: Option<Vec<(String, u32)>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     variable_values: Option<Vec<(String, u32, u32)>>,
 
+    #[serde(skip_serializing_if = "Option::is_none")]
     active_season: Option<String>,
 
+    #[serde(skip_serializing_if = "Option::is_none")]
     banditry: Option<f32>,
 
+    #[serde(skip_serializing_if = "Option::is_none")]
     progress_trigger_population: Option<u8>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     progress_trigger_production: Option<u8>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     progress_trigger_trade: Option<u8>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     progress_trigger_population_siege: Option<u8>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     progress_trigger_production_siege: Option<u8>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     progress_trigger_trade_siege: Option<u8>,
 
+    #[serde(skip_serializing_if = "Option::is_none")]
     scholars: Option<Vec<String>>,
 
+    #[serde(skip_serializing_if = "Option::is_none")]
     ammo: Option<Vec<String>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     armors: Option<Vec<(String, u16)>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     diggers: Option<Vec<String>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     gloves: Option<Vec<(String, u16)>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     helms: Option<Vec<(String, u16)>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     instrument: Option<Vec<String>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     pants: Option<Vec<(String, u16)>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     shields: Option<Vec<String>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     shoes: Option<Vec<(String, u16)>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     siege_ammo: Option<Vec<String>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     tool: Option<Vec<String>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     toys: Option<Vec<String>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     trap_components: Option<Vec<String>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     weapons: Option<Vec<String>>,
 
+    #[serde(skip_serializing_if = "Option::is_none")]
     gem_shape: Option<Vec<String>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     stone_shape: Option<Vec<String>>,
 
+    #[serde(skip_serializing_if = "Option::is_none")]
     source_hfid: Option<u32>,
 }
 

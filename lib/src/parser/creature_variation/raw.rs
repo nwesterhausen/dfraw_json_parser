@@ -11,6 +11,7 @@ use super::{Rule, Token, TOKEN_MAP};
 #[serde(rename_all = "camelCase")]
 pub struct CreatureVariation {
     /// Common Raw file Things
+    #[serde(skip_serializing_if = "Option::is_none")]
     metadata: Option<RawMetadata>,
     identifier: String,
     object_id: String,

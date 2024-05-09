@@ -10,6 +10,7 @@ use crate::parser::{
 #[serde(rename_all = "camelCase")]
 pub struct MaterialTemplate {
     identifier: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
     metadata: Option<RawMetadata>,
     object_id: String,
     material: Material,
