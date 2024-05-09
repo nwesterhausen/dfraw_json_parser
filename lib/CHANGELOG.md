@@ -7,6 +7,39 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## v0.17.4 (2024-05-09)
+
+### Chore
+
+ - <csr-id-50cccd5a417b4628adbd1179f37b8d3a94ad2545/> lint
+
+### Bug Fixes
+
+ - <csr-id-8590e3ea1896b4a42da1e3d73b399ba3899f80a1/> use biomejs for formatting
+ - <csr-id-ac35f9f7ed5f36d69776f1d0eed9b717045c8cf2/> export bindings for ParserOptions
+
+### Commit Statistics
+
+<csr-read-only-do-not-edit/>
+
+ - 5 commits contributed to the release.
+ - 3 commits were understood as [conventional](https://www.conventionalcommits.org).
+ - 0 issues like '(#ID)' were seen in commit messages
+
+### Commit Details
+
+<csr-read-only-do-not-edit/>
+
+<details><summary>view details</summary>
+
+ * **Uncategorized**
+    - Merge pull request #90 from nwesterhausen/parser-options-binding ([`3594888`](https://github.com/nwesterhausen/dfraw_json_parser/commit/35948885fcb18bd176e32f5debf69d61de1d2b3f))
+    - Lint ([`50cccd5`](https://github.com/nwesterhausen/dfraw_json_parser/commit/50cccd5a417b4628adbd1179f37b8d3a94ad2545))
+    - Use biomejs for formatting ([`8590e3e`](https://github.com/nwesterhausen/dfraw_json_parser/commit/8590e3ea1896b4a42da1e3d73b399ba3899f80a1))
+    - Export bindings for ParserOptions ([`ac35f9f`](https://github.com/nwesterhausen/dfraw_json_parser/commit/ac35f9f7ed5f36d69776f1d0eed9b717045c8cf2))
+    - Merge pull request #89 from nwesterhausen/binding-fix ([`2675f17`](https://github.com/nwesterhausen/dfraw_json_parser/commit/2675f1780a83ebb2aff56370e8461d7a575e82b5))
+</details>
+
 ## v0.17.3 (2024-05-09)
 
 ### Bug Fixes
@@ -18,7 +51,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 <csr-read-only-do-not-edit/>
 
- - 4 commits contributed to the release.
+ - 5 commits contributed to the release.
  - 2 commits were understood as [conventional](https://www.conventionalcommits.org).
  - 0 issues like '(#ID)' were seen in commit messages
 
@@ -29,6 +62,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 <details><summary>view details</summary>
 
  * **Uncategorized**
+    - Release dfraw_json_parser v0.17.3 ([`bb18339`](https://github.com/nwesterhausen/dfraw_json_parser/commit/bb183391d9c8decb507fbdb5c95d671807eb7385))
     - Also export bindings for "tauri" feature ([`ac13e28`](https://github.com/nwesterhausen/dfraw_json_parser/commit/ac13e28197d4cdc016ef736b19682ec43dfb7e4b))
     - Merge branch 'main' into binding-fix ([`3d321ba`](https://github.com/nwesterhausen/dfraw_json_parser/commit/3d321bab5e00703e9dd0fe0c74fbcdef79ab2d3b))
     - Derive specta::type for ProgressTask ([`00f97d6`](https://github.com/nwesterhausen/dfraw_json_parser/commit/00f97d6744b34f8964486c3ee6d0b5735dd14233))
