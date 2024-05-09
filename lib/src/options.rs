@@ -1,6 +1,6 @@
-use std::path::{Path, PathBuf};
-use specta::Type;
 use serde::{Deserialize, Serialize};
+use specta::Type;
+use std::path::{Path, PathBuf};
 
 use crate::parser::{ObjectType, RawModuleLocation};
 
