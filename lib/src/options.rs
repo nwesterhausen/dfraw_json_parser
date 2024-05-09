@@ -1,6 +1,6 @@
-use std::path::{Path, PathBuf};
-
 use serde::{Deserialize, Serialize};
+use specta::Type;
+use std::path::{Path, PathBuf};
 
 use crate::parser::{ObjectType, RawModuleLocation};
 
@@ -40,7 +40,7 @@ use crate::parser::{ObjectType, RawModuleLocation};
 ///
 #[allow(clippy::module_name_repetitions)]
 #[allow(clippy::struct_excessive_bools)]
-#[derive(Debug, Clone, Serialize, Deserialize, PartialEq, Eq, Hash)]
+#[derive(Debug, Clone, Serialize, Deserialize, PartialEq, Eq, Hash, Type)]
 #[serde(rename_all = "camelCase")]
 pub struct ParserOptions {
     /// Whether to attach a metadata field to the raws.
