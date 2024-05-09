@@ -15,6 +15,7 @@ use super::{dimensions::Dimensions, phf_table::TILE_PAGE_TAGS, tokens::TilePageT
 #[derive(Serialize, Deserialize, Debug, Clone, Default, specta::Type)]
 #[serde(rename_all = "camelCase")]
 pub struct TilePage {
+    #[serde(skip_serializing_if = "Option::is_none")]
     metadata: Option<RawMetadata>,
     identifier: String,
     object_id: String,

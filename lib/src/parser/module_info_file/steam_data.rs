@@ -4,11 +4,17 @@ use serde::{Deserialize, Serialize};
 #[derive(Serialize, Deserialize, Default, Clone, Debug, specta::Type)]
 #[serde(rename_all = "camelCase")]
 pub struct SteamData {
+    #[serde(skip_serializing_if = "Option::is_none")]
     title: Option<String>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     description: Option<String>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     tags: Option<Vec<String>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     key_value_tags: Option<Vec<String>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     metadata: Option<Vec<String>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     changelog: Option<String>,
     file_id: u64,
 }

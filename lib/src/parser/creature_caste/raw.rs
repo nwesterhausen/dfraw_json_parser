@@ -15,37 +15,60 @@ use super::{phf_table::CASTE_TOKENS, tokens::CasteTag, Gait};
 #[serde(rename_all = "camelCase")]
 pub struct Caste {
     identifier: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
     tags: Option<Vec<CasteTag>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     description: Option<String>,
     // String Tokens
+    #[serde(skip_serializing_if = "Option::is_none")]
     baby_name: Option<SingPlurName>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     caste_name: Option<Name>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     child_name: Option<SingPlurName>,
     // [min, max] ranges
     /// Default \[0,0\]
+    #[serde(skip_serializing_if = "Option::is_none")]
     clutch_size: Option<[u32; 2]>,
     /// Default \[0,0\]
+    #[serde(skip_serializing_if = "Option::is_none")]
     litter_size: Option<[u32; 2]>,
     /// Default \[0,0\]
+    #[serde(skip_serializing_if = "Option::is_none")]
     max_age: Option<[u32; 2]>,
     // Integer tokens
+    #[serde(skip_serializing_if = "Option::is_none")]
     baby: Option<u32>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     child: Option<u32>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     difficulty: Option<u32>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     egg_size: Option<u32>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     grass_trample: Option<u32>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     grazer: Option<u32>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     low_light_vision: Option<u32>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     pet_value: Option<u32>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     pop_ratio: Option<u32>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     change_body_size_percentage: Option<u32>,
     // Arrays
+    #[serde(skip_serializing_if = "Option::is_none")]
     creature_class: Option<Vec<String>>,
     // Special Tokens
+    #[serde(skip_serializing_if = "Option::is_none")]
     body_size: Option<Vec<BodySize>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     milkable: Option<Milkable>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     tile: Option<Tile>,
     /// The gaits by which the creature can move.
+    #[serde(skip_serializing_if = "Option::is_none")]
     gaits: Option<Vec<Gait>>,
 }
 

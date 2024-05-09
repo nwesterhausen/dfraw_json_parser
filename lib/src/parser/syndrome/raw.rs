@@ -13,21 +13,31 @@ use super::{phf_table::SYNDROME_TOKEN, tokens::SyndromeToken};
 #[serde(rename_all = "camelCase")]
 pub struct Syndrome {
     /// Seen the `[SYN_IDENTIFIER:INEBRIATION]` tag in `material_templates.txt`
+    #[serde(skip_serializing_if = "Option::is_none")]
     identifier: Option<String>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     name: Option<String>,
 
+    #[serde(skip_serializing_if = "Option::is_none")]
     affected_classes: Option<Vec<String>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     immune_classes: Option<Vec<String>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     affected_creatures: Option<Vec<(String, String)>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     immune_creatures: Option<Vec<(String, String)>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     classes: Option<Vec<String>>,
 
     /// Seen the `[SYN_CONCENTRATION_ADDED:100:1000]` tag in `material_templates.txt`
     /// default is 0:0
+    #[serde(skip_serializing_if = "Option::is_none")]
     concentration_added: Option<[u32; 2]>,
 
+    #[serde(skip_serializing_if = "Option::is_none")]
     tags: Option<Vec<SyndromeToken>>,
 
+    #[serde(skip_serializing_if = "Option::is_none")]
     conditions: Option<Vec<String>>,
 }
 

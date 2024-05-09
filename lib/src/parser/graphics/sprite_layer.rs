@@ -11,8 +11,11 @@ pub struct SpriteLayer {
     layer_name: String,
     tile_page_id: String,
     offset: Dimensions,
+    #[serde(skip_serializing_if = "Option::is_none")]
     offset_2: Option<Dimensions>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     large_image: Option<bool>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     conditions: Option<Vec<(Condition, String)>>,
 }
 

@@ -10,44 +10,79 @@ use super::tokens::PositionToken;
 pub struct Position {
     identifier: String,
 
+    #[serde(skip_serializing_if = "Option::is_none")]
     allowed_classes: Option<Vec<String>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     allowed_creatures: Option<Vec<String>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     appointed_by: Option<String>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     color: Option<Color>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     commander: Option<String>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     demand_max: Option<u32>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     execution_skill: Option<String>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     gender: Option<String>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     land_holder: Option<u32>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     land_name: Option<String>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     mandate_max: Option<u32>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     name: Option<SingPlurName>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     name_male: Option<SingPlurName>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     name_female: Option<SingPlurName>,
 
-    number: Option<i32>,     //set -1 for AS_NEEDED
+    #[serde(skip_serializing_if = "Option::is_none")]
+    number: Option<i32>, //set -1 for AS_NEEDED
+    #[serde(skip_serializing_if = "Option::is_none")]
     precedence: Option<i32>, //set -1 for NONE
+    #[serde(skip_serializing_if = "Option::is_none")]
     rejected_classes: Option<Vec<String>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     rejected_creatures: Option<Vec<String>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     replaced_by: Option<String>,
 
+    #[serde(skip_serializing_if = "Option::is_none")]
     required_bedroom: Option<u32>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     required_boxes: Option<u32>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     required_cabinets: Option<u32>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     required_dining: Option<u32>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     required_office: Option<u32>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     required_racks: Option<u32>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     required_stands: Option<u32>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     required_tomb: Option<u32>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     requires_population: Option<u32>,
 
+    #[serde(skip_serializing_if = "Option::is_none")]
     responsibilities: Option<Vec<String>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     spouse: Option<SingPlurName>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     spouse_female: Option<SingPlurName>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     spouse_male: Option<SingPlurName>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     squad: Option<String>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     succession: Option<String>,
 
+    #[serde(skip_serializing_if = "Vec::is_empty")]
     tags: Vec<PositionToken>,
 }
 

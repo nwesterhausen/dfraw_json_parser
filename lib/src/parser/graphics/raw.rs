@@ -19,18 +19,25 @@ use super::{
 #[derive(Serialize, Deserialize, Debug, Clone, Default, specta::Type)]
 #[serde(rename_all = "camelCase")]
 pub struct Graphic {
+    #[serde(skip_serializing_if = "Option::is_none")]
     metadata: Option<RawMetadata>,
     identifier: String,
     object_id: String,
 
+    #[serde(skip_serializing_if = "Option::is_none")]
     caste_identifier: Option<String>,
     kind: GraphicType,
 
+    #[serde(skip_serializing_if = "Option::is_none")]
     sprites: Option<Vec<SpriteGraphic>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     layers: Option<Vec<(String, Vec<SpriteLayer>)>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     growths: Option<Vec<(String, Vec<SpriteGraphic>)>>,
 
+    #[serde(skip_serializing_if = "Option::is_none")]
     custom_extensions: Option<Vec<CustomGraphicExtension>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     tags: Option<Vec<String>>,
 
     #[serde(skip)]
