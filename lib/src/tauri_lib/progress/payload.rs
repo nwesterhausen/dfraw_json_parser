@@ -1,10 +1,10 @@
 use serde::{Deserialize, Serialize};
+use specta::Type;
 
 use super::{Details, Task};
 
 /// A payload that can be used to gauge the progress of the parsing process.
-
-#[derive(Serialize, Deserialize, Debug, Clone, Default)]
+#[derive(Serialize, Deserialize, Debug, Clone, Default, Type)]
 #[serde(rename_all = "camelCase")]
 #[allow(clippy::module_name_repetitions)]
 pub struct ProgressPayload {

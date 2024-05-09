@@ -2,7 +2,6 @@ use serde::{Deserialize, Serialize};
 use specta::Type;
 
 /// Tasks that describe what the parser is currently doing.
-
 #[derive(Serialize, Deserialize, Debug, Clone, Default, Type)]
 #[serde(rename_all = "camelCase")]
 #[allow(clippy::module_name_repetitions)]

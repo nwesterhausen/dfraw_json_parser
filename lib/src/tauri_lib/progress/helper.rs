@@ -2,11 +2,11 @@ use crate::RawModuleLocation;
 
 use super::{Details, Payload, Task};
 
-#[cfg(feature = "tauri")]
-#[allow(clippy::module_name_repetitions)]
 /// A helper struct for sending progress updates to the Tauri frontend.
 ///
 /// This struct is only available when the `tauri` feature is enabled.
+#[cfg(feature = "tauri")]
+#[allow(clippy::module_name_repetitions)]
 pub struct ProgressHelper {
     /// The estimated total number of steps that will be taken.
     estimated_total: usize,

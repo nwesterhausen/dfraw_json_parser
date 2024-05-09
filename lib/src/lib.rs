@@ -127,6 +127,8 @@ pub use options::ParserOptions;
 pub use parser::*;
 
 #[cfg(feature = "tauri")]
+pub use tauri_lib::ProgressDetails;
+#[cfg(feature = "tauri")]
 pub use tauri_lib::ProgressPayload;
 #[cfg(feature = "tauri")]
 pub use tauri_lib::ProgressTask;
