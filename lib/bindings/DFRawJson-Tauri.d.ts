@@ -6,30 +6,30 @@
  * Details about the current file being parsed, specifically where and what it is.
  */
 export type ProgressDetails = {
-  location: RawModuleLocation;
-  module: string | null;
-  rawFile: string | null;
-  fileLocation: string | null;
+	location: RawModuleLocation;
+	module: string | null;
+	rawFile: string | null;
+	fileLocation: string | null;
 };
 
 /**
  * Tasks that describe what the parser is currently doing.
  */
 export type ProgressTask =
-  | "parseRaws"
-  | "parseLegends"
-  | "parseModuleInfoFiles"
-  | "resolveRaws"
-  | "idle";
+	| "parseRaws"
+	| "parseLegends"
+	| "parseModuleInfoFiles"
+	| "resolveRaws"
+	| "idle";
 
 /**
  * A payload that can be used to gauge the progress of the parsing process.
  */
 export type ProgressPayload = {
-  details: ProgressDetails;
-  currentTask: ProgressTask;
-  percentage: number;
-  runningTotal: string;
+	details: ProgressDetails;
+	currentTask: ProgressTask;
+	percentage: number;
+	runningTotal: string;
 };
 
 /**
@@ -37,8 +37,8 @@ export type ProgressPayload = {
  * `{df_directory}/data/vanilla`, `{df_directory}/mods`, and `{df_directory/data/installed_mods}`
  */
 export type RawModuleLocation =
-  | "InstalledMods"
-  | "Mods"
-  | "Vanilla"
-  | "Unknown"
-  | "LegendsExport";
+	| "InstalledMods"
+	| "Mods"
+	| "Vanilla"
+	| "Unknown"
+	| "LegendsExport";
