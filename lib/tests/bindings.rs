@@ -665,3 +665,72 @@ fn generate_ts_bindings() {
         &bindings.join("\n\n"),
     );
 }
+
+#[cfg(feature = "tauri")]
+#[test]
+fn export_tauri_ts_bindings() {
+    // get our current working directory
+    let cwd = std::env::current_dir().unwrap();
+    // set lib/bindings/AllBindings.d.ts as the output file
+    let output_dir = cwd.join("bindings");
+    // make sure output dir exists
+    std::fs::create_dir_all(&output_dir).unwrap();
+    eprintln!("Output dir: {:?}", &output_dir);
+    let ts_bindings = TypescriptBinding::new(output_dir);
+
+    let config = ExportConfiguration::default()
+        .export_by_default(Some(true))
+        .bigint(BigIntExportBehavior::String);
+
+    let bindings: Vec<String> = vec![
+        match export::<dfraw_json_parser::ProgressDetails>(&config) {
+            Ok(x) => x,
+            Err(e) => {
+                eprintln!("Failed to export progress::details::ProgressDetails");
+                eprintln!("{e:?}");
+                String::new()
+            }
+        },
+        match export::<dfraw_json_parser::ProgressTask>(&config) {
+            Ok(x) => x,
+            Err(e) => {
+                eprintln!("Failed to export progress::tasks::ProgressTask");
+                eprintln!("{e:?}");
+                String::new()
+            }
+        },
+        match export::<dfraw_json_parser::ProgressPayload>(&config) {
+            Ok(x) => x,
+            Err(e) => {
+                eprintln!("Failed to export progress::payload::ProgressPayload");
+                eprintln!("{e:?}");
+                String::new()
+            }
+        },
+        // add the needed type RawModuleLocation
+        match export::<dfraw_json_parser::parser::RawModuleLocation>(&config) {
+            Ok(x) => x,
+            Err(e) => {
+                eprintln!("Failed to export parser::RawModuleLocation");
+                eprintln!("{e:?}");
+                String::new()
+            }
+        },
+    ];
+
+    let missed = bindings.iter().filter(|x| x.is_empty()).collect::<Vec<_>>();
+    // change missed into the number of missed bindings
+    let missed = missed.len();
+    // if there are missed bindings, print a warning
+    if missed > 0 {
+        eprintln!("Missed {missed} bindings");
+    }
+
+    // write the bindings to the output file
+    ts_bindings.write(
+        "tauri_lib library",
+        "DFRawJson-Tauri.d.ts",
+        None,
+        &bindings.join("\n\n"),
+    );
+}

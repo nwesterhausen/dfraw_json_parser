@@ -11,6 +11,8 @@ pub use progress::Helper as ProgressHelper;
 pub use progress::Payload as ProgressPayload;
 #[cfg(feature = "tauri")]
 pub use progress::Task as ProgressTask;
+#[cfg(feature = "tauri")]
+pub use progress::Details as ProgressDetails;
 
 /// A modified version of the `parse` function that uses the Tauri emitter.
 #[cfg(feature = "tauri")]
