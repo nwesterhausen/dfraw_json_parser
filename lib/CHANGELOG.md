@@ -220,6 +220,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
     - Release dfraw_json_parser v0.15.1, dfraw_json_parser-cli v1.0.1 ([`84e6712`](https://github.com/nwesterhausen/dfraw_json_parser/commit/84e671284f0076d6192ca86a90093ab4dc3b5b7c))
     - Release dfraw_json_parser v0.15.1, dfraw_json_parser-cli v1.0.1 ([`75c7772`](https://github.com/nwesterhausen/dfraw_json_parser/commit/75c7772fe4a0820067138494a2df363242b0a179))
     - Improve creature parsing ([`b1fda6c`](https://github.com/nwesterhausen/dfraw_json_parser/commit/b1fda6c6f90758ffe4c19641aa49d6c9729b15e6))
+
 </details>
 
 <csr-unknown>
@@ -240,17 +241,18 @@ chore: update bindingsfeat: impl RawObject for CreatureVariationchore(deps): upd
  - <csr-id-b1fda6c6f90758ffe4c19641aa49d6c9729b15e6/> improve creature parsing
    - refactor: CreatureVariation as object
 
+
 ### Bug Fixes
 
- - <csr-id-f7097e9cd45f2be1275d2c758b48026a6be1588f/> add supporting fields
+- <csr-id-f7097e9cd45f2be1275d2c758b48026a6be1588f/> add supporting fields
 
 ### Commit Statistics
 
 <csr-read-only-do-not-edit/>
 
- - 4 commits contributed to the release.
- - 3 commits were understood as [conventional](https://www.conventionalcommits.org).
- - 0 issues like '(#ID)' were seen in commit messages
+- 4 commits contributed to the release.
+- 3 commits were understood as [conventional](https://www.conventionalcommits.org).
+- 0 issues like '(#ID)' were seen in commit messages
 
 ### Commit Details
 
@@ -258,11 +260,12 @@ chore: update bindingsfeat: impl RawObject for CreatureVariationchore(deps): upd
 
 <details><summary>view details</summary>
 
- * **Uncategorized**
-    - Release dfraw_json_parser v0.15.1, dfraw_json_parser-cli v1.0.1 ([`230e276`](https://github.com/nwesterhausen/dfraw_json_parser/commit/230e276670526478228309dcc97c1d0dde54e250))
-    - Bump versions ([`afa8e0e`](https://github.com/nwesterhausen/dfraw_json_parser/commit/afa8e0e1d327654b1cfca2bad6d1cfad2deabe2b))
-    - Update bindings ([`54ed44d`](https://github.com/nwesterhausen/dfraw_json_parser/commit/54ed44dc4a5e5e4121e62cd28d85b6394730a0cc))
-    - Add supporting fields ([`f7097e9`](https://github.com/nwesterhausen/dfraw_json_parser/commit/f7097e9cd45f2be1275d2c758b48026a6be1588f))
+- **Uncategorized**
+  - Release dfraw_json_parser v0.15.1, dfraw_json_parser-cli v1.0.1 ([`230e276`](https://github.com/nwesterhausen/dfraw_json_parser/commit/230e276670526478228309dcc97c1d0dde54e250))
+  - Bump versions ([`afa8e0e`](https://github.com/nwesterhausen/dfraw_json_parser/commit/afa8e0e1d327654b1cfca2bad6d1cfad2deabe2b))
+  - Update bindings ([`54ed44d`](https://github.com/nwesterhausen/dfraw_json_parser/commit/54ed44dc4a5e5e4121e62cd28d85b6394730a0cc))
+  - Add supporting fields ([`f7097e9`](https://github.com/nwesterhausen/dfraw_json_parser/commit/f7097e9cd45f2be1275d2c758b48026a6be1588f))
+
 </details>
 
 <csr-unknown>
@@ -278,7 +281,7 @@ chore: update bindingsfeat: impl RawObject for CreatureVariationchore(deps): upd
 
 ### Changed
 
- - <csr-id-3afa6a764c0dcc8b4cc3678a647f6bfbe3cfcd5a/> replace log calls with tracing
+- <csr-id-3afa6a764c0dcc8b4cc3678a647f6bfbe3cfcd5a/> replace log calls with tracing
 
 ### Chore
 
@@ -288,19 +291,19 @@ chore: update bindingsfeat: impl RawObject for CreatureVariationchore(deps): upd
 
 ### Documentation
 
- - <csr-id-c16d34cad7454837180779faed37e8e74c34a2e9/> end code block
- - <csr-id-0b36de580a11476621cbc7d292cd31e5dac63ba5/> improve some docs
+- <csr-id-c16d34cad7454837180779faed37e8e74c34a2e9/> end code block
+- <csr-id-0b36de580a11476621cbc7d292cd31e5dac63ba5/> improve some docs
 
 ### New Features
 
- - <csr-id-3c37a448aa7ad518015576d39fa14b49deec607d/> use `thiserror` to provide errors
+- <csr-id-3c37a448aa7ad518015576d39fa14b49deec607d/> use `thiserror` to provide errors
 
 ### Bug Fixes
 
- - <csr-id-7104a38bf34c169fb53ce79b2d6d9c5dbc4e10e7/> failing doctest
- - <csr-id-cad7df65d139b392b6b7c47609240c4f7da109db/> improve error handling
- - <csr-id-e50ca4f36894ce2734833034953ea18306d3fe5b/> don't let one error break everything
- - <csr-id-0c1817b8b3140b0f1880b06563253c54bfaa9686/> address clippy warnings
+- <csr-id-7104a38bf34c169fb53ce79b2d6d9c5dbc4e10e7/> failing doctest
+- <csr-id-cad7df65d139b392b6b7c47609240c4f7da109db/> improve error handling
+- <csr-id-e50ca4f36894ce2734833034953ea18306d3fe5b/> don't let one error break everything
+- <csr-id-0c1817b8b3140b0f1880b06563253c54bfaa9686/> address clippy warnings
 
 ### Refactor
 
@@ -313,9 +316,9 @@ chore: update bindingsfeat: impl RawObject for CreatureVariationchore(deps): upd
 
 <csr-read-only-do-not-edit/>
 
- - 14 commits contributed to the release.
- - 13 commits were understood as [conventional](https://www.conventionalcommits.org).
- - 0 issues like '(#ID)' were seen in commit messages
+- 14 commits contributed to the release.
+- 13 commits were understood as [conventional](https://www.conventionalcommits.org).
+- 0 issues like '(#ID)' were seen in commit messages
 
 ### Commit Details
 
@@ -323,21 +326,22 @@ chore: update bindingsfeat: impl RawObject for CreatureVariationchore(deps): upd
 
 <details><summary>view details</summary>
 
- * **Uncategorized**
-    - Release dfraw_json_parser v0.15.0, dfraw_json_parser-cli v1.0.0 ([`81b3060`](https://github.com/nwesterhausen/dfraw_json_parser/commit/81b3060c7a4a8a397c58021592efee578372e73b))
-    - Bump package versions ([`550c0b7`](https://github.com/nwesterhausen/dfraw_json_parser/commit/550c0b756c7a4c15ddc466b2ed84decc4ae8801f))
-    - Failing doctest ([`7104a38`](https://github.com/nwesterhausen/dfraw_json_parser/commit/7104a38bf34c169fb53ce79b2d6d9c5dbc4e10e7))
-    - Improve error handling ([`cad7df6`](https://github.com/nwesterhausen/dfraw_json_parser/commit/cad7df65d139b392b6b7c47609240c4f7da109db))
-    - Don't let one error break everything ([`e50ca4f`](https://github.com/nwesterhausen/dfraw_json_parser/commit/e50ca4f36894ce2734833034953ea18306d3fe5b))
-    - Put changelog in correct directory ([`d6f0009`](https://github.com/nwesterhausen/dfraw_json_parser/commit/d6f0009171df92df08b99b617c7755065c9ca40b))
-    - Address clippy warnings ([`0c1817b`](https://github.com/nwesterhausen/dfraw_json_parser/commit/0c1817b8b3140b0f1880b06563253c54bfaa9686))
-    - End code block ([`c16d34c`](https://github.com/nwesterhausen/dfraw_json_parser/commit/c16d34cad7454837180779faed37e8e74c34a2e9))
-    - Use `thiserror` to provide errors ([`3c37a44`](https://github.com/nwesterhausen/dfraw_json_parser/commit/3c37a448aa7ad518015576d39fa14b49deec607d))
-    - Further improve library ergonomics ([`29c5ba1`](https://github.com/nwesterhausen/dfraw_json_parser/commit/29c5ba10963b956830c8bf533ddd2d4e1bec0942))
-    - Improve some docs ([`0b36de5`](https://github.com/nwesterhausen/dfraw_json_parser/commit/0b36de580a11476621cbc7d292cd31e5dac63ba5))
-    - Improve module ergonomics ([`bd013b6`](https://github.com/nwesterhausen/dfraw_json_parser/commit/bd013b63d53420088773f96c096a0df55655bc59))
-    - Replace log calls with tracing ([`3afa6a7`](https://github.com/nwesterhausen/dfraw_json_parser/commit/3afa6a764c0dcc8b4cc3678a647f6bfbe3cfcd5a))
-    - Move to workspace ([`65288c7`](https://github.com/nwesterhausen/dfraw_json_parser/commit/65288c71f553aedef24ec9cf80cfd65601044f73))
+- **Uncategorized**
+  - Release dfraw_json_parser v0.15.0, dfraw_json_parser-cli v1.0.0 ([`81b3060`](https://github.com/nwesterhausen/dfraw_json_parser/commit/81b3060c7a4a8a397c58021592efee578372e73b))
+  - Bump package versions ([`550c0b7`](https://github.com/nwesterhausen/dfraw_json_parser/commit/550c0b756c7a4c15ddc466b2ed84decc4ae8801f))
+  - Failing doctest ([`7104a38`](https://github.com/nwesterhausen/dfraw_json_parser/commit/7104a38bf34c169fb53ce79b2d6d9c5dbc4e10e7))
+  - Improve error handling ([`cad7df6`](https://github.com/nwesterhausen/dfraw_json_parser/commit/cad7df65d139b392b6b7c47609240c4f7da109db))
+  - Don't let one error break everything ([`e50ca4f`](https://github.com/nwesterhausen/dfraw_json_parser/commit/e50ca4f36894ce2734833034953ea18306d3fe5b))
+  - Put changelog in correct directory ([`d6f0009`](https://github.com/nwesterhausen/dfraw_json_parser/commit/d6f0009171df92df08b99b617c7755065c9ca40b))
+  - Address clippy warnings ([`0c1817b`](https://github.com/nwesterhausen/dfraw_json_parser/commit/0c1817b8b3140b0f1880b06563253c54bfaa9686))
+  - End code block ([`c16d34c`](https://github.com/nwesterhausen/dfraw_json_parser/commit/c16d34cad7454837180779faed37e8e74c34a2e9))
+  - Use `thiserror` to provide errors ([`3c37a44`](https://github.com/nwesterhausen/dfraw_json_parser/commit/3c37a448aa7ad518015576d39fa14b49deec607d))
+  - Further improve library ergonomics ([`29c5ba1`](https://github.com/nwesterhausen/dfraw_json_parser/commit/29c5ba10963b956830c8bf533ddd2d4e1bec0942))
+  - Improve some docs ([`0b36de5`](https://github.com/nwesterhausen/dfraw_json_parser/commit/0b36de580a11476621cbc7d292cd31e5dac63ba5))
+  - Improve module ergonomics ([`bd013b6`](https://github.com/nwesterhausen/dfraw_json_parser/commit/bd013b63d53420088773f96c096a0df55655bc59))
+  - Replace log calls with tracing ([`3afa6a7`](https://github.com/nwesterhausen/dfraw_json_parser/commit/3afa6a764c0dcc8b4cc3678a647f6bfbe3cfcd5a))
+  - Move to workspace ([`65288c7`](https://github.com/nwesterhausen/dfraw_json_parser/commit/65288c71f553aedef24ec9cf80cfd65601044f73))
+
 </details>
 
 ## v0.14.0 (2023-10-24)
@@ -351,9 +355,9 @@ chore: update bindingsfeat: impl RawObject for CreatureVariationchore(deps): upd
 
 ### Bug Fixes
 
- - <csr-id-692f5c6069b6ce4b3bf0088b513dae384770d159/> update rust crate regex to 1.10
- - <csr-id-b44b1dcc83a5cdf200acb88f555041f02eb0b436/> update rust crate tauri to 1.5
- - <csr-id-45f13d9e74b177f5211b8e9eb259c92458f1ef0a/> include sapling in helper function
+- <csr-id-692f5c6069b6ce4b3bf0088b513dae384770d159/> update rust crate regex to 1.10
+- <csr-id-b44b1dcc83a5cdf200acb88f555041f02eb0b436/> update rust crate tauri to 1.5
+- <csr-id-45f13d9e74b177f5211b8e9eb259c92458f1ef0a/> include sapling in helper function
 
 ### Other
 
@@ -632,6 +636,7 @@ chore: update bindingsfeat: impl RawObject for CreatureVariationchore(deps): upd
 
   - fix: respect parser options
 
+
   - feat: add syndromes
 
   - chore: update bindings
@@ -764,21 +769,21 @@ chore: update bindingsfeat: impl RawObject for CreatureVariationchore(deps): upd
 
 ### New Features
 
- - <csr-id-fd3d92fae81b4a5f855fa9bfd8bcea80cb3cb41d/> include sapling sprites
+- <csr-id-fd3d92fae81b4a5f855fa9bfd8bcea80cb3cb41d/> include sapling sprites
 
 ### Bug Fixes
 
- - <csr-id-0bcac7e447473577396fa317959b55e3663d3628/> update rust crate log to 0.4.20
- - <csr-id-6c8ab8132385f83e447c557dd09626c10b54d976/> update rust crate regex to 1.9
- - <csr-id-080fade8efc95aa9b3bb95b7a26fbc046f9d5829/> update rust crate phf to 0.11.2
- - <csr-id-561c95598d64e444f4d2803d31533cdc714f2103/> update rust crate tauri to 1.4
- - <csr-id-f0f97723d32725d63611fea545bd71b01a7d201a/> update rust crate log to 0.4.19
- - <csr-id-7b516eabb1630e3e4f51b6c6c3e3151727a010be/> update rust crate log to 0.4.18
- - <csr-id-ff9da26d227f3f792479c5b0d38c60427496531c/> update rust crate tauri to 1.3
- - <csr-id-cf8952ac17ccbe4ab01d0729b01d59327ab56ff6/> update rust crate regex to 1.8
- - <csr-id-692f5c6069b6ce4b3bf0088b513dae384770d159/> update rust crate regex to 1.10
- - <csr-id-b44b1dcc83a5cdf200acb88f555041f02eb0b436/> update rust crate tauri to 1.5
- - <csr-id-45f13d9e74b177f5211b8e9eb259c92458f1ef0a/> include sapling in helper function
+- <csr-id-0bcac7e447473577396fa317959b55e3663d3628/> update rust crate log to 0.4.20
+- <csr-id-6c8ab8132385f83e447c557dd09626c10b54d976/> update rust crate regex to 1.9
+- <csr-id-080fade8efc95aa9b3bb95b7a26fbc046f9d5829/> update rust crate phf to 0.11.2
+- <csr-id-561c95598d64e444f4d2803d31533cdc714f2103/> update rust crate tauri to 1.4
+- <csr-id-f0f97723d32725d63611fea545bd71b01a7d201a/> update rust crate log to 0.4.19
+- <csr-id-7b516eabb1630e3e4f51b6c6c3e3151727a010be/> update rust crate log to 0.4.18
+- <csr-id-ff9da26d227f3f792479c5b0d38c60427496531c/> update rust crate tauri to 1.3
+- <csr-id-cf8952ac17ccbe4ab01d0729b01d59327ab56ff6/> update rust crate regex to 1.8
+- <csr-id-692f5c6069b6ce4b3bf0088b513dae384770d159/> update rust crate regex to 1.10
+- <csr-id-b44b1dcc83a5cdf200acb88f555041f02eb0b436/> update rust crate tauri to 1.5
+- <csr-id-45f13d9e74b177f5211b8e9eb259c92458f1ef0a/> include sapling in helper function
 
 ### Other
 
@@ -794,7 +799,7 @@ chore: update bindingsfeat: impl RawObject for CreatureVariationchore(deps): upd
 
 ### New Features
 
- - <csr-id-50d07775ca1c672936a6811699a077cd19fa173c/> ✨ add announcements.txt parsing and writing
+- <csr-id-50d07775ca1c672936a6811699a077cd19fa173c/> ✨ add announcements.txt parsing and writing
 
 ## v0.11.0 (2023-01-21)
 
@@ -803,17 +808,17 @@ chore: update bindingsfeat: impl RawObject for CreatureVariationchore(deps): upd
 
 ### New Features
 
- - <csr-id-648c92071d54b52b0e8fbc5a3dfb2ed680a0c7e2/> ✨ handle some plant graphics
- - <csr-id-c18a2b1cf2950295a15874962e800f5b96ca3580/> ✨ parse graphics at the same time as other raws
- - <csr-id-ae7324aec3f997f6cd2399665299b4929868dec7/> ✨ add graphics raw parsing to lib
- - <csr-id-49bc46ce335cad5db501d2d9e0904e19e6f0c767/> ✨ add proper raw header to graphics
- - <csr-id-1d2b8915be91857fdb3b12f0d101549fe543b5f6/> ✨ parse graphic tile page raws
- - <csr-id-a860a99b871c855007d9228190e1b01be64a9dff/> ✨ implement basic graphic parser
+- <csr-id-648c92071d54b52b0e8fbc5a3dfb2ed680a0c7e2/> ✨ handle some plant graphics
+- <csr-id-c18a2b1cf2950295a15874962e800f5b96ca3580/> ✨ parse graphics at the same time as other raws
+- <csr-id-ae7324aec3f997f6cd2399665299b4929868dec7/> ✨ add graphics raw parsing to lib
+- <csr-id-49bc46ce335cad5db501d2d9e0904e19e6f0c767/> ✨ add proper raw header to graphics
+- <csr-id-1d2b8915be91857fdb3b12f0d101549fe543b5f6/> ✨ parse graphic tile page raws
+- <csr-id-a860a99b871c855007d9228190e1b01be64a9dff/> ✨ implement basic graphic parser
 
 ### Bug Fixes
 
- - <csr-id-72c8601830284c46c2dde22c5f2ea38447ca00f5/> 🐛 don't return too early
- - <csr-id-b0f66ac25811a2445a3156c937059e2fc437134f/> ⚡️ remove un-needed clones
+- <csr-id-72c8601830284c46c2dde22c5f2ea38447ca00f5/> 🐛 don't return too early
+- <csr-id-b0f66ac25811a2445a3156c937059e2fc437134f/> ⚡️ remove un-needed clones
 
 ### Refactor
 
@@ -825,7 +830,7 @@ chore: update bindingsfeat: impl RawObject for CreatureVariationchore(deps): upd
 
 ### New Features
 
- - <csr-id-cf64641d44584997038e558b9eb09b795ce02837/> ✨ add more detail to progress payload
+- <csr-id-cf64641d44584997038e558b9eb09b795ce02837/> ✨ add more detail to progress payload
 
 ## v0.10.0 (2023-01-17)
 
@@ -858,18 +863,18 @@ chore: update bindingsfeat: impl RawObject for CreatureVariationchore(deps): upd
 
 ### Documentation
 
- - <csr-id-7e118c7fb20f7b84f5d38343b5563276e995b1e5/> 📝 improve library documentation
+- <csr-id-7e118c7fb20f7b84f5d38343b5563276e995b1e5/> 📝 improve library documentation
 
 ### New Features
 
- - <csr-id-b53d1a008b109833bdd8ca36ab5c4ca7a9106bfd/> ⚡️ propogate path as ref
- - <csr-id-e91d009daa2858212c155fc9f7ea83c94af83c57/> ✨ support SELECT and hopefully CUT
- - <csr-id-e38f2e8e85f95eb82cac0ce0d769f66dea06b758/> ✨ add tauri-supported raw module location parsing
+- <csr-id-b53d1a008b109833bdd8ca36ab5c4ca7a9106bfd/> ⚡️ propogate path as ref
+- <csr-id-e91d009daa2858212c155fc9f7ea83c94af83c57/> ✨ support SELECT and hopefully CUT
+- <csr-id-e38f2e8e85f95eb82cac0ce0d769f66dea06b758/> ✨ add tauri-supported raw module location parsing
 
 ### Bug Fixes
 
- - <csr-id-46067f419a8a8d6912f2c626286eafa2f9c9393e/> update rust crate regex to 1.7
- - <csr-id-8ea5911026b8b65f86393dbbac3223678710caaf/> update rust crate regex to 1.7
+- <csr-id-46067f419a8a8d6912f2c626286eafa2f9c9393e/> update rust crate regex to 1.7
+- <csr-id-8ea5911026b8b65f86393dbbac3223678710caaf/> update rust crate regex to 1.7
 
 ### Refactor
 
@@ -884,29 +889,29 @@ chore: update bindingsfeat: impl RawObject for CreatureVariationchore(deps): upd
 
 ### New Features
 
- - <csr-id-591e64c025b70b31d899a6e6d4c59e0501650e1a/> ✨ add magma safe calculation
+- <csr-id-591e64c025b70b31d899a6e6d4c59e0501650e1a/> ✨ add magma safe calculation
 
 ### Bug Fixes
 
- - <csr-id-357f61d32d7c544ab3a7125c4516e24d30eb9a0d/> 🐛 fix typo in RollChance type
+- <csr-id-357f61d32d7c544ab3a7125c4516e24d30eb9a0d/> 🐛 fix typo in RollChance type
 
 ## v0.9.3 (2023-01-10)
 
 ### Bug Fixes
 
- - <csr-id-007c8b41d67bd7a97f0874cd53a9a5e03f436a6d/> 🐛 handle 'ALL' for state_name etc
+- <csr-id-007c8b41d67bd7a97f0874cd53a9a5e03f436a6d/> 🐛 handle 'ALL' for state_name etc
 
 ## v0.9.2 (2023-01-09)
 
 ### Bug Fixes
 
- - <csr-id-f16e0e21b8056914c410e224e47db22e3b6061e2/> 🐛 casteTags property in camel case
+- <csr-id-f16e0e21b8056914c410e224e47db22e3b6061e2/> 🐛 casteTags property in camel case
 
 ## v0.9.1 (2023-01-09)
 
 ### Bug Fixes
 
- - <csr-id-b2781ed4df8ef99419169bc29313f309856fa824/> 📝 object property consistency changes
+- <csr-id-b2781ed4df8ef99419169bc29313f309856fa824/> 📝 object property consistency changes
 
 ## v0.9.0 (2023-01-09)
 
@@ -927,7 +932,7 @@ chore: update bindingsfeat: impl RawObject for CreatureVariationchore(deps): upd
 
 ### New Features
 
- - <csr-id-984103be271f86f8c683195f9e5463f218a1cbde/> ✨ add relative_path to parsed data
+- <csr-id-984103be271f86f8c683195f9e5463f218a1cbde/> ✨ add relative_path to parsed data
 
 ## v0.8.0 (2023-01-09)
 
@@ -937,16 +942,16 @@ chore: update bindingsfeat: impl RawObject for CreatureVariationchore(deps): upd
 
 ### New Features
 
- - <csr-id-ee95964c58bad45f0678a3c414523ff1958e4661/> ✨ add remaining inorganic tokens
- - <csr-id-1a52fb5b9e5f09cdb4bba0ebcd08a72662751d74/> ✨ add un-recognized BIOME tokens as-is
- - <csr-id-ca789a7e7bc8d5d10f1ff5bc43b0dfda96a249c9/> ✨ add inorganic object parsing
+- <csr-id-ee95964c58bad45f0678a3c414523ff1958e4661/> ✨ add remaining inorganic tokens
+- <csr-id-1a52fb5b9e5f09cdb4bba0ebcd08a72662751d74/> ✨ add un-recognized BIOME tokens as-is
+- <csr-id-ca789a7e7bc8d5d10f1ff5bc43b0dfda96a249c9/> ✨ add inorganic object parsing
    Adds parsing support for inoragnic raws
-   
+
    Updates the SimpleMaterial struct with a Temperatures to hold temperature information (removing "specific_heat").
 
 ### Bug Fixes
 
- - <csr-id-04a55b93596a794fa59f55e3146b7f3ecc9ff43a/> 🐛 handle NONE case for temperatures
+- <csr-id-04a55b93596a794fa59f55e3146b7f3ecc9ff43a/> 🐛 handle NONE case for temperatures
 
 ### Refactor
 
@@ -969,8 +974,8 @@ chore: update bindingsfeat: impl RawObject for CreatureVariationchore(deps): upd
 
 ### Bug Fixes
 
- - <csr-id-f931dbeedff7e3a5ccfe065213b7672737b86de5/> 🐛 typescript typing cohesion
- - <csr-id-7bde574e03f659e1abff93cb6d4d1fc0dd0af34d/> 🐛 fix typings for plant
+- <csr-id-f931dbeedff7e3a5ccfe065213b7672737b86de5/> 🐛 typescript typing cohesion
+- <csr-id-7bde574e03f659e1abff93cb6d4d1fc0dd0af34d/> 🐛 fix typings for plant
 
 ## v0.7.6 (2023-01-01)
 
@@ -987,23 +992,23 @@ chore: update bindingsfeat: impl RawObject for CreatureVariationchore(deps): upd
 
 ### Bug Fixes
 
- - <csr-id-6c576b2a13153bbe757c5cd72f92107120f6e60a/> 🐛 use identifier if empty name
+- <csr-id-6c576b2a13153bbe757c5cd72f92107120f6e60a/> 🐛 use identifier if empty name
 
 ## v0.7.4 (2022-12-28)
 
 ### New Features
 
- - <csr-id-ed463c84a64cc8b774ebb576704ff20c0bec15d0/> ✨ add human-readable raw module source to raws
+- <csr-id-ed463c84a64cc8b774ebb576704ff20c0bec15d0/> ✨ add human-readable raw module source to raws
 
 ## v0.7.3 (2022-12-28)
 
 ### New Features
 
- - <csr-id-d072b719c51dcb1b8065edd9251364aded5b79d2/> ✨ add parse_single_raw to lib and cli example
+- <csr-id-d072b719c51dcb1b8065edd9251364aded5b79d2/> ✨ add parse_single_raw to lib and cli example
 
 ### Bug Fixes
 
- - <csr-id-ae012665b7097242b39e27e07741d5f284eec291/> 🐛 save all info for final raw read from file
+- <csr-id-ae012665b7097242b39e27e07741d5f284eec291/> 🐛 save all info for final raw read from file
 
 ## v0.7.2 (2022-12-28)
 
@@ -1027,26 +1032,26 @@ chore: update bindingsfeat: impl RawObject for CreatureVariationchore(deps): upd
 
 ### Documentation
 
- - <csr-id-db4c9c40712b05f619c12bd15b18b0220a5fd5ce/> 📝 add CHANGELOG.md
+- <csr-id-db4c9c40712b05f619c12bd15b18b0220a5fd5ce/> 📝 add CHANGELOG.md
    using changelog generation via cargo-smart-release
 
 ### New Features
 
- - <csr-id-d21a63e2466562711aa277b0f6a26ace9ceb9534/> ✨ add an objectId to the info file object
- - <csr-id-3c48e4c79f7afe38d08057413b9549aa782bd528/> ✨ add function to write info_module json to file
+- <csr-id-d21a63e2466562711aa277b0f6a26ace9ceb9534/> ✨ add an objectId to the info file object
+- <csr-id-3c48e4c79f7afe38d08057413b9549aa782bd528/> ✨ add function to write info_module json to file
    Also includes addtional property 'display_title' on df info file object
- - <csr-id-443c83957de911e1a775ef0c77bcb8bb5fcb3aa1/> ✨ add function to get the info.txt details for mods
- - <csr-id-021fe8e584658b8556b22c76a73eccdb6ebb55b4/> :sparkles: add field to report type of raw it is
- - <csr-id-30d48b2020a0681108db167489a726d58dfc360d/> :sparkles: coerce non-numeric numeric values into numerals
- - <csr-id-1b38a83d4427e8edbcd0bc1a80367b6f0335e431/> 🔊 improve error logging on into.txt parsing
- - <csr-id-0ffef9095c9156ea28dbdb138c31bb7350eda22e/> ✨ include raw module source directory
+- <csr-id-443c83957de911e1a775ef0c77bcb8bb5fcb3aa1/> ✨ add function to get the info.txt details for mods
+- <csr-id-021fe8e584658b8556b22c76a73eccdb6ebb55b4/> :sparkles: add field to report type of raw it is
+- <csr-id-30d48b2020a0681108db167489a726d58dfc360d/> :sparkles: coerce non-numeric numeric values into numerals
+- <csr-id-1b38a83d4427e8edbcd0bc1a80367b6f0335e431/> 🔊 improve error logging on into.txt parsing
+- <csr-id-0ffef9095c9156ea28dbdb138c31bb7350eda22e/> ✨ include raw module source directory
    Since df raws can be found in separate directories, we should save that in the data.
-   
+
    The method signatures for parsing raws in directories have been changed to require a DFInfoFile reference instead of strings from that object.
 
 ### Bug Fixes
 
- - <csr-id-d180a175b6e40e46fd0d8ce136cf710078fa2b68/> :bug: fix raw_type field name
+- <csr-id-d180a175b6e40e46fd0d8ce136cf710078fa2b68/> :bug: fix raw_type field name
 
 ### Refactor
 
@@ -1069,14 +1074,14 @@ chore: update bindingsfeat: impl RawObject for CreatureVariationchore(deps): upd
 
 ### New Features
 
- - <csr-id-a222b276b20a65f460d337235c1c5833576cda25/> ✨ add extra info about what kind of raw module is parsed
- - <csr-id-72fc3a666dd7c274c181f8877bc3d1bb2d2742e0/> ✨ send current module along with progress
- - <csr-id-0b2449691aa6895f236da1c4e2869659dba1d167/> 🚀 add feature "tauri" to emit progress
+- <csr-id-a222b276b20a65f460d337235c1c5833576cda25/> ✨ add extra info about what kind of raw module is parsed
+- <csr-id-72fc3a666dd7c274c181f8877bc3d1bb2d2742e0/> ✨ send current module along with progress
+- <csr-id-0b2449691aa6895f236da1c4e2869659dba1d167/> 🚀 add feature "tauri" to emit progress
 
 ### Bug Fixes
 
- - <csr-id-2fbd8699570e0f1c95ef14a8903d86de3c289685/> 🚑️ with final check of pct, must be initialized first
- - <csr-id-2505a5cdc04dd52e46189f26b047c55980a8f5c4/> ⚡️ only emit 1.0 if it hasn't already
+- <csr-id-2fbd8699570e0f1c95ef14a8903d86de3c289685/> 🚑️ with final check of pct, must be initialized first
+- <csr-id-2505a5cdc04dd52e46189f26b047c55980a8f5c4/> ⚡️ only emit 1.0 if it hasn't already
 
 ## v0.3.0 (2022-12-13)
 
@@ -1088,20 +1093,19 @@ chore: update bindingsfeat: impl RawObject for CreatureVariationchore(deps): upd
 
 ### Documentation
 
- - <csr-id-bd06df53aef97bd7a7e44276f707a58d52387541/> 📝 update rustdoc
- - <csr-id-cc6ee32284b48968c361337f88d45d9059f44af6/> 📝 update crates.io required documentation
+- <csr-id-bd06df53aef97bd7a7e44276f707a58d52387541/> 📝 update rustdoc
+- <csr-id-cc6ee32284b48968c361337f88d45d9059f44af6/> 📝 update crates.io required documentation
 
 ### New Features
 
- - <csr-id-41822170b73e9b26df9561789791945f6658db40/> ✨ improve library-ness, bump to 0.2.0
- - <csr-id-5698147910b87f039fe755f46af7111f384b8e38/> ✨ update from other project, make library
+- <csr-id-41822170b73e9b26df9561789791945f6658db40/> ✨ improve library-ness, bump to 0.2.0
+- <csr-id-5698147910b87f039fe755f46af7111f384b8e38/> ✨ update from other project, make library
 
 ### Bug Fixes
 
- - <csr-id-c8dba2275374c1cbff53b285388b00cb79dfb844/> 🔥 don't check in Cargo.lock
- - <csr-id-b47b6f3e60c84d3af03ee84444c85b84c14b6112/> 🐛 fix type definition
+- <csr-id-c8dba2275374c1cbff53b285388b00cb79dfb844/> 🔥 don't check in Cargo.lock
+- <csr-id-b47b6f3e60c84d3af03ee84444c85b84c14b6112/> 🐛 fix type definition
 
 ## v0.1.1 (2022-01-18)
 
 ## v0.1.0 (2022-01-11)
-
