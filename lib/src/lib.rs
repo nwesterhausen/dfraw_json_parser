@@ -128,6 +128,8 @@ pub use parser::*;
 
 #[cfg(feature = "tauri")]
 pub use tauri_lib::ProgressPayload;
+#[cfg(feature = "tauri")]
+pub use tauri_lib::ProgressTask;
 
 use crate::{
     helpers::clone_raw_object_box,
