@@ -7,6 +7,34 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## v0.17.3 (2024-05-09)
+
+### Bug Fixes
+
+ - <csr-id-ac13e28197d4cdc016ef736b19682ec43dfb7e4b/> also export bindings for "tauri" feature
+ - <csr-id-00f97d6744b34f8964486c3ee6d0b5735dd14233/> derive specta::type for ProgressTask
+
+### Commit Statistics
+
+<csr-read-only-do-not-edit/>
+
+ - 4 commits contributed to the release.
+ - 2 commits were understood as [conventional](https://www.conventionalcommits.org).
+ - 0 issues like '(#ID)' were seen in commit messages
+
+### Commit Details
+
+<csr-read-only-do-not-edit/>
+
+<details><summary>view details</summary>
+
+ * **Uncategorized**
+    - Also export bindings for "tauri" feature ([`ac13e28`](https://github.com/nwesterhausen/dfraw_json_parser/commit/ac13e28197d4cdc016ef736b19682ec43dfb7e4b))
+    - Merge branch 'main' into binding-fix ([`3d321ba`](https://github.com/nwesterhausen/dfraw_json_parser/commit/3d321bab5e00703e9dd0fe0c74fbcdef79ab2d3b))
+    - Derive specta::type for ProgressTask ([`00f97d6`](https://github.com/nwesterhausen/dfraw_json_parser/commit/00f97d6744b34f8964486c3ee6d0b5735dd14233))
+    - Merge pull request #88 from nwesterhausen/fix-re-export ([`af1ae8e`](https://github.com/nwesterhausen/dfraw_json_parser/commit/af1ae8e962ff904a58a8788d0118a2491209a582))
+</details>
+
 ## v0.17.2 (2024-05-09)
 
 ### Bug Fixes
@@ -17,7 +45,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 <csr-read-only-do-not-edit/>
 
- - 3 commits contributed to the release.
+ - 4 commits contributed to the release.
  - 1 commit was understood as [conventional](https://www.conventionalcommits.org).
  - 0 issues like '(#ID)' were seen in commit messages
 
@@ -28,6 +56,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 <details><summary>view details</summary>
 
  * **Uncategorized**
+    - Release dfraw_json_parser v0.17.2 ([`a89922c`](https://github.com/nwesterhausen/dfraw_json_parser/commit/a89922c388908228e65eed24d4035a60e799fe06))
     - Re-export ProgressTask ([`d233f47`](https://github.com/nwesterhausen/dfraw_json_parser/commit/d233f47969f6ef908b120775d9a21fa0b8990ec0))
     - Merge pull request #87 from nwesterhausen/bump-version-0-17 ([`56ffcf7`](https://github.com/nwesterhausen/dfraw_json_parser/commit/56ffcf7435e163c27b26828aaa0dc7445f6b888d))
     - Merge branch 'main' into bump-version-0-17 ([`cc9efdb`](https://github.com/nwesterhausen/dfraw_json_parser/commit/cc9efdbb347aeaded068d77bee07aa69a5f5357d))
@@ -56,6 +85,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 <csr-id-1288ced44711fab15d65aa38a14972617ef5f0f5/>
 <csr-id-94babbfe7f3b84fecf4ac431698bb2b8ad77af2e/>
 <csr-id-34de0452a55b38f78bdf85a8340ccedb49a9e716/>
+<csr-id-32397f0adb91cbe8709673a4d741380dc630c25b/>
 
 ### Chore
 
