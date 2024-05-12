@@ -109,14 +109,12 @@ Self::TriggerableGroup { .. } |
             TokenComplexity::Simple => {
                 // All of these tokens have a pattern of `key:value` so we can parse `value` as appropriate
                 // We just pass this off to the token's `simple_parse` method to handle the parsing
-                let simple_value = key.split(':').nth(1).unwrap_or_default();
-                parse_simple_token(token, simple_value)
+                parse_simple_token(token, value)
             }
             TokenComplexity::Complex => {
                 // These tokens have a variable number of arguments, so we need to parse them differently
                 // We pass this off to the token's `complex_parse` method to handle the parsing
-                let simple_value = key.split(':').nth(1).unwrap_or_default();
-                parse_complex_token(token, simple_value, value)
+                parse_complex_token(token, value)
             }
         }
     }
@@ -285,42 +283,62 @@ fn parse_simple_token(token: &CreatureTag, value: &str) -> Option<CreatureTag> {
 /// * `argument_1` - The first argument to parse
 /// * `remaining_args` - The remaining arguments to parse (as a ':' separated string)
 #[allow(clippy::too_many_lines)]
-fn parse_complex_token(
-    token: &CreatureTag,
-    argument_1: &str,
-    remaining_args: &str,
-) -> Option<CreatureTag> {
+fn parse_complex_token(token: &CreatureTag, args: &str) -> Option<CreatureTag> {
+    let mut values = args.split(':').collect::<Vec<&str>>();
     match token {
         CreatureTag::ApplyCreatureVariation { .. } => {
-            // Parse the first argument as a `String`
-            // Parse the remaining arguments as a `String`
-            Some(CreatureTag::ApplyCreatureVariation {
-                id: argument_1.to_string(),
-                args: remaining_args
-                    .split(':')
-                    .map(std::string::ToString::to_string)
-                    .collect(),
-            })
+            // Check if there are at least 2 arguments
+            if values.len() < 2 {
+                tracing::warn!("parse_complex_token: not enough arguments for CreatureTag::ApplyCreatureVariation {}/2", args.len());
+                return None;
+            }
+            let id = values.remove(0).to_string();
+            let args = values
+                .iter()
+                .map(std::string::ToString::to_string)
+                .collect();
+            Some(CreatureTag::ApplyCreatureVariation { id, args })
         }
         CreatureTag::ClusterNumber { .. } => {
-            // Parse the first argument as a `u32`
-            // Parse the remaining arguments as a `u32`
-            let value = argument_1.parse::<u32>().unwrap_or_default();
-            let value2 = remaining_args.parse::<u32>().unwrap_or_default();
-            Some(CreatureTag::ClusterNumber {
-                min: value,
-                max: value2,
-            })
+            // Check if there are at least 2 arguments
+            if values.len() < 2 {
+                tracing::warn!(
+                    "parse_complex_token: not enough arguments for CreatureTag::ClusterNumber {}/2",
+                    args.len()
+                );
+                return None;
+            }
+            let Ok(min) = values.remove(0).parse::<u32>() else {
+                tracing::warn!("parse_complex_token: CreatureTag::ClusterNumber failed to parse min value: {args}");
+                return None;
+            };
+            let Ok(max) = values.remove(0).parse::<u32>() else {
+                tracing::warn!("parse_complex_token: CreatureTag::ClusterNumber failed to parse max value: {args}");
+                return None;
+            };
+            Some(CreatureTag::ClusterNumber { min, max })
         }
         CreatureTag::Color { .. } => {
-            let foreground = argument_1.parse::<u32>().unwrap_or_default();
-            // Parse a total of 2 arguments as `u32`
-            let values_23: Vec<u32> = remaining_args
-                .split(':')
-                .map(|s| s.parse::<u32>().unwrap_or_default())
-                .collect();
-            let background = values_23.first().copied().unwrap_or_default();
-            let brightness = values_23.get(1).copied().unwrap_or_default();
+            // Check if there are at least 3 arguments
+            if values.len() < 3 {
+                tracing::warn!(
+                    "parse_complex_token: not enough arguments for CreatureTag::Color {}/3",
+                    args.len()
+                );
+                return None;
+            }
+            let Ok(foreground) = values.remove(0).parse::<u32>() else {
+                tracing::warn!("parse_complex_token: CreatureTag::Color failed to parse foreground value: {args}");
+                return None;
+            };
+            let Ok(background) = values.remove(0).parse::<u32>() else {
+                tracing::warn!("parse_complex_token: CreatureTag::Color failed to parse background value: {args}");
+                return None;
+            };
+            let Ok(brightness) = values.remove(0).parse::<u32>() else {
+                tracing::warn!("parse_complex_token: CreatureTag::Color failed to parse brightness value: {args}");
+                return None;
+            };
             Some(CreatureTag::Color {
                 foreground,
                 background,
@@ -328,14 +346,26 @@ fn parse_complex_token(
             })
         }
         CreatureTag::GlowColor { .. } => {
-            let foreground = argument_1.parse::<u32>().unwrap_or_default();
-            // Parse a total of 2 arguments as `u32`
-            let values_23: Vec<u32> = remaining_args
-                .split(':')
-                .map(|s| s.parse::<u32>().unwrap_or_default())
-                .collect();
-            let background = values_23.first().copied().unwrap_or_default();
-            let brightness = values_23.get(1).copied().unwrap_or_default();
+            // Check if there are at least 3 arguments
+            if values.len() < 3 {
+                tracing::warn!(
+                    "parse_complex_token: not enough arguments for CreatureTag::GlowColor {}/3",
+                    args.len()
+                );
+                return None;
+            }
+            let Ok(foreground) = values.remove(0).parse::<u32>() else {
+                tracing::warn!("parse_complex_token: CreatureTag::GlowColor failed to parse foreground value: {args}");
+                return None;
+            };
+            let Ok(background) = values.remove(0).parse::<u32>() else {
+                tracing::warn!("parse_complex_token: CreatureTag::GlowColor failed to parse background value: {args}");
+                return None;
+            };
+            let Ok(brightness) = values.remove(0).parse::<u32>() else {
+                tracing::warn!("parse_complex_token: CreatureTag::GlowColor failed to parse brightness value: {args}");
+                return None;
+            };
             Some(CreatureTag::GlowColor {
                 foreground,
                 background,
@@ -343,34 +373,52 @@ fn parse_complex_token(
             })
         }
         CreatureTag::GeneralBabyName { .. } => {
-            // Parse the first argument as a `String`
-            let singular = argument_1.to_string();
-            // Parse the remaining arguments as a `String`
-            let plural = remaining_args.to_string();
+            // Check if there are at least 2 arguments
+            if values.len() < 2 {
+                tracing::warn!(
+                    "parse_complex_token: not enough arguments for CreatureTag::GeneralBabyName {}/2",
+                    args.len()
+                );
+                return None;
+            }
+            let singular = values.remove(0).to_string();
+            let plural = values.join(":").to_string();
             Some(CreatureTag::GeneralBabyName { singular, plural })
         }
         CreatureTag::GeneralChildName { .. } => {
-            // Parse the first argument as a `String`
-            let singular = argument_1.to_string();
-            // Parse the remaining arguments as a `String`
-            let plural = remaining_args.to_string();
+            // Check if there are at least 2 arguments
+            if values.len() < 2 {
+                tracing::warn!(
+                    "parse_complex_token: not enough arguments for CreatureTag::GeneralChildName {}/2",
+                    args.len()
+                );
+                return None;
+            }
+            let singular = values.remove(0).to_string();
+            let plural = values.join(":").to_string();
             Some(CreatureTag::GeneralChildName { singular, plural })
         }
         CreatureTag::HarvestProduct { .. } => {
-            // Parse the first argument as a `u32`
-            let number = argument_1.parse::<u32>().unwrap_or_default();
-            // Parse the remaining arguments as a `u32` then `Vec<String>`
-            let values: Vec<&str> = remaining_args.split(':').collect();
-            let time = values
-                .first()
-                .copied()
-                .unwrap_or_default()
-                .parse::<u32>()
-                .unwrap_or_default();
-            let item_tokens = values
-                .get(1..)
-                .map(|s| s.iter().map(std::string::ToString::to_string).collect())
-                .unwrap_or_default();
+            // Check if there are at least 3 arguments
+            if values.len() < 3 {
+                tracing::warn!(
+                    "parse_complex_token: not enough arguments for CreatureTag::HarvestProduct {}/3",
+                    args.len()
+                );
+                return None;
+            }
+            let Ok(number) = values.remove(0).parse::<u32>() else {
+                tracing::warn!("parse_complex_token: CreatureTag::HarvestProduct failed to parse number value: {args}");
+                return None;
+            };
+            let Ok(time) = values.remove(0).parse::<u32>() else {
+                tracing::warn!("parse_complex_token: CreatureTag::HarvestProduct failed to parse time value: {args}");
+                return None;
+            };
+            let item_tokens: Vec<String> = values
+                .iter()
+                .map(std::string::ToString::to_string)
+                .collect();
             Some(CreatureTag::HarvestProduct {
                 number,
                 time,
@@ -378,15 +426,17 @@ fn parse_complex_token(
             })
         }
         CreatureTag::Name { .. } => {
-            // Parse the first argument as a `String`
-            let name = argument_1.to_string();
-            // Parse the remaining arguments as a `Vec<String>`
-            let values: Vec<String> = remaining_args
-                .split(':')
-                .map(std::string::ToString::to_string)
-                .collect();
-            let plural_name = values.first().cloned().unwrap_or_default();
-            let adjective = values.get(1).cloned().unwrap_or_default();
+            // Check if there are at least 3 arguments
+            if values.len() < 3 {
+                tracing::warn!(
+                    "parse_complex_token: not enough arguments for CreatureTag::Name {}/3",
+                    args.len()
+                );
+                return None;
+            }
+            let name = values.remove(0).to_string();
+            let plural_name = values.remove(0).to_string();
+            let adjective = values.join(":").to_string();
             Some(CreatureTag::Name {
                 name,
                 plural_name,
@@ -394,22 +444,36 @@ fn parse_complex_token(
             })
         }
         CreatureTag::PopulationNumber { .. } => {
-            // Parse the first argument as a `u32`
-            // Parse the remaining arguments as a `u32`
-            let min = argument_1.parse::<u32>().ok().unwrap_or_default();
-            let max = remaining_args.parse::<u32>().ok().unwrap_or_default();
+            // Check if there are at least 2 arguments
+            if values.len() < 2 {
+                tracing::warn!(
+                    "parse_complex_token: not enough arguments for CreatureTag::PopulationNumber {}/2",
+                    args.len()
+                );
+                return None;
+            }
+            let Ok(min) = values.remove(0).parse::<u32>() else {
+                tracing::warn!("parse_complex_token: CreatureTag::PopulationNumber failed to parse min value: {args}");
+                return None;
+            };
+            let Ok(max) = values.remove(0).parse::<u32>() else {
+                tracing::warn!("parse_complex_token: CreatureTag::PopulationNumber failed to parse max value: {args}");
+                return None;
+            };
             Some(CreatureTag::PopulationNumber { min, max })
         }
         CreatureTag::ProfessionName { .. } => {
-            // Parse the first argument as a `String`
-            let id = argument_1.to_string();
-            // Parse the remaining arguments as a `Vec<String>`
-            let values: Vec<String> = remaining_args
-                .split(':')
-                .map(std::string::ToString::to_string)
-                .collect();
-            let name = values.first().cloned().unwrap_or_default();
-            let plural_name = values.get(1).cloned().unwrap_or_default();
+            // Check if there are at least 3 arguments
+            if values.len() < 3 {
+                tracing::warn!(
+                    "parse_complex_token: not enough arguments for CreatureTag::ProfessionName {}/3",
+                    args.len()
+                );
+                return None;
+            }
+            let id = values.remove(0).to_string();
+            let name = values.remove(0).to_string();
+            let plural_name = values.join(":").to_string();
             Some(CreatureTag::ProfessionName {
                 id,
                 name,
@@ -417,61 +481,115 @@ fn parse_complex_token(
             })
         }
         CreatureTag::TriggerableGroup { .. } => {
-            // Parse the first argument as a `u32`
-            let min = argument_1.parse::<u32>().ok().unwrap_or_default();
-            // Parse the remaining arguments as a `u32`
-            let max = remaining_args.parse::<u32>().ok().unwrap_or_default();
+            // Check if there are at least 2 arguments
+            if values.len() < 2 {
+                tracing::warn!(
+                    "parse_complex_token: not enough arguments for CreatureTag::TriggerableGroup {}/2",
+                    args.len()
+                );
+                return None;
+            }
+            let Ok(min) = values.remove(0).parse::<u32>() else {
+                tracing::warn!("parse_complex_token: CreatureTag::TriggerableGroup failed to parse min value: {args}");
+                return None;
+            };
+            let Ok(max) = values.remove(0).parse::<u32>() else {
+                tracing::warn!("parse_complex_token: CreatureTag::TriggerableGroup failed to parse max value: {args}");
+                return None;
+            };
             Some(CreatureTag::TriggerableGroup { min, max })
         }
         CreatureTag::UndergroundDepth { .. } => {
-            // Parse the first argument as a `u32`
-            let min = argument_1.parse::<u32>().ok().unwrap_or_default();
-            // Parse the remaining arguments as a `u32`
-            let max = remaining_args.parse::<u32>().ok().unwrap_or_default();
+            // Check if there are at least 2 arguments
+            if values.len() < 2 {
+                tracing::warn!(
+                    "parse_complex_token: not enough arguments for CreatureTag::UndergroundDepth {}/2",
+                    args.len()
+                );
+                return None;
+            }
+            let Ok(min) = values.remove(0).parse::<u32>() else {
+                tracing::warn!("parse_complex_token: CreatureTag::UndergroundDepth failed to parse min value: {args}");
+                return None;
+            };
+            let Ok(max) = values.remove(0).parse::<u32>() else {
+                tracing::warn!("parse_complex_token: CreatureTag::UndergroundDepth failed to parse max value: {args}");
+                return None;
+            };
             Some(CreatureTag::UndergroundDepth { min, max })
         }
         CreatureTag::UseCaste { .. } => {
-            // Parse the first argument as a `String`
-            let caste = argument_1.to_string();
-            // Parse the remaining arguments as a `String`
-            let original_caste = remaining_args.to_string();
+            // Check if there are at least 2 arguments
+            if values.len() < 2 {
+                tracing::warn!(
+                    "parse_complex_token: not enough arguments for CreatureTag::UseCaste {}/2",
+                    args.len()
+                );
+                return None;
+            }
+            let caste = values.remove(0).to_string();
+            let original_caste = values.join(":").to_string();
             Some(CreatureTag::UseCaste {
                 caste,
                 original_caste,
             })
         }
         CreatureTag::UseMaterial { .. } => {
-            // Parse the first argument as a `String`
-            let material = argument_1.to_string();
-            // Parse the remaining arguments as a `String`
-            let original_material = remaining_args.to_string();
+            // Check if there are at least 2 arguments
+            if values.len() < 2 {
+                tracing::warn!(
+                    "parse_complex_token: not enough arguments for CreatureTag::UseMaterial {}/2",
+                    args.len()
+                );
+                return None;
+            }
+            let material = values.remove(0).to_string();
+            let original_material = values.join(":").to_string();
             Some(CreatureTag::UseMaterial {
                 material,
                 original_material,
             })
         }
         CreatureTag::UseMaterialTemplate { .. } => {
-            // Parse the first argument as a `String`
-            let material = argument_1.to_string();
-            // Parse the remaining arguments as a `String`
-            let template = remaining_args.to_string();
+            // Check if there are at least 2 arguments
+            if values.len() < 2 {
+                tracing::warn!(
+                    "parse_complex_token: not enough arguments for CreatureTag::UseMaterialTemplate {}/2",
+                    args.len()
+                );
+                return None;
+            }
+            let material = values.remove(0).to_string();
+            let template = values.join(":").to_string();
             Some(CreatureTag::UseMaterialTemplate { material, template })
         }
         CreatureTag::UseTissue { .. } => {
-            // Parse the first argument as a `String`
-            let tissue = argument_1.to_string();
-            // Parse the remaining arguments as a `String`
-            let original_tissue = remaining_args.to_string();
+            // Check if there are at least 2 arguments
+            if values.len() < 2 {
+                tracing::warn!(
+                    "parse_complex_token: not enough arguments for CreatureTag::UseTissue {}/2",
+                    args.len()
+                );
+                return None;
+            }
+            let tissue = values.remove(0).to_string();
+            let original_tissue = values.join(":").to_string();
             Some(CreatureTag::UseTissue {
                 tissue,
                 original_tissue,
             })
         }
         CreatureTag::UseTissueTemplate { .. } => {
-            // Parse the first argument as a `String`
-            let tissue = argument_1.to_string();
-            // Parse the remaining arguments as a `String`
-            let template = remaining_args.to_string();
+            // Check if there are at least 2 arguments
+            if values.len() < 2 {
+                tracing::warn!(
+                    "parse_complex_token: not enough arguments for CreatureTag::UseTissueTemplate {}/2",
+                    args.len()
+                );
+                return None;
+            }
+            let tissue = values.remove(0).to_string();
+            let template = values.join(":").to_string();
             Some(CreatureTag::UseTissueTemplate { tissue, template })
         }
         _ => {

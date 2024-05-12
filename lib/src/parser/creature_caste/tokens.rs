@@ -1,3 +1,4 @@
+use crate::parser::object_types::ObjectType;
 use serde::{Deserialize, Serialize};
 
 /// Tokens that can be found in a creature's caste definitions.
@@ -1889,13 +1890,13 @@ pub enum CasteTag {
     ///
     /// Arguments:
     ///
-    /// * `is_plant`: Whether the required item is a plant (true) or creature (false)
+    /// * `food_type`: The type of the required food
     /// * `identifier`: The identifier of the required plant or creature
     ///
     /// Appears as `SPECIFIC_FOOD:PLANT:Bamboo` or `SPECIFIC_FOOD:CREATURE:Tiger`
     SpecificFood {
-        /// Whether the required item is a plant (true) or creature (false)
-        is_plant: bool,
+        /// The type of the required food
+        food_type: ObjectType,
         /// The identifier of the required plant or creature
         identifier: String,
     },

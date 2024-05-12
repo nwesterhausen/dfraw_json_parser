@@ -54,7 +54,6 @@
 			},
 			"args": [
 				"--vanilla",
-				"-c",
 				"-P",
 				"-s",
 				"D:/SteamLibrary/steamapps/common/Dwarf Fortress"
