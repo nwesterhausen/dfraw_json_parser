@@ -7,7 +7,37 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## v0.17.5 (2024-05-12)
+
+### Bug Fixes
+
+ - <csr-id-5ed660f9d959ed5387dd39dc5f5a30ab35b6a333/> creature token parsing fixes
+ - <csr-id-8274f5f7f5bd6706f17fe991b9ad39520e1b4452/> skip_serializing_if None or Empty
+
+### Commit Statistics
+
+<csr-read-only-do-not-edit/>
+
+ - 3 commits contributed to the release over the course of 2 calendar days.
+ - 2 days passed between releases.
+ - 2 commits were understood as [conventional](https://www.conventionalcommits.org).
+ - 0 issues like '(#ID)' were seen in commit messages
+
+### Commit Details
+
+<csr-read-only-do-not-edit/>
+
+<details><summary>view details</summary>
+
+ * **Uncategorized**
+    - Creature token parsing fixes ([`5ed660f`](https://github.com/nwesterhausen/dfraw_json_parser/commit/5ed660f9d959ed5387dd39dc5f5a30ab35b6a333))
+    - Skip_serializing_if None or Empty ([`8274f5f`](https://github.com/nwesterhausen/dfraw_json_parser/commit/8274f5f7f5bd6706f17fe991b9ad39520e1b4452))
+    - Merge pull request #93 from nwesterhausen/fix-actions ([`fa35b8d`](https://github.com/nwesterhausen/dfraw_json_parser/commit/fa35b8d3a08c750503fe5e3f75df8653d94b7874))
+</details>
+
 ## v0.17.4 (2024-05-09)
+
+<csr-id-50cccd5a417b4628adbd1179f37b8d3a94ad2545/>
 
 ### Chore
 
@@ -22,7 +52,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 <csr-read-only-do-not-edit/>
 
- - 5 commits contributed to the release.
+ - 6 commits contributed to the release.
  - 3 commits were understood as [conventional](https://www.conventionalcommits.org).
  - 0 issues like '(#ID)' were seen in commit messages
 
@@ -33,6 +63,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 <details><summary>view details</summary>
 
  * **Uncategorized**
+    - Release dfraw_json_parser v0.17.4 ([`9fb38ac`](https://github.com/nwesterhausen/dfraw_json_parser/commit/9fb38acc7a197028a4c2370d7e7d019436ba36c2))
     - Merge pull request #90 from nwesterhausen/parser-options-binding ([`3594888`](https://github.com/nwesterhausen/dfraw_json_parser/commit/35948885fcb18bd176e32f5debf69d61de1d2b3f))
     - Lint ([`50cccd5`](https://github.com/nwesterhausen/dfraw_json_parser/commit/50cccd5a417b4628adbd1179f37b8d3a94ad2545))
     - Use biomejs for formatting ([`8590e3e`](https://github.com/nwesterhausen/dfraw_json_parser/commit/8590e3ea1896b4a42da1e3d73b399ba3899f80a1))
