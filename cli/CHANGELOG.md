@@ -5,7 +5,41 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## v1.2.1 (2024-05-12)
+
+### Bug Fixes
+
+ - <csr-id-5ed660f9d959ed5387dd39dc5f5a30ab35b6a333/> creature token parsing fixes
+ - <csr-id-8274f5f7f5bd6706f17fe991b9ad39520e1b4452/> skip_serializing_if None or Empty
+
+### Commit Statistics
+
+<csr-read-only-do-not-edit/>
+
+ - 3 commits contributed to the release over the course of 2 calendar days.
+ - 2 days passed between releases.
+ - 2 commits were understood as [conventional](https://www.conventionalcommits.org).
+ - 0 issues like '(#ID)' were seen in commit messages
+
+### Commit Details
+
+<csr-read-only-do-not-edit/>
+
+<details><summary>view details</summary>
+
+ * **Uncategorized**
+    - Creature token parsing fixes ([`5ed660f`](https://github.com/nwesterhausen/dfraw_json_parser/commit/5ed660f9d959ed5387dd39dc5f5a30ab35b6a333))
+    - Skip_serializing_if None or Empty ([`8274f5f`](https://github.com/nwesterhausen/dfraw_json_parser/commit/8274f5f7f5bd6706f17fe991b9ad39520e1b4452))
+    - Merge pull request #93 from nwesterhausen/fix-actions ([`fa35b8d`](https://github.com/nwesterhausen/dfraw_json_parser/commit/fa35b8d3a08c750503fe5e3f75df8653d94b7874))
+</details>
+
 ## v1.2.0 (2024-05-09)
+
+<csr-id-32397f0adb91cbe8709673a4d741380dc630c25b/>
+<csr-id-544a6c24ecf8e0eb71b4de265d44868c984363a1/>
+<csr-id-9677349012e4188b607e3769601df00e504dd362/>
+<csr-id-ff2c2064b0d2c729c2bd815e5760b215e23c686e/>
+<csr-id-f366c66ee155adde8f93a99bb7fdee958feddb08/>
 
 ### Chore
 
@@ -35,7 +69,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 <csr-read-only-do-not-edit/>
 
- - 9 commits contributed to the release over the course of 41 calendar days.
+ - 10 commits contributed to the release over the course of 41 calendar days.
  - 152 days passed between releases.
  - 7 commits were understood as [conventional](https://www.conventionalcommits.org).
  - 0 issues like '(#ID)' were seen in commit messages
@@ -47,6 +81,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 <details><summary>view details</summary>
 
  * **Uncategorized**
+    - Release dfraw_json_parser-cli v1.2.0 ([`6a3860d`](https://github.com/nwesterhausen/dfraw_json_parser/commit/6a3860d42aac43803a162ad31088638bd6688491))
     - Bump version to 0.17 ([`32397f0`](https://github.com/nwesterhausen/dfraw_json_parser/commit/32397f0adb91cbe8709673a4d741380dc630c25b))
     - Bump cli to 1.1.1 ([`544a6c2`](https://github.com/nwesterhausen/dfraw_json_parser/commit/544a6c24ecf8e0eb71b4de265d44868c984363a1))
     - Bump version to 0.17 ([`9677349`](https://github.com/nwesterhausen/dfraw_json_parser/commit/9677349012e4188b607e3769601df00e504dd362))

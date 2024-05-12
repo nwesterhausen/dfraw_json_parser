@@ -605,7 +605,7 @@ dependencies = [
 
 [[package]]
 name = "dfraw_json_parser-cli"
-version = "1.2.0"
+version = "1.2.1"
 dependencies = [
  "chrono",
  "dfraw_json_parser",
