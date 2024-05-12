@@ -24,30 +24,40 @@ use super::{phf_table::PLANT_TOKENS, tokens::PlantTag};
 #[serde(rename_all = "camelCase")]
 pub struct Plant {
     /// Common Raw file Things
+    #[serde(skip_serializing_if = "Option::is_none")]
     metadata: Option<RawMetadata>,
     identifier: String,
     object_id: String,
 
     // Basic Tokens
     name: Name,
+    #[serde(skip_serializing_if = "Option::is_none")]
     pref_strings: Option<Vec<String>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     tags: Option<Vec<PlantTag>>,
 
     // Environment Tokens
     /// Default [0, 0] (aboveground)
+    #[serde(skip_serializing_if = "Option::is_none")]
     underground_depth: Option<[u32; 2]>,
     /// Default frequency is 50
+    #[serde(skip_serializing_if = "Option::is_none")]
     frequency: Option<u32>,
     /// List of biomes this plant can grow in
+    #[serde(skip_serializing_if = "Option::is_none")]
     biomes: Option<Vec<biome::Token>>,
 
     /// Growth Tokens define the growths of the plant (leaves, fruit, etc.)
+    #[serde(skip_serializing_if = "Option::is_none")]
     growths: Option<Vec<PlantGrowth>>,
     /// If plant is a tree, it will have details about the tree.
+    #[serde(skip_serializing_if = "Option::is_none")]
     tree_details: Option<Tree>,
     /// If plant is a shrub, it will have details about the shrub.
+    #[serde(skip_serializing_if = "Option::is_none")]
     shrub_details: Option<Shrub>,
 
+    #[serde(skip_serializing_if = "Option::is_none")]
     materials: Option<Vec<Material>>,
 }
 

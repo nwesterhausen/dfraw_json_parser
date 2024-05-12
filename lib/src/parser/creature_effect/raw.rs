@@ -11,15 +11,20 @@ pub struct CreatureEffect {
     severity: u32,
     probability: u8,
 
+    #[serde(skip_serializing_if = "Option::is_none")]
     affected_body_parts_by_category: Option<Vec<String>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     affected_body_parts_by_type: Option<Vec<String>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     affected_body_parts_by_token: Option<Vec<String>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     tags: Option<Vec<CreatureEffectProperty>>,
 
     start: u32,
     peak: u32,
     end: u32,
 
+    #[serde(skip_serializing_if = "Option::is_none")]
     dwf_stretch: Option<u8>,
 }
 

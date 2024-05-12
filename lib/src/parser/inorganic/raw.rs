@@ -16,18 +16,26 @@ use super::{
 #[serde(rename_all = "camelCase")]
 pub struct Inorganic {
     identifier: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
     metadata: Option<RawMetadata>,
     object_id: String,
     material: Material,
 
+    #[serde(skip_serializing_if = "Option::is_none")]
     metal_ore_chance: Option<Vec<(String, u8)>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     thread_metal_chance: Option<Vec<(String, u8)>>,
 
+    #[serde(skip_serializing_if = "Option::is_none")]
     environment_class: Option<EnvironmentClass>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     environment_inclusion_type: Option<InclusionType>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     environment_inclusion_frequency: Option<u32>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     environment_class_specific: Option<Vec<String>>,
 
+    #[serde(skip_serializing_if = "Option::is_none")]
     tags: Option<Vec<InorganicToken>>,
 }
 

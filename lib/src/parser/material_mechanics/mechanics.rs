@@ -9,15 +9,23 @@ use tracing::warn;
 #[derive(Serialize, Deserialize, Debug, Clone, Default, specta::Type)]
 #[serde(rename_all = "camelCase", rename = "MaterialMechanics")]
 pub struct Mechanics {
+    #[serde(skip_serializing_if = "Option::is_none")]
     impact: Option<Properties>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     compressive: Option<Properties>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     tensile: Option<Properties>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     torsion: Option<Properties>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     shear: Option<Properties>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     bending: Option<Properties>,
 
+    #[serde(skip_serializing_if = "Option::is_none")]
     max_edge: Option<i32>,
 
+    #[serde(skip_serializing_if = "Option::is_none")]
     solid_density: Option<i32>,
 }
 

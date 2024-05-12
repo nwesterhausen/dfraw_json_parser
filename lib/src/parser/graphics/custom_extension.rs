@@ -9,8 +9,11 @@ use super::tokens::GraphicType;
 #[serde(rename_all = "camelCase")]
 pub struct CustomGraphicExtension {
     extension_type: GraphicType,
+    #[serde(skip_serializing_if = "Option::is_none")]
     tile_page_id: Option<String>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     value_1: Option<u32>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     value_2: Option<u32>,
 }
 

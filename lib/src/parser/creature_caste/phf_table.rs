@@ -1,4 +1,5 @@
 use super::tokens::CasteTag;
+use crate::parser::object_types::ObjectType;
 /// A map of caste tokens to their respective strings.
 pub static CASTE_TOKENS: phf::Map<&'static str, CasteTag> = phf::phf_map! {
     "ADOPTS_OWNER" => CasteTag::AdoptsOwner,
@@ -252,7 +253,7 @@ pub static CASTE_TOKENS: phf::Map<&'static str, CasteTag> = phf::phf_map! {
     "CASTE_SOLDIER_TILE" => CasteTag::SoldierTile { tile: String::new() },
     "CASTE_SOLDIER_ALTTILE" => CasteTag::SoldierAltTile { tile: String::new() },
     "SOUND" => CasteTag::Sound { sound_type: String::new(), sound_range: 0, sound_interval: 0, requires_breathing: false, first_person: String::new(), third_person: String::new(), out_of_sight: String::new() },
-    "SPECIFIC_FOOD" => CasteTag::SpecificFood { is_plant: false, identifier: String::new() },
+    "SPECIFIC_FOOD" => CasteTag::SpecificFood { food_type: ObjectType::Unknown, identifier: String::new() },
     "SPOUSE_CONVERSION_TARGET" => CasteTag::SpouseConversionTarget,
     "SPOUSE_CONVERTER" => CasteTag::SpouseConverter,
     "SPREAD_EVIL_SPHERES_IF_RULER" => CasteTag::SpreadEvilSpheresIfRuler,

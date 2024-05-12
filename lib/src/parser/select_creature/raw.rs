@@ -9,10 +9,12 @@ use crate::parser::{
 #[derive(Serialize, Deserialize, Debug, Clone, Default, specta::Type)]
 #[serde(rename_all = "camelCase")]
 pub struct SelectCreature {
+    #[serde(skip_serializing_if = "Option::is_none")]
     metadata: Option<RawMetadata>,
     identifier: String,
     object_id: String,
 
+    #[serde(skip_serializing_if = "Vec::is_empty")]
     tags: Vec<String>,
 }
 impl SelectCreature {

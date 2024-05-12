@@ -32,10 +32,15 @@ pub struct InfoFile {
     name: String,
     description: String,
 
+    #[serde(skip_serializing_if = "Option::is_none")]
     requires_ids: Option<Vec<String>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     conflicts_with_ids: Option<Vec<String>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     requires_ids_before: Option<Vec<String>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     requires_ids_after: Option<Vec<String>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     steam_data: Option<SteamData>,
 }
 
