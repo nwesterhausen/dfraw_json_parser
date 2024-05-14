@@ -103,24 +103,24 @@ export type Biome =
  * they are saved and can be applied later (at the consumer's discretion).
  */
 export type Creature = {
-	metadata: Metadata | null;
+	metadata?: Metadata | null;
 	identifier: string;
 	castes: Caste[];
-	tags: CreatureTag[] | null;
-	biomes: Biome[] | null;
-	prefStrings: string[] | null;
-	tile: Tile | null;
-	frequency: number | null;
-	clusterNumber: number[] | null;
-	populationNumber: number[] | null;
-	undergroundDepth: number[] | null;
-	generalBabyName: SingPlurName | null;
-	generalChildName: SingPlurName | null;
+	tags?: CreatureTag[] | null;
+	biomes?: Biome[] | null;
+	prefStrings?: string[] | null;
+	tile?: Tile | null;
+	frequency?: number | null;
+	clusterNumber?: number[] | null;
+	populationNumber?: number[] | null;
+	undergroundDepth?: number[] | null;
+	generalBabyName?: SingPlurName | null;
+	generalChildName?: SingPlurName | null;
 	name: Name;
-	copyTagsFrom: string | null;
-	applyCreatureVariation: string[] | null;
+	copyTagsFrom?: string | null;
+	applyCreatureVariation?: string[] | null;
 	objectId: string;
-	selectCreatureVariation: SelectCreature[] | null;
+	selectCreatureVariation?: SelectCreature[] | null;
 };
 
 /**
@@ -628,7 +628,7 @@ export type CasteTag =
 				out_of_sight: string;
 			};
 	  }
-	| { SpecificFood: { is_plant: boolean; identifier: string } }
+	| { SpecificFood: { food_type: ObjectType; identifier: string } }
 	| "SpouseConversionTarget"
 	| "SpouseConverter"
 	| "SpreadEvilSpheresIfRuler"
@@ -703,29 +703,29 @@ export type CasteTag =
  */
 export type Caste = {
 	identifier: string;
-	tags: CasteTag[] | null;
-	description: string | null;
-	babyName: SingPlurName | null;
-	casteName: Name | null;
-	childName: SingPlurName | null;
-	clutchSize: number[] | null;
-	litterSize: number[] | null;
-	maxAge: number[] | null;
-	baby: number | null;
-	child: number | null;
-	difficulty: number | null;
-	eggSize: number | null;
-	grassTrample: number | null;
-	grazer: number | null;
-	lowLightVision: number | null;
-	petValue: number | null;
-	popRatio: number | null;
-	changeBodySizePercentage: number | null;
-	creatureClass: string[] | null;
-	bodySize: BodySize[] | null;
-	milkable: Milkable | null;
-	tile: Tile | null;
-	gaits: Gait[] | null;
+	tags?: CasteTag[] | null;
+	description?: string | null;
+	babyName?: SingPlurName | null;
+	casteName?: Name | null;
+	childName?: SingPlurName | null;
+	clutchSize?: number[] | null;
+	litterSize?: number[] | null;
+	maxAge?: number[] | null;
+	baby?: number | null;
+	child?: number | null;
+	difficulty?: number | null;
+	eggSize?: number | null;
+	grassTrample?: number | null;
+	grazer?: number | null;
+	lowLightVision?: number | null;
+	petValue?: number | null;
+	popRatio?: number | null;
+	changeBodySizePercentage?: number | null;
+	creatureClass?: string[] | null;
+	bodySize?: BodySize[] | null;
+	milkable?: Milkable | null;
+	tile?: Tile | null;
+	gaits?: Gait[] | null;
 };
 
 /**
@@ -813,7 +813,7 @@ export type CreatureEffectToken =
  * A creature variation.
  */
 export type CreatureVariation = {
-	metadata: Metadata | null;
+	metadata?: Metadata | null;
 	identifier: string;
 	objectId: string;
 	rules: CreatureVariationRule[];
@@ -890,69 +890,69 @@ export type CVTag =
  * A struct representing an Entity object.
  */
 export type Entity = {
-	metadata: Metadata | null;
+	metadata?: Metadata | null;
 	identifier: string;
 	objectId: string;
 	tags: EntityToken[];
-	creature: string | null;
-	translation: string | null;
-	exclusiveStartBiome: string | null;
-	biomeSupport: [string, number][] | null;
-	settlementBiome: string[] | null;
-	startBiome: string[] | null;
-	likesSites: string[] | null;
-	toleratesSites: string[] | null;
-	worldConstructions: string[] | null;
-	maxPopNumber: number | null;
-	maxSitePopNumber: number | null;
-	maxStartingCivNumber: number | null;
-	permittedBuildings: string[] | null;
-	permittedJobs: string[] | null;
-	permittedReactions: string[] | null;
-	currency: [string, number][] | null;
-	artFacetModifier: [string, number][] | null;
-	artImageElementModifier: [string, number][] | null;
-	itemImprovementModifier: [string, number][] | null;
-	selectSymbols: [string, string][] | null;
-	subselectSymbols: [string, string][] | null;
-	cullSymbols: [string, string][] | null;
-	friendlyColor: Color | null;
-	religion: string | null;
-	religionSpheres: string[] | null;
-	sphereAlignments: string[] | null;
-	positions: Position[] | null;
-	landHolderTrigger: string | null;
-	siteVariablePositions: string[] | null;
-	variablePositions: string[] | null;
-	ethics: [string, string][] | null;
-	values: [string, number][] | null;
-	variableValues: [string, number, number][] | null;
-	activeSeason: string | null;
-	banditry: number | null;
-	progressTriggerPopulation: number | null;
-	progressTriggerProduction: number | null;
-	progressTriggerTrade: number | null;
-	progressTriggerPopulationSiege: number | null;
-	progressTriggerProductionSiege: number | null;
-	progressTriggerTradeSiege: number | null;
-	scholars: string[] | null;
-	ammo: string[] | null;
-	armors: [string, number][] | null;
-	diggers: string[] | null;
-	gloves: [string, number][] | null;
-	helms: [string, number][] | null;
-	instrument: string[] | null;
-	pants: [string, number][] | null;
-	shields: string[] | null;
-	shoes: [string, number][] | null;
-	siegeAmmo: string[] | null;
-	tool: string[] | null;
-	toys: string[] | null;
-	trapComponents: string[] | null;
-	weapons: string[] | null;
-	gemShape: string[] | null;
-	stoneShape: string[] | null;
-	sourceHfid: number | null;
+	creature?: string | null;
+	translation?: string | null;
+	exclusiveStartBiome?: string | null;
+	biomeSupport?: [string, number][] | null;
+	settlementBiome?: string[] | null;
+	startBiome?: string[] | null;
+	likesSites?: string[] | null;
+	toleratesSites?: string[] | null;
+	worldConstructions?: string[] | null;
+	maxPopNumber?: number | null;
+	maxSitePopNumber?: number | null;
+	maxStartingCivNumber?: number | null;
+	permittedBuildings?: string[] | null;
+	permittedJobs?: string[] | null;
+	permittedReactions?: string[] | null;
+	currency?: [string, number][] | null;
+	artFacetModifier?: [string, number][] | null;
+	artImageElementModifier?: [string, number][] | null;
+	itemImprovementModifier?: [string, number][] | null;
+	selectSymbols?: [string, string][] | null;
+	subselectSymbols?: [string, string][] | null;
+	cullSymbols?: [string, string][] | null;
+	friendlyColor?: Color | null;
+	religion?: string | null;
+	religionSpheres?: string[] | null;
+	sphereAlignments?: string[] | null;
+	positions?: Position[] | null;
+	landHolderTrigger?: string | null;
+	siteVariablePositions?: string[] | null;
+	variablePositions?: string[] | null;
+	ethics?: [string, string][] | null;
+	values?: [string, number][] | null;
+	variableValues?: [string, number, number][] | null;
+	activeSeason?: string | null;
+	banditry?: number | null;
+	progressTriggerPopulation?: number | null;
+	progressTriggerProduction?: number | null;
+	progressTriggerTrade?: number | null;
+	progressTriggerPopulationSiege?: number | null;
+	progressTriggerProductionSiege?: number | null;
+	progressTriggerTradeSiege?: number | null;
+	scholars?: string[] | null;
+	ammo?: string[] | null;
+	armors?: [string, number][] | null;
+	diggers?: string[] | null;
+	gloves?: [string, number][] | null;
+	helms?: [string, number][] | null;
+	instrument?: string[] | null;
+	pants?: [string, number][] | null;
+	shields?: string[] | null;
+	shoes?: [string, number][] | null;
+	siegeAmmo?: string[] | null;
+	tool?: string[] | null;
+	toys?: string[] | null;
+	trapComponents?: string[] | null;
+	weapons?: string[] | null;
+	gemShape?: string[] | null;
+	stoneShape?: string[] | null;
+	sourceHfid?: number | null;
 };
 
 /**
@@ -1122,16 +1122,16 @@ export type EntityToken =
  * A struct representing a Graphic object.
  */
 export type Graphic = {
-	metadata: Metadata | null;
+	metadata?: Metadata | null;
 	identifier: string;
 	objectId: string;
-	casteIdentifier: string | null;
+	casteIdentifier?: string | null;
 	kind: GraphicType;
-	sprites: SpriteGraphic[] | null;
-	layers: [string, SpriteLayer[]][] | null;
-	growths: [string, SpriteGraphic[]][] | null;
-	customExtensions: CustomGraphicExtension[] | null;
-	tags: string[] | null;
+	sprites?: SpriteGraphic[] | null;
+	layers?: [string, SpriteLayer[]][] | null;
+	growths?: [string, SpriteGraphic[]][] | null;
+	customExtensions?: CustomGraphicExtension[] | null;
+	tags?: string[] | null;
 };
 
 /**
@@ -1141,13 +1141,13 @@ export type SpriteGraphic = {
 	primaryCondition: Condition;
 	tilePageId: string;
 	offset: Dimensions;
-	color: ColorModification | null;
-	largeImage: boolean | null;
-	offset2: Dimensions | null;
-	secondaryCondition: Condition | null;
-	colorPalletSwap: number | null;
-	targetIdentifier: string | null;
-	extraDescriptor: string | null;
+	color?: ColorModification | null;
+	largeImage?: boolean | null;
+	offset2?: Dimensions | null;
+	secondaryCondition?: Condition | null;
+	colorPalletSwap?: number | null;
+	targetIdentifier?: string | null;
+	extraDescriptor?: string | null;
 };
 
 /**
@@ -1157,16 +1157,16 @@ export type SpriteLayer = {
 	layerName: string;
 	tilePageId: string;
 	offset: Dimensions;
-	offset2: Dimensions | null;
-	largeImage: boolean | null;
-	conditions: [Condition, string][] | null;
+	offset2?: Dimensions | null;
+	largeImage?: boolean | null;
+	conditions?: [Condition, string][] | null;
 };
 
 /**
  * A struct representing a `TilePage` object.
  */
 export type TilePage = {
-	metadata: Metadata | null;
+	metadata?: Metadata | null;
 	identifier: string;
 	objectId: string;
 	file: string;
@@ -1457,16 +1457,16 @@ export type TilePageTag = "tileDim" | "pageDim" | "file" | "unknown";
  */
 export type Inorganic = {
 	identifier: string;
-	metadata: Metadata | null;
+	metadata?: Metadata | null;
 	objectId: string;
 	material: Material;
-	metalOreChance: [string, number][] | null;
-	threadMetalChance: [string, number][] | null;
-	environmentClass: EnvironmentClass | null;
-	environmentInclusionType: InclusionType | null;
-	environmentInclusionFrequency: number | null;
-	environmentClassSpecific: string[] | null;
-	tags: InorganicToken[] | null;
+	metalOreChance?: [string, number][] | null;
+	threadMetalChance?: [string, number][] | null;
+	environmentClass?: EnvironmentClass | null;
+	environmentInclusionType?: InclusionType | null;
+	environmentInclusionFrequency?: number | null;
+	environmentClassSpecific?: string[] | null;
+	tags?: InorganicToken[] | null;
 };
 
 /**
@@ -1527,31 +1527,31 @@ export type InorganicToken =
  * A struct representing a material
  */
 export type Material = {
-	materialType: MaterialType | null;
-	name: string | null;
-	fuelType: FuelType | null;
-	creatureIdentifier: string | null;
-	plantIdentifier: string | null;
-	isLocalMaterial: boolean | null;
-	reagentIdentifier: string | null;
-	reactionProductIdentifier: string | null;
-	templateIdentifier: string | null;
-	usage: MaterialUsage[] | null;
-	value: number | null;
-	color: Color | null;
-	stateNames: StateName | null;
-	stateAdjectives: StateName | null;
-	stateColors: StateName | null;
-	temperatures: Temperatures | null;
-	properties: string[] | null;
-	syndromes: Syndrome[] | null;
-	mechanicalProperties: MaterialMechanics | null;
-	liquidDensity: number | null;
-	molarMass: number | null;
-	buildColor: Color | null;
-	displayColor: Color | null;
-	tile: Tile | null;
-	itemSymbol: string | null;
+	materialType?: MaterialType | null;
+	name?: string | null;
+	fuelType?: FuelType | null;
+	creatureIdentifier?: string | null;
+	plantIdentifier?: string | null;
+	isLocalMaterial?: boolean | null;
+	reagentIdentifier?: string | null;
+	reactionProductIdentifier?: string | null;
+	templateIdentifier?: string | null;
+	usage?: MaterialUsage[] | null;
+	value?: number | null;
+	color?: Color | null;
+	stateNames?: StateName | null;
+	stateAdjectives?: StateName | null;
+	stateColors?: StateName | null;
+	temperatures?: Temperatures | null;
+	properties?: string[] | null;
+	syndromes?: Syndrome[] | null;
+	mechanicalProperties?: MaterialMechanics | null;
+	liquidDensity?: number | null;
+	molarMass?: number | null;
+	buildColor?: Color | null;
+	displayColor?: Color | null;
+	tile?: Tile | null;
+	itemSymbol?: string | null;
 };
 
 /**
@@ -1772,7 +1772,7 @@ export type MaterialUsage =
  */
 export type MaterialTemplate = {
 	identifier: string;
-	metadata: Metadata | null;
+	metadata?: Metadata | null;
 	objectId: string;
 	material: Material;
 };
@@ -1781,19 +1781,19 @@ export type MaterialTemplate = {
  * A struct representing a plant
  */
 export type Plant = {
-	metadata: Metadata | null;
+	metadata?: Metadata | null;
 	identifier: string;
 	objectId: string;
 	name: Name;
-	prefStrings: string[] | null;
-	tags: PlantTag[] | null;
-	undergroundDepth: number[] | null;
-	frequency: number | null;
-	biomes: Biome[] | null;
-	growths: PlantGrowth[] | null;
-	treeDetails: Tree | null;
-	shrubDetails: Shrub | null;
-	materials: Material[] | null;
+	prefStrings?: string[] | null;
+	tags?: PlantTag[] | null;
+	undergroundDepth?: number[] | null;
+	frequency?: number | null;
+	biomes?: Biome[] | null;
+	growths?: PlantGrowth[] | null;
+	treeDetails?: Tree | null;
+	shrubDetails?: Shrub | null;
+	materials?: Material[] | null;
 };
 
 /**
@@ -1826,12 +1826,12 @@ export type PlantGrowth = {
 	growthType: GrowthType;
 	name: SingPlurName;
 	item: string;
-	hostTiles: PlantPart[] | null;
-	trunkHeightPercentage: number[] | null;
-	density: number | null;
-	print: string | null;
-	timing: number[] | null;
-	tags: GrowthTag[] | null;
+	hostTiles?: PlantPart[] | null;
+	trunkHeightPercentage?: number[] | null;
+	density?: number | null;
+	print?: string | null;
+	timing?: number[] | null;
+	tags?: GrowthTag[] | null;
 };
 
 /**
@@ -1891,40 +1891,40 @@ export type PlantPart =
  */
 export type Position = {
 	identifier: string;
-	allowedClasses: string[] | null;
-	allowedCreatures: string[] | null;
-	appointedBy: string | null;
-	color: Color | null;
-	commander: string | null;
-	demandMax: number | null;
-	executionSkill: string | null;
-	gender: string | null;
-	landHolder: number | null;
-	landName: string | null;
-	mandateMax: number | null;
-	name: SingPlurName | null;
-	nameMale: SingPlurName | null;
-	nameFemale: SingPlurName | null;
-	number: number | null;
-	precedence: number | null;
-	rejectedClasses: string[] | null;
-	rejectedCreatures: string[] | null;
-	replacedBy: string | null;
-	requiredBedroom: number | null;
-	requiredBoxes: number | null;
-	requiredCabinets: number | null;
-	requiredDining: number | null;
-	requiredOffice: number | null;
-	requiredRacks: number | null;
-	requiredStands: number | null;
-	requiredTomb: number | null;
-	requiresPopulation: number | null;
-	responsibilities: string[] | null;
-	spouse: SingPlurName | null;
-	spouseFemale: SingPlurName | null;
-	spouseMale: SingPlurName | null;
-	squad: string | null;
-	succession: string | null;
+	allowedClasses?: string[] | null;
+	allowedCreatures?: string[] | null;
+	appointedBy?: string | null;
+	color?: Color | null;
+	commander?: string | null;
+	demandMax?: number | null;
+	executionSkill?: string | null;
+	gender?: string | null;
+	landHolder?: number | null;
+	landName?: string | null;
+	mandateMax?: number | null;
+	name?: SingPlurName | null;
+	nameMale?: SingPlurName | null;
+	nameFemale?: SingPlurName | null;
+	number?: number | null;
+	precedence?: number | null;
+	rejectedClasses?: string[] | null;
+	rejectedCreatures?: string[] | null;
+	replacedBy?: string | null;
+	requiredBedroom?: number | null;
+	requiredBoxes?: number | null;
+	requiredCabinets?: number | null;
+	requiredDining?: number | null;
+	requiredOffice?: number | null;
+	requiredRacks?: number | null;
+	requiredStands?: number | null;
+	requiredTomb?: number | null;
+	requiresPopulation?: number | null;
+	responsibilities?: string[] | null;
+	spouse?: SingPlurName | null;
+	spouseFemale?: SingPlurName | null;
+	spouseMale?: SingPlurName | null;
+	squad?: string | null;
+	succession?: string | null;
 	tags: PositionToken[];
 };
 
@@ -2003,7 +2003,7 @@ export type SeedMaterial = {
  * A struct representing a creature selection
  */
 export type SelectCreature = {
-	metadata: Metadata | null;
+	metadata?: Metadata | null;
 	identifier: string;
 	objectId: string;
 	tags: string[];
@@ -2022,26 +2022,26 @@ export type SelectRules =
  * A shrub in the raws.
  */
 export type Shrub = {
-	growingSeason: SeasonToken[] | null;
-	growDuration: number | null;
-	value: number | null;
-	pickedTile: number | null;
-	deadPickedTile: number | null;
-	shrubTile: number | null;
-	deadShrubTile: number | null;
-	clusterSize: number | null;
-	pickedColor: Color | null;
-	deadPickedColor: Color | null;
-	shrubColor: Color | null;
-	deadShrubColor: Color | null;
-	shrubDrownLevel: number | null;
-	drink: string | null;
-	mill: string | null;
-	thread: string | null;
-	seed: SeedMaterial | null;
-	extractStillVial: string | null;
-	extractVial: string | null;
-	extractBarrel: string | null;
+	growingSeason?: SeasonToken[] | null;
+	growDuration?: number | null;
+	value?: number | null;
+	pickedTile?: number | null;
+	deadPickedTile?: number | null;
+	shrubTile?: number | null;
+	deadShrubTile?: number | null;
+	clusterSize?: number | null;
+	pickedColor?: Color | null;
+	deadPickedColor?: Color | null;
+	shrubColor?: Color | null;
+	deadShrubColor?: Color | null;
+	shrubDrownLevel?: number | null;
+	drink?: string | null;
+	mill?: string | null;
+	thread?: string | null;
+	seed?: SeedMaterial | null;
+	extractStillVial?: string | null;
+	extractVial?: string | null;
+	extractBarrel?: string | null;
 };
 
 /**
@@ -2082,16 +2082,16 @@ export type ShrubToken =
  * A struct representing a syndrome
  */
 export type Syndrome = {
-	identifier: string | null;
-	name: string | null;
-	affectedClasses: string[] | null;
-	immuneClasses: string[] | null;
-	affectedCreatures: [string, string][] | null;
-	immuneCreatures: [string, string][] | null;
-	classes: string[] | null;
-	concentrationAdded: number[] | null;
-	tags: SyndromeToken[] | null;
-	conditions: string[] | null;
+	identifier?: string | null;
+	name?: string | null;
+	affectedClasses?: string[] | null;
+	immuneClasses?: string[] | null;
+	affectedCreatures?: [string, string][] | null;
+	immuneCreatures?: [string, string][] | null;
+	classes?: string[] | null;
+	concentrationAdded?: number[] | null;
+	tags?: SyndromeToken[] | null;
+	conditions?: string[] | null;
 };
 
 /**
@@ -2118,37 +2118,37 @@ export type SyndromeToken =
  */
 export type Tree = {
 	material: string;
-	trunkName: Name | null;
-	maxTrunkHeight: number | null;
-	maxTrunkDiameter: number | null;
-	trunkPeriod: number | null;
-	trunkWidthPeriod: number | null;
-	branchName: Name | null;
-	branchDensity: number | null;
-	branchRadius: number | null;
-	heavyBranchesName: Name | null;
-	heavyBranchDensity: number | null;
-	heavyBranchRadius: number | null;
-	trunkBranching: number | null;
-	rootName: Name | null;
-	rootDensity: number | null;
-	rootRadius: number | null;
-	twigsName: Name | null;
-	twigsPlacement: TwigPlacement[] | null;
-	capName: Name | null;
-	capPeriod: number | null;
-	capRadius: number | null;
-	treeTile: string | null;
-	deadTreeTile: string | null;
-	saplingTile: string | null;
-	deadSaplingTile: string | null;
-	treeColor: Color | null;
-	deadTreeColor: Color | null;
-	saplingColor: Color | null;
-	deadSaplingColor: Color | null;
-	saplingDrownLevel: number | null;
-	treeDrownLevel: number | null;
-	tags: TreeToken[] | null;
+	trunkName?: Name | null;
+	maxTrunkHeight?: number | null;
+	maxTrunkDiameter?: number | null;
+	trunkPeriod?: number | null;
+	trunkWidthPeriod?: number | null;
+	branchName?: Name | null;
+	branchDensity?: number | null;
+	branchRadius?: number | null;
+	heavyBranchesName?: Name | null;
+	heavyBranchDensity?: number | null;
+	heavyBranchRadius?: number | null;
+	trunkBranching?: number | null;
+	rootName?: Name | null;
+	rootDensity?: number | null;
+	rootRadius?: number | null;
+	twigsName?: Name | null;
+	twigsPlacement?: TwigPlacement[] | null;
+	capName?: Name | null;
+	capPeriod?: number | null;
+	capRadius?: number | null;
+	treeTile?: string | null;
+	deadTreeTile?: string | null;
+	saplingTile?: string | null;
+	deadSaplingTile?: string | null;
+	treeColor?: Color | null;
+	deadTreeColor?: Color | null;
+	saplingColor?: Color | null;
+	deadSaplingColor?: Color | null;
+	saplingDrownLevel?: number | null;
+	treeDrownLevel?: number | null;
+	tags?: TreeToken[] | null;
 };
 
 /**
@@ -2240,14 +2240,14 @@ export type Modification =
  * types of mechanical stress.
  */
 export type MaterialMechanics = {
-	impact: MechanicalProperties | null;
-	compressive: MechanicalProperties | null;
-	tensile: MechanicalProperties | null;
-	torsion: MechanicalProperties | null;
-	shear: MechanicalProperties | null;
-	bending: MechanicalProperties | null;
-	maxEdge: number | null;
-	solidDensity: number | null;
+	impact?: MechanicalProperties | null;
+	compressive?: MechanicalProperties | null;
+	tensile?: MechanicalProperties | null;
+	torsion?: MechanicalProperties | null;
+	shear?: MechanicalProperties | null;
+	bending?: MechanicalProperties | null;
+	maxEdge?: number | null;
+	solidDensity?: number | null;
 };
 
 /**
@@ -2300,23 +2300,23 @@ export type InfoFile = {
 	author: string;
 	name: string;
 	description: string;
-	requiresIds: string[] | null;
-	conflictsWithIds: string[] | null;
-	requiresIdsBefore: string[] | null;
-	requiresIdsAfter: string[] | null;
-	steamData: SteamData | null;
+	requiresIds?: string[] | null;
+	conflictsWithIds?: string[] | null;
+	requiresIdsBefore?: string[] | null;
+	requiresIdsAfter?: string[] | null;
+	steamData?: SteamData | null;
 };
 
 /**
  * The additional data specific to the steam workshop
  */
 export type SteamData = {
-	title: string | null;
-	description: string | null;
-	tags: string[] | null;
-	keyValueTags: string[] | null;
-	metadata: string[] | null;
-	changelog: string | null;
+	title?: string | null;
+	description?: string | null;
+	tags?: string[] | null;
+	keyValueTags?: string[] | null;
+	metadata?: string[] | null;
+	changelog?: string | null;
 	fileId: string;
 };
 
@@ -2426,13 +2426,13 @@ export type Milkable = { material: string; frequency: number };
  * The temperature properties of a material
  */
 export type Temperatures = {
-	specificHeat: number | null;
-	ignitionPoint: number | null;
-	meltingPoint: number | null;
-	boilingPoint: number | null;
-	heatDamagePoint: number | null;
-	coldDamagePoint: number | null;
-	materialFixedTemperature: number | null;
+	specificHeat?: number | null;
+	ignitionPoint?: number | null;
+	meltingPoint?: number | null;
+	boilingPoint?: number | null;
+	heatDamagePoint?: number | null;
+	coldDamagePoint?: number | null;
+	materialFixedTemperature?: number | null;
 };
 
 /**
@@ -2440,10 +2440,10 @@ export type Temperatures = {
  */
 export type Tile = {
 	character: string;
-	altCharacter: string | null;
-	color: Color | null;
-	glowCharacter: string | null;
-	glowColor: Color | null;
+	altCharacter?: string | null;
+	color?: Color | null;
+	glowCharacter?: string | null;
+	glowColor?: Color | null;
 };
 
 /**
@@ -2456,9 +2456,9 @@ export type Dimensions = { x: number; y: number };
  */
 export type CustomGraphicExtension = {
 	extensionType: GraphicType;
-	tilePageId: string | null;
-	value1: number | null;
-	value2: number | null;
+	tilePageId?: string | null;
+	value1?: number | null;
+	value2?: number | null;
 };
 
 /**
