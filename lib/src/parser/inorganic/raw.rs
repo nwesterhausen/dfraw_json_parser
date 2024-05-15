@@ -160,6 +160,27 @@ impl Inorganic {
             );
         }
     }
+
+    /// Check whether the inorganic has the specified inorganic tag (found in the `tags` field).
+    ///
+    /// # Arguments
+    ///
+    /// * `tag`: The tag to check for.
+    ///
+    /// # Returns
+    ///
+    /// Returns true if the inorganic has the specified tag, and false otherwise.
+    #[must_use]
+    pub fn has_tag(&self, tag: &InorganicToken) -> bool {
+        if let Some(tags) = &self.tags {
+            for t in tags {
+                if std::mem::discriminant(t) == std::mem::discriminant(tag) {
+                    return true;
+                }
+            }
+        }
+        false
+    }
 }
 
 #[typetag::serde]

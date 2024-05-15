@@ -2,12 +2,18 @@ use serde::{Deserialize, Serialize};
 use specta::Type;
 use tracing::{debug, trace, warn};
 
-use crate::parser::{
-    biome, clean_search_vec, creature_caste::Caste, creature_caste::TOKEN_MAP as CASTE_TOKENS,
-    creature_variation::Requirements as CreatureVariationRequirements,
-    helpers::build_object_id_from_pieces, metadata::RawObjectToken, object_types::ObjectType,
-    select_creature::SelectCreature, serializer_helper, Name, RawMetadata, RawObject, Searchable,
-    SingPlurName, Tile,
+use crate::{
+    creature_caste::Token as CasteTag,
+    parser::{
+        biome, clean_search_vec,
+        creature_caste::{Caste, TOKEN_MAP as CASTE_TOKENS},
+        creature_variation::Requirements as CreatureVariationRequirements,
+        helpers::build_object_id_from_pieces,
+        metadata::RawObjectToken,
+        object_types::ObjectType,
+        select_creature::SelectCreature,
+        serializer_helper, Name, RawMetadata, RawObject, Searchable, SingPlurName, Tile,
+    },
 };
 
 use super::{phf_table::CREATURE_TOKENS, tokens::CreatureTag};
@@ -651,6 +657,46 @@ impl Creature {
         }
 
         cleaned
+    }
+
+    /// Check whether the creature has the specified creature tag (found in the `tags` field).
+    ///
+    /// # Arguments
+    ///
+    /// * `tag`: The tag to check for.
+    ///
+    /// # Returns
+    ///
+    /// Returns true if the creature has the specified tag, and false otherwise.
+    #[must_use]
+    pub fn has_tag(&self, tag: &CreatureTag) -> bool {
+        if let Some(tags) = &self.tags {
+            for t in tags {
+                if std::mem::discriminant(t) == std::mem::discriminant(tag) {
+                    return true;
+                }
+            }
+        }
+        false
+    }
+
+    /// Check whether any of the castes have the specified creature caste tag.
+    ///
+    /// # Arguments
+    ///
+    /// * `tag`: The tag to check for.
+    ///
+    /// # Returns
+    ///
+    /// Returns true if any of the castes have the specified tag, and false otherwise.
+    #[must_use]
+    pub fn has_caste_tag(&self, tag: &CasteTag) -> bool {
+        for caste in &self.castes {
+            if caste.has_tag(tag) {
+                return true;
+            }
+        }
+        false
     }
 }
 
