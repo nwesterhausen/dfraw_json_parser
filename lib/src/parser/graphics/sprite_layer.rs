@@ -25,7 +25,7 @@ impl SpriteLayer {
     /// # Returns
     ///
     /// * `&str` - The `tile_page_id` of the `SpriteLayer`.
-    pub fn get_tile_page_id(&self) -> &str {
+    #[must_use] pub fn get_tile_page_id(&self) -> &str {
         self.tile_page_id.as_str()
     }
     /// Parse a condition token into a `LayerCondition`.

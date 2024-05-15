@@ -398,26 +398,32 @@ impl InfoFile {
         Ok(info_file_data)
     }
     /// Returns the identifier for the `InfoFile`
+    #[must_use]
     pub fn get_identifier(&self) -> String {
         String::from(&self.identifier)
     }
     /// Returns the location the `InfoFile` was parsed from
+    #[must_use]
     pub const fn get_location(&self) -> RawModuleLocation {
         self.location
     }
     /// Returns the description for the `InfoFile`
+    #[must_use]
     pub fn get_description(&self) -> String {
         String::from(&self.description)
     }
     /// Returns the name for the `InfoFile`
+    #[must_use]
     pub fn get_name(&self) -> String {
         String::from(&self.name)
     }
     /// Returns the displayed version for the `InfoFile`
+    #[must_use]
     pub fn get_version(&self) -> String {
         String::from(&self.displayed_version)
     }
     /// Returns the module's object id
+    #[must_use]
     pub fn get_object_id(&self) -> String {
         String::from(&self.object_id)
     }
@@ -433,6 +439,7 @@ impl InfoFile {
     ///
     /// assert_eq!(info_file.get_parent_directory(), "vanilla_creatures");
     /// ```
+    #[must_use]
     pub fn get_parent_directory(&self) -> String {
         String::from(&self.parent_directory)
     }

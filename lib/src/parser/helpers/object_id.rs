@@ -15,7 +15,7 @@ use crate::parser::{ObjectType, RawMetadata};
 /// Returns:
 ///
 /// a string.
-pub fn build_object_id_from_pieces(
+#[must_use] pub fn build_object_id_from_pieces(
     metadata: &RawMetadata,
     identifier: &str,
     raw_type: &ObjectType,

@@ -57,6 +57,7 @@ impl Milkable {
     /// # Returns
     ///
     /// * `&str` - The material of the milkable
+    #[must_use]
     pub fn get_material(&self) -> &str {
         &self.material
     }
@@ -65,6 +66,7 @@ impl Milkable {
     /// # Returns
     ///
     /// * `u32` - The frequency of the milkable
+    #[must_use]
     pub const fn get_frequency(&self) -> u32 {
         self.frequency
     }

@@ -109,6 +109,7 @@ impl Gait {
     /// ## Returns
     ///
     /// The parsed gait
+    #[must_use]
     pub fn from_value(value: &str) -> Self {
         let mut gait = Self::default();
         let mut parts = value.split(':');
@@ -216,7 +217,7 @@ impl Gait {
     /// ## Returns
     ///
     /// True if the gait is empty, false otherwise.
-    pub fn is_empty(&self) -> bool {
+    #[must_use] pub fn is_empty(&self) -> bool {
         self.gait_type == GaitType::Unknown
     }
 }

@@ -40,7 +40,7 @@ impl CreatureVariation {
     /// # Returns
     ///
     /// A new creature variation with the given identifier.
-    pub fn new(identifier: &str, metadata: &RawMetadata) -> Self {
+    #[must_use] pub fn new(identifier: &str, metadata: &RawMetadata) -> Self {
         Self {
             metadata: Some(metadata.clone()),
             identifier: identifier.to_string(),

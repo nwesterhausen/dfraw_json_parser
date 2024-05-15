@@ -62,14 +62,11 @@ for the steam workshop if it is a mod downloaded from the steam workshop.
 
 */
 
-#![warn(clippy::pedantic)]
-#![allow(clippy::must_use_candidate)]
-
 use parser::{
     creature::Creature, creature_variation::CreatureVariation, unprocessed_raw::UnprocessedRaw,
 };
 use std::path::{Path, PathBuf};
-use tracing::{debug, error, info, warn};
+use tracing::{debug, error, info};
 use util::validate_options;
 use walkdir::{DirEntry, WalkDir};
 

@@ -76,6 +76,7 @@ impl UnprocessedRaw {
     }
 
     /// Gets the identifier of the object
+    #[must_use]
     pub fn get_identifier(&self) -> &str {
         &self.identifier
     }
@@ -262,7 +263,7 @@ impl UnprocessedRaw {
 
                     if let Some(source_creature) = source_creature_options.first() {
                         // We found a creature to copy tags from, so we can copy the tags
-                        Creature::copy_tags_from(&creature, source_creature);
+                        creature = Creature::copy_tags_from(&creature, source_creature);
                     } else {
                         debug!(
                             "Unable to find creature with identifier `{}` to copy tags from",

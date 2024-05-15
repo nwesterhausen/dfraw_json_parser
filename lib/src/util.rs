@@ -445,6 +445,7 @@ pub fn validate_options(options: &ParserOptions) -> Result<ParserOptions, Parser
 ///
 /// The function `raws_to_string` returns a `String` that represents the input `Vec<Box<dyn RawObject>>`
 /// as a JSON array.
+#[must_use]
 pub fn raws_to_string(raws: Vec<Box<dyn RawObject>>) -> String {
     // It should be an array, so start with '[' character,
     // then add each raw object, separated by a comma.
@@ -470,6 +471,7 @@ pub fn raws_to_string(raws: Vec<Box<dyn RawObject>>) -> String {
 /// Returns:
 ///
 /// a vector of `DFCreature` objects.
+#[must_use]
 pub fn get_only_creatures_from_raws(all_raws: &[Box<dyn RawObject>]) -> Vec<Creature> {
     all_raws
         .iter()
@@ -489,6 +491,7 @@ pub fn get_only_creatures_from_raws(all_raws: &[Box<dyn RawObject>]) -> Vec<Crea
 /// Returns:
 ///
 /// a vector of `SelectCreature` objects.
+#[must_use]
 pub fn get_only_select_creatures_from_raws(all_raws: &[Box<dyn RawObject>]) -> Vec<SelectCreature> {
     all_raws
         .iter()
@@ -570,6 +573,7 @@ pub fn try_get_file<P: AsRef<Path>>(file_path: &P) -> Result<File, ParserError> 
 ///
 /// A `HashMap<ObjectType, usize>` where the key is the object type and the value is the number of
 /// objects of that type.
+#[must_use]
 pub fn summarize_raws(raws: &[Box<dyn RawObject>]) -> HashMap<ObjectType, usize> {
     let mut summary: std::collections::HashMap<ObjectType, usize> =
         std::collections::HashMap::new();

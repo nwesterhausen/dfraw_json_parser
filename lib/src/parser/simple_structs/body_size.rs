@@ -19,6 +19,7 @@ impl BodySize {
     /// # Returns
     ///
     /// * The `BodySize` struct
+    #[must_use]
     pub fn from_value(value: &str) -> Self {
         let split = value.split(':').collect::<Vec<&str>>();
         if split.len() == 3 {

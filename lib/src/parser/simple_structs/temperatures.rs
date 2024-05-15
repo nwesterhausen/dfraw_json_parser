@@ -44,6 +44,7 @@ impl Temperatures {
     /// # Returns
     ///
     /// * `bool` - Whether the temperatures are empty (default values)
+    #[must_use]
     pub const fn is_empty(&self) -> bool {
         self.specific_heat.is_none()
             && self.ignition_point.is_none()

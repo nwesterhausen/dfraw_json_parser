@@ -40,7 +40,7 @@ impl SpriteGraphic {
     /// # Returns
     ///
     /// A string slice containing the tile page ID.
-    pub fn get_tile_page_id(&self) -> &str {
+    #[must_use] pub fn get_tile_page_id(&self) -> &str {
         self.tile_page_id.as_str()
     }
     /// Create a new sprite graphic by parsing a token.

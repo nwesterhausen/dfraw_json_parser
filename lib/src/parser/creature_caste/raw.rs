@@ -243,7 +243,7 @@ impl Caste {
     /// # Returns
     ///
     /// * `&str` - The identifier of the creature.
-    pub fn get_identifier(&self) -> &str {
+    #[must_use] pub fn get_identifier(&self) -> &str {
         &self.identifier
     }
     /// Function to remove a tag from the creature.
@@ -452,7 +452,7 @@ impl Caste {
     /// ## Returns
     ///
     /// True if the caste has the given tag, false otherwise.
-    pub fn has_tag(&self, tag: &CasteTag) -> bool {
+    #[must_use] pub fn has_tag(&self, tag: &CasteTag) -> bool {
         if let Some(tags) = &self.tags {
             for t in tags {
                 if std::mem::discriminant(t) == std::mem::discriminant(tag) {

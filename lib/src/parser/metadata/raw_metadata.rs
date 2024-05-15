@@ -99,6 +99,7 @@ impl Metadata {
     /// # Returns
     ///
     /// * The identifier of the raw file as a `&str`
+    #[must_use]
     pub fn get_raw_identifier(&self) -> &str {
         &self.raw_identifier
     }
@@ -107,6 +108,7 @@ impl Metadata {
     /// # Returns
     ///
     /// * The name of the module as a `&str`
+    #[must_use]
     pub fn get_module_name(&self) -> &str {
         &self.module_name
     }
@@ -115,6 +117,7 @@ impl Metadata {
     /// # Returns
     ///
     /// * The version of the module as a `&str`
+    #[must_use]
     pub fn get_module_numerical_version(&self) -> &str {
         &self.module_version
     }
@@ -123,6 +126,7 @@ impl Metadata {
     /// # Returns
     ///
     /// * The version of the module as a `&str`
+    #[must_use]
     pub fn get_module_version(&self) -> &str {
         &self.module_version
     }
@@ -131,6 +135,7 @@ impl Metadata {
     /// # Returns
     ///
     /// * The full path to the raw file as a `&str`
+    #[must_use]
     pub fn get_raw_file_path(&self) -> &str {
         &self.raw_file_path
     }
@@ -139,6 +144,7 @@ impl Metadata {
     /// # Returns
     ///
     /// * `RawModuleLocation` - The location of the owning raw module
+    #[must_use]
     pub const fn get_location(&self) -> &RawModuleLocation {
         &self.raw_module_location
     }
@@ -147,6 +153,7 @@ impl Metadata {
     /// # Returns
     ///
     /// * The `object_id` of the owning raw module as a `&str`
+    #[must_use]
     pub fn get_module_object_id(&self) -> &str {
         &self.module_object_id
     }

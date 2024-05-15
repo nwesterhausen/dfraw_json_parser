@@ -123,6 +123,7 @@ impl Creature {
     /// # Returns
     ///
     /// An empty instance of `Creature`.
+    #[must_use]
     pub fn empty() -> Self {
         Self {
             metadata: Some(
@@ -150,6 +151,7 @@ impl Creature {
     /// # Returns
     ///
     /// a `Creature` object.
+    #[must_use]
     pub fn new(identifier: &str, metadata: &RawMetadata) -> Self {
         Self {
             identifier: String::from(identifier),
@@ -168,6 +170,7 @@ impl Creature {
     /// # Returns
     ///
     /// The private field `copy_tags_from`.
+    #[must_use]
     pub fn get_copy_tags_from(&self) -> &str {
         self.copy_tags_from
             .as_ref()
@@ -279,6 +282,7 @@ impl Creature {
     ///
     /// Returns true if there is a caste with the given name in this creature's caste list,
     /// and false otherwise.
+    #[must_use]
     pub fn has_caste(&self, name: &str) -> bool {
         for caste in &self.castes {
             if caste.get_identifier().eq(name) {
@@ -319,6 +323,7 @@ impl Creature {
     ///
     /// A combined `Creature`, which is a combination of the original creature and the
     /// creature to copy from.
+    #[must_use]
     pub fn copy_tags_from(creature: &Self, creature_to_copy_from: &Self) -> Self {
         // Because anything specified in our self will override the copied tags, first we need to clone the creature
         let mut combined_creature = creature_to_copy_from.clone();
@@ -423,11 +428,13 @@ impl Creature {
     /// # Returns
     ///
     /// The castes that belong to this creature.
+    #[must_use]
     pub fn get_castes(&self) -> &[Caste] {
         self.castes.as_slice()
     }
 
     /// Get a list of tags that belong to this creature.
+    #[must_use]
     pub fn get_tags(&self) -> Vec<CreatureTag> {
         if self.tags.is_none() {
             return Vec::new();
@@ -442,6 +449,7 @@ impl Creature {
         ret_tags
     }
     /// Get the biomes the creature can be found in.
+    #[must_use]
     pub fn get_biomes(&self) -> Vec<biome::Token> {
         if self.biomes.is_none() {
             return Vec::new();

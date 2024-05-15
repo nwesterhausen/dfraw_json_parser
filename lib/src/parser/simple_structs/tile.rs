@@ -64,6 +64,7 @@ impl Tile {
     /// # Returns
     ///
     /// * `bool` - Whether the tile is the default tile
+    #[must_use]
     pub fn is_default(&self) -> bool {
         self.character.is_empty()
             && self.alt_character.is_none()
@@ -76,6 +77,7 @@ impl Tile {
     /// # Returns
     ///
     /// * `&str` - The character of the tile
+    #[must_use]
     pub fn get_character(&self) -> &str {
         &self.character
     }
@@ -84,6 +86,7 @@ impl Tile {
     /// # Returns
     ///
     /// * `&str` - The alternate character of the tile
+    #[must_use]
     pub fn get_alt_character(&self) -> &str {
         self.alt_character
             .as_ref()
