@@ -207,6 +207,48 @@ impl Plant {
             );
         }
     }
+
+    /// Check whether the plant has a specific tag
+    ///
+    /// # Arguments
+    ///
+    /// * `tag` - The tag to check for
+    ///
+    /// # Returns
+    ///
+    /// Whether the plant has the tag
+    #[must_use]
+    pub fn has_tag(&self, tag: &PlantTag) -> bool {
+        if let Some(tags) = &self.tags {
+            for t in tags {
+                if std::mem::discriminant(t) == std::mem::discriminant(tag) {
+                    return true;
+                }
+            }
+        }
+        false
+    }
+
+    /// Check whether the plant has a specific biome
+    ///
+    /// # Arguments
+    ///
+    /// * `biome` - The biome to check for
+    ///
+    /// # Returns
+    ///
+    /// Whether the plant can grow in the biome
+    #[must_use]
+    pub fn has_biome(&self, biome: &biome::Token) -> bool {
+        if let Some(biomes) = &self.biomes {
+            for b in biomes {
+                if b == biome {
+                    return true;
+                }
+            }
+        }
+        false
+    }
 }
 
 #[typetag::serde]

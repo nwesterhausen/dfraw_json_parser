@@ -680,6 +680,27 @@ impl Creature {
         false
     }
 
+    /// Check whether the creature has a specified biome.
+    ///
+    /// # Arguments
+    ///
+    /// * `biome`: The biome to check for.
+    ///
+    /// # Returns
+    ///
+    /// Returns true if the creature has the specified biome, and false otherwise.
+    #[must_use]
+    pub fn has_biome(&self, biome: &biome::Token) -> bool {
+        if let Some(biomes) = &self.biomes {
+            for b in biomes {
+                if b == biome {
+                    return true;
+                }
+            }
+        }
+        false
+    }
+
     /// Check whether any of the castes have the specified creature caste tag.
     ///
     /// # Arguments
