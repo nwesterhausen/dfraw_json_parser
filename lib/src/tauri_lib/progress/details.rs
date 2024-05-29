@@ -4,7 +4,7 @@ use specta::Type;
 use crate::RawModuleLocation;
 
 /// Details about the current file being parsed, specifically where and what it is.
-#[derive(Serialize, Deserialize, Debug, Clone, Default,Type)]
+#[derive(Serialize, Deserialize, Debug, Clone, Default, Type)]
 #[serde(rename_all = "camelCase")]
 #[allow(clippy::module_name_repetitions)]
 pub struct ProgressDetails {
