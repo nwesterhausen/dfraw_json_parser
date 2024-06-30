@@ -207,6 +207,40 @@ impl Plant {
             );
         }
     }
+
+    /// Check if the plant has a specific biome token.
+    ///
+    /// # Arguments
+    ///
+    /// * `biome` - The biome token to check for
+    ///
+    /// # Returns
+    ///
+    /// True if the plant has the biome token, false otherwise
+    pub fn has_biome(&self, biome: &biome::Token) -> bool {
+        if let Some(biomes) = &self.biomes {
+            biomes.contains(biome)
+        } else {
+            false
+        }
+    }
+
+    /// Check if the plant has a specific tag.
+    ///
+    /// # Arguments
+    ///
+    /// * `tag` - The tag to check for
+    ///
+    /// # Returns
+    ///
+    /// True if the plant has the tag, false otherwise
+    pub fn has_tag(&self, tag: &PlantTag) -> bool {
+        if let Some(tags) = &self.tags {
+            tags.contains(tag)
+        } else {
+            false
+        }
+    }
 }
 
 #[typetag::serde]
