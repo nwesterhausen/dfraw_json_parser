@@ -3,11 +3,14 @@ use specta::Type;
 use tracing::{debug, trace, warn};
 
 use crate::parser::{
-    biome, clean_search_vec, creature_caste::Caste, creature_caste::TOKEN_MAP as CASTE_TOKENS,
+    biome, clean_search_vec,
+    creature_caste::{Caste, Token as CasteToken, TOKEN_MAP as CASTE_TOKENS},
     creature_variation::Requirements as CreatureVariationRequirements,
-    helpers::build_object_id_from_pieces, metadata::RawObjectToken, object_types::ObjectType,
-    select_creature::SelectCreature, serializer_helper, Name, RawMetadata, RawObject, Searchable,
-    SingPlurName, Tile,
+    helpers::build_object_id_from_pieces,
+    metadata::RawObjectToken,
+    object_types::ObjectType,
+    select_creature::SelectCreature,
+    serializer_helper, Name, RawMetadata, RawObject, Searchable, SingPlurName, Tile,
 };
 
 use super::{phf_table::CREATURE_TOKENS, tokens::CreatureTag};
@@ -643,6 +646,53 @@ impl Creature {
         }
 
         cleaned
+    }
+
+    /// Check if the creature has a specific biome token.
+    ///
+    /// # Arguments
+    ///
+    /// * `biome` - The biome token to check for.
+    ///
+    /// # Returns
+    ///
+    /// A boolean indicating if the creature has the biome token.
+    pub fn has_biome(&self, biome: &biome::Token) -> bool {
+        if let Some(biomes) = &self.biomes {
+            biomes.contains(biome)
+        } else {
+            false
+        }
+    }
+
+    /// Check if the creature has a specific creature tag.
+    ///
+    /// # Arguments
+    ///
+    /// * `tag` - The creature tag to check for.
+    ///
+    /// # Returns
+    ///
+    /// A boolean indicating if the creature has the creature tag.
+    pub fn has_tag(&self, tag: &CreatureTag) -> bool {
+        if let Some(tags) = &self.tags {
+            tags.contains(tag)
+        } else {
+            false
+        }
+    }
+
+    /// Check if the creature has a specific creature caste tag.
+    ///
+    /// # Arguments
+    ///
+    /// * `tag` - The creature caste tag to check for.
+    ///
+    /// # Returns
+    ///
+    /// A boolean indicating if the creature has the creature caste tag.
+    pub fn has_caste_tag(&self, tag: &CasteToken) -> bool {
+        self.castes.iter().any(|caste| caste.has_tag(tag))
     }
 }
 

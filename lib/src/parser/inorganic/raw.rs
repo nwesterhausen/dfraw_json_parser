@@ -160,6 +160,23 @@ impl Inorganic {
             );
         }
     }
+
+    /// Check if the inorganic raw has the given tag.
+    ///
+    /// # Arguments
+    ///
+    /// * `tag` - The tag to check for.
+    ///
+    /// # Returns
+    ///
+    /// True if the inorganic raw has the given tag, false otherwise.
+    pub fn has_tag(&self, tag: &InorganicToken) -> bool {
+        if let Some(tags) = &self.tags {
+            tags.contains(tag)
+        } else {
+            false
+        }
+    }
 }
 
 #[typetag::serde]
