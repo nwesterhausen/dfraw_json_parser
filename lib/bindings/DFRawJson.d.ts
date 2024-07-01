@@ -3775,7 +3775,7 @@ export type CasteTag =
 	 */
 	| "Pet"
 	/**
-	 * Allows the creature to be tamed in Fortress mode. Prequisite for all other working animal roles. Civilizations cannot domesticate it in worldgen,
+	 * Allows the creature to be tamed in Fortress mode. Prerequisite for all other working animal roles. Civilizations cannot domesticate it in worldgen,
 	 * with certain exceptions. Adding this to civilization members will classify them as pets instead of citizens, with all the problems that entails.
 	 *
 	 * Appears as `PET_EXOTIC`

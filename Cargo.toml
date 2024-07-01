@@ -1,6 +1,6 @@
 [workspace]
 
-members = ["lib", "cli"]
+members = ["lib", "cli", "newlib"]
 resolver = "2"
 
 # Some very strict lints.

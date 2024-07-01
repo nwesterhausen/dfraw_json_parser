@@ -1,8 +1,9 @@
-use crate::parser::object_types::ObjectType;
-use serde::{Deserialize, Serialize};
+use crate::metadata::ObjectType;
 
 /// Tokens that can be found in a creature's caste definitions.
-#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, Default, specta::Type)]
+#[derive(
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, Default, specta::Type,
+)]
 pub enum CasteTag {
     /// Prevents tamed creature from being made available for adoption, instead allowing it to automatically adopt whoever it wants.
     /// The basic requirements for adoption are intact, and the creature will only adopt individuals who have a preference for their species.
