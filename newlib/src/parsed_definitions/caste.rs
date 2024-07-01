@@ -1,9 +1,16 @@
 use tracing::warn;
 
 use crate::{
-    body_size::BodySize, default_checks, gait::Gait, metadata::TokenComplexity, milkable::Milkable,
-    name::Name, raw_definitions::CASTE_TOKENS, tags::CasteTag, tile::Tile,
-    traits::searchable::Searchable,
+    body_size::BodySize,
+    creature::Creature,
+    default_checks,
+    gait::Gait,
+    milkable::Milkable,
+    name::Name,
+    raw_definitions::CASTE_TOKENS,
+    tags::CasteTag,
+    tile::Tile,
+    traits::{searchable::Searchable, RawObjectToken, TagOperations},
 };
 
 /// A struct representing a creature caste.
@@ -142,7 +149,7 @@ impl Caste {
             return;
         }
         // Both simple and complex tags should have a value, and that needs to be parsed. So let the tag handle it.
-        let Some(tag_and_value) = CasteTag::parse_token(key, value) else {
+        let Some(tag_and_value) = CasteTag::parse(key, value) else {
             warn!(
                 "parse_tag: Called unwrap on a None value for tag {} with value {}",
                 key, value
@@ -682,5 +689,17 @@ impl Searchable for Caste {
         }
 
         vec
+    }
+}
+
+#[typetag::serialize]
+impl RawObjectToken<Creature> for CasteTag {
+    fn is_within(&self, object: &Creature) -> bool {
+        for caste in object.get_castes() {
+            if caste.get_tags().contains(self) {
+                return true;
+            }
+        }
+        false
     }
 }

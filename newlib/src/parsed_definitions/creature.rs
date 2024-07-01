@@ -9,7 +9,10 @@ use crate::{
     select_creature::SelectCreature,
     tags::{BiomeTag, CasteTag, CreatureTag},
     tile::Tile,
-    traits::{searchable::clean_search_vec, CreatureVariationRequirements, RawObject, Searchable},
+    traits::{
+        searchable::clean_search_vec, CreatureVariationRequirements, RawObject, Searchable,
+        TagOperations,
+    },
     utilities::build_object_id_from_pieces,
 };
 
@@ -756,7 +759,7 @@ impl RawObject for Creature {
             return;
         }
 
-        let Some(tag) = CreatureTag::parse_token(key, value) else {
+        let Some(tag) = CreatureTag::parse(key, value) else {
             warn!("parse_tag: unknown tag {} with value {}", key, value);
             return;
         };

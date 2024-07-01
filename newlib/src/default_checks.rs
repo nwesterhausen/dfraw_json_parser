@@ -116,3 +116,54 @@ pub const fn is_zero(num: Option<u32>) -> bool {
     }
     true
 }
+
+/// This is only used for serialize
+pub const fn is_zero_i32(value: Option<i32>) -> bool {
+    if let Some(value) = value {
+        return value == 0;
+    }
+    true
+}
+/// This is only used for serialize
+pub fn is_zero_f32(value: Option<f32>) -> bool {
+    if let Some(value) = value {
+        return value == 0.0;
+    }
+    true
+}
+
+/// This is only used for serialize
+pub const fn is_500_u32(value: Option<u32>) -> bool {
+    if let Some(value) = value {
+        return value == 500;
+    }
+    true
+}
+/// This is only used for serialize
+pub const fn is_50_u32(value: Option<u32>) -> bool {
+    if let Some(value) = value {
+        return value == 50;
+    }
+    true
+}
+/// This is only used for serialize
+pub const fn is_3_u32(value: Option<u32>) -> bool {
+    if let Some(value) = value {
+        return value == 3;
+    }
+    true
+}
+/// This is only used for serialize
+pub const fn is_zero_u32(value: Option<u32>) -> bool {
+    if let Some(value) = value {
+        return value == 0;
+    }
+    true
+}
+/// This is only used for serialize
+pub const fn is_zero_u8(value: Option<u8>) -> bool {
+    if let Some(value) = value {
+        return value == 0;
+    }
+    true
+}

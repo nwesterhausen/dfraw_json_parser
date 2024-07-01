@@ -2,7 +2,7 @@
 ///
 /// A token can have no arguments, a single argument, or multiple arguments. This corresponds to the
 /// `None`, `Simple`, and `Complex` variants, respectively.
-pub enum Complexity {
+pub enum TagComplexity {
     /// The token affects raws by itself with no arguments
     None,
     /// The token affects raws and requires a single argument

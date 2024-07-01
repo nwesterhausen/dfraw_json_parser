@@ -12,14 +12,22 @@ use std::{
     path::{Path, PathBuf},
 };
 
+use itertools::Itertools;
+use lazy_regex::regex;
 use slug::slugify;
 use tracing::{debug, error, info, trace, warn};
 use walkdir::WalkDir;
 
 use crate::{
     creature::Creature,
-    metadata::{ObjectType, ParserOptions, RawMetadata, RawObject},
+    creature_variation::CreatureVariation,
+    entity::Entity,
+    graphic::Graphic,
+    metadata::{ObjectType, ParserOptions, RawMetadata},
+    regex::VARIATION_ARGUMENT_RE,
     select_creature::SelectCreature,
+    tile_page::TilePage,
+    traits::{CreatureVariationRequirements, RawObject},
     ParserError,
 };
 
@@ -767,4 +775,347 @@ pub fn with_limit_and_page(
         }
     }
     new_raws
+}
+
+/// Apply copy tags from one creature to another.
+///
+/// # Arguments
+///
+/// * `all_raws` - The list of all raw objects.
+///
+/// # Side Effects
+///
+/// Updates the list of raw objects with the applied copy tags.
+///
+/// # Notes
+///
+/// This function is called after all raw objects have been parsed and before any other processing is done.
+#[allow(clippy::too_many_lines)]
+pub fn apply_copy_tags_from(all_raws: &mut Vec<Box<dyn RawObject>>) {
+    let untouched_raws: Vec<_> = all_raws.iter().map(clone_raw_object_box).collect();
+
+    let creatures_with_copy_tags_from: Vec<Creature> = {
+        untouched_raws
+            .iter()
+            .filter(|r| r.get_type() == &ObjectType::Creature)
+            .filter_map(|r| {
+                let creature = r
+                    .as_any()
+                    .downcast_ref::<Creature>()
+                    .unwrap_or(&Creature::empty())
+                    .clone();
+
+                if creature.get_copy_tags_from() == "" {
+                    None
+                } else {
+                    Some(creature)
+                }
+            })
+            .collect()
+    };
+    let source_creature_identifier_list: Vec<String> = creatures_with_copy_tags_from
+        .iter()
+        .map(|c| c.get_copy_tags_from().to_lowercase())
+        .unique()
+        .collect();
+    info!(
+        "updating {} of {} raws from {} creatures",
+        creatures_with_copy_tags_from.len(),
+        all_raws.len(),
+        source_creature_identifier_list.len()
+    );
+
+    // Build a list of unique creature identifiers to target, based on the apply_copy_tags_from list.
+    let source_creatures: Vec<Creature> = untouched_raws
+        .iter()
+        .filter_map(|raw| {
+            if raw.get_type() == &ObjectType::Creature
+                && source_creature_identifier_list.contains(&raw.get_identifier().to_lowercase())
+            {
+                Some(
+                    raw.as_any()
+                        .downcast_ref::<Creature>()
+                        .unwrap_or(&Creature::empty())
+                        .clone(),
+                )
+            } else {
+                None
+            }
+        })
+        .collect::<Vec<Creature>>();
+
+    // The outside loop iterates over the source creatures, which we will use to copy tags from
+    // Inside the loop, we find which creatures have the source creature's identifier in their
+    // copy_tags_from field, and then apply the source creature's tags to those creatures.
+    // Then we put the updated creatures into the new_creatures vector, which will be used to
+    // replace the old creatures in the all_raws vector.
+
+    let mut new_creatures: Vec<Creature> = Vec::new();
+    for source_creature in source_creatures {
+        let target_creatures: Vec<Creature> = creatures_with_copy_tags_from
+            .iter()
+            .filter(|c| {
+                c.get_copy_tags_from().to_lowercase()
+                    == source_creature.get_identifier().to_lowercase()
+            })
+            .cloned()
+            .collect::<Vec<Creature>>();
+
+        for target_creature in target_creatures {
+            new_creatures.push(Creature::copy_tags_from(&target_creature, &source_creature));
+        }
+    }
+
+    info!("copied tags to {} creatures", new_creatures.len());
+
+    let mut object_ids_to_purge: Vec<&str> = Vec::new();
+
+    object_ids_to_purge.extend(new_creatures.iter().map(RawObject::get_object_id));
+
+    let mut new_raws: Vec<Box<dyn RawObject>> =
+        with_purge(all_raws, object_ids_to_purge.as_slice());
+
+    if all_raws.len() < new_raws.len() {
+        warn!(
+            "post purge has {} raws, but started with {}",
+            new_raws.len(),
+            all_raws.len()
+        );
+    } else {
+        info!("purged {} raws", all_raws.len() - new_raws.len());
+    }
+
+    for creature in new_creatures {
+        new_raws.push(Box::new(creature));
+    }
+
+    if all_raws.len() < new_raws.len() {
+        warn!(
+            "finished with {} raws, but started with {}",
+            new_raws.len(),
+            all_raws.len()
+        );
+    } else {
+        info!(
+            "finished with {} raws (net {} lost)",
+            new_raws.len(),
+            all_raws.len() - new_raws.len()
+        );
+    }
+
+    *all_raws = new_raws;
+}
+
+/// Function to absorb `SELECT_CREATURE` records into the Creature records.
+///
+/// # Parameters
+///
+/// * `all_raws` - The raw objects to absorb the `SELECT_CREATURE` records into.
+///
+/// # Panics
+///
+/// This function will panic if the raw object is not a Creature.
+///
+/// # Notes
+///
+/// This function will remove the `SELECT_CREATURE` records from the raws after applying them to the Creature records.
+///
+/// # Side Effects
+///
+/// This function will modify the `all_raws` parameter.
+#[allow(clippy::too_many_lines)]
+pub fn absorb_select_creature(all_raws: &mut Vec<Box<dyn RawObject>>) {
+    let all_select_creatures = { get_only_select_creatures_from_raws(all_raws) };
+
+    info!(
+        "looking at {} SELECT_CREATURE of {} raws",
+        all_select_creatures.len(),
+        all_raws.len()
+    );
+
+    let mut object_ids_to_purge: Vec<&str> = Vec::new();
+    let mut new_creatures: Vec<Creature> = Vec::new();
+    let mut target_creature_identifiers: Vec<&str> = Vec::new();
+
+    for select_creature in all_select_creatures.as_slice() {
+        if target_creature_identifiers.contains(&select_creature.get_identifier()) {
+            continue;
+        }
+        target_creature_identifiers.push(select_creature.get_identifier());
+    }
+
+    for raw in &*all_raws {
+        if raw.get_type() == &ObjectType::Creature
+            && target_creature_identifiers.contains(&raw.get_identifier())
+        {
+            let select_creature_vec: Vec<SelectCreature> = all_select_creatures
+                .iter()
+                .filter(|r| r.get_identifier() == raw.get_identifier())
+                .cloned()
+                .collect();
+
+            if select_creature_vec.is_empty() {
+                // Skip this creature if there are no select_creature records for it
+                continue;
+            }
+
+            let mut temp_creature = raw
+                .as_any()
+                .downcast_ref::<Creature>()
+                .unwrap_or(&Creature::empty())
+                .clone();
+            temp_creature.extend_select_creature_variation(select_creature_vec);
+
+            let object_id = raw.get_object_id();
+            object_ids_to_purge.push(object_id);
+
+            if !temp_creature.is_empty() {
+                new_creatures.push(temp_creature.clone());
+            }
+        }
+    }
+
+    if new_creatures.is_empty() {
+        return;
+    }
+
+    object_ids_to_purge.extend(
+        new_creatures
+            .iter()
+            .flat_map(Creature::get_child_object_ids),
+    );
+
+    let mut new_raws: Vec<Box<dyn RawObject>> =
+        with_purge(all_raws.as_slice(), object_ids_to_purge.as_slice());
+
+    for creature in new_creatures {
+        new_raws.push(Box::new(creature));
+    }
+
+    info!(
+        "finished with {} raws (some {} purged)",
+        new_raws.len(),
+        all_raws.len() - new_raws.len()
+    );
+
+    *all_raws = new_raws;
+}
+
+/// Replaces all instances of `!ARGn` with the corresponding argument.
+///
+/// ## Arguments
+///
+/// * `string` - The string to replace the arguments in.
+/// * `args` - The arguments to replace in the string.
+///
+/// ## Returns
+///
+/// * `String` - The string with the arguments replaced.
+pub fn replace_args_in_string(string: &str, args: &[&str]) -> String {
+    VARIATION_ARGUMENT_RE
+        .replace_all(string, |caps: &regex::Captures| {
+            argument_as_string(caps, args)
+        })
+        .to_string()
+}
+
+/// ADD or NEW tags can simply be applied by the parsing logic that already exists.
+///
+/// ## Arguments
+///
+/// * `creature` - The creature to apply the tag to.
+/// * `tag` - The tag to apply.
+/// * `value` - The value to apply to the tag.
+pub fn apply_new_tag(creature: &mut Creature, tag: &str, value: Option<&str>) {
+    (creature as &mut dyn CreatureVariationRequirements)
+        .add_tag_and_value(tag, value.unwrap_or_default());
+}
+
+/// Removes a tag from a creature.
+///
+/// ## Arguments
+///
+/// * `creature` - The creature to remove the tag from.
+/// * `tag` - The tag to remove.
+pub fn remove_tag(creature: &mut Creature, tag: &str) {
+    (creature as &mut dyn CreatureVariationRequirements).remove_tag(tag);
+}
+
+/// Converts a tag on a creature.
+pub fn convert_tag(
+    creature: &mut Creature,
+    tag: &str,
+    target: Option<&str>,
+    replacement: Option<&str>,
+) {
+    if let Some(target) = target {
+        if let Some(replacement) = replacement {
+            tracing::trace!(
+                "Converting tag {}:{} to {}:{} on creature {}",
+                tag,
+                target,
+                tag,
+                replacement,
+                creature.get_identifier()
+            );
+            // Convert the tag to the target value.
+            (creature as &mut dyn CreatureVariationRequirements).remove_tag_and_value(tag, target);
+            (creature as &mut dyn CreatureVariationRequirements)
+                .add_tag_and_value(tag, replacement);
+        } else {
+            tracing::trace!(
+                "Converting tag {}:{} to {}:{} on creature {}",
+                tag,
+                target,
+                replacement.unwrap_or_default(),
+                target,
+                creature.get_identifier(),
+            );
+            // Convert the tag to the target value.
+            (creature as &mut dyn CreatureVariationRequirements).remove_tag_and_value(tag, target);
+            (creature as &mut dyn CreatureVariationRequirements).add_tag_and_value(tag, target);
+        }
+    } else {
+        tracing::trace!(
+            "Converting tag {} to {} on creature {}",
+            tag,
+            replacement.unwrap_or_default(),
+            creature.get_identifier()
+        );
+        // Convert the tag to the replacement value.
+        (creature as &mut dyn CreatureVariationRequirements).remove_tag(tag);
+        (creature as &mut dyn CreatureVariationRequirements)
+            .add_tag(replacement.unwrap_or_default());
+    }
+}
+
+/// Returns the argument which matches the given capture group.
+/// This expects you to be capturing based on the regex in `VARIATION_ARGUMENT_RE`.
+///
+/// That way it will match `!ARGn` and `!ARGnn` and `!ARGnnn` and replace with the corresponding
+/// argument.
+///
+/// ## Arguments
+///
+/// * `caps` - The capture group to get the argument name from.
+/// * `args` - The arguments to get the argument from.
+///
+/// ## Returns
+///
+/// * `String` - The argument which matches the given capture group.
+pub fn argument_as_string(caps: &regex::Captures, args: &[&str]) -> String {
+    if let Some(index) = caps.get(1) {
+        let index = index.as_str().parse::<usize>().unwrap_or_default();
+        if let Some(argument_value) = args.get(index - 1) {
+            return (*argument_value).to_string();
+        }
+    }
+    if let Some(arg) = caps.get(0) {
+        tracing::warn!(
+            "Creature Variation Argument is invalid. Argument captured: '{}'",
+            arg.as_str()
+        );
+        return arg.as_str().to_string();
+    }
+    String::new()
 }

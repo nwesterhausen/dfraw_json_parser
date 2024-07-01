@@ -46,7 +46,7 @@ impl Name {
     /// * `true` if the name is empty, `false` otherwise.
     #[must_use]
     pub fn is_empty(&self) -> bool {
-        self.singular.is_empty() && self.plural.is_empty() && self.adjective.is_empty()
+        self.singular.is_empty() && self.plural.is_empty() && self.adjective.is_none()
     }
     /// Sets the singular name
     ///
@@ -86,8 +86,9 @@ impl Name {
         if !self.plural.is_empty() {
             vec.push(self.plural.clone());
         }
-        if !self.adjective.is_none() {
-            vec.push(self.adjective.unwrap_or_default().clone());
+        match self.adjective {
+            Some(ref adj) if !adj.is_empty() => vec.push(adj.clone()),
+            _ => {}
         }
         vec
     }

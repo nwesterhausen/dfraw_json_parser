@@ -21,6 +21,7 @@ crate-type = ["rlib"]
 encoding_rs = "0.8.34"
 # Used to be able to force reading the raw files as Latin1 (has a BuffReader we use).
 encoding_rs_io = "0.1"
+itertools = "0.13.0"
 # Generates static/reusabled regex for parsing the raw text files.
 lazy-regex = "3.1.0"
 # Used for making a shared static ref to the Latin1 encoding.
