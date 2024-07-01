@@ -1,5 +1,6 @@
 //! This library provides an API for parsing Dwarf Fortress raw files.
 
+mod default_checks;
 mod error;
 mod legends_export;
 mod parsed_definitions;

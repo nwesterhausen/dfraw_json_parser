@@ -8,14 +8,18 @@ use std::{
     fs::File,
     hash::BuildHasher,
     io::{BufWriter, Write},
+    num::ParseIntError,
     path::{Path, PathBuf},
 };
 
-use tracing::{debug, error, info, warn};
+use slug::slugify;
+use tracing::{debug, error, info, trace, warn};
 use walkdir::WalkDir;
 
 use crate::{
-    metadata::{ObjectType, ParserOptions, RawObject},
+    creature::Creature,
+    metadata::{ObjectType, ParserOptions, RawMetadata, RawObject},
+    select_creature::SelectCreature,
     ParserError,
 };
 

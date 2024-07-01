@@ -3,7 +3,9 @@
 
 use std::any::Any;
 
-use super::{ObjectType, RawMetadata, Searchable};
+use crate::metadata::{ObjectType, RawMetadata};
+
+use super::searchable::Searchable;
 
 #[allow(clippy::module_name_repetitions)]
 #[typetag::serde(tag = "type")]
