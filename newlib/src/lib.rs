@@ -4,11 +4,11 @@ mod error;
 mod legends_export;
 mod parsed_definitions;
 mod parser;
-mod raw_definitions;
 mod utilities;
 
 pub mod constants;
 pub mod metadata;
+pub mod raw_definitions;
 pub mod regex;
 pub mod traits;
 

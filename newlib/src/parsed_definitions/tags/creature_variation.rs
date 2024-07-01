@@ -1,3 +1,7 @@
+use tracing::warn;
+
+use crate::raw_definitions::CREATURE_VARIATION_TOKENS;
+
 /// An enum representing a creature variation tag.
 #[derive(
     serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, Default, specta::Type,
@@ -30,7 +34,7 @@ pub enum CreatureVariationTag {
     Unknown,
 }
 
-impl CVTag {
+impl CreatureVariationTag {
     /// Function to create a new `CVTag` from a key.
     ///
     /// # Parameters
@@ -42,7 +46,7 @@ impl CVTag {
     /// * `CVTag` - The `CVTag` created from the key.
     #[must_use]
     pub fn from_key(key: &str) -> Self {
-        let tag = CV_TOKENS.get(key).unwrap_or(&Self::Unknown);
+        let tag = CREATURE_VARIATION_TOKENS.get(key).unwrap_or(&Self::Unknown);
         if tag == &Self::Unknown {
             warn!("Unknown creature variation (CV) tag: {}", key);
         }

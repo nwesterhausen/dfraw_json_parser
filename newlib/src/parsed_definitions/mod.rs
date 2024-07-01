@@ -3,6 +3,6 @@
 mod info_file;
 mod steam_data;
 
-pub mod tokens;
+pub mod tags;
 
 pub use info_file::InfoFile;
