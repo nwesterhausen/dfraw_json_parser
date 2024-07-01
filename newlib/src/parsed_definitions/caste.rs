@@ -5,6 +5,7 @@ use crate::{
     creature::Creature,
     default_checks,
     gait::Gait,
+    metadata::TagComplexity,
     milkable::Milkable,
     name::Name,
     raw_definitions::CASTE_TOKENS,
@@ -134,11 +135,11 @@ impl Caste {
             }
             return;
         }
-        if matches!(tag.get_complexity(), TokenComplexity::None) {
+        if matches!(tag.get_complexity(), TagComplexity::None) {
             // If the tag is a TokenComplexity::None, then the value should be empty
             // So we should log the extra value before adding the tag to the last caste
             warn!(
-                "parse_tag: tag {} has a value of {} but is a TokenComplexity::None as {:?}",
+                "parse_tag: tag {} has a value of {} but is a TagComplexity::None as {:?}",
                 key, value, tag
             );
             if let Some(tags) = self.tags.as_mut() {
@@ -266,12 +267,12 @@ impl Caste {
             return;
         };
 
-        if matches!(tag.get_complexity(), TokenComplexity::None) {
+        if matches!(tag.get_complexity(), TagComplexity::None) {
             // If the tag is a TokenComplexity::None, then the value should be empty
             // So we should log the extra value before adding the tag to the last caste
             if !value.is_empty() {
                 warn!(
-                "remove_tag_and_value: tag {} has a value of {} but is a TokenComplexity::None as {:?}",
+                "remove_tag_and_value: tag {} has a value of {} but is a TagComplexity::None as {:?}",
                 key, value, tag
             );
                 return;
