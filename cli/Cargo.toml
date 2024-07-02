@@ -25,5 +25,5 @@ version = "0.6.2"
 features = ["colored"]
 
 [dependencies.dfraw_json_parser]
-path = "../lib"
+path = "../jsonlib"
 version = "0.17"

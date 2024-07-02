@@ -4,14 +4,15 @@ use std::path::Path;
 use quick_xml::{events::Event, Reader};
 use tracing::{error, info};
 
-use crate::options::ParserOptions;
-use crate::parser::ObjectType;
-use crate::ParserError;
-use crate::{parser::RawObject, util::try_get_file};
+use crate::{
+    legends_export::{ExportedCreature, ExportedEntity},
+    metadata::{ObjectType, ParserOptions},
+    traits::RawObject,
+    utilities::try_get_file,
+    ParserError,
+};
 
-use super::legends_metadata;
-use super::xml_creature::ExportedCreature;
-use super::xml_entity::ExportedEntity;
+use super::util::legends_metadata;
 
 #[derive(Eq, PartialEq)]
 enum Current {
