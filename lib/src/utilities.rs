@@ -634,7 +634,7 @@ pub fn parse_min_max_range(value: &str) -> Result<[u32; 2], ParseIntError> {
 ///
 /// The function `clone_raw_vector_with_purge` returns a vector of boxed dynamic objects (`Vec<Box<dyn
 /// RawObject>>`).
-pub fn with_purge(
+pub fn clone_raw_vector_with_purge(
     all_raws: &[Box<dyn RawObject>],
     object_ids_to_purge: &[&str],
 ) -> Vec<Box<dyn RawObject>> {
@@ -761,7 +761,7 @@ pub fn clone_raw_object_box(box_ref: &Box<dyn RawObject>) -> Box<dyn RawObject> 
 /// Returns:
 ///
 /// a vector of boxed dynamic objects (`Vec<Box<dyn RawObject>>`).
-pub fn with_limit_and_page(
+pub fn clone_raw_vector_with_limit_and_page(
     all_raws: &[Box<dyn RawObject>],
     limit: usize,
     page: usize,
@@ -879,7 +879,7 @@ pub fn apply_copy_tags_from(all_raws: &mut Vec<Box<dyn RawObject>>) {
     object_ids_to_purge.extend(new_creatures.iter().map(RawObject::get_object_id));
 
     let mut new_raws: Vec<Box<dyn RawObject>> =
-        with_purge(all_raws, object_ids_to_purge.as_slice());
+        clone_raw_vector_with_purge(all_raws, object_ids_to_purge.as_slice());
 
     if all_raws.len() < new_raws.len() {
         warn!(
@@ -992,7 +992,7 @@ pub fn absorb_select_creature(all_raws: &mut Vec<Box<dyn RawObject>>) {
     );
 
     let mut new_raws: Vec<Box<dyn RawObject>> =
-        with_purge(all_raws.as_slice(), object_ids_to_purge.as_slice());
+        clone_raw_vector_with_purge(all_raws.as_slice(), object_ids_to_purge.as_slice());
 
     for creature in new_creatures {
         new_raws.push(Box::new(creature));
