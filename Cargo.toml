@@ -1,6 +1,6 @@
 [workspace]
 
-members = ["lib", "cli"]
+members = ["lib", "cli", "jsonlib"]
 resolver = "2"
 
 # Some very strict lints.
@@ -10,6 +10,7 @@ missing_docs = "warn"
 unreachable_code = "warn"
 unreachable_patterns = "warn"
 [workspace.lints.clippy]
+module_name_repetition = "allow"
 enum_glob_use = "deny"
 pedantic = "deny"
 nursery = "deny"

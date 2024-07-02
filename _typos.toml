@@ -1,0 +1,34 @@
+[files]
+ignore-hidden = true
+ignore-files = true
+ignore-dot = true
+ignore-vcs = true
+extend-exclude = [
+  # No need to check *.lock files
+  "*.lock",
+]
+
+[default]
+binary = false
+check_filename = true
+check_file = true
+unicode = true
+locale = "en-us"
+
+[default.extend-identifiers]
+# This abbreviation of MENTAL is used in a RAW token
+MENT_ATT_CAP_PERC = "MENT_ATT_CAP_PERC"
+MENT_ATT_RANGE = "MENT_ATT_RANGE"
+MENT_ATT_RATE = "MENT_ATT_RATE"
+# Used in creature effect tokens too
+CE_MENT_ATT_CHANGE = "CE_MENT_ATT_CHANGE"
+MentAttChange = "MentAttChange"
+# These are misspellings in the raw tokens
+RESISTABLE = "RESISTABLE"
+MISCHIEVOUS = "MISCHIEVOUS"
+
+[default.extend-words]
+# This misspelling of MISCHIEVOUS is used in a RAW token
+mischievious = "mischievious"
+# This misspelling is used in a RAW token
+resitable = "RESISTABLE"

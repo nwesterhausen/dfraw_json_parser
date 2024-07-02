@@ -7,11 +7,11 @@
 # - cargo
 # - pnpm
 
-rm -rf lib/bindings
+rm -rf jsonlib/bindings
 
 # Running `test --all-features` will also generate bindings via `ts-rs` however they are not
 # formatted nicely. So we then run prettier to format them.
 cargo test --all-features
 
 # Ensure that the generated bindings are formatted nicely.
-bunx @biomejs/biome format --write lib/bindings/*.ts
+bunx @biomejs/biome format --write jsonlib/bindings/*.ts

@@ -7,7 +7,10 @@
 //! ```sh
 //! dfraw-json-parser [OPTIONS] <dwarf-fortress-path>
 //! ```
-use dfraw_json_parser::{ObjectType, ParserOptions, RawModuleLocation};
+use dfraw_json_parser::{
+    metadata::{ObjectType, ParserOptions, RawModuleLocation},
+    parse,
+};
 
 use std::path::{Path, PathBuf};
 use tracing::Level;
@@ -432,7 +435,7 @@ pub fn main() -> Result<(), lexopt::Error> {
     }
 
     // Parse the raws
-    let result = dfraw_json_parser::parse(&options).map_err(|e| {
+    let result = parse(&options).map_err(|e| {
         lexopt::Error::Custom(Box::new(std::io::Error::new(
             std::io::ErrorKind::Other,
             format!("Failed to parse raws: {e:?}"),

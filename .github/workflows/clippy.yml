@@ -95,7 +95,7 @@ jobs:
         run: |
           cargo build
           cargo test --all-features
-          bunx @biomejs/biome format --write lib/bindings/*.ts
+          bunx @biomejs/biome format --write jsonlib/bindings/*.ts
       - name: Check for changes
         run: |
           git diff --exit-code

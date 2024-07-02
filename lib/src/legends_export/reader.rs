@@ -4,14 +4,15 @@ use std::path::Path;
 use quick_xml::{events::Event, Reader};
 use tracing::{error, info};
 
-use crate::options::ParserOptions;
-use crate::parser::ObjectType;
-use crate::ParserError;
-use crate::{parser::RawObject, util::try_get_file};
+use crate::{
+    legends_export::{ExportedCreature, ExportedEntity},
+    metadata::{ObjectType, ParserOptions},
+    traits::RawObject,
+    utilities::try_get_file,
+    ParserError,
+};
 
-use super::legends_metadata;
-use super::xml_creature::ExportedCreature;
-use super::xml_entity::ExportedEntity;
+use super::util::legends_metadata;
 
 #[derive(Eq, PartialEq)]
 enum Current {
@@ -42,6 +43,10 @@ enum Parent {
 /// # Returns
 ///
 /// A vector of boxed dynamic `RawObject` trait objects.
+///
+/// # Errors
+///
+/// Returns a `ParserError` if there is an issue reading the file or parsing the file.
 pub fn parse_legends_export<P: AsRef<Path>>(
     input_path: &P,
     options: &ParserOptions,
@@ -64,7 +69,7 @@ pub fn parse_legends_export<P: AsRef<Path>>(
     );
 
     let mut reader = Reader::from_str(&file_str);
-    reader.trim_text(true);
+    reader.config_mut().trim_text(true);
 
     let mut current_tag = Current::None;
     let mut parent_tag = Parent::None;
