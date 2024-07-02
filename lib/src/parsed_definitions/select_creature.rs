@@ -1,3 +1,5 @@
+//! Parsed `SelectCreature` definition
+
 use crate::{
     metadata::{ObjectType, RawMetadata},
     traits::{searchable::clean_search_vec, RawObject, Searchable},

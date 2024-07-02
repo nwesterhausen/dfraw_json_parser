@@ -1,3 +1,5 @@
+//! Plant definition and parsing
+
 use tracing::{debug, warn};
 
 use crate::{

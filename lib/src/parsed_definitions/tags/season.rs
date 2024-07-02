@@ -1,3 +1,5 @@
+//! The tokens for the seasons
+
 /// The tokens for the seasons
 #[derive(
     serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, Default, specta::Type,

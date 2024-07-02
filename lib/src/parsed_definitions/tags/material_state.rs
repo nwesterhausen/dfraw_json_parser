@@ -1,3 +1,5 @@
+//! Material property tags.
+
 /// A material state that can be set in a material definition.
 #[derive(
     serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, Default, specta::Type,

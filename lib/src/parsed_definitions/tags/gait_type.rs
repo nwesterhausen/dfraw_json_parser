@@ -1,3 +1,5 @@
+//! Gait type tag definition.
+
 /// An enum representing a gait type.
 #[derive(
     serde::Serialize, serde::Deserialize, Debug, Clone, Default, PartialEq, Eq, specta::Type,

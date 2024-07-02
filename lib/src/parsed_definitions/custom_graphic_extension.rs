@@ -1,3 +1,5 @@
+//! Custom graphic extension definition.
+
 use tracing::warn;
 
 use crate::tags::GraphicTypeTag;

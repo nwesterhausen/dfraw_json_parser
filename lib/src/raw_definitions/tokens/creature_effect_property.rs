@@ -1,3 +1,5 @@
+//! String token to parsed tag map for creature effect property tokens.
+
 use crate::tags::CreatureEffectPropertyTag;
 
 /// A map of creature effect properties to their strings.

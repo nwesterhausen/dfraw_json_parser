@@ -1,3 +1,5 @@
+//! Plant tags
+
 /// The tags of a plant
 #[derive(
     serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, Default, specta::Type,

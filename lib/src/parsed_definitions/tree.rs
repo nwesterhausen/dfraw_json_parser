@@ -1,3 +1,5 @@
+//! Tree definition and parsing.
+
 use tracing::{error, warn};
 
 use crate::{

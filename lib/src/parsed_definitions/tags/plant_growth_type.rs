@@ -1,3 +1,5 @@
+//! The types of growths
+
 /// The types of growths
 #[derive(
     serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, Default, specta::Type, Copy,

@@ -1,3 +1,5 @@
+//! String token to parsed tag map for plant tokens.
+
 use crate::tags::PlantTag;
 
 /// Mapping of plant tokens to strings

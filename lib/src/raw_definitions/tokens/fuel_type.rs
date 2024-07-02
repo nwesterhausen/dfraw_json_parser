@@ -1,3 +1,5 @@
+//! String token to parsed tag map for fuel type tokens.
+
 use crate::tags::FuelTypeTag;
 
 /// Mapping of fuel type tokens to strings

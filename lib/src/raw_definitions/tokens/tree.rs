@@ -1,3 +1,5 @@
+//! String token to parsed tag map for tree tokens.
+
 use crate::tags::TreeTag;
 
 /// The mapping of tree tokens to their string representation

@@ -1,3 +1,5 @@
+//! String token to parsed tag map for biome tokens.
+
 use crate::tags::BiomeTag;
 
 /// A map of biome tokens to their respective strings.

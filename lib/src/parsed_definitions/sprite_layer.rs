@@ -1,3 +1,5 @@
+//! Contains the `SpriteLayer` struct and associated functions.
+
 use tracing::warn;
 
 use crate::{dimensions::Dimensions, raw_definitions::CONDITION_TOKENS, tags::ConditionTag};

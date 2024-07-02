@@ -1,3 +1,5 @@
+//! Plant graphic template tag
+
 /// The graphic of the tile
 #[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, specta::Type, Copy)]
 #[serde(rename_all = "camelCase")]

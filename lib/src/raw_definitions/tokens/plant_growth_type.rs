@@ -1,3 +1,5 @@
+//! String token to parsed tag map for plant growth type tokens.
+
 use crate::tags::PlantGrowthTypeTag;
 
 /// Mapping of growth type tokens to strings

@@ -1,3 +1,5 @@
+//! Raw Object trait
+
 #[allow(clippy::module_name_repetitions)]
 #[typetag::serde(tag = "type")]
 /// The `RawObjectToken` trait is implemented by all raw object tokens. This trait is used
@@ -15,6 +17,7 @@ impl std::fmt::Display for dyn RawObjectToken {
 /// used to be able to downcast a raw object token to `Any`, so it can be downcast to
 /// a specific raw object token type.
 pub trait RawObjectTokenToAny: 'static {
+    /// Downcast the raw object token to `Any`
     fn as_any(&self) -> &dyn std::any::Any;
 }
 

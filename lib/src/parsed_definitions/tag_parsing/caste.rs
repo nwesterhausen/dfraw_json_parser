@@ -1,3 +1,5 @@
+//! The parsing implementation for `CasteTag`
+
 use crate::{
     metadata::{TagComplexity, OBJECT_TOKEN_MAP},
     raw_definitions::CASTE_TOKENS,
@@ -187,229 +189,229 @@ impl TagOperations for CasteTag {
     ///
     /// * `Some(Self)` - The parsed token
     /// * `None` - The token could not be parsed
-    fn parse_simple_token(&self, value: &str) -> Option<CasteTag> {
+    fn parse_simple_token(&self, value: &str) -> Option<Self> {
         match self {
-            CasteTag::AltTile { .. } => {
+            Self::AltTile { .. } => {
                 let tile = String::from(value);
-                Some(CasteTag::AltTile { tile })
+                Some(Self::AltTile { tile })
             }
-            CasteTag::Baby { .. } => {
+            Self::Baby { .. } => {
                 let age: u32 = value.parse().ok().unwrap_or_default();
-                Some(CasteTag::Baby { age })
+                Some(Self::Baby { age })
             }
-            CasteTag::BeachFrequency { .. } => {
+            Self::BeachFrequency { .. } => {
                 let frequency: u32 = value.parse().ok().unwrap_or_default();
-                Some(CasteTag::BeachFrequency { frequency })
+                Some(Self::BeachFrequency { frequency })
             }
-            CasteTag::BodyGloss { .. } => {
+            Self::BodyGloss { .. } => {
                 let gloss = String::from(value);
-                Some(CasteTag::BodyGloss { gloss })
+                Some(Self::BodyGloss { gloss })
             }
-            CasteTag::BodyPartAddType { .. } => {
+            Self::BodyPartAddType { .. } => {
                 let body_part_type = String::from(value);
-                Some(CasteTag::BodyPartAddType { body_part_type })
+                Some(Self::BodyPartAddType { body_part_type })
             }
-            CasteTag::BodyPartRemoveType { .. } => {
+            Self::BodyPartRemoveType { .. } => {
                 let body_part_type = String::from(value);
-                Some(CasteTag::BodyPartRemoveType { body_part_type })
+                Some(Self::BodyPartRemoveType { body_part_type })
             }
-            CasteTag::BuildingDestroyer { .. } => {
+            Self::BuildingDestroyer { .. } => {
                 let building_destroyer: u32 = value.parse().ok().unwrap_or_default();
                 let door_and_furniture_focused = building_destroyer == 1;
-                Some(CasteTag::BuildingDestroyer {
+                Some(Self::BuildingDestroyer {
                     door_and_furniture_focused,
                 })
             }
-            CasteTag::CanDoInteraction { .. } => {
+            Self::CanDoInteraction { .. } => {
                 let interaction = String::from(value);
-                Some(CasteTag::CanDoInteraction { interaction })
+                Some(Self::CanDoInteraction { interaction })
             }
-            CasteTag::ChangeBodySizePercent { .. } => {
+            Self::ChangeBodySizePercent { .. } => {
                 let percent: u32 = value.parse().ok().unwrap_or_default();
-                Some(CasteTag::ChangeBodySizePercent { percent })
+                Some(Self::ChangeBodySizePercent { percent })
             }
-            CasteTag::Child { .. } => {
+            Self::Child { .. } => {
                 let age: u32 = value.parse().ok().unwrap_or_default();
-                Some(CasteTag::Child { age })
+                Some(Self::Child { age })
             }
-            CasteTag::CreatureClass { .. } => {
+            Self::CreatureClass { .. } => {
                 let class = String::from(value);
-                Some(CasteTag::CreatureClass { class })
+                Some(Self::CreatureClass { class })
             }
-            CasteTag::CreatureVariationAddTag { .. } => {
+            Self::CreatureVariationAddTag { .. } => {
                 let tag = String::from(value);
-                Some(CasteTag::CreatureVariationAddTag { tag })
+                Some(Self::CreatureVariationAddTag { tag })
             }
-            CasteTag::CreatureVariationRemoveTag { .. } => {
+            Self::CreatureVariationRemoveTag { .. } => {
                 let tag = String::from(value);
-                Some(CasteTag::CreatureVariationRemoveTag { tag })
+                Some(Self::CreatureVariationRemoveTag { tag })
             }
-            CasteTag::Description { .. } => {
+            Self::Description { .. } => {
                 let description = String::from(value);
-                Some(CasteTag::Description { description })
+                Some(Self::Description { description })
             }
-            CasteTag::Difficulty { .. } => {
+            Self::Difficulty { .. } => {
                 let Ok(difficulty) = value.parse::<u32>() else {
                     tracing::warn!("parse_simple_token: Cannot parse difficulty: {}", value);
                     return None;
                 };
-                Some(CasteTag::Difficulty { difficulty })
+                Some(Self::Difficulty { difficulty })
             }
-            CasteTag::ExtraButcherObjectShape { .. } => {
+            Self::ExtraButcherObjectShape { .. } => {
                 let shape = String::from(value);
-                Some(CasteTag::ExtraButcherObjectShape { shape })
+                Some(Self::ExtraButcherObjectShape { shape })
             }
-            CasteTag::EggSize { .. } => {
+            Self::EggSize { .. } => {
                 let size: u32 = value.parse().ok().unwrap_or_default();
-                Some(CasteTag::EggSize { size })
+                Some(Self::EggSize { size })
             }
-            CasteTag::Extract { .. } => {
+            Self::Extract { .. } => {
                 let material = String::from(value);
-                Some(CasteTag::Extract { material })
+                Some(Self::Extract { material })
             }
-            CasteTag::FixedTemp { .. } => {
+            Self::FixedTemp { .. } => {
                 let temperature: i32 = value.parse().ok().unwrap_or_default();
-                Some(CasteTag::FixedTemp { temperature })
+                Some(Self::FixedTemp { temperature })
             }
-            CasteTag::Gait { .. } => {
+            Self::Gait { .. } => {
                 let gait = String::from(value);
-                Some(CasteTag::Gait { gait })
+                Some(Self::Gait { gait })
             }
-            CasteTag::GlowTile { .. } => {
+            Self::GlowTile { .. } => {
                 let tile = String::from(value);
-                Some(CasteTag::GlowTile { tile })
+                Some(Self::GlowTile { tile })
             }
-            CasteTag::Gnawer { .. } => {
+            Self::Gnawer { .. } => {
                 let verb = String::from(value);
-                Some(CasteTag::Gnawer { verb })
+                Some(Self::Gnawer { verb })
             }
-            CasteTag::GobbleVerminClass { .. } => {
+            Self::GobbleVerminClass { .. } => {
                 let vermin_class = String::from(value);
-                Some(CasteTag::GobbleVerminClass { vermin_class })
+                Some(Self::GobbleVerminClass { vermin_class })
             }
-            CasteTag::GrassTrample { .. } => {
+            Self::GrassTrample { .. } => {
                 let trample = value.parse::<u32>().ok()?;
-                Some(CasteTag::GrassTrample { trample })
+                Some(Self::GrassTrample { trample })
             }
-            CasteTag::GravitateBodySize { .. } => {
+            Self::GravitateBodySize { .. } => {
                 let target: u32 = value.parse().ok().unwrap_or_default();
-                Some(CasteTag::GravitateBodySize { target })
+                Some(Self::GravitateBodySize { target })
             }
-            CasteTag::Grazer { .. } => {
+            Self::Grazer { .. } => {
                 let grazer: u32 = value.parse().ok().unwrap_or_default();
-                Some(CasteTag::Grazer { grazer })
+                Some(Self::Grazer { grazer })
             }
-            CasteTag::Habit { .. } => {
+            Self::Habit { .. } => {
                 let habit = String::from(value);
-                Some(CasteTag::Habit { habit })
+                Some(Self::Habit { habit })
             }
-            CasteTag::HabitNumber { .. } => {
+            Self::HabitNumber { .. } => {
                 let number: u32 = value.parse().ok().unwrap_or_default();
-                Some(CasteTag::HabitNumber { number })
+                Some(Self::HabitNumber { number })
             }
-            CasteTag::Homeotherm { .. } => {
+            Self::Homeotherm { .. } => {
                 let temperature: u32 = value.parse().ok().unwrap_or_default();
-                Some(CasteTag::Homeotherm {
+                Some(Self::Homeotherm {
                     temperature: Some(temperature),
                 })
             }
-            CasteTag::ItemCorpseQuality { .. } => {
+            Self::ItemCorpseQuality { .. } => {
                 let quality = value.parse::<u32>().ok()?;
-                Some(CasteTag::ItemCorpseQuality { quality })
+                Some(Self::ItemCorpseQuality { quality })
             }
-            CasteTag::LairCharacteristic { .. } => {
+            Self::LairCharacteristic { .. } => {
                 let characteristic = String::from(value);
-                Some(CasteTag::LairCharacteristic { characteristic })
+                Some(Self::LairCharacteristic { characteristic })
             }
-            CasteTag::LairHunterSpeech { .. } => {
+            Self::LairHunterSpeech { .. } => {
                 let speech_file = String::from(value);
-                Some(CasteTag::LairHunterSpeech { speech_file })
+                Some(Self::LairHunterSpeech { speech_file })
             }
-            CasteTag::LowLightVision { .. } => {
+            Self::LowLightVision { .. } => {
                 let vision = value.parse::<u32>().ok()?;
-                Some(CasteTag::LowLightVision { vision })
+                Some(Self::LowLightVision { vision })
             }
-            CasteTag::MannerismArms { .. } => {
+            Self::MannerismArms { .. } => {
                 let arms = String::from(value);
-                Some(CasteTag::MannerismArms { arms })
+                Some(Self::MannerismArms { arms })
             }
-            CasteTag::MannerismCheek { .. } => {
+            Self::MannerismCheek { .. } => {
                 let cheek = String::from(value);
-                Some(CasteTag::MannerismCheek { cheek })
+                Some(Self::MannerismCheek { cheek })
             }
-            CasteTag::MannerismEar { .. } => {
+            Self::MannerismEar { .. } => {
                 let ear = String::from(value);
-                Some(CasteTag::MannerismEar { ear })
+                Some(Self::MannerismEar { ear })
             }
-            CasteTag::MannerismEyes { .. } => {
+            Self::MannerismEyes { .. } => {
                 let eyes = String::from(value);
-                Some(CasteTag::MannerismEyes { eyes })
+                Some(Self::MannerismEyes { eyes })
             }
-            CasteTag::MannerismFeet { .. } => {
+            Self::MannerismFeet { .. } => {
                 let feet = String::from(value);
-                Some(CasteTag::MannerismFeet { feet })
+                Some(Self::MannerismFeet { feet })
             }
-            CasteTag::MannerismHair { .. } => {
+            Self::MannerismHair { .. } => {
                 let hair = String::from(value);
-                Some(CasteTag::MannerismHair { hair })
+                Some(Self::MannerismHair { hair })
             }
-            CasteTag::MannerismKnuckles { .. } => {
+            Self::MannerismKnuckles { .. } => {
                 let knuckles = String::from(value);
-                Some(CasteTag::MannerismKnuckles { knuckles })
+                Some(Self::MannerismKnuckles { knuckles })
             }
-            CasteTag::MannerismLips { .. } => {
+            Self::MannerismLips { .. } => {
                 let lips = String::from(value);
-                Some(CasteTag::MannerismLips { lips })
+                Some(Self::MannerismLips { lips })
             }
-            CasteTag::MannerismHands { .. } => {
+            Self::MannerismHands { .. } => {
                 let hands = String::from(value);
-                Some(CasteTag::MannerismHands { hands })
+                Some(Self::MannerismHands { hands })
             }
-            CasteTag::MannerismHead { .. } => {
+            Self::MannerismHead { .. } => {
                 let head = String::from(value);
-                Some(CasteTag::MannerismHead { head })
+                Some(Self::MannerismHead { head })
             }
-            CasteTag::MannerismLeg { .. } => {
+            Self::MannerismLeg { .. } => {
                 let leg = String::from(value);
-                Some(CasteTag::MannerismLeg { leg })
+                Some(Self::MannerismLeg { leg })
             }
-            CasteTag::MannerismMouth { .. } => {
+            Self::MannerismMouth { .. } => {
                 let mouth = String::from(value);
-                Some(CasteTag::MannerismMouth { mouth })
+                Some(Self::MannerismMouth { mouth })
             }
-            CasteTag::MannerismNose { .. } => {
+            Self::MannerismNose { .. } => {
                 let nose = String::from(value);
-                Some(CasteTag::MannerismNose { nose })
+                Some(Self::MannerismNose { nose })
             }
-            CasteTag::MannerismTongue { .. } => {
+            Self::MannerismTongue { .. } => {
                 let tongue = String::from(value);
-                Some(CasteTag::MannerismTongue { tongue })
+                Some(Self::MannerismTongue { tongue })
             }
-            CasteTag::MannerismNails { .. } => {
+            Self::MannerismNails { .. } => {
                 let nails = String::from(value);
-                Some(CasteTag::MannerismNails { nails })
+                Some(Self::MannerismNails { nails })
             }
-            CasteTag::ModValue { .. } => {
+            Self::ModValue { .. } => {
                 let value = String::from(value);
-                Some(CasteTag::ModValue { value })
+                Some(Self::ModValue { value })
             }
-            CasteTag::OdorLevel { .. } => {
+            Self::OdorLevel { .. } => {
                 let odor_level: u32 = value.parse().ok().unwrap_or_default();
-                Some(CasteTag::OdorLevel { odor_level })
+                Some(Self::OdorLevel { odor_level })
             }
-            CasteTag::OdorString { .. } => {
+            Self::OdorString { .. } => {
                 let odor_string = String::from(value);
-                Some(CasteTag::OdorString { odor_string })
+                Some(Self::OdorString { odor_string })
             }
-            CasteTag::PenetratePower { .. } => {
+            Self::PenetratePower { .. } => {
                 let penetrate_power: u32 = value.parse().ok().unwrap_or_default();
-                Some(CasteTag::PenetratePower { penetrate_power })
+                Some(Self::PenetratePower { penetrate_power })
             }
-            CasteTag::PetValue { .. } => {
+            Self::PetValue { .. } => {
                 let pet_value: u32 = value.parse().ok().unwrap_or_default();
-                Some(CasteTag::PetValue { pet_value })
+                Some(Self::PetValue { pet_value })
             }
-            CasteTag::PetValueDivisor { .. } => {
+            Self::PetValueDivisor { .. } => {
                 let Ok(divisor) = value.parse::<u32>() else {
                     tracing::warn!(
                         "parse_simple_token: Cannot parse pet value divisor: {}",
@@ -417,9 +419,9 @@ impl TagOperations for CasteTag {
                     );
                     return None;
                 };
-                Some(CasteTag::PetValueDivisor { divisor })
+                Some(Self::PetValueDivisor { divisor })
             }
-            CasteTag::PopulationRatio { .. } => {
+            Self::PopulationRatio { .. } => {
                 let Ok(pop_ratio) = value.parse::<u32>() else {
                     tracing::warn!(
                         "parse_simple_token: Cannot parse population ratio: {}",
@@ -427,20 +429,20 @@ impl TagOperations for CasteTag {
                     );
                     return None;
                 };
-                Some(CasteTag::PopulationRatio { pop_ratio })
+                Some(Self::PopulationRatio { pop_ratio })
             }
-            CasteTag::ProneToRage { .. } => {
+            Self::ProneToRage { .. } => {
                 let Ok(rage_chance) = value.parse::<u32>() else {
                     tracing::warn!("parse_simple_token: Cannot parse rage chance: {}", value);
                     return None;
                 };
-                Some(CasteTag::ProneToRage { rage_chance })
+                Some(Self::ProneToRage { rage_chance })
             }
-            CasteTag::RemainsColor { .. } => {
+            Self::RemainsColor { .. } => {
                 let remains_color = String::from(value);
-                Some(CasteTag::RemainsColor { remains_color })
+                Some(Self::RemainsColor { remains_color })
             }
-            CasteTag::SkillLearnRates { .. } => {
+            Self::SkillLearnRates { .. } => {
                 let Ok(rate) = value.parse::<u32>() else {
                     tracing::warn!(
                         "parse_simple_token: Cannot parse skill learn rate: {}",
@@ -448,41 +450,41 @@ impl TagOperations for CasteTag {
                     );
                     return None;
                 };
-                Some(CasteTag::SkillLearnRates { rate })
+                Some(Self::SkillLearnRates { rate })
             }
-            CasteTag::SlainSpeech { .. } => {
+            Self::SlainSpeech { .. } => {
                 let speech_file = String::from(value);
-                Some(CasteTag::SlainSpeech { speech_file })
+                Some(Self::SlainSpeech { speech_file })
             }
-            CasteTag::SoldierAltTile { .. } => {
+            Self::SoldierAltTile { .. } => {
                 let tile = String::from(value);
-                Some(CasteTag::SoldierAltTile { tile })
+                Some(Self::SoldierAltTile { tile })
             }
-            CasteTag::SoldierTile { .. } => {
+            Self::SoldierTile { .. } => {
                 let tile = String::from(value);
-                Some(CasteTag::SoldierTile { tile })
+                Some(Self::SoldierTile { tile })
             }
-            CasteTag::Tile { .. } => {
+            Self::Tile { .. } => {
                 let tile = String::from(value);
-                Some(CasteTag::Tile { tile })
+                Some(Self::Tile { tile })
             }
-            CasteTag::TradeCapacity { .. } => {
+            Self::TradeCapacity { .. } => {
                 let Ok(capacity) = value.parse::<u32>() else {
                     tracing::warn!("parse_simple_token: Cannot parse trade capacity: {}", value);
                     return None;
                 };
-                Some(CasteTag::TradeCapacity { capacity })
+                Some(Self::TradeCapacity { capacity })
             }
-            CasteTag::ViewRange { .. } => {
+            Self::ViewRange { .. } => {
                 let Ok(view_range) = value.parse::<u32>() else {
                     tracing::warn!("parse_simple_token: Cannot parse view range: {}", value);
                     return None;
                 };
-                Some(CasteTag::ViewRange { view_range })
+                Some(Self::ViewRange { view_range })
             }
-            CasteTag::Webber { .. } => {
+            Self::Webber { .. } => {
                 let material = String::from(value);
-                Some(CasteTag::Webber { material })
+                Some(Self::Webber { material })
             }
             _ => {
                 tracing::error!("parse_simple_token: Cannot parse token (not simple): {self:?}");
@@ -491,7 +493,7 @@ impl TagOperations for CasteTag {
         }
     }
 
-    #[allow(clippy::too_many_lines)]
+    #[allow(clippy::too_many_lines, clippy::cognitive_complexity)]
     /// Parses a token with the complex pattern of `key:value1:value2:value3` or similar. Each complex token
     /// has a different number of arguments, so we need to parse them differently.
     ///
@@ -504,9 +506,9 @@ impl TagOperations for CasteTag {
     ///
     /// * `Some(Self)` - The parsed token
     /// * `None` - The token could not be parsed
-    fn parse_complex_token(&self, values: &[&str]) -> Option<CasteTag> {
+    fn parse_complex_token(&self, values: &[&str]) -> Option<Self> {
         match self {
-            CasteTag::ApplyCreatureVariation { .. } => {
+            Self::ApplyCreatureVariation { .. } => {
                 // check if there are enough arguments
                 if values.len() < 2 {
                     tracing::warn!(
@@ -521,9 +523,9 @@ impl TagOperations for CasteTag {
                     .iter()
                     .map(std::string::ToString::to_string)
                     .collect::<Vec<String>>();
-                Some(CasteTag::ApplyCreatureVariation { id, args })
+                Some(Self::ApplyCreatureVariation { id, args })
             }
-            CasteTag::Attack { .. } => {
+            Self::Attack { .. } => {
                 // Appears as `ATTACK:NAME:BODYPART:BY_CATEGORY:HORN`
                 // check if there are enough arguments
                 if values.len() < 2 {
@@ -535,10 +537,10 @@ impl TagOperations for CasteTag {
                     return None;
                 }
                 let name = (*values.first().unwrap_or(&"")).to_string();
-                let body_part = (*values.get(1..).unwrap_or_default()).join(":").to_string();
-                Some(CasteTag::Attack { name, body_part })
+                let body_part = (*values.get(1..).unwrap_or_default()).join(":");
+                Some(Self::Attack { name, body_part })
             }
-            CasteTag::AttackTrigger { .. } => {
+            Self::AttackTrigger { .. } => {
                 // Appears as `ATTACK_TRIGGER:0:1:2` for population, exported_wealth and created_wealth
                 // check if there are enough arguments
                 if values.len() < 3 {
@@ -567,13 +569,13 @@ impl TagOperations for CasteTag {
                 );
                     return None;
                 };
-                Some(CasteTag::AttackTrigger {
+                Some(Self::AttackTrigger {
                     population,
                     exported_wealth,
                     created_wealth,
                 })
             }
-            CasteTag::BabyName { .. } => {
+            Self::BabyName { .. } => {
                 if values.len() < 2 {
                     tracing::warn!(
                     "parse_complex_token: Cannot parse BabyName: not enough arguments: {}/2 '{:?}'",
@@ -583,10 +585,10 @@ impl TagOperations for CasteTag {
                     return None;
                 }
                 let singular = (*values.first().unwrap_or(&"")).to_string();
-                let plural = (*values.get(1..).unwrap_or_default()).join(":").to_string();
-                Some(CasteTag::BabyName { singular, plural })
+                let plural = (*values.get(1..).unwrap_or_default()).join(":");
+                Some(Self::BabyName { singular, plural })
             }
-            CasteTag::Blood { .. } => {
+            Self::Blood { .. } => {
                 if values.len() < 2 {
                     tracing::warn!(
                     "parse_complex_token: Cannot parse Blood: not enough arguments: {}/2 '{values:?}'",
@@ -595,17 +597,17 @@ impl TagOperations for CasteTag {
                     return None;
                 }
                 let material = (*values.first().unwrap_or(&"")).to_string();
-                let state = (*values.get(1..).unwrap_or_default()).join(":").to_string();
-                Some(CasteTag::Blood { material, state })
+                let state = (*values.get(1..).unwrap_or_default()).join(":");
+                Some(Self::Blood { material, state })
             }
-            CasteTag::Body { .. } => {
+            Self::Body { .. } => {
                 let body_parts = values
                     .iter()
                     .map(std::string::ToString::to_string)
                     .collect();
-                Some(CasteTag::Body { body_parts })
+                Some(Self::Body { body_parts })
             }
-            CasteTag::BodyAppearanceModifier { .. } => {
+            Self::BodyAppearanceModifier { .. } => {
                 // Arguments become a string (attribute) and 7 i32s, separated by `:`
                 if values.len() < 8 {
                     tracing::warn!(
@@ -659,7 +661,7 @@ impl TagOperations for CasteTag {
                 );
                     return None;
                 };
-                Some(CasteTag::BodyAppearanceModifier {
+                Some(Self::BodyAppearanceModifier {
                     attribute,
                     values: [
                         lowest,
@@ -672,7 +674,7 @@ impl TagOperations for CasteTag {
                     ],
                 })
             }
-            CasteTag::BodyPartAppearanceModifier { .. } => {
+            Self::BodyPartAppearanceModifier { .. } => {
                 // Arguments become a string (attribute) and 7 i32s, separated by `:`
                 if values.len() < 8 {
                     tracing::warn!(
@@ -726,7 +728,7 @@ impl TagOperations for CasteTag {
                 );
                     return None;
                 };
-                Some(CasteTag::BodyPartAppearanceModifier {
+                Some(Self::BodyPartAppearanceModifier {
                     quality,
                     spread: [
                         lowest,
@@ -739,18 +741,18 @@ impl TagOperations for CasteTag {
                     ],
                 })
             }
-            CasteTag::BodyDetailPlan { .. } => {
+            Self::BodyDetailPlan { .. } => {
                 let body_plan = (*values.first().unwrap_or(&"")).to_string();
                 let arguments = (*values.get(1..).unwrap_or_default())
                     .iter()
                     .map(std::string::ToString::to_string)
                     .collect::<Vec<String>>();
-                Some(CasteTag::BodyDetailPlan {
+                Some(Self::BodyDetailPlan {
                     body_plan,
                     arguments,
                 })
             }
-            CasteTag::BodySize { .. } => {
+            Self::BodySize { .. } => {
                 // Body size is [YEAR:DAYS:SIZE], all are u32s
                 if values.len() < 3 {
                     tracing::warn!(
@@ -772,9 +774,9 @@ impl TagOperations for CasteTag {
                     tracing::warn!("parse_complex_token: Cannot parse body size: size: {values:?}");
                     return None;
                 };
-                Some(CasteTag::BodySize { year, days, size })
+                Some(Self::BodySize { year, days, size })
             }
-            CasteTag::ChildName { .. } => {
+            Self::ChildName { .. } => {
                 if values.len() < 2 {
                     tracing::warn!(
                     "parse_complex_token: Cannot parse ChildName: not enough arguments: {}/2 '{:?}'",
@@ -784,10 +786,10 @@ impl TagOperations for CasteTag {
                     return None;
                 }
                 let singular = (*values.first().unwrap_or(&"")).to_string();
-                let plural = (*values.get(1..).unwrap_or_default()).join(":").to_string();
-                Some(CasteTag::ChildName { singular, plural })
+                let plural = (*values.get(1..).unwrap_or_default()).join(":");
+                Some(Self::ChildName { singular, plural })
             }
-            CasteTag::ClutchSize { .. } => {
+            Self::ClutchSize { .. } => {
                 // Two `u32`s
                 if values.len() < 2 {
                     tracing::warn!(
@@ -809,9 +811,9 @@ impl TagOperations for CasteTag {
                     );
                     return None;
                 };
-                Some(CasteTag::ClutchSize { min, max })
+                Some(Self::ClutchSize { min, max })
             }
-            CasteTag::Color { .. } => {
+            Self::Color { .. } => {
                 if values.len() < 3 {
                     tracing::warn!(
                     "parse_complex_token: Cannot parse color: not enough arguments: {}/3 '{:?}'",
@@ -838,13 +840,13 @@ impl TagOperations for CasteTag {
                     );
                     return None;
                 };
-                Some(CasteTag::Color {
+                Some(Self::Color {
                     foreground,
                     background,
                     brightness,
                 })
             }
-            CasteTag::EggMaterial { .. } => {
+            Self::EggMaterial { .. } => {
                 if values.len() < 2 {
                     tracing::warn!(
                     "parse_complex_token: Cannot parse egg material: not enough arguments: {}/2 '{values:?}'",
@@ -854,24 +856,22 @@ impl TagOperations for CasteTag {
                 }
                 // Take the last `String` as the `state` and the rest as the `material`
                 let state = (*values.last().unwrap_or(&"")).to_string();
-                let material = (*values.get(..values.len() - 1).unwrap_or_default())
-                    .join(":")
-                    .to_string();
-                Some(CasteTag::EggMaterial { material, state })
+                let material = (*values.get(..values.len() - 1).unwrap_or_default()).join(":");
+                Some(Self::EggMaterial { material, state })
             }
-            CasteTag::ExtraButcherObject { .. } => {
+            Self::ExtraButcherObject { .. } => {
                 // `String` and `Vec<String>`
                 let object_type = (*values.first().unwrap_or(&"")).to_string();
                 let arguments = (*values.get(1..).unwrap_or_default())
                     .iter()
                     .map(std::string::ToString::to_string)
                     .collect::<Vec<String>>();
-                Some(CasteTag::ExtraButcherObject {
+                Some(Self::ExtraButcherObject {
                     object_type,
                     arguments,
                 })
             }
-            CasteTag::ExtraButcherObjectItem { .. } => {
+            Self::ExtraButcherObjectItem { .. } => {
                 if values.len() < 2 {
                     tracing::warn!(
                     "parse_complex_token: Cannot parse extra butcher object item: not enough arguments: {}/2 '{values:?}'",
@@ -881,10 +881,10 @@ impl TagOperations for CasteTag {
                 }
                 // Two strings
                 let item = (*values.first().unwrap_or(&"")).to_string();
-                let material = (*values.get(1..).unwrap_or_default()).join(":").to_string();
-                Some(CasteTag::ExtraButcherObjectItem { item, material })
+                let material = (*values.get(1..).unwrap_or_default()).join(":");
+                Some(Self::ExtraButcherObjectItem { item, material })
             }
-            CasteTag::GeneralMaterialForceMultiplier { .. } => {
+            Self::GeneralMaterialForceMultiplier { .. } => {
                 if values.len() < 2 {
                     tracing::warn!(
                     "parse_complex_token: Cannot parse general material force multiplier: not enough arguments: {}/2 '{values:?}'",
@@ -905,9 +905,9 @@ impl TagOperations for CasteTag {
                 );
                     return None;
                 };
-                Some(CasteTag::GeneralMaterialForceMultiplier { value_a, value_b })
+                Some(Self::GeneralMaterialForceMultiplier { value_a, value_b })
             }
-            CasteTag::GlowColor { .. } => {
+            Self::GlowColor { .. } => {
                 // Arguments become 3 `u32`s, separated by `:`
                 if values.len() < 3 {
                     tracing::warn!(
@@ -935,13 +935,13 @@ impl TagOperations for CasteTag {
                     );
                     return None;
                 };
-                Some(CasteTag::GlowColor {
+                Some(Self::GlowColor {
                     foreground,
                     background,
                     brightness,
                 })
             }
-            CasteTag::GobbleVerminCreature { .. } => {
+            Self::GobbleVerminCreature { .. } => {
                 if values.len() < 2 {
                     tracing::warn!(
                     "parse_complex_token: Cannot parse gobble vermin creature: not enough arguments: {}/2 '{values:?}'",
@@ -951,26 +951,26 @@ impl TagOperations for CasteTag {
                 }
                 // Two strings
                 let vermin_creature = (*values.first().unwrap_or(&"")).to_string();
-                let vermin_caste = (*values.get(1..).unwrap_or_default()).join(":").to_string();
-                Some(CasteTag::GobbleVerminCreature {
+                let vermin_caste = (*values.get(1..).unwrap_or_default()).join(":");
+                Some(Self::GobbleVerminCreature {
                     vermin_creature,
                     vermin_caste,
                 })
             }
-            CasteTag::InteractionDetail { .. } => {
+            Self::InteractionDetail { .. } => {
                 let args = values
                     .iter()
                     .map(std::string::ToString::to_string)
                     .collect::<Vec<String>>();
-                Some(CasteTag::InteractionDetail { args })
+                Some(Self::InteractionDetail { args })
             }
-            CasteTag::ItemCorpse { .. } => {
+            Self::ItemCorpse { .. } => {
                 // Two strings
                 let item = (*values.first().unwrap_or(&"")).to_string();
-                let material = (*values.get(1..).unwrap_or_default()).join(":").to_string();
-                Some(CasteTag::ItemCorpse { item, material })
+                let material = (*values.get(1..).unwrap_or_default()).join(":");
+                Some(Self::ItemCorpse { item, material })
             }
-            CasteTag::Lair { .. } => {
+            Self::Lair { .. } => {
                 if values.len() < 2 {
                     tracing::warn!(
                     "parse_complex_token: Cannot parse lair: not enough arguments: {}/2 '{values:?}'",
@@ -984,15 +984,15 @@ impl TagOperations for CasteTag {
                     tracing::warn!("parse_complex_token: Cannot parse lair proability: {values:?}");
                     return None;
                 };
-                Some(CasteTag::Lair { lair, probability })
+                Some(Self::Lair { lair, probability })
             }
-            CasteTag::LaysUnusualEggs { .. } => {
+            Self::LaysUnusualEggs { .. } => {
                 // Two strings
                 let item = (*values.first().unwrap_or(&"")).to_string();
-                let material = (*values.get(1..).unwrap_or_default()).join(":").to_string();
-                Some(CasteTag::LaysUnusualEggs { item, material })
+                let material = (*values.get(1..).unwrap_or_default()).join(":");
+                Some(Self::LaysUnusualEggs { item, material })
             }
-            CasteTag::Ligaments { .. } => {
+            Self::Ligaments { .. } => {
                 if values.len() < 2 {
                     tracing::warn!(
                     "parse_complex_token: Cannot parse ligaments: not enough arguments: {}/2 '{:?}'",
@@ -1009,15 +1009,13 @@ impl TagOperations for CasteTag {
                     return None;
                 };
                 // The rest of the arguments are the `material`
-                let material = (*values.get(..values.len() - 1).unwrap_or_default())
-                    .join(":")
-                    .to_string();
-                Some(CasteTag::Ligaments {
+                let material = (*values.get(..values.len() - 1).unwrap_or_default()).join(":");
+                Some(Self::Ligaments {
                     material,
                     healing_rate,
                 })
             }
-            CasteTag::LitterSize { .. } => {
+            Self::LitterSize { .. } => {
                 // Two `u32`s
                 let Ok(min) = (*values.first().unwrap_or(&"")).parse::<u32>() else {
                     tracing::warn!(
@@ -1031,14 +1029,14 @@ impl TagOperations for CasteTag {
                     );
                     return None;
                 };
-                Some(CasteTag::LitterSize { min, max })
+                Some(Self::LitterSize { min, max })
             }
-            CasteTag::MannerismFingers { .. } => {
+            Self::MannerismFingers { .. } => {
                 let finger = (*values.first().unwrap_or(&"")).to_string();
-                let fingers = (*values.get(1..).unwrap_or_default()).join(":").to_string();
-                Some(CasteTag::MannerismFingers { finger, fingers })
+                let fingers = (*values.get(1..).unwrap_or_default()).join(":");
+                Some(Self::MannerismFingers { finger, fingers })
             }
-            CasteTag::MaxAge { .. } => {
+            Self::MaxAge { .. } => {
                 // Two `u32`s
                 let Ok(min) = (*values.first().unwrap_or(&"")).parse::<u32>() else {
                     tracing::warn!("parse_complex_token: Cannot parse max age: min: {values:?}");
@@ -1048,9 +1046,9 @@ impl TagOperations for CasteTag {
                     tracing::warn!("parse_complex_token: Cannot parse max age: max: {values:?}");
                     return None;
                 };
-                Some(CasteTag::MaxAge { min, max })
+                Some(Self::MaxAge { min, max })
             }
-            CasteTag::MentalAttributeCapPercentage { .. } => {
+            Self::MentalAttributeCapPercentage { .. } => {
                 if values.len() < 2 {
                     tracing::warn!(
                     "parse_complex_token: Cannot parse mental attribute cap percentage: not enough arguments: {}/2 '{values:?}'",
@@ -1065,12 +1063,12 @@ impl TagOperations for CasteTag {
                 );
                     return None;
                 };
-                Some(CasteTag::MentalAttributeCapPercentage {
+                Some(Self::MentalAttributeCapPercentage {
                     attribute,
                     percentage,
                 })
             }
-            CasteTag::MentalAttributeRange { .. } => {
+            Self::MentalAttributeRange { .. } => {
                 // Arguments become a `String` and 7 `u32`s
                 if values.len() < 8 {
                     tracing::warn!(
@@ -1124,7 +1122,7 @@ impl TagOperations for CasteTag {
                 );
                     return None;
                 };
-                Some(CasteTag::MentalAttributeRange {
+                Some(Self::MentalAttributeRange {
                     attribute,
                     ranges: [
                         lowest,
@@ -1137,7 +1135,7 @@ impl TagOperations for CasteTag {
                     ],
                 })
             }
-            CasteTag::MentalAttributeRate { .. } => {
+            Self::MentalAttributeRate { .. } => {
                 // Arguments become a `String` and 4 `u32`s
                 if values.len() < 5 {
                     tracing::warn!(
@@ -1173,7 +1171,7 @@ impl TagOperations for CasteTag {
                 );
                     return None;
                 };
-                Some(CasteTag::MentalAttributeRate {
+                Some(Self::MentalAttributeRate {
                     attribute,
                     improvement_cost,
                     decay_rate_unused,
@@ -1181,7 +1179,7 @@ impl TagOperations for CasteTag {
                     decay_rate_demotion,
                 })
             }
-            CasteTag::Milkable { .. } => {
+            Self::Milkable { .. } => {
                 // Arguments become a `String` and `u32`
                 if values.len() < 2 {
                     tracing::warn!(
@@ -1199,15 +1197,13 @@ impl TagOperations for CasteTag {
                     return None;
                 };
                 // Material is the rest of the arguments, joined as a `String`
-                let material = (*values.get(..values.len() - 1).unwrap_or_default())
-                    .join(":")
-                    .to_string();
-                Some(CasteTag::Milkable {
+                let material = (*values.get(..values.len() - 1).unwrap_or_default()).join(":");
+                Some(Self::Milkable {
                     material,
                     frequency,
                 })
             }
-            CasteTag::Name { .. } => {
+            Self::Name { .. } => {
                 if values.len() < 3 {
                     tracing::warn!(
                         "parse_complex_token: Cannot parse name: not enough arguments: {}/3 '{:?}'",
@@ -1218,14 +1214,14 @@ impl TagOperations for CasteTag {
                 }
                 let singular = (*values.first().unwrap_or(&"")).to_string();
                 let plural = (*values.get(1).unwrap_or(&"")).to_string();
-                let adjective = (*values.get(2..).unwrap_or_default()).join(":").to_string();
-                Some(CasteTag::Name {
+                let adjective = (*values.get(2..).unwrap_or_default()).join(":");
+                Some(Self::Name {
                     singular,
                     plural,
                     adjective,
                 })
             }
-            CasteTag::NaturalSkill { .. } => {
+            Self::NaturalSkill { .. } => {
                 // Grab `level` from the end of `value`
                 let Ok(level) = (*values.last().unwrap_or(&"")).parse() else {
                     tracing::warn!(
@@ -1234,12 +1230,10 @@ impl TagOperations for CasteTag {
                     return None;
                 };
                 // The rest of the arguments are the `skill`
-                let skill = (*values.get(..values.len() - 1).unwrap_or_default())
-                    .join(":")
-                    .to_string();
-                Some(CasteTag::NaturalSkill { skill, level })
+                let skill = (*values.get(..values.len() - 1).unwrap_or_default()).join(":");
+                Some(Self::NaturalSkill { skill, level })
             }
-            CasteTag::Personality { .. } => {
+            Self::Personality { .. } => {
                 // Check if there are enough arguments to parse
                 if values.len() < 4 {
                     tracing::warn!(
@@ -1269,14 +1263,14 @@ impl TagOperations for CasteTag {
                     );
                     return None;
                 };
-                Some(CasteTag::Personality {
+                Some(Self::Personality {
                     personality_trait,
                     low,
                     median,
                     high,
                 })
             }
-            CasteTag::PhysicalAttributeCapPercentage { .. } => {
+            Self::PhysicalAttributeCapPercentage { .. } => {
                 // Arguments become a `String` and 1 `u32`s
                 if values.len() < 2 {
                     tracing::warn!(
@@ -1294,12 +1288,12 @@ impl TagOperations for CasteTag {
                 );
                     return None;
                 };
-                Some(CasteTag::PhysicalAttributeCapPercentage {
+                Some(Self::PhysicalAttributeCapPercentage {
                     attribute,
                     percentage,
                 })
             }
-            CasteTag::PhysicalAttributeRange { .. } => {
+            Self::PhysicalAttributeRange { .. } => {
                 // Arguments become a `String` and 7 `u32`s
                 if values.len() < 8 {
                     tracing::warn!(
@@ -1353,7 +1347,7 @@ impl TagOperations for CasteTag {
                 );
                     return None;
                 };
-                Some(CasteTag::PhysicalAttributeRange {
+                Some(Self::PhysicalAttributeRange {
                     attribute,
                     ranges: [
                         lowest,
@@ -1366,7 +1360,7 @@ impl TagOperations for CasteTag {
                     ],
                 })
             }
-            CasteTag::PhysicalAttributeRate { .. } => {
+            Self::PhysicalAttributeRate { .. } => {
                 // Arguments become a `String` and 4 `u32`s
                 if values.len() < 5 {
                     tracing::warn!(
@@ -1402,7 +1396,7 @@ impl TagOperations for CasteTag {
                 );
                     return None;
                 };
-                Some(CasteTag::PhysicalAttributeRate {
+                Some(Self::PhysicalAttributeRate {
                     attribute,
                     improvement_cost,
                     decay_rate_unused,
@@ -1410,7 +1404,7 @@ impl TagOperations for CasteTag {
                     decay_rate_demotion,
                 })
             }
-            CasteTag::ProfessionName { .. } => {
+            Self::ProfessionName { .. } => {
                 // Arguments become a singular name, plural name, and adjective, separated by `:`
                 if values.len() < 3 {
                     tracing::warn!(
@@ -1423,25 +1417,23 @@ impl TagOperations for CasteTag {
                 let profession = (*values.first().unwrap_or(&"")).to_string();
                 let singular = (*values.get(1).unwrap_or(&"")).to_string();
                 let plural = (*values.get(2).unwrap_or(&"")).to_string();
-                Some(CasteTag::ProfessionName {
+                Some(Self::ProfessionName {
                     profession,
                     singular,
                     plural,
                 })
             }
-            CasteTag::Pus { .. } => {
+            Self::Pus { .. } => {
                 // Grab `material_state` from the end
                 let material_state = (*values.last().unwrap_or(&"")).to_string();
                 // Set `material` to `simple_value` + the remains of `value`
-                let material = (*values.get(..values.len() - 1).unwrap_or_default())
-                    .join(":")
-                    .to_string();
-                Some(CasteTag::Pus {
+                let material = (*values.get(..values.len() - 1).unwrap_or_default()).join(":");
+                Some(Self::Pus {
                     material,
                     material_state,
                 })
             }
-            CasteTag::RelativeSize { .. } => {
+            Self::RelativeSize { .. } => {
                 // Appears as `RELATIVE_SIZE:SomeBodyPartSelector:SomeBodyPart:100`
                 // check if there are enough arguments
                 if values.len() < 3 {
@@ -1460,16 +1452,14 @@ impl TagOperations for CasteTag {
                     return None;
                 };
                 let body_part_selector = (*values.first().unwrap_or(&"")).to_string();
-                let body_part = (*values.get(1..values.len() - 1).unwrap_or_default())
-                    .join(":")
-                    .to_string();
-                Some(CasteTag::RelativeSize {
+                let body_part = (*values.get(1..values.len() - 1).unwrap_or_default()).join(":");
+                Some(Self::RelativeSize {
                     body_part_selector,
                     body_part,
                     relative_size,
                 })
             }
-            CasteTag::Remains { .. } => {
+            Self::Remains { .. } => {
                 // Appears as `REMAINS:SomeRemain:SomeRemains`
                 // check if there are enough arguments
                 if values.len() < 2 {
@@ -1481,10 +1471,10 @@ impl TagOperations for CasteTag {
                     return None;
                 }
                 let singular = (*values.first().unwrap_or(&"")).to_string();
-                let plural = (*values.get(1..).unwrap_or_default()).join(":").to_string();
-                Some(CasteTag::Remains { singular, plural })
+                let plural = (*values.get(1..).unwrap_or_default()).join(":");
+                Some(Self::Remains { singular, plural })
             }
-            CasteTag::RetractIntoBodyPart { .. } => {
+            Self::RetractIntoBodyPart { .. } => {
                 // check if there are enough arguments
                 if values.len() < 6 {
                     tracing::warn!(
@@ -1503,10 +1493,8 @@ impl TagOperations for CasteTag {
                 // Then the body_part_selector
                 let body_part_selector = (*values.first().unwrap_or(&"")).to_string();
                 // And finally the body_part
-                let body_part = (*values.get(1..values.len() - 4).unwrap_or_default())
-                    .join(":")
-                    .to_string();
-                Some(CasteTag::RetractIntoBodyPart {
+                let body_part = (*values.get(1..values.len() - 4).unwrap_or_default()).join(":");
+                Some(Self::RetractIntoBodyPart {
                     body_part_selector,
                     body_part,
                     second_person,
@@ -1515,7 +1503,7 @@ impl TagOperations for CasteTag {
                     third_person_cancel,
                 })
             }
-            CasteTag::RootAround { .. } => {
+            Self::RootAround { .. } => {
                 if values.len() < 4 {
                     tracing::warn!(
                     "parse_complex_token: Cannot parse RootAround: not enough arguments: {}/4 '{:?}'",
@@ -1527,17 +1515,15 @@ impl TagOperations for CasteTag {
                 let third_person_verb = (*values.last().unwrap_or(&"")).to_string();
                 let second_person_verb = (*values.get(values.len() - 2).unwrap_or(&"")).to_string();
                 let body_part_selector = (*values.first().unwrap_or(&"")).to_string();
-                let body_part = (*values.get(1..values.len() - 2).unwrap_or_default())
-                    .join(":")
-                    .to_string();
-                Some(CasteTag::RootAround {
+                let body_part = (*values.get(1..values.len() - 2).unwrap_or_default()).join(":");
+                Some(Self::RootAround {
                     body_part_selector,
                     body_part,
                     second_person_verb,
                     third_person_verb,
                 })
             }
-            CasteTag::Secretion { .. } => {
+            Self::Secretion { .. } => {
                 if values.len() < 6 {
                     tracing::warn!(
                     "parse_complex_token: Cannot parse Secretion: not enough arguments: {}/6 '{:?}'",
@@ -1552,10 +1538,8 @@ impl TagOperations for CasteTag {
                 // Grab from the end
                 let trigger = (*values.last().unwrap_or(&"")).to_string();
                 let tissue_layer = (*values.get(values.len() - 2).unwrap_or(&"")).to_string();
-                let body_part = (*values.get(1..values.len() - 2).unwrap_or_default())
-                    .join(":")
-                    .to_string();
-                Some(CasteTag::Secretion {
+                let body_part = (*values.get(1..values.len() - 2).unwrap_or_default()).join(":");
+                Some(Self::Secretion {
                     material_token,
                     material_state,
                     body_part_selector,
@@ -1564,7 +1548,7 @@ impl TagOperations for CasteTag {
                     trigger,
                 })
             }
-            CasteTag::SenseCreatureClass { .. } => {
+            Self::SenseCreatureClass { .. } => {
                 // Appears as `SENSE_CREATURE_CLASS:SomeCreatureClass:SomeTile:0:0:0`
                 if values.len() < 5 {
                     tracing::warn!(
@@ -1594,7 +1578,7 @@ impl TagOperations for CasteTag {
                     return None;
                 };
 
-                Some(CasteTag::SenseCreatureClass {
+                Some(Self::SenseCreatureClass {
                     creature_class,
                     tile,
                     foreground,
@@ -1602,7 +1586,7 @@ impl TagOperations for CasteTag {
                     brightness,
                 })
             }
-            CasteTag::SetBodyPartGroup { .. } => {
+            Self::SetBodyPartGroup { .. } => {
                 // Check if there are enough arguments to parse
                 if values.len() < 2 {
                     tracing::warn!(
@@ -1614,13 +1598,13 @@ impl TagOperations for CasteTag {
                 }
                 // Parse first argument as `String`
                 let body_part_selector = (*values.first().unwrap_or(&"")).to_string();
-                let body_part = (*values.get(1..).unwrap_or_default()).join(":").to_string();
-                Some(CasteTag::SetBodyPartGroup {
+                let body_part = (*values.get(1..).unwrap_or_default()).join(":");
+                Some(Self::SetBodyPartGroup {
                     body_part_selector,
                     body_part,
                 })
             }
-            CasteTag::SkillRates { .. } => {
+            Self::SkillRates { .. } => {
                 // Check if there are enough arguments to parse
                 if values.len() < 4 {
                     tracing::warn!(
@@ -1654,14 +1638,14 @@ impl TagOperations for CasteTag {
                 );
                     return None;
                 };
-                Some(CasteTag::SkillRates {
+                Some(Self::SkillRates {
                     improvement_rate,
                     decay_rate_unused,
                     decay_rate_rusty,
                     decay_rate_demotion,
                 })
             }
-            CasteTag::SkillRustRates { .. } => {
+            Self::SkillRustRates { .. } => {
                 // Check if there are enough arguments to parse
                 if values.len() < 3 {
                     tracing::warn!(
@@ -1689,13 +1673,13 @@ impl TagOperations for CasteTag {
                 );
                     return None;
                 };
-                Some(CasteTag::SkillRustRates {
+                Some(Self::SkillRustRates {
                     decay_rate_unused,
                     decay_rate_rusty,
                     decay_rate_demotion,
                 })
             }
-            CasteTag::Sound { .. } => {
+            Self::Sound { .. } => {
                 // Check if there are enough arguments to parse
                 if values.len() < 6 {
                     tracing::warn!(
@@ -1719,15 +1703,12 @@ impl TagOperations for CasteTag {
                     );
                     return None;
                 };
-                let mut breathing_bump = 0;
-                if requires_breathing {
-                    // Remove the breathing value
-                    breathing_bump = 1;
-                }
+                let breathing_bump = usize::from(requires_breathing);
+
                 let third_person = (*values.get(3 + breathing_bump).unwrap_or(&"")).to_string();
                 let first_person = (*values.get(4 + breathing_bump).unwrap_or(&"")).to_string();
                 let out_of_sight = (*values.get(5 + breathing_bump).unwrap_or(&"")).to_string();
-                Some(CasteTag::Sound {
+                Some(Self::Sound {
                     sound_type,
                     sound_range,
                     sound_interval,
@@ -1737,20 +1718,20 @@ impl TagOperations for CasteTag {
                     out_of_sight,
                 })
             }
-            CasteTag::SpecificFood { .. } => {
+            Self::SpecificFood { .. } => {
                 let Some(food_type) = OBJECT_TOKEN_MAP.get(*values.first().unwrap_or(&"")) else {
                     tracing::warn!(
                         "parse_complex_token: Cannot parse SpecificFood: object type: {values:?}"
                     );
                     return None;
                 };
-                let identifier = (*values.get(1..).unwrap_or_default()).join(":").to_string();
-                Some(CasteTag::SpecificFood {
+                let identifier = (*values.get(1..).unwrap_or_default()).join(":");
+                Some(Self::SpecificFood {
                     food_type: food_type.clone(),
                     identifier,
                 })
             }
-            CasteTag::SyndromeDilutionFactor { .. } => {
+            Self::SyndromeDilutionFactor { .. } => {
                 // Check if there are enough arguments to parse
                 if values.len() < 2 {
                     tracing::warn!(
@@ -1767,12 +1748,12 @@ impl TagOperations for CasteTag {
                 );
                     return None;
                 };
-                Some(CasteTag::SyndromeDilutionFactor {
+                Some(Self::SyndromeDilutionFactor {
                     syndrome,
                     percentage,
                 })
             }
-            CasteTag::Tendons { .. } => {
+            Self::Tendons { .. } => {
                 // `material_state` is a `String` and is at the end of `value`
                 // `material` is `simple_value` + the remains of `value`
                 // Grab `healing_rate` from the end of `value`
@@ -1783,37 +1764,35 @@ impl TagOperations for CasteTag {
                     return None;
                 };
                 // Set `material` to `simple_value` + the remains of `value`
-                let material = (*values.get(..values.len() - 1).unwrap_or_default())
-                    .join(":")
-                    .to_string();
-                Some(CasteTag::Tendons {
+                let material = (*values.get(..values.len() - 1).unwrap_or_default()).join(":");
+                Some(Self::Tendons {
                     material,
                     healing_rate,
                 })
             }
-            CasteTag::TissueLayer { .. } => {
+            Self::TissueLayer { .. } => {
                 let body_part_selector = (*values.first().unwrap_or(&"")).to_string();
                 let body_part = (*values.get(1).unwrap_or(&"")).to_string();
                 let tissue = (*values.get(2).unwrap_or(&"")).to_string();
-                let location = (*values.get(3..).unwrap_or_default()).join(":").to_string();
-                Some(CasteTag::TissueLayer {
+                let location = (*values.get(3..).unwrap_or_default()).join(":");
+                Some(Self::TissueLayer {
                     body_part_selector,
                     body_part,
                     tissue,
                     location,
                 })
             }
-            CasteTag::TissueLayerUnder { .. } => {
+            Self::TissueLayerUnder { .. } => {
                 let body_part_selector = (*values.first().unwrap_or(&"")).to_string();
                 let body_part = (*values.get(1).unwrap_or(&"")).to_string();
-                let tissue = (*values.get(2..).unwrap_or_default()).join(":").to_string();
-                Some(CasteTag::TissueLayerUnder {
+                let tissue = (*values.get(2..).unwrap_or_default()).join(":");
+                Some(Self::TissueLayerUnder {
                     body_part_selector,
                     body_part,
                     tissue,
                 })
             }
-            CasteTag::VerminBite { .. } => {
+            Self::VerminBite { .. } => {
                 let Ok(chance) = (*values.first().unwrap_or(&"")).parse::<u32>() else {
                     tracing::warn!(
                         "parse_complex_token: Cannot parse vermin bite: chance: {values:?}"
@@ -1822,15 +1801,15 @@ impl TagOperations for CasteTag {
                 };
                 let verb = (*values.get(1).unwrap_or(&"")).to_string();
                 let material = (*values.get(2).unwrap_or(&"")).to_string();
-                let material_state = (*values.get(3..).unwrap_or_default()).join(":").to_string();
-                Some(CasteTag::VerminBite {
+                let material_state = (*values.get(3..).unwrap_or_default()).join(":");
+                Some(Self::VerminBite {
                     chance,
                     verb,
                     material,
                     material_state,
                 })
             }
-            CasteTag::VisionArc { .. } => {
+            Self::VisionArc { .. } => {
                 let Ok(binocular) = (*values.first().unwrap_or(&"")).parse::<u32>() else {
                     tracing::warn!(
                         "parse_complex_token: Cannot parse vision arc: binocular: {values:?}"
@@ -1843,7 +1822,7 @@ impl TagOperations for CasteTag {
                     );
                     return None;
                 };
-                Some(CasteTag::VisionArc {
+                Some(Self::VisionArc {
                     binocular,
                     non_binocular,
                 })

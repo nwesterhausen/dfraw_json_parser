@@ -1,3 +1,5 @@
+//! String token to parsed tag map for condition tokens.
+
 use crate::tags::ConditionTag;
 
 /// Map of condition tags to their string representation.

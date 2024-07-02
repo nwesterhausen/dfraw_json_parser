@@ -1,3 +1,5 @@
+//! Parsed Inorganic object definition.
+
 use crate::{
     default_checks,
     material::Material,

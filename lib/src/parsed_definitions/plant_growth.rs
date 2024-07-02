@@ -1,3 +1,5 @@
+//! Contains the struct for plant growths and its implementation.
+
 use tracing::{error, warn};
 
 use crate::{

@@ -1,3 +1,5 @@
+//! String token to parsed tag map for syndrome tokens.
+
 use crate::tags::SyndromeTag;
 
 /// Mapping of syndrome tokens to strings

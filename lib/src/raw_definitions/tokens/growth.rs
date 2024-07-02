@@ -1,3 +1,5 @@
+//! String token to parsed tag map for growth tag tokens.
+
 use crate::tags::GrowthTag;
 
 /// Map of growth tag tags to their string representation.

@@ -1,3 +1,5 @@
+//! String token to parsed tag map for plant graphic template tokens.
+
 use crate::tags::PlantGraphicTemplateTag;
 
 /// Map of plant graphic templates to their string representation.

@@ -1,3 +1,5 @@
+//! Contains the Position struct and implementation (for government positions)
+
 use crate::{color::Color, default_checks, name::Name, tags::PositionTag};
 
 /// Represents a position in the government of an entity

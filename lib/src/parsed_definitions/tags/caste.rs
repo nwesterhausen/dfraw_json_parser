@@ -1,3 +1,5 @@
+//! Tags that can be used to define a creature's caste.
+
 use crate::metadata::ObjectType;
 
 /// Tokens that can be found in a creature's caste definitions.

@@ -1,3 +1,5 @@
+//! A module containing the `CreatureEffect` struct and its implementations.
+
 use crate::{default_checks, tags::CreatureEffectPropertyTag};
 
 /// A creature effect.

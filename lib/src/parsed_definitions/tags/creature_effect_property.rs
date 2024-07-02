@@ -1,3 +1,5 @@
+//! An enum representing a creature effect property tag.
+
 /// An enum representing a creature effect property tag.
 #[derive(
     serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, Default, specta::Type,

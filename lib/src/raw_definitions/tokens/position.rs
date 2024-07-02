@@ -1,3 +1,5 @@
+//! String token to parsed tag map for position tokens.
+
 use crate::tags::PositionTag;
 
 /// Mapping of position tokens to strings

@@ -1,3 +1,5 @@
+//! A module for the `TilePage` object.
+
 use std::path::PathBuf;
 
 use tracing::warn;

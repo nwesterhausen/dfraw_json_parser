@@ -1,3 +1,5 @@
+//! Milkable struct and implementation
+
 #[allow(clippy::module_name_repetitions)]
 #[derive(serde::Serialize, serde::Deserialize, Debug, Clone, Default, specta::Type)]
 #[serde(rename_all = "camelCase")]

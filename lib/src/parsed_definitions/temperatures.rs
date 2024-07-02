@@ -1,3 +1,5 @@
+//! Temperature properties of a material
+
 #[derive(serde::Serialize, serde::Deserialize, Debug, Clone, Default, specta::Type)]
 #[serde(rename_all = "camelCase")]
 /// The temperature properties of a material

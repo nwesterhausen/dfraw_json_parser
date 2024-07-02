@@ -1,3 +1,5 @@
+//! A module containing the `BodySize` struct and its implementation.
+
 /// A struct representing a body size in the format `years:days:size_cm3`
 #[allow(clippy::module_name_repetitions)]
 #[derive(

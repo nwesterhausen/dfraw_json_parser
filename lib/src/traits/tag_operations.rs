@@ -1,3 +1,5 @@
+//! This module contains the `TagOperations` trait, which is used to parse tokens from raw files.
+
 use crate::metadata::TagComplexity;
 
 /// The `TokenOperations` trait is used to parse tokens from raw files.

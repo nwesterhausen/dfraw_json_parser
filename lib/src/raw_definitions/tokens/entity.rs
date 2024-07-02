@@ -1,3 +1,5 @@
+//! String token to parsed tag map for entity tokens.
+
 use crate::tags::EntityTag;
 /// A map of all the entity tokens to strings
 pub static ENTITY_TOKENS: phf::Map<&'static str, EntityTag> = phf::phf_map! {

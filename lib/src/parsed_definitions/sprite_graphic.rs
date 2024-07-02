@@ -1,3 +1,5 @@
+//! A module that contains the `SpriteGraphic` struct and its implementation.
+
 use itertools::Itertools;
 use tracing::warn;
 

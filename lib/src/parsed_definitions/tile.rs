@@ -1,3 +1,5 @@
+//! Tile definition for DF Classic
+
 use super::color::Color;
 
 #[allow(clippy::module_name_repetitions)]

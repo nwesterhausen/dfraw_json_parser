@@ -1,3 +1,5 @@
+//! String token to parsed tag map for inclusion type tokens.
+
 use crate::tags::InclusionTypeTag;
 
 /// Map of inclusion types to their string representation.

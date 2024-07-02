@@ -1,3 +1,5 @@
+//! String token to parsed tag map for inorganic tokens.
+
 use crate::tags::InorganicTag;
 
 /// Map of inorganic tokens to their string representation.

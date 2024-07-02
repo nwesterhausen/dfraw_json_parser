@@ -26,8 +26,7 @@ itertools = "0.13.0"
 lazy-regex = "3.1.0"
 # Used for making a shared static ref to the Latin1 encoding.
 once_cell = "1.19.0"
-# Our lookup tables for RAW_TOKENS to RawTokens are generated with phf.
-phf = "0.11.2"
+# Quick-xml is used to parse legends export files.
 quick-xml = "0.35.0"
 # We slugify the names of the raw files to make them easier to work with.
 slug = "0.1.5"
@@ -47,3 +46,9 @@ walkdir = "2.5.0"
 version = "1.0"
 default-features = true
 features = ["derive"]
+
+# Our lookup tables for RAW_TOKENS to RawTokens are generated with phf.
+[dependencies.phf]
+version = "0.11.2"
+default-features = true
+features = ["macros"]

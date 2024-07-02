@@ -1,3 +1,5 @@
+//! A module to handle the parsing of material definitions from the raws.
+
 use tracing::warn;
 
 use crate::{

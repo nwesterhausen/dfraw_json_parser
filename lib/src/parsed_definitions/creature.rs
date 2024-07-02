@@ -1,3 +1,7 @@
+//! The `Creature` struct represents a creature in a Dwarf Fortress, with the properties
+//! that can be set in the raws. Not all the raws are represented here, only the ones that
+//! are currently supported by the library.
+
 use tracing::{debug, trace, warn};
 
 use crate::{

@@ -1,3 +1,5 @@
+//! Contains the Entity struct and implementations.
+
 use tracing::warn;
 
 use crate::{

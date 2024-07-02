@@ -1,3 +1,5 @@
+//! Name struct for singular, plural, and adjective names (or any combination thereof)
+
 /// A name with a singular, plural, and adjective form
 #[derive(serde::Serialize, serde::Deserialize, Debug, Clone, Default, specta::Type)]
 #[serde(rename_all = "camelCase")]

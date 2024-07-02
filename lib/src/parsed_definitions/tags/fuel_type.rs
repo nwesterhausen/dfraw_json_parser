@@ -1,3 +1,5 @@
+//! A material fuel type that can be set in a material definition.
+
 /// A material fuel type that can be set in a material definition.
 #[derive(
     serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, Default, specta::Type,

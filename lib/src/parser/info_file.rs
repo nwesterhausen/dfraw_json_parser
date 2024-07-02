@@ -11,14 +11,19 @@ use crate::{
 
 /// The function `parse_module_info_files` parses module information files based on the provided options.
 ///
-/// Arguments:
+/// # Arguments:
 ///
 /// * `options`: A reference to a `ParserOptions` struct, which contains various options for parsing
 /// module information.
 ///
-/// Returns:
+/// # Returns:
 ///
 /// The function `parse_module_info_files` returns a `Vec<InfoFile>`.
+///
+/// # Errors
+///
+/// * `ParserError::Io` - If the `info.txt` file cannot be read, doesn't exist, or is an invalid `info.txt` file
+///
 pub fn parse_module_info_files(options: &ParserOptions) -> Result<Vec<InfoFile>, ParserError> {
     let mut results = Vec::new();
 

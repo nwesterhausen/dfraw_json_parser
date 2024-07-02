@@ -1,3 +1,5 @@
+//! Tags that modify a creature
+
 /// A struct representing a modification to a creature
 #[derive(serde::Serialize, serde::Deserialize, Debug, Clone, Eq, PartialEq, specta::Type)]
 pub enum ModificationTag {

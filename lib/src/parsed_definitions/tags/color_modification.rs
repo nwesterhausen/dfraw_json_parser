@@ -1,3 +1,5 @@
+//! The color modification of the tile
+
 use tracing::warn;
 
 /// The color modification of the tile

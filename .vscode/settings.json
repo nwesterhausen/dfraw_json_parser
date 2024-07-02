@@ -1,21 +1,27 @@
 {
 	"docwriter.style": "RustDoc",
-	"rust-analyzer.cargo.features": [
-		"tauri"
-	],
-	"conventionalCommits.scopes": [
-		"deps"
-	],
+	"rust-analyzer.cargo.features": ["tauri"],
+	"conventionalCommits.scopes": ["deps"],
 	"rust-analyzer.check.command": "clippy",
 	"rust-analyzer.check.extraArgs": [
 		"--",
-		"-W",
+		"-D",
 		"clippy::pedantic",
-		"-W",
-		"clippy::cargo",
-		"-W",
-		"clippy::indexing_slicing",
+		"-D",
+		"clippy::nursery",
+		"-D",
+		"clippy::unwrap_used",
+		"-D",
+		"clippy::enum_glob_use",
+		"-D",
+		"unreachable_patterns",
+		"-D",
+		"unreachable_code",
+		"-D",
+		"missing_docs",
+		"-D",
+		"unsafe_code",
 		"-A",
-		"clippy::module_name_repetitions",
+		"clippy::module_name_repetitions"
 	]
 }

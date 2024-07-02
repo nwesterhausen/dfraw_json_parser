@@ -1,3 +1,5 @@
+//! The tokens for the shrubs
+
 /// The tokens for the shrubs
 #[derive(
     serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, Default, specta::Type,

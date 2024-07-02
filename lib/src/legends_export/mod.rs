@@ -1,3 +1,7 @@
+//! This module supports parsing Dwarf Fortress legends export files.
+//!
+//! So far this only supports parsing the creature and entity sections of the legends export.
+
 mod reader;
 mod util;
 

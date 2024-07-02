@@ -1,3 +1,5 @@
+//! String token to parsed tag map for material usage tokens.
+
 use crate::tags::MaterialUsageTag;
 
 /// Mapping of material usage tokens to strings

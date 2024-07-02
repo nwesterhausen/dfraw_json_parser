@@ -1,3 +1,5 @@
+//! Plant growth tags
+
 /// The growth tag of a plant
 #[derive(
     serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, Default, specta::Type, Copy,

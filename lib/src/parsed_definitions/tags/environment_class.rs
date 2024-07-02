@@ -1,3 +1,5 @@
+//! The class of environment that the stone appears in.
+
 /// The class of environment that the stone appears in.
 #[derive(
     serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, Default, specta::Type,

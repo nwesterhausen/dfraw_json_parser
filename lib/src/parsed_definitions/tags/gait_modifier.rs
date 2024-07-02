@@ -1,3 +1,5 @@
+//! Gait modifier tags are used to modify the speed of a creature based on various factors.
+
 /// An enum representing a gait modifier.
 #[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, specta::Type)]
 pub enum GaitModifierTag {

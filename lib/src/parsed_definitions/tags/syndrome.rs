@@ -1,3 +1,5 @@
+//! Syndrome tags.
+
 /// Represents the tokens that can be used in a syndrome definition.
 #[derive(
     serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, Default, specta::Type,

@@ -1,3 +1,5 @@
+//! String token to parsed tag map for twig placement tokens.
+
 use crate::tags::TwigPlacementTag;
 
 /// The mapping of tree tokens to their string representation

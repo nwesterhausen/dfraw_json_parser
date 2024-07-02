@@ -9,7 +9,7 @@ struct TypescriptBinding {
 }
 
 impl TypescriptBinding {
-    fn new(output_path: std::path::PathBuf) -> Self {
+    const fn new(output_path: std::path::PathBuf) -> Self {
         Self { output_path }
     }
 
@@ -39,14 +39,14 @@ impl TypescriptBinding {
 }
 
 #[test]
-#[allow(clippy::too_many_lines)]
+#[allow(clippy::too_many_lines, clippy::cognitive_complexity)]
 fn generate_ts_bindings() {
     // get our current working directory
-    let cwd = std::env::current_dir().unwrap();
+    let cwd = std::env::current_dir().expect("Failed to get current working directory");
     // set lib/bindings/AllBindings.d.ts as the output file
     let output_dir = cwd.join("bindings");
     // make sure output dir exists
-    std::fs::create_dir_all(&output_dir).unwrap();
+    std::fs::create_dir_all(&output_dir).expect("Failed to create output directory");
     eprintln!("Output dir: {:?}", &output_dir);
     let ts_bindings = TypescriptBinding::new(output_dir);
 
@@ -657,9 +657,8 @@ fn generate_ts_bindings() {
         },
     ];
 
-    let missed = bindings.iter().filter(|x| x.is_empty()).collect::<Vec<_>>();
     // change missed into the number of missed bindings
-    let missed = missed.len();
+    let missed = bindings.iter().filter(|x| x.is_empty()).count();
     // if there are missed bindings, print a warning
     if missed > 0 {
         eprintln!("Missed {missed} bindings");
@@ -678,11 +677,11 @@ fn generate_ts_bindings() {
 #[test]
 fn export_tauri_ts_bindings() {
     // get our current working directory
-    let cwd = std::env::current_dir().unwrap();
+    let cwd = std::env::current_dir().expect("Failed to get current working directory");
     // set lib/bindings/AllBindings.d.ts as the output file
     let output_dir = cwd.join("bindings");
     // make sure output dir exists
-    std::fs::create_dir_all(&output_dir).unwrap();
+    std::fs::create_dir_all(&output_dir).expect("Failed to create output directory");
     eprintln!("Output dir: {:?}", &output_dir);
     let ts_bindings = TypescriptBinding::new(output_dir);
 
@@ -724,9 +723,8 @@ fn export_tauri_ts_bindings() {
         },
     ];
 
-    let missed = bindings.iter().filter(|x| x.is_empty()).collect::<Vec<_>>();
     // change missed into the number of missed bindings
-    let missed = missed.len();
+    let missed = bindings.iter().filter(|x| x.is_empty()).count();
     // if there are missed bindings, print a warning
     if missed > 0 {
         eprintln!("Missed {missed} bindings");

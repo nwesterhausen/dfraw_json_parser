@@ -1,3 +1,5 @@
+//! Graphic type tags for the tileset
+
 /// The graphic type of the tile
 #[derive(
     serde::Serialize, serde::Deserialize, Debug, Clone, Copy, PartialEq, Eq, Default, specta::Type,

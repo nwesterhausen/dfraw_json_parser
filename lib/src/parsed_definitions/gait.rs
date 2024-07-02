@@ -1,3 +1,5 @@
+//! Module containing the parsed gait definition.
+
 use tracing::warn;
 
 use crate::tags::{GaitModifierTag, GaitTypeTag};

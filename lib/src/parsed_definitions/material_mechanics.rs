@@ -1,3 +1,5 @@
+//! Contains the `MaterialMechanics` struct and associated functions.
+
 use tracing::warn;
 
 use crate::{

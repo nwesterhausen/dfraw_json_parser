@@ -1,3 +1,5 @@
+//! Contains the `CreatureEffectTag` enum and associated functions.
+
 /// An enum representing a creature effect tag.
 #[derive(
     serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, Default, specta::Type,

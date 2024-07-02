@@ -1,3 +1,5 @@
+//! State names for materials
+
 /// Represents the name of a materials 3 states (solid, liquid, gas)
 #[derive(serde::Serialize, serde::Deserialize, Debug, Clone, Default, specta::Type)]
 #[serde(rename_all = "camelCase", rename = "StateName")]

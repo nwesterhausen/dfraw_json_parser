@@ -1,3 +1,5 @@
+//! String token to parsed tag map for shrub tokens.
+
 use crate::tags::ShrubTag;
 
 /// The mapping of shrub tokens to their string representation

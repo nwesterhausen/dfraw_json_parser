@@ -1,3 +1,5 @@
+//! Seed material definition
+
 use tracing::warn;
 
 use crate::{color::Color, name::Name};

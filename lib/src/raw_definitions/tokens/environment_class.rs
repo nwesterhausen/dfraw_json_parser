@@ -1,3 +1,5 @@
+//! String token to parsed tag map for environment class tokens.
+
 use crate::tags::EnvironmentClassTag;
 
 /// Map of environment classes to their string representation.

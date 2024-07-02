@@ -1,3 +1,5 @@
+//! Tags which represent biomes.
+
 /// An enum representing a biome.
 #[derive(
     serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, Default, specta::Type,

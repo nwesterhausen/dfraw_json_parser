@@ -1,3 +1,5 @@
+//! Contains the `MechanicalProperties` struct and its implementation
+
 /// Represents the mechanical properties of a material via the yield, fracture, and elasticity
 #[allow(clippy::module_name_repetitions)]
 #[derive(serde::Serialize, serde::Deserialize, Debug, Clone, Default, specta::Type)]

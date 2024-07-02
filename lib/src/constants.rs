@@ -1,3 +1,5 @@
+//! Constants used throughout the library
+
 /// The encoding used by dwarf fortress text files
 pub static DF_ENCODING: once_cell::sync::Lazy<&encoding_rs::Encoding> =
     once_cell::sync::Lazy::new(|| {

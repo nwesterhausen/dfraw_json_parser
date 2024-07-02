@@ -1,3 +1,5 @@
+//! String token to parsed tag map for creature variation tokens.
+
 use crate::tags::CreatureVariationTag;
 
 /// A map of all the creature variation tags to strings

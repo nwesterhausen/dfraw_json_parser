@@ -1,3 +1,5 @@
+//! Growth tags for tiles
+
 /// The growth tag of the tile
 #[derive(
     serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, Default, specta::Type, Copy,

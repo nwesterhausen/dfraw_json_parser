@@ -1,3 +1,5 @@
+//! String token to parsed tag map for caste tokens.
+
 use crate::{metadata::ObjectType, tags::CasteTag};
 
 /// A map of caste tokens to their respective strings.

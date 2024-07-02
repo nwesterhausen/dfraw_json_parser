@@ -1,3 +1,5 @@
+//! Material type tags
+
 /// A material template
 #[derive(
     serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, Default, specta::Type,

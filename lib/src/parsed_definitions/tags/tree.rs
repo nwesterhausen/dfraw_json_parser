@@ -1,3 +1,5 @@
+//! The tags for the tree parser
+
 /// The tokens for the tree parser
 #[derive(
     serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, Default, specta::Type,

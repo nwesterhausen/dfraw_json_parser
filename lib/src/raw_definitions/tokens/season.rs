@@ -1,3 +1,5 @@
+//! String token to parsed tag map for season tokens.
+
 use crate::tags::SeasonTag;
 
 /// Mapping of position tokens to strings

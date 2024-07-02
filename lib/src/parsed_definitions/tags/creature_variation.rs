@@ -1,3 +1,5 @@
+//! An enum representing a creature variation tag.
+
 use tracing::warn;
 
 use crate::raw_definitions::CREATURE_VARIATION_TOKENS;

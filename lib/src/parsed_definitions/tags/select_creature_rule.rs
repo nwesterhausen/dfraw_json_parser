@@ -1,3 +1,5 @@
+//! The rules for selecting a creature
+
 /// The rules for selecting a creature
 #[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, specta::Type)]
 pub enum SelectCreatureRuleTag {

@@ -1,3 +1,5 @@
+//! Material template definition
+
 use crate::{
     material::Material,
     metadata::{ObjectType, RawMetadata},

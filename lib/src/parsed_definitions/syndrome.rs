@@ -1,3 +1,5 @@
+//! Syndrome struct and implementation
+
 use tracing::{debug, warn};
 
 use crate::{

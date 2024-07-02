@@ -1,3 +1,5 @@
+//! Tags for conditions that can be applied to a tile/entity (graphics)
+
 use crate::raw_definitions::CONDITION_TOKENS;
 
 /// A condition that can be applied to a tile/entity

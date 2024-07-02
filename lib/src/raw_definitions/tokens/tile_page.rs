@@ -1,3 +1,5 @@
+//! String token to parsed tag map for tile page tokens.
+
 use crate::tags::TilePageTag;
 
 /// Map of tile page tags to their string representation.

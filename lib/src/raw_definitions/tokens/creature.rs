@@ -1,3 +1,5 @@
+//! String token to parsed tag map for creature tokens.
+
 use crate::tags::CreatureTag;
 
 /// A map of creature tags to their respective enum values.

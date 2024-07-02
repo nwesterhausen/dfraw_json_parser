@@ -1,3 +1,5 @@
+//! Tags that can be used in inorganic raws.
+
 /// Tags that can be used in inorganic raws.
 #[derive(
     serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, Default, specta::Type,

@@ -1,3 +1,5 @@
+//! Graphic object definition and parsing.
+
 use tracing::warn;
 
 use crate::{

@@ -1,3 +1,5 @@
+//! String token to parsed tag map for graphic type tokens.
+
 use crate::tags::GraphicTypeTag;
 
 /// Map of graphic type tags to their string representation.

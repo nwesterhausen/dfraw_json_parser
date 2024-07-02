@@ -16,4 +16,4 @@ pub use progress::Task as ProgressTask;
 
 /// A modified version of the `parse` function that uses the Tauri emitter.
 #[cfg(feature = "tauri")]
-pub(crate) use with_progress::parse;
+pub use with_progress::parse;

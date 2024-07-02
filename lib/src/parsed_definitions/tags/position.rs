@@ -1,3 +1,5 @@
+//! Position tags are used to define the properties of a position in the game. They are used in the `position` token.
+
 /// Represents a position token
 #[derive(
     serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, Default, specta::Type,

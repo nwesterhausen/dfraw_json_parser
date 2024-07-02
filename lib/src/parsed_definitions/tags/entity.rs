@@ -1,3 +1,5 @@
+//! Tokens that can be found in an entity raw file.
+
 /// Tokens that can be found in an entity raw file.
 #[derive(
     serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, Default, specta::Type,

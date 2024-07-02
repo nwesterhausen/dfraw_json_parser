@@ -1,3 +1,5 @@
+//! Inclusion type tag.
+
 /// The type of inclusion that the stone has.
 #[derive(
     serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, Default, specta::Type,

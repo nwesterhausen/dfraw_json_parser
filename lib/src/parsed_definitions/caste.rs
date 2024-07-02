@@ -1,3 +1,5 @@
+//! A module for the Caste struct and its implementations.
+
 use tracing::warn;
 
 use crate::{

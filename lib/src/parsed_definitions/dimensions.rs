@@ -1,3 +1,5 @@
+//! A module containing the `Dimensions` struct and its implementations.
+
 use tracing::{error, warn};
 
 /// A struct representing a Dimensions object.

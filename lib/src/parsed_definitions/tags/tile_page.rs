@@ -1,3 +1,5 @@
+//! The tokens used to define the tile page
+
 /// The tokens used to define the tile page
 #[derive(
     serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, Default, specta::Type, Copy,

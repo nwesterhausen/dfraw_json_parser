@@ -33,8 +33,8 @@ use crate::ProgressTask;
 ///
 /// This function will return an error if the Dwarf Fortress directory is invalid, or if the raws cannot be parsed.
 #[cfg(feature = "tauri")]
-#[allow(clippy::too_many_lines)]
-pub(crate) fn parse(
+#[allow(clippy::too_many_lines, clippy::cognitive_complexity)]
+pub fn parse(
     options: &ParserOptions,
     progress_helper: &mut ProgressHelper,
 ) -> Result<ParseResult, ParserError> {
@@ -241,12 +241,13 @@ pub(crate) fn parse(
         })
         .map(|c| utilities::clone_raw_object_box(&c))
         .filter_map(|c| {
-            if let Some(creature) = c.as_ref().as_any().downcast_ref::<Creature>() {
-                Some(creature.clone())
-            } else {
-                tracing::error!("Downcast failed for simple creature {}", c.get_identifier());
-                None
-            }
+            c.as_ref().as_any().downcast_ref::<Creature>().map_or_else(
+                || {
+                    tracing::error!("Downcast failed for simple creature {}", c.get_identifier());
+                    None
+                },
+                |creature| Some(creature.clone()),
+            )
         })
         .collect();
 
@@ -331,7 +332,10 @@ fn parse_location<P: AsRef<Path>>(
     info!(
         "Found {} raw modules in {:?}",
         raw_modules_in_location.len(),
-        options.locations_to_parse.first().unwrap(),
+        options
+            .locations_to_parse
+            .first()
+            .unwrap_or(&RawModuleLocation::Unknown),
     );
 
     // Calculate total number of modules we will parse:

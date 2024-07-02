@@ -1,3 +1,5 @@
+//! A module for the creature variation definition.
+
 use tracing::warn;
 
 use crate::{

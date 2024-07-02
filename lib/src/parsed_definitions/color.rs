@@ -1,3 +1,5 @@
+//! A module containing the `Color` struct and its implementations.
+
 /// A struct representing a color in the format "foreground:background:brightness".
 #[allow(clippy::module_name_repetitions)]
 #[derive(serde::Serialize, serde::Deserialize, Debug, Clone, Default, specta::Type)]

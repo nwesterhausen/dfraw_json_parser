@@ -1,3 +1,5 @@
+//! Trait for creature variation requirements
+
 /// Trait for creature variation requirements
 #[typetag::serde]
 pub trait CreatureVariationRequirements {

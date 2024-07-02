@@ -1,4 +1,5 @@
 //! The `info.txt` file for a raw module. This file contains metadata about the module.
+
 use std::{
     io::{BufRead, BufReader},
     path::Path,

@@ -1,3 +1,5 @@
+//! A module for creature variation rules.
+
 use lazy_regex::regex;
 
 use crate::{
