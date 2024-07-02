@@ -435,9 +435,9 @@ impl InfoFile {
     ///
     /// ```rust
     /// use std::path::Path;
-    /// use dfraw_json_parser::{ModuleInfoFile, RawModuleLocation};
+    /// use dfraw_parser::{InfoFile, metadata::RawModuleLocation};
     ///
-    /// let mut info_file = ModuleInfoFile::new("vanilla_creatures", RawModuleLocation::Vanilla, "vanilla_creatures");
+    /// let mut info_file = InfoFile::new("vanilla_creatures", RawModuleLocation::Vanilla, "vanilla_creatures");
     ///
     /// assert_eq!(info_file.get_parent_directory(), "vanilla_creatures");
     /// ```
@@ -455,9 +455,9 @@ impl InfoFile {
     ///
     /// ```rust
     /// use std::path::Path;
-    /// use dfraw_json_parser::{ModuleInfoFile, RawModuleLocation};
+    /// use dfraw_parser::{InfoFile, metadata::RawModuleLocation};
     ///
-    /// let mut info_file = ModuleInfoFile::new("vanilla_creatures", RawModuleLocation::Vanilla, "vanilla_creatures");
+    /// let mut info_file = InfoFile::new("vanilla_creatures", RawModuleLocation::Vanilla, "vanilla_creatures");
     ///
     /// info_file.set_module_name("vanilla_creatures_2");
     /// assert_eq!(info_file.get_name(), "vanilla_creatures_2");

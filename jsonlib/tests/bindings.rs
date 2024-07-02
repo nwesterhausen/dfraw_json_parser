@@ -53,602 +53,604 @@ fn generate_ts_bindings() {
     let config = ExportConfig::default().bigint(BigIntExportBehavior::String);
 
     let bindings: Vec<String> = vec![
-        match export::<dfraw_json_parser::biome::Token>(&config) {
+        match export::<dfraw_parser::tags::BiomeTag>(&config) {
             Ok(x) => x,
             Err(e) => {
-                eprintln!("Failed to export biome::Token");
+                eprintln!("Failed to export dfraw_parser::tags::BiomeTag");
                 eprintln!("{e:?}");
                 String::new()
             }
         },
-        match export::<dfraw_json_parser::creature::Creature>(&config) {
+        match export::<dfraw_parser::tags::CasteTag>(&config) {
             Ok(x) => x,
             Err(e) => {
-                eprintln!("Failed to export creature::Creature");
+                eprintln!("Failed to export dfraw_parser::tags::CreatureTag");
                 eprintln!("{e:?}");
                 String::new()
             }
         },
-        match export::<dfraw_json_parser::creature::Token>(&config) {
+        match export::<dfraw_parser::tags::ColorModificationTag>(&config) {
             Ok(x) => x,
             Err(e) => {
-                eprintln!("Failed to export creature::Token");
+                eprintln!("Failed to export dfraw_parser::tags::ColorModificationTag");
                 eprintln!("{e:?}");
                 String::new()
             }
         },
-        match export::<dfraw_json_parser::creature_caste::Gait>(&config) {
+        match export::<dfraw_parser::tags::ConditionTag>(&config) {
             Ok(x) => x,
             Err(e) => {
-                eprintln!("Failed to export creature_caste::Gait");
+                eprintln!("Failed to export dfraw_parser::tags::ConditionTag");
                 eprintln!("{e:?}");
                 String::new()
             }
         },
-        match export::<dfraw_json_parser::creature_caste::GaitType>(&config) {
+        match export::<dfraw_parser::tags::CreatureTag>(&config) {
             Ok(x) => x,
             Err(e) => {
-                eprintln!("Failed to export creature_caste::GaitType");
+                eprintln!("Failed to export dfraw_parser::tags::CreatureTag");
                 eprintln!("{e:?}");
                 String::new()
             }
         },
-        match export::<dfraw_json_parser::creature_caste::GaitModifier>(&config) {
+        match export::<dfraw_parser::tags::CreatureEffectTag>(&config) {
             Ok(x) => x,
             Err(e) => {
-                eprintln!("Failed to export creature_caste::GaitModifier");
+                eprintln!("Failed to export dfraw_parser::tags::CreatureEffectTag");
                 eprintln!("{e:?}");
                 String::new()
             }
         },
-        match export::<dfraw_json_parser::creature_caste::Token>(&config) {
+        match export::<dfraw_parser::tags::CreatureEffectPropertyTag>(&config) {
             Ok(x) => x,
             Err(e) => {
-                eprintln!("Failed to export creature_caste::Token");
+                eprintln!("Failed to export dfraw_parser::tags::CreatureEffectPropertyTag");
                 eprintln!("{e:?}");
                 String::new()
             }
         },
-        match export::<dfraw_json_parser::creature_caste::Caste>(&config) {
+        match export::<dfraw_parser::tags::CreatureVariationTag>(&config) {
             Ok(x) => x,
             Err(e) => {
-                eprintln!("Failed to export creature_caste::Caste");
+                eprintln!("Failed to export dfraw_parser::tags::CreatureVariationTag");
                 eprintln!("{e:?}");
                 String::new()
             }
         },
-        match export::<dfraw_json_parser::creature_effect::PropertyToken>(&config) {
+        match export::<dfraw_parser::tags::CreatureVariationRuleTag>(&config) {
             Ok(x) => x,
             Err(e) => {
-                eprintln!("Failed to export creature_effect::PropertyToken");
+                eprintln!("Failed to export dfraw_parser::tags::CreatureVariationRuleTag");
                 eprintln!("{e:?}");
                 String::new()
             }
         },
-        match export::<dfraw_json_parser::creature_effect::Token>(&config) {
+        match export::<dfraw_parser::tags::EntityTag>(&config) {
             Ok(x) => x,
             Err(e) => {
-                eprintln!("Failed to export creature_effect::Token");
+                eprintln!("Failed to export dfraw_parser::tags::EntityTag");
                 eprintln!("{e:?}");
                 String::new()
             }
         },
-        match export::<dfraw_json_parser::creature_variation::CreatureVariation>(&config) {
+        match export::<dfraw_parser::tags::EnvironmentClassTag>(&config) {
             Ok(x) => x,
             Err(e) => {
-                eprintln!("Failed to export creature_variation::CreatureVariation");
+                eprintln!("Failed to export dfraw_parser::tags::EnvironmentClassTag");
                 eprintln!("{e:?}");
                 String::new()
             }
         },
-        match export::<dfraw_json_parser::creature_variation::Rule>(&config) {
+        match export::<dfraw_parser::tags::FuelTypeTag>(&config) {
             Ok(x) => x,
             Err(e) => {
-                eprintln!("Failed to export creature_variation::Rule");
+                eprintln!("Failed to export dfraw_parser::tags::FuelTypeTag");
                 eprintln!("{e:?}");
                 String::new()
             }
         },
-        match export::<dfraw_json_parser::creature_variation::Token>(&config) {
+        match export::<dfraw_parser::tags::GaitModifierTag>(&config) {
             Ok(x) => x,
             Err(e) => {
-                eprintln!("Failed to export creature_variation::Token");
+                eprintln!("Failed to export dfraw_parser::tags::GaitModifierTag");
                 eprintln!("{e:?}");
                 String::new()
             }
         },
-        match export::<dfraw_json_parser::entity::Entity>(&config) {
+        match export::<dfraw_parser::tags::GaitTypeTag>(&config) {
             Ok(x) => x,
             Err(e) => {
-                eprintln!("Failed to export entity::Entity");
+                eprintln!("Failed to export dfraw_parser::tags::GaitTypeTag");
                 eprintln!("{e:?}");
                 String::new()
             }
         },
-        match export::<dfraw_json_parser::entity::Token>(&config) {
+        match export::<dfraw_parser::tags::GraphicTypeTag>(&config) {
             Ok(x) => x,
             Err(e) => {
-                eprintln!("Failed to export entity::Token");
+                eprintln!("Failed to export dfraw_parser::tags::GraphicTypeTag");
                 eprintln!("{e:?}");
                 String::new()
             }
         },
-        match export::<dfraw_json_parser::graphics::Graphic>(&config) {
+        match export::<dfraw_parser::tags::GrowthTag>(&config) {
             Ok(x) => x,
             Err(e) => {
-                eprintln!("Failed to export graphics::Graphic");
+                eprintln!("Failed to export dfraw_parser::tags::GrowthTag");
                 eprintln!("{e:?}");
                 String::new()
             }
         },
-        match export::<dfraw_json_parser::graphics::SpriteGraphic>(&config) {
+        match export::<dfraw_parser::tags::InclusionTypeTag>(&config) {
             Ok(x) => x,
             Err(e) => {
-                eprintln!("Failed to export graphics::SpriteGraphic");
+                eprintln!("Failed to export dfraw_parser::tags::InclusionTypeTag");
                 eprintln!("{e:?}");
                 String::new()
             }
         },
-        match export::<dfraw_json_parser::graphics::SpriteLayer>(&config) {
+        match export::<dfraw_parser::tags::InorganicTag>(&config) {
             Ok(x) => x,
             Err(e) => {
-                eprintln!("Failed to export graphics::SpriteLayer");
+                eprintln!("Failed to export dfraw_parser::tags::InorganicTag");
                 eprintln!("{e:?}");
                 String::new()
             }
         },
-        match export::<dfraw_json_parser::graphics::TilePage>(&config) {
+        match export::<dfraw_parser::tags::MaterialPropertyTag>(&config) {
             Ok(x) => x,
             Err(e) => {
-                eprintln!("Failed to export graphics::TilePage");
+                eprintln!("Failed to export dfraw_parser::tags::MaterialPropertyTag");
                 eprintln!("{e:?}");
                 String::new()
             }
         },
-        match export::<dfraw_json_parser::graphics::ColorModificationToken>(&config) {
+        match export::<dfraw_parser::tags::MaterialStateTag>(&config) {
             Ok(x) => x,
             Err(e) => {
-                eprintln!("Failed to export graphics::ColorModificationToken");
+                eprintln!("Failed to export dfraw_parser::tags::MaterialStateTag");
                 eprintln!("{e:?}");
                 String::new()
             }
         },
-        match export::<dfraw_json_parser::graphics::ConditionToken>(&config) {
+        match export::<dfraw_parser::tags::MaterialTypeTag>(&config) {
             Ok(x) => x,
             Err(e) => {
-                eprintln!("Failed to export graphics::ConditionToken");
+                eprintln!("Failed to export dfraw_parser::tags::MaterialTypeTag");
                 eprintln!("{e:?}");
                 String::new()
             }
         },
-        match export::<dfraw_json_parser::graphics::GraphicTypeToken>(&config) {
+        match export::<dfraw_parser::tags::MaterialUsageTag>(&config) {
             Ok(x) => x,
             Err(e) => {
-                eprintln!("Failed to export graphics::GraphicTypeToken");
+                eprintln!("Failed to export dfraw_parser::tags::MaterialUsageTag");
                 eprintln!("{e:?}");
                 String::new()
             }
         },
-        match export::<dfraw_json_parser::graphics::GrowthToken>(&config) {
+        match export::<dfraw_parser::tags::ModificationTag>(&config) {
             Ok(x) => x,
             Err(e) => {
-                eprintln!("Failed to export graphics::GrowthToken");
+                eprintln!("Failed to export dfraw_parser::tags::ModificationTag");
                 eprintln!("{e:?}");
                 String::new()
             }
         },
-        match export::<dfraw_json_parser::graphics::PlantGraphicTemplateToken>(&config) {
+        match export::<dfraw_parser::tags::PlantTag>(&config) {
             Ok(x) => x,
             Err(e) => {
-                eprintln!("Failed to export graphics::PlantGraphicTemplateToken");
+                eprintln!("Failed to export dfraw_parser::tags::PlantTag");
                 eprintln!("{e:?}");
                 String::new()
             }
         },
-        match export::<dfraw_json_parser::graphics::TilePageToken>(&config) {
+        match export::<dfraw_parser::tags::PlantGraphicTemplateTag>(&config) {
             Ok(x) => x,
             Err(e) => {
-                eprintln!("Failed to export graphics::TilePageToken");
+                eprintln!("Failed to export dfraw_parser::tags::PlantGraphicTemplateTag");
                 eprintln!("{e:?}");
                 String::new()
             }
         },
-        match export::<dfraw_json_parser::inorganic::Inorganic>(&config) {
+        match export::<dfraw_parser::tags::PlantGrowthTag>(&config) {
             Ok(x) => x,
             Err(e) => {
-                eprintln!("Failed to export inorganic::Inorganic");
+                eprintln!("Failed to export dfraw_parser::tags::PlantGrowthTag");
                 eprintln!("{e:?}");
                 String::new()
             }
         },
-        match export::<dfraw_json_parser::inorganic::EnvironmentClassToken>(&config) {
+        match export::<dfraw_parser::tags::PlantGrowthTypeTag>(&config) {
             Ok(x) => x,
             Err(e) => {
-                eprintln!("Failed to export inorganic::EnvironmentClassToken");
+                eprintln!("Failed to export dfraw_parser::tags::PlantGrowthTypeTag");
                 eprintln!("{e:?}");
                 String::new()
             }
         },
-        match export::<dfraw_json_parser::inorganic::InclusionTypeToken>(&config) {
+        match export::<dfraw_parser::tags::PlantPartTag>(&config) {
             Ok(x) => x,
             Err(e) => {
-                eprintln!("Failed to export inorganic::InclusionTypeToken");
+                eprintln!("Failed to export dfraw_parser::tags::PlantPartTag");
                 eprintln!("{e:?}");
                 String::new()
             }
         },
-        match export::<dfraw_json_parser::inorganic::Token>(&config) {
+        match export::<dfraw_parser::tags::PositionTag>(&config) {
             Ok(x) => x,
             Err(e) => {
-                eprintln!("Failed to export inorganic::Token");
+                eprintln!("Failed to export dfraw_parser::tags::PositionTag");
                 eprintln!("{e:?}");
                 String::new()
             }
         },
-        match export::<dfraw_json_parser::material::Material>(&config) {
+        match export::<dfraw_parser::tags::SeasonTag>(&config) {
             Ok(x) => x,
             Err(e) => {
-                eprintln!("Failed to export material::Material");
+                eprintln!("Failed to export dfraw_parser::tags::SeasonTag");
                 eprintln!("{e:?}");
                 String::new()
             }
         },
-        match export::<dfraw_json_parser::material::FuelTypeToken>(&config) {
+        match export::<dfraw_parser::tags::SelectCreatureRuleTag>(&config) {
             Ok(x) => x,
             Err(e) => {
-                eprintln!("Failed to export material::FuelTypeToken");
+                eprintln!("Failed to export dfraw_parser::tags::SelectCreatureRuleTag");
                 eprintln!("{e:?}");
                 String::new()
             }
         },
-        match export::<dfraw_json_parser::material::PropertyToken>(&config) {
+        match export::<dfraw_parser::tags::ShrubTag>(&config) {
             Ok(x) => x,
             Err(e) => {
-                eprintln!("Failed to export material::PropertyToken");
+                eprintln!("Failed to export dfraw_parser::tags::ShrubTag");
                 eprintln!("{e:?}");
                 String::new()
             }
         },
-        match export::<dfraw_json_parser::material::StateToken>(&config) {
+        match export::<dfraw_parser::tags::SyndromeTag>(&config) {
             Ok(x) => x,
             Err(e) => {
-                eprintln!("Failed to export material::StateToken");
+                eprintln!("Failed to export dfraw_parser::tags::SyndromeTag");
                 eprintln!("{e:?}");
                 String::new()
             }
         },
-        match export::<dfraw_json_parser::material::TypeToken>(&config) {
+        match export::<dfraw_parser::tags::TilePageTag>(&config) {
             Ok(x) => x,
             Err(e) => {
-                eprintln!("Failed to export material::TypeToken");
+                eprintln!("Failed to export dfraw_parser::tags::TilePageTag");
                 eprintln!("{e:?}");
                 String::new()
             }
         },
-        match export::<dfraw_json_parser::material::UsageToken>(&config) {
+        match export::<dfraw_parser::tags::TreeTag>(&config) {
             Ok(x) => x,
             Err(e) => {
-                eprintln!("Failed to export material::UsageToken");
+                eprintln!("Failed to export dfraw_parser::tags::TreeTag");
                 eprintln!("{e:?}");
                 String::new()
             }
         },
-        match export::<dfraw_json_parser::material_template::MaterialTemplate>(&config) {
+        match export::<dfraw_parser::tags::TwigPlacementTag>(&config) {
             Ok(x) => x,
             Err(e) => {
-                eprintln!("Failed to export material_template::MaterialTemplate");
+                eprintln!("Failed to export dfraw_parser::tags::TwigPlacementTag");
                 eprintln!("{e:?}");
                 String::new()
             }
         },
-        match export::<dfraw_json_parser::plant::Plant>(&config) {
+        // Now for the parsed raw definitions
+        match export::<dfraw_parser::BodySize>(&config) {
             Ok(x) => x,
             Err(e) => {
-                eprintln!("Failed to export plant::Plant");
+                eprintln!("Failed to export dfraw_parser::BodySize");
                 eprintln!("{e:?}");
                 String::new()
             }
         },
-        match export::<dfraw_json_parser::plant::Token>(&config) {
+        match export::<dfraw_parser::Caste>(&config) {
             Ok(x) => x,
             Err(e) => {
-                eprintln!("Failed to export plant::Token");
+                eprintln!("Failed to export dfraw_parser::Caste");
                 eprintln!("{e:?}");
                 String::new()
             }
         },
-        match export::<dfraw_json_parser::plant_growth::PlantGrowth>(&config) {
+        match export::<dfraw_parser::Color>(&config) {
             Ok(x) => x,
             Err(e) => {
-                eprintln!("Failed to export plant_growth::PlantGrowth");
+                eprintln!("Failed to export dfraw_parser::Color");
                 eprintln!("{e:?}");
                 String::new()
             }
         },
-        match export::<dfraw_json_parser::plant_growth::Token>(&config) {
+        match export::<dfraw_parser::Creature>(&config) {
             Ok(x) => x,
             Err(e) => {
-                eprintln!("Failed to export plant_growth::Token");
+                eprintln!("Failed to export dfraw_parser::Creature");
                 eprintln!("{e:?}");
                 String::new()
             }
         },
-        match export::<dfraw_json_parser::plant_growth::TypeToken>(&config) {
+        match export::<dfraw_parser::CreatureEffect>(&config) {
             Ok(x) => x,
             Err(e) => {
-                eprintln!("Failed to export plant_growth::TypeTokenn");
+                eprintln!("Failed to export dfraw_parser::CreatureEffect");
                 eprintln!("{e:?}");
                 String::new()
             }
         },
-        match export::<dfraw_json_parser::plant_growth::PlantPartToken>(&config) {
+        match export::<dfraw_parser::CreatureVariation>(&config) {
             Ok(x) => x,
             Err(e) => {
-                eprintln!("Failed to export plant_growth::PlantPartToken");
+                eprintln!("Failed to export dfraw_parser::CreatureVariation");
                 eprintln!("{e:?}");
                 String::new()
             }
         },
-        match export::<dfraw_json_parser::position::Position>(&config) {
+        match export::<dfraw_parser::CustomGraphicExtension>(&config) {
             Ok(x) => x,
             Err(e) => {
-                eprintln!("Failed to export position::Position");
+                eprintln!("Failed to export dfraw_parser::CustomGraphicExtension");
                 eprintln!("{e:?}");
                 String::new()
             }
         },
-        match export::<dfraw_json_parser::position::Token>(&config) {
+        match export::<dfraw_parser::Dimensions>(&config) {
             Ok(x) => x,
             Err(e) => {
-                eprintln!("Failed to export position::Token");
+                eprintln!("Failed to export dfraw_parser::Dimensions");
                 eprintln!("{e:?}");
                 String::new()
             }
         },
-        match export::<dfraw_json_parser::seed_material::SeedMaterial>(&config) {
+        match export::<dfraw_parser::Entity>(&config) {
             Ok(x) => x,
             Err(e) => {
-                eprintln!("Failed to export seed_material::SeedMaterial");
+                eprintln!("Failed to export dfraw_parser::Entity");
                 eprintln!("{e:?}");
                 String::new()
             }
         },
-        match export::<dfraw_json_parser::select_creature::SelectCreature>(&config) {
+        match export::<dfraw_parser::Gait>(&config) {
             Ok(x) => x,
             Err(e) => {
-                eprintln!("Failed to export select_creature::SelectCreature");
+                eprintln!("Failed to export dfraw_parser::Gait");
                 eprintln!("{e:?}");
                 String::new()
             }
         },
-        match export::<dfraw_json_parser::select_creature::SelectRules>(&config) {
+        match export::<dfraw_parser::Graphic>(&config) {
             Ok(x) => x,
             Err(e) => {
-                eprintln!("Failed to export select_creature::SelectRules");
+                eprintln!("Failed to export dfraw_parser::Graphic");
                 eprintln!("{e:?}");
                 String::new()
             }
         },
-        match export::<dfraw_json_parser::shrub::Shrub>(&config) {
+        match export::<dfraw_parser::InfoFile>(&config) {
             Ok(x) => x,
             Err(e) => {
-                eprintln!("Failed to export shrub::Shru");
+                eprintln!("Failed to export dfraw_parser::InfoFile");
                 eprintln!("{e:?}");
                 String::new()
             }
         },
-        match export::<dfraw_json_parser::shrub::SeasonToken>(&config) {
+        match export::<dfraw_parser::Inorganic>(&config) {
             Ok(x) => x,
             Err(e) => {
-                eprintln!("Failed to export shrub::SeasonToken");
+                eprintln!("Failed to export dfraw_parser::Inorganic");
                 eprintln!("{e:?}");
                 String::new()
             }
         },
-        match export::<dfraw_json_parser::shrub::Token>(&config) {
+        match export::<dfraw_parser::Material>(&config) {
             Ok(x) => x,
             Err(e) => {
-                eprintln!("Failed to export shrub::Token");
+                eprintln!("Failed to export dfraw_parser::Material");
                 eprintln!("{e:?}");
                 String::new()
             }
         },
-        match export::<dfraw_json_parser::syndrome::Syndrome>(&config) {
+        match export::<dfraw_parser::MaterialMechanics>(&config) {
             Ok(x) => x,
             Err(e) => {
-                eprintln!("Failed to export syndrome::Syndrome");
+                eprintln!("Failed to export dfraw_parser::MaterialMechanics");
                 eprintln!("{e:?}");
                 String::new()
             }
         },
-        match export::<dfraw_json_parser::syndrome::Token>(&config) {
+        match export::<dfraw_parser::MaterialTemplate>(&config) {
             Ok(x) => x,
             Err(e) => {
-                eprintln!("Failed to export syndrome::Token");
+                eprintln!("Failed to export dfraw_parser::MaterialTemplate");
                 eprintln!("{e:?}");
                 String::new()
             }
         },
-        match export::<dfraw_json_parser::tree::Tree>(&config) {
+        match export::<dfraw_parser::MechanicalProperties>(&config) {
             Ok(x) => x,
             Err(e) => {
-                eprintln!("Failed to export tree::Tree");
+                eprintln!("Failed to export dfraw_parser::MechanicalProperties");
                 eprintln!("{e:?}");
                 String::new()
             }
         },
-        match export::<dfraw_json_parser::tree::Token>(&config) {
+        match export::<dfraw_parser::Milkable>(&config) {
             Ok(x) => x,
             Err(e) => {
-                eprintln!("Failed to export tree::Token");
+                eprintln!("Failed to export dfraw_parser::Milkable");
                 eprintln!("{e:?}");
                 String::new()
             }
         },
-        match export::<dfraw_json_parser::tree::TwigPlacementToken>(&config) {
+        match export::<dfraw_parser::Name>(&config) {
             Ok(x) => x,
             Err(e) => {
-                eprintln!("Failed to export tree::TwigPlacementToken");
+                eprintln!("Failed to export dfraw_parser::Name");
                 eprintln!("{e:?}");
                 String::new()
             }
         },
-        match export::<dfraw_json_parser::unprocessed_raw::UnprocessedRaw>(&config) {
+        match export::<dfraw_parser::Plant>(&config) {
             Ok(x) => x,
             Err(e) => {
-                eprintln!("Failed to export unprocessed_raw::UnprocessedRaw");
+                eprintln!("Failed to export dfraw_parser::Plant");
                 eprintln!("{e:?}");
                 String::new()
             }
         },
-        match export::<dfraw_json_parser::unprocessed_raw::Modification>(&config) {
+        match export::<dfraw_parser::PlantGrowth>(&config) {
             Ok(x) => x,
             Err(e) => {
-                eprintln!("Failed to export unprocessed_raw::Modification");
+                eprintln!("Failed to export dfraw_parser::PlantGrowth");
                 eprintln!("{e:?}");
                 String::new()
             }
         },
-        match export::<dfraw_json_parser::parser::MaterialMechanics>(&config) {
+        match export::<dfraw_parser::Position>(&config) {
             Ok(x) => x,
             Err(e) => {
-                eprintln!("Failed to export parser::MaterialMechanics");
+                eprintln!("Failed to export dfraw_parser::Position");
                 eprintln!("{e:?}");
                 String::new()
             }
         },
-        match export::<dfraw_json_parser::parser::RawMetadata>(&config) {
+        match export::<dfraw_parser::SeedMaterial>(&config) {
             Ok(x) => x,
             Err(e) => {
-                eprintln!("Failed to export parser::RawMetadata");
+                eprintln!("Failed to export dfraw_parser::SeedMaterial");
                 eprintln!("{e:?}");
                 String::new()
             }
         },
-        match export::<dfraw_json_parser::parser::ModuleInfoFile>(&config) {
+        match export::<dfraw_parser::SelectCreature>(&config) {
             Ok(x) => x,
             Err(e) => {
-                eprintln!("Failed to export parser::ModuleInfoFile");
+                eprintln!("Failed to export dfraw_parser::SelectCreature");
                 eprintln!("{e:?}");
                 String::new()
             }
         },
-        match export::<dfraw_json_parser::parser::SteamData>(&config) {
+        match export::<dfraw_parser::Shrub>(&config) {
             Ok(x) => x,
             Err(e) => {
-                eprintln!("Failed to export parser::SteamData");
+                eprintln!("Failed to export dfraw_parser::Shrub");
                 eprintln!("{e:?}");
                 String::new()
             }
         },
-        match export::<dfraw_json_parser::parser::StateName>(&config) {
+        match export::<dfraw_parser::SpriteGraphic>(&config) {
             Ok(x) => x,
             Err(e) => {
-                eprintln!("Failed to export parser::StateName");
+                eprintln!("Failed to export dfraw_parser::SpriteGraphic");
                 eprintln!("{e:?}");
                 String::new()
             }
         },
-        match export::<dfraw_json_parser::parser::MechanicalProperties>(&config) {
+        match export::<dfraw_parser::SpriteLayer>(&config) {
             Ok(x) => x,
             Err(e) => {
-                eprintln!("Failed to export parser::MechanicalProperties");
+                eprintln!("Failed to export dfraw_parser::SpriteLayer");
                 eprintln!("{e:?}");
                 String::new()
             }
         },
-        match export::<dfraw_json_parser::parser::Name>(&config) {
+        match export::<dfraw_parser::StateNames>(&config) {
             Ok(x) => x,
             Err(e) => {
-                eprintln!("Failed to export parser::Name");
+                eprintln!("Failed to export dfraw_parser::StateNames");
                 eprintln!("{e:?}");
                 String::new()
             }
         },
-        match export::<dfraw_json_parser::parser::SingPlurName>(&config) {
+        match export::<dfraw_parser::SteamData>(&config) {
             Ok(x) => x,
             Err(e) => {
-                eprintln!("Failed to export parser::SingPlurName");
+                eprintln!("Failed to export dfraw_parser::SteamData");
                 eprintln!("{e:?}");
                 String::new()
             }
         },
-        match export::<dfraw_json_parser::parser::ObjectType>(&config) {
+        match export::<dfraw_parser::Syndrome>(&config) {
             Ok(x) => x,
             Err(e) => {
-                eprintln!("Failed to export parser::ObjectType");
+                eprintln!("Failed to export dfraw_parser::Syndrome");
                 eprintln!("{e:?}");
                 String::new()
             }
         },
-        match export::<dfraw_json_parser::parser::RawModuleLocation>(&config) {
+        match export::<dfraw_parser::Temperatures>(&config) {
             Ok(x) => x,
             Err(e) => {
-                eprintln!("Failed to export parser::RawModuleLocation");
+                eprintln!("Failed to export dfraw_parser::Temperatures");
                 eprintln!("{e:?}");
                 String::new()
             }
         },
-        match export::<dfraw_json_parser::parser::BodySize>(&config) {
+        match export::<dfraw_parser::Tile>(&config) {
             Ok(x) => x,
             Err(e) => {
-                eprintln!("Failed to export parser::BodySize");
+                eprintln!("Failed to export dfraw_parser::Tile");
                 eprintln!("{e:?}");
                 String::new()
             }
         },
-        match export::<dfraw_json_parser::parser::Color>(&config) {
+        match export::<dfraw_parser::TilePage>(&config) {
             Ok(x) => x,
             Err(e) => {
-                eprintln!("Failed to export parser::Color");
+                eprintln!("Failed to export dfraw_parser::TilePage");
                 eprintln!("{e:?}");
                 String::new()
             }
         },
-        match export::<dfraw_json_parser::parser::Milkable>(&config) {
+        match export::<dfraw_parser::Tree>(&config) {
             Ok(x) => x,
             Err(e) => {
-                eprintln!("Failed to export parser::Milkable");
+                eprintln!("Failed to export dfraw_parser::Tree");
                 eprintln!("{e:?}");
                 String::new()
             }
         },
-        match export::<dfraw_json_parser::parser::Temperatures>(&config) {
+        // Now for the metadata
+        match export::<dfraw_parser::metadata::ObjectType>(&config) {
             Ok(x) => x,
             Err(e) => {
-                eprintln!("Failed to export parser::Temperatures");
+                eprintln!("Failed to export dfraw_parser::metadata::ObjectType");
                 eprintln!("{e:?}");
                 String::new()
             }
         },
-        match export::<dfraw_json_parser::parser::Tile>(&config) {
+        match export::<dfraw_parser::metadata::ParserOptions>(&config) {
             Ok(x) => x,
             Err(e) => {
-                eprintln!("Failed to export parser::Tile");
+                eprintln!("Failed to export dfraw_parser::metadata::ParserOptions");
                 eprintln!("{e:?}");
                 String::new()
             }
         },
-        match export::<dfraw_json_parser::parser::graphics::Dimensions>(&config) {
+        match export::<dfraw_parser::metadata::RawModuleLocation>(&config) {
             Ok(x) => x,
             Err(e) => {
-                eprintln!("Failed to export parser::graphics::Dimensions");
+                eprintln!("Failed to export dfraw_parser::metadata::RawModuleLocation");
                 eprintln!("{e:?}");
                 String::new()
             }
         },
-        match export::<dfraw_json_parser::parser::graphics::CustomGraphicExtension>(&config) {
+        match export::<dfraw_parser::metadata::RawMetadata>(&config) {
             Ok(x) => x,
             Err(e) => {
-                eprintln!("Failed to export parser::graphics::CustomGraphicExtension");
+                eprintln!("Failed to export dfraw_parser::metadata::RawMetadata");
                 eprintln!("{e:?}");
                 String::new()
             }
         },
-        match export::<dfraw_json_parser::ParserOptions>(&config) {
+        match export::<dfraw_parser::metadata::TagComplexity>(&config) {
             Ok(x) => x,
             Err(e) => {
-                eprintln!("Failed to export parser::graphics::CustomGraphicExtension");
+                eprintln!("Failed to export dfraw_parser::metadata::TagComplexity");
                 eprintln!("{e:?}");
                 String::new()
             }
@@ -712,10 +714,10 @@ fn export_tauri_ts_bindings() {
             }
         },
         // add the needed type RawModuleLocation
-        match export::<dfraw_json_parser::parser::RawModuleLocation>(&config) {
+        match export::<dfraw_parser::metadata::RawModuleLocation>(&config) {
             Ok(x) => x,
             Err(e) => {
-                eprintln!("Failed to export parser::RawModuleLocation");
+                eprintln!("Failed to export dfraw_parser::metadata::RawModuleLocation");
                 eprintln!("{e:?}");
                 String::new()
             }

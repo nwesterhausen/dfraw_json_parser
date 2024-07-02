@@ -43,6 +43,10 @@ enum Parent {
 /// # Returns
 ///
 /// A vector of boxed dynamic `RawObject` trait objects.
+///
+/// # Errors
+///
+/// Returns a `ParserError` if there is an issue reading the file or parsing the file.
 pub fn parse_legends_export<P: AsRef<Path>>(
     input_path: &P,
     options: &ParserOptions,

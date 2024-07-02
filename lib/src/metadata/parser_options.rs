@@ -20,7 +20,8 @@ use super::{ObjectType, RawModuleLocation};
 ///
 /// ```rust
 /// use std::path::PathBuf;
-/// use dfraw_json_parser::{ParserOptions, RawObject, ObjectType, RawModuleLocation};
+/// use dfraw_parser::metadata::{ParserOptions, ObjectType, RawModuleLocation};
+/// use dfraw_parser::traits::RawObject;
 ///
 /// let mut options = ParserOptions::new("path/to/dwarf_fortress");
 /// options.add_location_to_parse(RawModuleLocation::Vanilla);
@@ -221,7 +222,7 @@ impl ParserOptions {
     /// This is a convenience function that is equivalent to:
     ///
     /// ```rust
-    /// use dfraw_json_parser::{ParserOptions, ObjectType};
+    /// use dfraw_parser::metadata::{ParserOptions, ObjectType};
     ///
     /// let mut options = ParserOptions::new("path/to/dwarf_fortress");
     /// options.add_object_type_to_parse(ObjectType::Graphics);

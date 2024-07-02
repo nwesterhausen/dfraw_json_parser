@@ -5,7 +5,7 @@
 /**
  * An enum representing a biome.
  */
-export type Biome =
+export type BiomeTag =
 	/**
 	 * A mountain biome.
 	 */
@@ -338,1173 +338,6 @@ export type Biome =
 	 * An unknown token
 	 */
 	| "Unknown";
-
-/**
- * The `Creature` struct represents a creature in a Dwarf Fortress, with the properties
- * that can be set in the raws. Not all the raws are represented here, only the ones that
- * are currently supported by the library.
- *
- * Some items like `CREATURE_VARIATION` and `CREATURE_VARIATION_CASTE` are saved in their raw
- * format. `SELECT_CREATURE` is saved here as a sub-creature object with all the properties
- * from that raw. This is because the `SELECT_CREATURE` raws are used to create new creatures
- * based on the properties of the creature they are applied to. But right now the application
- * of those changes is not applied, in order to preserve the original creature. So instead,
- * they are saved and can be applied later (at the consumer's discretion).
- */
-export type Creature = {
-	/**
-	 * The `metadata` field is of type `RawMetadata` and is used to provide additional information
-	 * about the raws the `Creature` is found in.
-	 */
-	metadata?: Metadata | null;
-	/**
-	 * The `identifier` field is a string that represents the identifier of the creature. It is used
-	 * to uniquely identify the creature (however it is not guaranteed to be unique across object types
-	 * or all raws parsed, *especially* if you are parsing multiple versions of the same raws).
-	 */
-	identifier: string;
-	/**
-	 * The `castes` field is a vector of `Caste` objects. Each `Caste` object represents a caste of the
-	 * creature. For example, a creature may have a `MALE` and `FEMALE` caste. Each `Caste` object has
-	 * its own properties, such as `name`, `description`, `body`, `flags`, etc.
-	 *
-	 * A lot of the properties of the `Creature` object are actually properties of a special `Caste`, `ALL`.
-	 */
-	castes: Caste[];
-	/**
-	 * Any tags that are not parsed into their own fields are stored in the `tags` field.
-	 */
-	tags?: CreatureTag[] | null;
-	/**
-	 * The biomes that this creature can be found in
-	 */
-	biomes?: Biome[] | null;
-	/**
-	 * Pref strings are things that make dwarves (or others?) like or dislike the creature.
-	 */
-	prefStrings?: string[] | null;
-	/**
-	 * The tile that represents the creature in the game (classic mode)
-	 */
-	tile?: Tile | null;
-	/**
-	 * Determines the chances of a creature appearing within its environment, with higher values resulting in more frequent appearance.
-	 *
-	 * Also affects the chance of a creature being brought in a caravan for trading. The game effectively considers all creatures that
-	 * can possibly appear and uses the FREQUENCY value as a weight - for example, if there are three creatures with frequencies 10/25/50,
-	 * the creature with `[FREQUENCY:50]` will appear approximately 58.8% of the time.
-	 *
-	 * Defaults to 50 if not specified.
-	 *
-	 * Minimum value is 0, maximum value is 100.
-	 *
-	 * Note: not to be confused with `[POP_RATIO]`.
-	 */
-	frequency?: number | null;
-	/**
-	 * The minimum/maximum numbers of how many creatures per spawned cluster. Vermin fish with this token in combination with
-	 * temperate ocean and river biome tokens will perform seasonal migrations.
-	 *
-	 * Defaults to [1,1] if not specified.
-	 */
-	clusterNumber?: [number, number] | null;
-	/**
-	 * The minimum/maximum numbers of how many of these creatures are present in each world map tile of the appropriate region.
-	 *
-	 * Defaults to [1,1] if not specified.
-	 */
-	populationNumber?: [number, number] | null;
-	/**
-	 * Depth that the creature appears underground. Numbers can be from 0 to 5. 0 is actually 'above ground' and can be used if the
-	 * creature is to appear both above and below ground. Values from 1-3 are the respective cavern levels, 4 is the magma sea and
-	 * 5 is the HFS.
-	 *
-	 * A single argument may be used instead of min and max.
-	 *
-	 * Civilizations that can use underground plants or animals will only export (via the embark screen or caravans) things that are available at depth 1.
-	 *
-	 * Default [0, 0] (aboveground)
-	 */
-	undergroundDepth?: [number, number] | null;
-	/**
-	 * Like `[BABYNAME]`, but applied regardless of caste.
-	 */
-	generalBabyName?: SingPlurName | null;
-	/**
-	 * Like `[CHILDNAME]`, but applied regardless of caste.
-	 */
-	generalChildName?: SingPlurName | null;
-	/**
-	 * The generic name for any creature of this type - will be used when distinctions between caste are unimportant. For names for specific castes,
-	 * use `[CASTE_NAME]` instead. If left undefined, the creature will be labeled as "nothing" by the game.
-	 */
-	name: Name;
-	/**
-	 * Copies another specified creature. This will override any definitions made before it; essentially, it makes this creature identical to the other one,
-	 * which can then be modified. Often used in combination with `[APPLY_CREATURE_VARIATION]` to import standard variations from a file.
-	 *
-	 * The vanilla giant animals and animal peoples are examples of this token combination.
-	 */
-	copyTagsFrom?: string | null;
-	/**
-	 * Applies the specified creature variation.
-	 *
-	 * These are stored "in the raw", i.e. how they appear in the raws. They are not handled until the end of the parsing process.
-	 */
-	applyCreatureVariation?: string[] | null;
-	/**
-	 * A generated field that is used to uniquely identify this object. It is generated from the `metadata`, `identifier`, and `ObjectType`.
-	 *
-	 * This field is always serialized.
-	 */
-	objectId: string;
-	/**
-	 * Various `SELECT_CREATUR` modifications.
-	 */
-	selectCreatureVariation?: SelectCreature[] | null;
-};
-
-/**
- * An enum representing a creature tag.
- */
-export type CreatureTag =
-	/**
-	 * If set, the creature will blink between its `[Tile]` and its `[AltTile]`.
-	 *
-	 * Arguments:
-	 *
-	 * - the 'character' or tile number
-	 *
-	 * Appears as `ALTTILE:123`
-	 */
-	| {
-			AltTile: {
-				/**
-				 * The character or tile number
-				 */
-				character: number;
-			};
-	  }
-	/**
-	 * Applies the specified creature variation with the given arguments to the creature. See `[ApplyCreatureVariation]` for more information.
-	 *
-	 * Appears as `APPLY_CREATURE_VARIATION:SOME_VARIATION` or `APPLY_CREATURE_VARIATION:SOME_VARIATION:ARG1:ARG2:ARG3`
-	 */
-	| {
-			ApplyCreatureVariation: {
-				/**
-				 * Creature variation ID to apply
-				 */
-				id: string;
-				/**
-				 * (Optional) any number of arguments to pass to the creature variation
-				 */
-				args: string[];
-			};
-	  }
-	/**
-	 * Applies the effects of all pending `[CV_ADD_TAG]` and `[CV_REMOVE_TAG]` tokens that have been defined in the current creature (so far).
-	 *
-	 * Appears as `APPLY_CURRENT_CREATURE_VARIATION`
-	 */
-	| "ApplyCurrentCreatureVariation"
-	/**
-	 * Enables the creature to be kept in artificial hives by beekeepers.
-	 *
-	 * Appears as `ARTIFICIAL_HIVEABLE`
-	 */
-	| "ArtificialHiveable"
-	/**
-	 * Select a biome the creature may appear in.
-	 *
-	 * Appears as `BIOME:SomeBiomeId`
-	 */
-	| {
-			Biome: {
-				/**
-				 * Biome identifier
-				 */
-				id: string;
-			};
-	  }
-	/**
-	 * Defines a caste
-	 */
-	| {
-			Caste: {
-				/**
-				 * The name of the caste
-				 */
-				name: string;
-			};
-	  }
-	/**
-	 * Multiplies frequency by a factor of (integer)%.
-	 *
-	 * Appears as `CHANGE_FREQUENCY_PERC:100`
-	 */
-	| {
-			ChangeFrequencyPercent: {
-				/**
-				 * The percentage to change the frequency by
-				 */
-				percent: number;
-			};
-	  }
-	/**
-	 * The minimum/maximum numbers of how many creatures per spawned cluster. Vermin fish with this token in
-	 * combination with temperate ocean and river biome tokens will perform seasonal migrations.
-	 *
-	 * Defaults to 1:1 if not specified.
-	 *
-	 * Appears as `CLUSTER_NUMBER:1:1`
-	 */
-	| {
-			ClusterNumber: {
-				/**
-				 * The minimum number of creatures per spawned cluster
-				 */
-				min: number;
-				/**
-				 * The maximum number of creatures per spawned cluster
-				 */
-				max: number;
-			};
-	  }
-	/**
-	 * Copies another specified creature. This will override any definitions made before it; essentially, it makes this creature identical to the other one, which can then
-	 * be modified. Often used in combination with `[APPLY_CREATURE_VARIATION]` to import standard variations from a file. The vanilla giant animals and animal peoples are
-	 * examples of this token combination.
-	 *
-	 * Arguments:
-	 *
-	 * * `creature`: The identifier of the creature to copy
-	 *
-	 * Appears as `COPY_TAGS_FROM:SomeCreature`
-	 */
-	| {
-			CopyTagsFrom: {
-				/**
-				 * The identifier of the creature to copy
-				 */
-				creature: string;
-			};
-	  }
-	/**
-	 * Creatures active in their civilization's military will use this tile instead.
-	 *
-	 * Appears as `CREATURE_SOLDIER_TILE:123`
-	 */
-	| {
-			CreatureSoldierTile: {
-				/**
-				 * The character or tile number
-				 */
-				character: number;
-			};
-	  }
-	/**
-	 * The symbol of the creature in ASCII mode.
-	 *
-	 * Appears as `CREATURE_TILE:123`
-	 */
-	| {
-			CreatureTile: {
-				/**
-				 * The character or tile number
-				 */
-				character: number;
-			};
-	  }
-	/**
-	 * The color of the creature's tile.
-	 *
-	 * Arguments:
-	 *
-	 * * `foreground`: The foreground color
-	 * * `background`: The background color
-	 * * `brightness`: The brightness of the color
-	 *
-	 * Appears as `COLOR:0:0:0`
-	 */
-	| {
-			Color: {
-				/**
-				 * The foreground color
-				 */
-				foreground: number;
-				/**
-				 * The background color
-				 */
-				background: number;
-				/**
-				 * The brightness of the color
-				 */
-				brightness: number;
-			};
-	  }
-	/**
-	 * Adding this token to a creature prevents it from appearing in generated worlds (unless it's marked as always present for a particular
-	 * civilization). For example, adding it to dogs will lead to worlds being generated without dogs in them. Also removes the creature from the
-	 * object testing arena's spawn list. If combined with [Fanciful], artistic depictions of the creature will occur regardless. Used by centaurs,
-	 * chimeras and griffons in the vanilla game.
-	 *
-	 * Appears as `DOES_NOT_EXIST`
-	 */
-	| "DoesNotExist"
-	/**
-	 * Makes the creature appear as a large 3x3 wagon responsible for carrying trade goods, pulled by two `[WAGON_PULLER]` creatures and driven by a merchant.
-	 *
-	 * Appears as `EQUIPMENT_WAGON`
-	 */
-	| "EquipmentWagon"
-	/**
-	 * The creature is considered evil and will only show up in evil biomes. Civilizations with `[EntityToken::UseEvilAnimals]` can domesticate them
-	 * regardless of exotic status. Has no effect on cavern creatures except to restrict taming. A civilization with evil creatures can colonize evil areas.
-	 *
-	 * Appears as `EVIL`
-	 */
-	| "Evil"
-	/**
-	 * The creature is a thing of legend and known to all civilizations. Its materials cannot be requested or preferred. The tag also adds some art value modifiers.
-	 * Used by a number of creatures. Conflicts with `[CasteToken::CommonDomestic]`.
-	 */
-	| "Fanciful"
-	/**
-	 * Determines the chances of a creature appearing within its environment, with higher values resulting in more frequent appearance. Also affects the chance of a
-	 * creature being brought in a caravan for trading. The game effectively considers all creatures that can possibly appear and uses the FREQUENCY value as a weight
-	 *
-	 * For example, if there are three creatures with frequencies 10/25/50, the creature with [FREQUENCY:50] will appear approximately 58.8% of the time.
-	 *
-	 * Defaults to 50 if not specified. Not to be confused with `[PopulationRatio]`.
-	 *
-	 * Appears as `FREQUENCY:50`
-	 */
-	| {
-			Frequency: {
-				/**
-				 * The frequency of the creature, a number between 0 and 100 (inclusive)
-				 */
-				frequency: number;
-			};
-	  }
-	/**
-	 * Name of the creatures baby form. Applies to all castes but can be overridden by `[CasteToken::BabyName]`.
-	 *
-	 * Appears as `GENERAL_BABY_NAME:BabyName:BabyNames`
-	 */
-	| {
-			GeneralBabyName: {
-				/**
-				 * The name of the baby
-				 */
-				singular: string;
-				/**
-				 * The plural name of the baby
-				 */
-				plural: string;
-			};
-	  }
-	/**
-	 * Name of the creatures child form. Applies to all castes but can be overridden by `[CasteToken::ChildName]`.
-	 *
-	 * Appears as `GENERAL_CHILD_NAME:ChildName:ChildNames`
-	 */
-	| {
-			GeneralChildName: {
-				/**
-				 * The name of the child
-				 */
-				singular: string;
-				/**
-				 * The plural name of the child
-				 */
-				plural: string;
-			};
-	  }
-	/**
-	 * Found on procedurally generated creatures like forgotten beasts, titans, demons, angels, and night creatures. Cannot be specified in user-defined raws.
-	 *
-	 * Appears as `GENERATED`
-	 */
-	| "Generated"
-	/**
-	 * The color of the creature's glow tile.
-	 *
-	 * Arguments:
-	 *
-	 * * `foreground`: The foreground color
-	 * * `background`: The background color
-	 * * `brightness`: The brightness of the color
-	 *
-	 * Appears as `GLOWCOLOR:0:0:0`
-	 */
-	| {
-			GlowColor: {
-				/**
-				 * The foreground color
-				 */
-				foreground: number;
-				/**
-				 * The background color
-				 */
-				background: number;
-				/**
-				 * The brightness of the color
-				 */
-				brightness: number;
-			};
-	  }
-	/**
-	 * The creature's tile when it is glowing.
-	 *
-	 * Arguments:
-	 *
-	 * * `character`: The character or tile number
-	 *
-	 * Appears as `GLOWTILE:123`
-	 */
-	| {
-			GlowTile: {
-				/**
-				 * The character or tile number
-				 */
-				character: number;
-			};
-	  }
-	/**
-	 * Creature is considered good and will only show up in good biomes - unicorns, for example. Civilizations with `[EntityToken::UseGoodAnimals]` can
-	 * domesticate them regardless of exotic status. Has no effect on cavern creatures except to restrict taming. A civilization that has good
-	 * creatures can colonize good areas in world-gen.
-	 *
-	 * Appears as `GOOD`
-	 */
-	| "Good"
-	/**
-	 * When using tags from an existing creature, inserts new tags at the end of the creature.
-	 *
-	 * Appears as `GO_TO_END`
-	 */
-	| "GoToEnd"
-	/**
-	 * When using tags from an existing creature, inserts new tags at the beginning of the creature.
-	 *
-	 * Appears as `GO_TO_START`
-	 */
-	| "GoToStart"
-	/**
-	 * When using tags from an existing creature, inserts new tags after the specified tag.
-	 *
-	 * Arguments:
-	 *
-	 * * `tag`: The tag to insert after
-	 *
-	 * Appears as `GO_TO_TAG:TAG`
-	 */
-	| {
-			GoToTag: {
-				/**
-				 * The tag to insert after
-				 */
-				tag: string;
-			};
-	  }
-	/**
-	 * What product is harvested from beekeeping.
-	 *
-	 * Arguments:
-	 *
-	 * * `number`: The number of products harvested
-	 * * `time`: The time it takes before the next harvest
-	 * * `item tokens`: The item tokens that are harvested (some arbitrary list of items)
-	 *
-	 * Appears as `HARVEST_PRODUCT:1:1:ITEM_TOKENS`
-	 */
-	| {
-			HarvestProduct: {
-				/**
-				 * The number of products harvested
-				 */
-				number: number;
-				/**
-				 * The time it takes before the next harvest
-				 */
-				time: number;
-				/**
-				 * The item tokens that are harvested (some arbitrary list of items)
-				 */
-				item_tokens: string[];
-			};
-	  }
-	/**
-	 * This is the core requisite tag allowing the creature to spawn as a wild animal in the appropriate biomes. Requires specifying a [Biome] in which the creature will spawn.
-	 * Does not require specifying a frequency, population number, or cluster number.
-	 *
-	 * This tag stacks with `[CasteToken::Megabeast]`, `[CasteToken::SemiMegabeast]`, or `[CasteToken::NightCreatureHunter]`; if used with one of these tags, the creature will spawn
-	 * as both a boss and as a wild animal. This tag does not stack with `[CasteToken::FeatureBeast]` and if both are used the creature will not spawn. This tag is unaffected by
-	 * `[CasteToken::Demon]`.
-	 *
-	 * Appears as `LARGE_ROAMING`
-	 */
-	| "LargeRoaming"
-	/**
-	 * Allows you to play as a wild animal of this species in adventurer mode. Prevents trading of (tame) instances of this creature in caravans.
-	 *
-	 * Appears as `LOCAL_POPS_CONTROLLABLE`
-	 */
-	| "LocalPopsControllable"
-	/**
-	 * Wild animals of this species may occasionally join a civilization. Prevents trading of (tame) instances of this creature in caravans.
-	 *
-	 * Appears as `LOCAL_POPS_PRODUCE_HEROES`
-	 */
-	| "LocalPopsProduceHeroes"
-	/**
-	 * The creatures will scatter if they have this tag, or form tight packs if they don't.
-	 *
-	 * Appears as `LOOSE_CLUSTERS`
-	 */
-	| "LooseClusters"
-	/**
-	 * Marks if the creature is an actual real-life creature. Only used for age-names at present.
-	 */
-	| "Mundane"
-	/**
-	 * The generic name for any creature of this type - will be used when distinctions between caste are unimportant. For names for specific castes, use `[CASTE_NAME]` instead.
-	 * If left undefined, the creature will be labeled as "nothing" by the game.
-	 *
-	 * Appears as `NAME:Name:Names:NameAdj`
-	 */
-	| {
-			Name: {
-				/**
-				 * The name of the creature
-				 */
-				name: string;
-				/**
-				 * The plural name of the creature
-				 */
-				plural_name: string;
-				/**
-				 * The adjective form of the creature's name
-				 */
-				adjective: string;
-			};
-	  }
-	/**
-	 * Adds a material to selected materials. Used immediately after `[SELECT_MATERIAL]`.
-	 *
-	 * Appears as `PLUS_MATERIAL:Material`
-	 */
-	| {
-			PlusMaterial: {
-				/**
-				 * The material to add
-				 */
-				material: string;
-			};
-	  }
-	/**
-	 * The minimum/maximum numbers of how many of these creatures are present in each world map tile of the appropriate region. Defaults to 1:1 if not specified.
-	 *
-	 * Appears as `POPULATION_NUMBER:1:1`
-	 */
-	| {
-			PopulationNumber: {
-				/**
-				 * The minimum number of creatures per spawned cluster
-				 */
-				min: number;
-				/**
-				 * The maximum number of creatures per spawned cluster
-				 */
-				max: number;
-			};
-	  }
-	/**
-	 * Sets what other creatures prefer about this creature.
-	 *
-	 * "Urist likes dwarves for their beards."
-	 *
-	 * Multiple entries will be chosen from at random. Creatures lacking a PREFSTRING token will never appear under another's preferences.
-	 *
-	 * Appears as `PREFSTRING:PrefString`
-	 */
-	| {
-			PrefString: {
-				/**
-				 * The preference string
-				 */
-				pref_string: string;
-			};
-	  }
-	/**
-	 * The generic name for members of this profession, at the creature level. In order to give members of specific castes different names for professions,
-	 * use `[CASTE_PROFESSION_NAME]` instead.
-	 *
-	 * Appears as `PROFESSION_NAME:ProfessionId:ProfessionName:ProfessionNames`
-	 */
-	| {
-			ProfessionName: {
-				/**
-				 * The profession id
-				 */
-				id: string;
-				/**
-				 * The name of the profession
-				 */
-				name: string;
-				/**
-				 * The plural name of the profession
-				 */
-				plural_name: string;
-			};
-	  }
-	/**
-	 * Removes a material from the creature.
-	 *
-	 * Appears as `REMOVE_MATERIAL:Material`
-	 */
-	| {
-			RemoveMaterial: {
-				/**
-				 * The material to remove
-				 */
-				material: string;
-			};
-	  }
-	/**
-	 * Removes a tissue from the creature.
-	 *
-	 * Appears as `REMOVE_TISSUE:Tissue`
-	 */
-	| {
-			RemoveTissue: {
-				/**
-				 * The tissue to remove
-				 */
-				tissue: string;
-			};
-	  }
-	/**
-	 * The creature will only show up in "savage" biomes. Has no effect on cavern creatures. Cannot be combined with [GOOD] or [EVIL].
-	 *
-	 * Appears as `SAVAGE`
-	 */
-	| "Savage"
-	/**
-	 * Adds an additional previously defined caste to the selection. Used after `[SELECT_CASTE]`.
-	 *
-	 * Appears as `SELECT_ADDITIONAL_CASTE:Caste`
-	 */
-	| {
-			SelectAdditionalCaste: {
-				/**
-				 * The caste to add
-				 */
-				caste: string;
-			};
-	  }
-	/**
-	 * Selects a previously defined caste
-	 *
-	 * Appears as `SELECT_CASTE:Caste`
-	 */
-	| {
-			SelectCaste: {
-				/**
-				 * The caste to select
-				 */
-				caste: string;
-			};
-	  }
-	/**
-	 * Selects a locally defined material. Can be ALL.
-	 *
-	 * Appears as `SELECT_MATERIAL:Material`
-	 */
-	| {
-			SelectMaterial: {
-				/**
-				 * The material to select
-				 */
-				material: string;
-			};
-	  }
-	/**
-	 * Selects a tissue for editing.
-	 *
-	 * Appears as `SELECT_TISSUE:Tissue`
-	 */
-	| {
-			SelectTissue: {
-				/**
-				 * The tissue to select
-				 */
-				tissue: string;
-			};
-	  }
-	/**
-	 * Boasting speeches relating to killing this creature. Examples include `text_dwarf.txt` and `text_elf.txt` in `data\vanilla\vanilla_creatures\objects`.
-	 *
-	 * Appears as `SLAIN_CASTE:SomeSpeechSet`
-	 */
-	| {
-			SlainSpeech: {
-				/**
-				 * The speech set to use
-				 */
-				slain_speech: string;
-			};
-	  }
-	/**
-	 * Determines how keen a creature's sense of smell is - lower is better. At 10000, a creature cannot smell at all.
-	 *
-	 * Appears as `SMELL_TRIGGER:10000`
-	 */
-	| {
-			SmellTrigger: {
-				/**
-				 * The smell trigger
-				 */
-				smell_trigger: number;
-			};
-	  }
-	/**
-	 * If this creature is active in its civilization's military, it will blink between its default tile and this one.
-	 *
-	 * Appears as `SOLDIER_ALTTILE:SomeTile`
-	 */
-	| {
-			SoldierAltTile: {
-				/**
-				 * The tile to use
-				 */
-				tile: string;
-			};
-	  }
-	/**
-	 * Found on generated angels. This is the historical figure ID of the deity with which the angel is associated. Since HFIDs are not predictable before worldgen,
-	 * this isn't terribly usable in mods.
-	 *
-	 * Appears as `SOURCE_HFID:123`
-	 */
-	| {
-			SourceHfid: {
-				/**
-				 * The historical figure ID
-				 */
-				hfid: number;
-			};
-	  }
-	/**
-	 * Sets what religious spheres the creature is aligned to, for purposes of being worshipped via the [POWER] token. Also affects the layout of hidden fun stuff,
-	 * and the creature's name.
-	 *
-	 * Appears as `SPHERE:SomeSphere`
-	 */
-	| {
-			Sphere: {
-				/**
-				 * The sphere to use
-				 */
-				sphere: string;
-			};
-	  }
-	/**
-	 * Begins defining a tissue in the creature file. Follow this with standard tissue definition tokens to define the tissue properties.
-	 *
-	 * Arguments:
-	 *
-	 * * `name`: The name of the tissue
-	 *
-	 * Appears as `TISSUE:SomeTissue`
-	 */
-	| {
-			Tissue: {
-				/**
-				 * The name of the tissue
-				 */
-				name: string;
-			};
-	  }
-	/**
-	 * A large swarm of vermin can be disturbed, usually in adventurer mode.
-	 *
-	 * Appears as `TRIGGERABLE_GROUP:5:10`
-	 */
-	| {
-			TriggerableGroup: {
-				/**
-				 * The minimum number of vermin in the swarm
-				 */
-				min: number;
-				/**
-				 * The maximum number of vermin in the swarm
-				 */
-				max: number;
-			};
-	  }
-	/**
-	 * Creature will occur in every region with the correct biome. Does not apply to [EVIL]/[GOOD] tags.
-	 *
-	 * Appears as `UBIQUITOUS`
-	 */
-	| "Ubiquitous"
-	/**
-	 * Depth that the creature appears underground. Numbers can be from 0 to 5. 0 is actually 'above ground' and can be used if the creature is to appear both above and below ground.
-	 * Values from 1-3 are the respective cavern levels, 4 is the magma sea and 5 is the HFS. A single argument may be used instead of min and max. Demons use only 5:5;
-	 * user-defined creatures with both this depth and [FLIER] will take part in the initial wave from the HFS alongside generated demons, but without [FLIER] they will only spawn from
-	 * the map edges. Civilizations that can use underground plants or animals will only export (via the embark screen or caravans) things that are available at depth 1.
-	 *
-	 * Arguments:
-	 *
-	 * * `min`: The minimum depth
-	 * * `max`: The maximum depth
-	 *
-	 * Appears as `UNDERGROUND_DEPTH:1:3`
-	 */
-	| {
-			UndergroundDepth: {
-				/**
-				 * The minimum depth
-				 */
-				min: number;
-				/**
-				 * The maximum depth
-				 */
-				max: number;
-			};
-	  }
-	/**
-	 * Defines a new caste derived directly from a previous caste. The new caste inherits all properties of the old one. The effect of this tag is automatic if one has not yet defined any castes:
-	 * "Any caste-level tag that occurs before castes are explicitly declared is saved up and placed on any caste that is declared later, unless the caste is explicitly derived from another caste."
-	 *
-	 * "When DF detects duplicate tokens in the raws of the same object, a failsafe seems to kick in; it takes the bottom-most of the duplicates, and disregards the others. In the case of tokens
-	 * added by a mod, it prioritizes the duplicate in the mod." This means that if a tag is defined in the base-caste and redefined in the derived caste, the derived tag overwrites the base tag.
-	 *
-	 * Arguments:
-	 *
-	 * * `caste`: The name of the new caste
-	 * * `original_caste`: The name of the original caste to copy
-	 *
-	 * Appears as `USE_CASTE:SomeCaste:SomeOriginalCaste`
-	 */
-	| {
-			UseCaste: {
-				/**
-				 * The name of the new caste
-				 */
-				caste: string;
-				/**
-				 * The name of the original caste to copy
-				 */
-				original_caste: string;
-			};
-	  }
-	/**
-	 * Defines a new local creature material and populates it with all properties defined in the specified local creature material.
-	 *
-	 * Arguments:
-	 *
-	 * * `material`: The name of the new material
-	 * * `original_material`: The name of the original material to copy
-	 *
-	 * Appears as `USE_MATERIAL:SomeMaterial:SomeOriginalMaterial`
-	 */
-	| {
-			UseMaterial: {
-				/**
-				 * The name of the new material
-				 */
-				material: string;
-				/**
-				 * The name of the original material to copy
-				 */
-				original_material: string;
-			};
-	  }
-	/**
-	 * Defines a new local creature material and populates it with all properties defined in the specified template. There seems to be a limit of 200 materials per creature.
-	 *
-	 * Arguments:
-	 *
-	 * * `material`: The name of the new material
-	 * * `template`: The name of the template to copy
-	 *
-	 * Appears as `USE_MATERIAL_TEMPLATE:SomeMaterial:SomeTemplate`
-	 */
-	| {
-			UseMaterialTemplate: {
-				/**
-				 * The name of the new material
-				 */
-				material: string;
-				/**
-				 * The name of the template to copy
-				 */
-				template: string;
-			};
-	  }
-	/**
-	 * Defines a new local creature tissue and populates it with all properties defined in the local tissue specified in the second argument.
-	 *
-	 * Arguments:
-	 *
-	 * * `tissue`: The name of the new tissue
-	 * * `original_tissue`: The name of the original tissue to copy
-	 *
-	 * Appears as `USE_TISSUE:SomeTissue:SomeOriginalTissue`
-	 */
-	| {
-			UseTissue: {
-				/**
-				 * The name of the new tissue
-				 */
-				tissue: string;
-				/**
-				 * The name of the original tissue to copy
-				 */
-				original_tissue: string;
-			};
-	  }
-	/**
-	 * Loads a tissue template listed in `OBJECT:TISSUE_TEMPLATE` files, such as `tissue_template_default.txt`.
-	 *
-	 * Arguments:
-	 *
-	 * * `tissue`: The name of the new tissue
-	 * * `template`: The name of the template to copy
-	 *
-	 * Appears as `USE_TISSUE_TEMPLATE:SomeTissue:SomeTemplate`
-	 */
-	| {
-			UseTissueTemplate: {
-				/**
-				 * The name of the new tissue
-				 */
-				tissue: string;
-				/**
-				 * The name of the template to copy
-				 */
-				template: string;
-			};
-	  }
-	/**
-	 * Changes the language of the creature into unintelligible 'kobold-speak', which creatures of other species will be unable to understand. If a civilized creature has this and is not
-	 * part of a [SKULKING] civ, it will tend to start wars with all nearby civilizations and will be unable to make peace treaties due to 'inability to communicate'.
-	 *
-	 * Appears as `UTTERNANCES`
-	 */
-	| "Utterances"
-	/**
-	 * The vermin creature will attempt to eat exposed food. See `[PENETRATEPOWER]`. Distinct from `[VERMIN_ROTTER]`.
-	 *
-	 * Appears as `VERMIN_EATER`
-	 */
-	| "VerminEater"
-	/**
-	 * The vermin appears in water and will attempt to swim around.
-	 *
-	 * Appears as `VERMIN_FISH`
-	 */
-	| "VerminFish"
-	/**
-	 * The creature appears in "general" surface ground locations. Note that this doesn't stop the creature from flying if it can (most vermin birds have this tag).
-	 *
-	 * Appears as `VERMIN_GROUNDER`
-	 */
-	| "VerminGrounder"
-	/**
-	 * The vermin are attracted to rotting stuff and loose food left in the open and cause unhappy thoughts to dwarves who encounter them. Present on flies, knuckle worms,
-	 * acorn flies, and blood gnats. Speeds up decay?
-	 *
-	 * Appears as `VERMIN_ROTTER`
-	 */
-	| "VerminRotter"
-	/**
-	 * The creature randomly appears near dirt or mud, and may be uncovered by creatures that have the `[ROOT_AROUND]` interaction such as geese and chickens.
-	 * Dwarves will ignore the creature when given the "Capture live land animal" task.
-	 *
-	 * Appears as `VERMIN_SOIL`
-	 */
-	| "VerminSoil"
-	/**
-	 * The vermin will appear in a single tile cluster of many vermin, such as a colony of ants.
-	 *
-	 * Appears as `VERMIN_SOIL_COLONY`
-	 */
-	| "VerminSoilColony"
-	/**
-	 * An unknown tag.
-	 */
-	| "Unknown"
-	/**
-	 * Mates to breed
-	 */
-	| "MatesToBreed"
-	/**
-	 * Has two genders
-	 */
-	| "TwoGenders"
-	/**
-	 * All castes are alive
-	 */
-	| "AllCastesAlive"
-	/**
-	 * Is a small race
-	 */
-	| "SmallRace"
-	/**
-	 * Occurs as an entity
-	 */
-	| "OccursAsEntityRace"
-	/**
-	 * Equipment used
-	 */
-	| "Equipment";
-
-/**
- * Gaits are a way to describe how a creature moves. Defined in the raws with:
- *
- * "GAIT:type:name:full speed:build up time:turning max:start speed:energy use"
- *
- * * use `NO_BUILD_UP` if you jump immediately to full speed
- *
- * these optional flags go at the end:
- *
- * * `LAYERS_SLOW` - fat/muscle layers slow the movement (muscle-slowing counter-acted by strength bonus)
- * * `STRENGTH` - strength attribute can speed/slow movement
- * * `AGILITY` - agility attribute can speed/slow movement
- * * `STEALTH_SLOWS:<n>` - n is percentage slowed
- * * it would be interesting to allow quirky attributes (like mental stats), but they aren't supported yet
- *
- * Examples:
- *
- * `[CV_NEW_TAG:GAIT:WALK:Sprint:!ARG4:10:3:!ARG2:50:LAYERS_SLOW:STRENGTH:AGILITY:STEALTH_SLOWS:50]`
- * `[CV_NEW_TAG:GAIT:WALK:Run:!ARG3:5:3:!ARG2:10:LAYERS_SLOW:STRENGTH:AGILITY:STEALTH_SLOWS:20]`
- * `[CV_NEW_TAG:GAIT:WALK:Jog:!ARG2:NO_BUILD_UP:5:LAYERS_SLOW:STRENGTH:AGILITY:STEALTH_SLOWS:10]`
- * `[CV_NEW_TAG:GAIT:WALK:Walk:!ARG1:NO_BUILD_UP:0]`
- * `[CV_NEW_TAG:GAIT:WALK:Stroll:!ARG5:NO_BUILD_UP:0]`
- * `[CV_NEW_TAG:GAIT:WALK:Creep:!ARG6:NO_BUILD_UP:0]`
- */
-export type Gait = {
-	/**
-	 * The type of gait
-	 */
-	gaitType: GaitType;
-	/**
-	 * The name of the gait
-	 */
-	name: string;
-	/**
-	 * The maximum speed achievable by a creature using this gait.
-	 */
-	maxSpeed: number;
-	/**
-	 * The energy use of the gait
-	 */
-	energyUse: number;
-	/**
-	 * The gait modifiers
-	 *
-	 * These are optional, and may be empty.
-	 */
-	modifiers: Modifier[];
-};
-
-/**
- * An enum representing a gait type.
- */
-export type GaitType =
-	/**
-	 * Travel on foot/the ground
-	 * Used for moving normally over ground tiles.
-	 */
-	| "walk"
-	/**
-	 * Travel on foot/the ground
-	 * Used for moving over ground tiles whilst prone.
-	 */
-	| "crawl"
-	/**
-	 * Climbing on walls, etc.
-	 * Used for moving whilst climbing.
-	 */
-	| "climb"
-	/**
-	 * Swimming in water/liquid
-	 * Used for moving through tiles containing water or magma at a depth of at least 4/7.
-	 */
-	| "swim"
-	/**
-	 * Flying through the air
-	 * Used for moving through open space.
-	 */
-	| "fly"
-	/**
-	 * Other gait type which is unexpected, but we can still handle it
-	 */
-	| { other: string }
-	/**
-	 * Unknown gait type (unset)
-	 */
-	| "unknown";
-
-/**
- * An enum representing a gait modifier.
- */
-export type Modifier =
-	/**
-	 * Fat/muscle layers slow the movement (muscle-slowing counter-acted by strength bonus)
-	 * Makes `THICKENS_ON_ENERGY_STORAGE` and `THICKENS_ON_STRENGTH` tissue layers slow movement depending on how thick they are.
-	 * Adding the `STRENGTH` gait flag counteracts the impact of the latter layer.
-	 */
-	| "layersSlow"
-	/**
-	 * Speeds/slows movement depending on the creature's Strength stat.
-	 */
-	| "strength"
-	/**
-	 * Speeds/slows movement depending on the creature's Agility stat.
-	 */
-	| "agility"
-	/**
-	 * Stealth slows movement by the specified percentage when the creature is sneaking.
-	 */
-	| {
-			stealthSlows: {
-				/**
-				 * The percentage slowed
-				 */
-				percentage: number;
-			};
-	  }
-	/**
-	 * No build up time
-	 */
-	| "noBuildUp"
-	/**
-	 * Build up time. Only used if the gait has a build up time.
-	 */
-	| {
-			buildUp: {
-				/**
-				 * The build up time indicates how long it will take for a creature using this gait to go from `<start speed>` to `<max speed>`.
-				 * For example, a value of 10 means that it should be able to reach the maximum speed by moving 10 tiles in a straight line over even terrain.
-				 */
-				time: number;
-				/**
-				 * The turning max indicates the maximum speed permissible when the creature suddenly changes its direction of motion.
-				 * The creature's speed will be reduced to `<max turning speed>` if traveling at a higher speed than this before turning.
-				 */
-				turning_max: number;
-				/**
-				 * The creature's speed when it starts moving using this gait
-				 */
-				start_speed: number;
-			};
-	  };
 
 /**
  * Tokens that can be found in a creature's caste definitions.
@@ -5001,150 +3834,1375 @@ export type CasteTag =
 	| "CannotBreatheAir";
 
 /**
- * A struct representing a creature caste.
+ * The color modification of the tile
  */
-export type Caste = {
-	identifier: string;
-	tags?: CasteTag[] | null;
-	description?: string | null;
-	babyName?: SingPlurName | null;
-	casteName?: Name | null;
-	childName?: SingPlurName | null;
+export type ColorModificationTag =
 	/**
-	 * Default \[0,0\]
+	 * The color is as is
 	 */
-	clutchSize?: [number, number] | null;
-	/**
-	 * Default \[0,0\]
-	 */
-	litterSize?: [number, number] | null;
-	/**
-	 * Default \[0,0\]
-	 */
-	maxAge?: [number, number] | null;
-	baby?: number | null;
-	child?: number | null;
-	difficulty?: number | null;
-	eggSize?: number | null;
-	grassTrample?: number | null;
-	grazer?: number | null;
-	lowLightVision?: number | null;
-	petValue?: number | null;
-	popRatio?: number | null;
-	changeBodySizePercentage?: number | null;
-	creatureClass?: string[] | null;
-	bodySize?: BodySize[] | null;
-	milkable?: Milkable | null;
-	tile?: Tile | null;
-	/**
-	 * The gaits by which the creature can move.
-	 */
-	gaits?: Gait[] | null;
-};
+	"asIs";
 
 /**
- * An enum representing a creature effect property.
+ * A condition that can be applied to a tile/entity
  */
-export type CreatureEffectProperty =
+export type ConditionTag =
 	/**
-	 * The severity of the effect. Higher values appear to be worse, with SEV:1000 `CE_NECROSIS` causing a part to near-instantly become rotten.
+	 * No condition
 	 */
-	| "Severity"
+	| "none"
 	/**
-	 * The probability of the effect actually manifesting in the victim, as a percentage. 100 means always, 1 means a 1 in 100 chance.
+	 * The start of a condition
 	 */
-	| "Probability"
+	| "condition"
 	/**
-	 * (Optional) Determines if the effect can be hindered by the target creature's disease resistance attribute.
-	 * Without this token, disease resistance is ignored. (yes, it's spelled incorrectly)
+	 * Default condition
 	 */
-	| "Resistible"
+	| "default"
 	/**
-	 * (Optional) This token presumably causes the severity of the effect to scale with the size of the creature compared
-	 * to the size of the dose of contagion they received, but has yet to be extensively tested.
+	 * A condition of "being animated"
 	 */
-	| "SizeDilutes"
+	| "animated"
 	/**
-	 * (Optional) As above, this token has yet to be tested but presumably delays the onset of an effect according to the size of the victim.
+	 * Condition of being a corpse
 	 */
-	| "SizeDelays"
+	| "corpse"
 	/**
-	 * (Optional; overrides BP tokens) This tag causes an effect to ignore all BP tokens and then forces the game to attempt to apply the effect to
-	 * the limb that came into contact with the contagion - i.e. the part that was bitten by the creature injecting the syndrome material,
-	 * or the one that was splattered by a contact contagion. If an effect can not be applied to the contacted limb (such as `IMPAIR_FUNCTION` on a non-organ)
-	 * then this token makes the effect do nothing. This token also makes inhaled syndromes have no effect.
+	 * Condition of being a child
 	 */
-	| "Localized"
+	| "child"
 	/**
-	 * (Optional) This effect only affects tissue layers with the VASCULAR token.
+	 * Condition of being a baby
 	 */
-	| "VascularOnly"
+	| "baby"
 	/**
-	 * (Optional) This effect only affects tissue layers with the MUSCULAR token.
+	 * Condition of being trained for hunting
 	 */
-	| "MuscularOnly"
+	| "trainedHunter"
 	/**
-	 * (Optional; overridden by LOCALIZED) Specifies which body parts and tissues the effect is to be applied to. Not every effect requires a target!
-	 * For example, if you wanted to target the lungs of a creature, you would use `BP:BY_CATEGORY:LUNG:ALL`. The effect would act on all body parts
-	 * within the creature with the CATEGORY tag LUNG and affect all tissue layers. For another example, say you wanted to cause the skin to rot off a creature -
-	 * you could use `BP:BY_CATEGORY:ALL:SKIN`, targeting the SKIN tissue on all body parts. Multiple targets can be given in one effect by placing the BP tokens end to end.
-	 * This is one of the most powerful and useful aspects of the syndrome system, as it allows you to selectively target body parts relevant to the contagion,
-	 * like lungs for coal dust inhalation, or the eyes for exposure to an acid gas.
+	 * Condition of being trained for war
 	 */
-	| "BodyPart"
+	| "trainedWar"
 	/**
-	 * `BY_CATEGORY:X` to target body parts with a matching `[CATEGORY:X]` body token (or `ALL` to affect everything)
+	 * Condition of being a list icont
 	 */
-	| "ByCategory"
+	| "listIcon"
 	/**
-	 * `BY_TYPE:X` to target body parts having a particular type (`UPPERBODY`, `LOWERBODY`, `HEAD`, `GRASP`, or `STANCE`)
+	 * Condition of being a skeleton
 	 */
-	| "ByType"
+	| "skeleton"
 	/**
-	 * `BY_TOKEN:X` to target individual body parts by their ID as specified by the `[BP]` token of the body plan definition.
+	 * Condition of being a skeleton with a skull
 	 */
-	| "ByToken"
+	| "skeletonWithSkull"
 	/**
-	 * Determines the time after exposure, in ticks, when the effect starts. Required for all effects.
+	 * Condition of being a zombie
 	 */
-	| "Start"
+	| "zombie"
 	/**
-	 * (Optional) Determines the time after exposure, in ticks, when the effect reaches its peak intensity.
+	 * Condition of being a necromancer
 	 */
-	| "Peak"
+	| "necromancer"
 	/**
-	 * (Optional) Determines the time after exposure, in ticks, when the effect ends.
+	 * Condition of being male
 	 */
-	| "End"
+	| "male"
 	/**
-	 * (Optional) Multiplies the duration values of the effect by the specified amount in Fortress mode.
+	 * Condition of being female
 	 */
-	| "DwfStretch"
+	| "female"
 	/**
-	 * (Optional) Makes the effect begin immediately rather than ramping up.
+	 * Condition of being a vampire
 	 */
-	| "AbruptStart"
+	| "vampireCursed"
 	/**
-	 * (Optional) Makes the effect end immediately rather than ramping down.
+	 * Condition of being a ghoul
 	 */
-	| "AbruptEnd"
+	| "ghoul"
 	/**
-	 * (Optional) Combination of `ABRUPT_START` and `ABRUPT_END`.
+	 * Condition of being a disturbed dead
 	 */
-	| "Abrupt"
+	| "disturbedDead"
 	/**
-	 * (Optional) Can be hidden by a unit assuming a secret identity, such as a vampire.
+	 * Condition of being remains
 	 */
-	| "CanBeHidden"
+	| "remains"
 	/**
-	 * Unknown value for default.
+	 * Condition of being a vermin
 	 */
-	| "Unknown";
+	| "vermin"
+	/**
+	 * Condition of being a light vermin
+	 */
+	| "lightVermin"
+	/**
+	 * Condition of being a hive
+	 */
+	| "hive"
+	/**
+	 * Condition of being a small swarm
+	 */
+	| "swarmSmall"
+	/**
+	 * Condition of being a medium swarm
+	 */
+	| "swarmMedium"
+	/**
+	 * Condition of being a large swarm
+	 */
+	| "swarmLarge"
+	/**
+	 * Condition of being not an artifact
+	 */
+	| "notArtifact"
+	/**
+	 * Condition of being a crafted artifact
+	 */
+	| "craftedArtifact"
+	/**
+	 * Condition of being dyed
+	 */
+	| "dye"
+	/**
+	 * Condition of not being dyed
+	 */
+	| "notDyed"
+	/**
+	 * Condition of being a crop
+	 */
+	| "crop"
+	/**
+	 * Condition of being a seed
+	 */
+	| "seed"
+	/**
+	 * Condition of being a plant (picked)
+	 */
+	| "picked"
+	/**
+	 * Condition of being a shrub
+	 */
+	| "shrub"
+	/**
+	 * Condition of being a sapling
+	 */
+	| "sapling"
+	/**
+	 * Condition of being a crop sprout
+	 */
+	| "cropSprout"
+	/**
+	 * Condition of being a large crop
+	 */
+	| "cropL"
+	/**
+	 * Condition of being a medium crop
+	 */
+	| "cropM"
+	/**
+	 * Condition of being a small crop
+	 */
+	| "cropR"
+	/**
+	 * Condition of being a dead shrub
+	 */
+	| "shrubDead"
+	/**
+	 * Condition of not being a child
+	 */
+	| "notChild"
+	/**
+	 * Condition of being at least so many hauled
+	 */
+	| "haulCountMin"
+	/**
+	 * Condition of being at most so many hauled
+	 */
+	| "haulCountMax"
+	/**
+	 * Condition of being a worn item
+	 */
+	| "itemWorn"
+	/**
+	 * Condition of having a profession
+	 */
+	| "professionCategory"
+	/**
+	 * Condition of being a class
+	 */
+	| "class"
+	/**
+	 * Condition of being a syndrome class
+	 */
+	| "syndromeClass"
+	/**
+	 * Condition of being a caste
+	 */
+	| "caste"
+	/**
+	 * Condition of being a tissue layer
+	 */
+	| "tissueLayer"
+	/**
+	 * Condition of being a material flag
+	 */
+	| "materialFlag"
+	/**
+	 * Condition of being a material type
+	 */
+	| "materialType"
+	/**
+	 * Condition of being off if an item is present
+	 */
+	| "shutOffIfItemPresent"
+	/**
+	 * Condition of being a random part index
+	 */
+	| "randomPartIndex"
+	/**
+	 * Condition of being a ghost
+	 */
+	| "ghost"
+	/**
+	 * Condition of being a tissue that may have color
+	 */
+	| "tissueMayHaveColor"
+	/**
+	 * Condition of being a tissue that is at least so long
+	 */
+	| "tissueMinLength"
+	/**
+	 * Condition of being a tissue that is at most so long
+	 */
+	| "tissueMaxLength"
+	/**
+	 * Condition of being a tissue at least so curly
+	 */
+	| "tissueMinCurly"
+	/**
+	 * Condition of being a tissue at most so curly
+	 */
+	| "tissueMaxCurly"
+	/**
+	 * Condition of being a tissue that may have a shape
+	 */
+	| "tissueMayHaveShaping"
+	/**
+	 * Condition of being a tissue that is not shaped
+	 */
+	| "tissueNotShaped"
+	/**
+	 * Condition of being a swapped tissue
+	 */
+	| "tissueSwap"
+	/**
+	 * Condition of being a specific layer (start layer definition)
+	 */
+	| "layer"
+	/**
+	 * Condition of being a specific layer set of layers
+	 */
+	| "layerSet"
+	/**
+	 * Condition of being a specific layer group
+	 */
+	| "layerGroup"
+	/**
+	 * Condition of being a specific layer group set of layers
+	 */
+	| "endLayerGroup"
+	/**
+	 * Condition of being the upper body
+	 */
+	| "bodyUpper"
+	/**
+	 * Condition of being a copy of a template
+	 */
+	| "copyOfTemplate"
+	/**
+	 * Hammerman profession
+	 */
+	| "hammerman"
+	/**
+	 * Master Hammerman profession
+	 */
+	| "masterHammerman"
+	/**
+	 * Spearman profession
+	 */
+	| "spearman"
+	/**
+	 * Master Spearman profession
+	 */
+	| "masterSpearman"
+	/**
+	 * Wrestler profession
+	 */
+	| "wrestler"
+	/**
+	 * Master Wrestler profession
+	 */
+	| "masterWrestler"
+	/**
+	 * Axeman profession
+	 */
+	| "axeman"
+	/**
+	 * Master Axeman profession
+	 */
+	| "masterAxeman"
+	/**
+	 * Swordsman profession
+	 */
+	| "swordsman"
+	/**
+	 * Master Swordsman profession
+	 */
+	| "masterSwordsman"
+	/**
+	 * Maceman profession
+	 */
+	| "maceman"
+	/**
+	 * Master Maceman profession
+	 */
+	| "masterMaceman"
+	/**
+	 * Pikeman profession
+	 */
+	| "pikeman"
+	/**
+	 * Master Pikeman profession
+	 */
+	| "masterPikeman"
+	/**
+	 * Recruit profession
+	 */
+	| "recruit"
+	/**
+	 * Thief profession
+	 */
+	| "thief"
+	/**
+	 * Master Thief profession
+	 */
+	| "masterThief"
+	/**
+	 * Lasher profession
+	 */
+	| "lasher"
+	/**
+	 * Master Lasher profession
+	 */
+	| "masterLasher"
+	/**
+	 * Monster slayer profession
+	 */
+	| "monsterSlayer"
+	/**
+	 * Crossbowman profession
+	 */
+	| "crossbowman"
+	/**
+	 * Master Crossbowman profession
+	 */
+	| "masterCrossbowman"
+	/**
+	 * Bowman profession
+	 */
+	| "bowman"
+	/**
+	 * Master Bowman profession
+	 */
+	| "masterBowman"
+	/**
+	 * Blowgunman profession
+	 */
+	| "blowgunman"
+	/**
+	 * Master Blowgunman profession
+	 */
+	| "masterBlowgunman"
+	/**
+	 * Beat hunter profession
+	 */
+	| "beastHunter"
+	/**
+	 * Scout profession
+	 */
+	| "scout"
+	/**
+	 * Ranger profession
+	 */
+	| "ranger"
+	/**
+	 * Hunter profession
+	 */
+	| "hunter"
+	/**
+	 * Sage profession
+	 */
+	| "sage"
+	/**
+	 * Scholar profession
+	 */
+	| "scholar"
+	/**
+	 * Philosopher profession
+	 */
+	| "philosopher"
+	/**
+	 * Mathematician profession
+	 */
+	| "mathematician"
+	/**
+	 * Historian profession
+	 */
+	| "historian"
+	/**
+	 * Astronomer profession
+	 */
+	| "astronomer"
+	/**
+	 * Naturalist profession
+	 */
+	| "naturalist"
+	/**
+	 * Chemist profession
+	 */
+	| "chemist"
+	/**
+	 * Geographer profession
+	 */
+	| "geographer"
+	/**
+	 * Scribe profession
+	 */
+	| "scribe"
+	/**
+	 * Bookbinder profession
+	 */
+	| "bookbinder"
+	/**
+	 * Performer profession
+	 */
+	| "performer"
+	/**
+	 * Poet profession
+	 */
+	| "poet"
+	/**
+	 * Bard profession
+	 */
+	| "bard"
+	/**
+	 * Dancer profession
+	 */
+	| "dancer";
 
 /**
- * An enum representing a creature effect token.
+ * An enum representing a creature tag.
  */
-export type CreatureEffectToken =
+export type CreatureTag =
+	/**
+	 * If set, the creature will blink between its `[Tile]` and its `[AltTile]`.
+	 *
+	 * Arguments:
+	 *
+	 * - the 'character' or tile number
+	 *
+	 * Appears as `ALTTILE:123`
+	 */
+	| {
+			AltTile: {
+				/**
+				 * The character or tile number
+				 */
+				character: number;
+			};
+	  }
+	/**
+	 * Applies the specified creature variation with the given arguments to the creature. See `[ApplyCreatureVariation]` for more information.
+	 *
+	 * Appears as `APPLY_CREATURE_VARIATION:SOME_VARIATION` or `APPLY_CREATURE_VARIATION:SOME_VARIATION:ARG1:ARG2:ARG3`
+	 */
+	| {
+			ApplyCreatureVariation: {
+				/**
+				 * Creature variation ID to apply
+				 */
+				id: string;
+				/**
+				 * (Optional) any number of arguments to pass to the creature variation
+				 */
+				args: string[];
+			};
+	  }
+	/**
+	 * Applies the effects of all pending `[CV_ADD_TAG]` and `[CV_REMOVE_TAG]` tokens that have been defined in the current creature (so far).
+	 *
+	 * Appears as `APPLY_CURRENT_CREATURE_VARIATION`
+	 */
+	| "ApplyCurrentCreatureVariation"
+	/**
+	 * Enables the creature to be kept in artificial hives by beekeepers.
+	 *
+	 * Appears as `ARTIFICIAL_HIVEABLE`
+	 */
+	| "ArtificialHiveable"
+	/**
+	 * Select a biome the creature may appear in.
+	 *
+	 * Appears as `BIOME:SomeBiomeId`
+	 */
+	| {
+			Biome: {
+				/**
+				 * Biome identifier
+				 */
+				id: string;
+			};
+	  }
+	/**
+	 * Defines a caste
+	 */
+	| {
+			Caste: {
+				/**
+				 * The name of the caste
+				 */
+				name: string;
+			};
+	  }
+	/**
+	 * Multiplies frequency by a factor of (integer)%.
+	 *
+	 * Appears as `CHANGE_FREQUENCY_PERC:100`
+	 */
+	| {
+			ChangeFrequencyPercent: {
+				/**
+				 * The percentage to change the frequency by
+				 */
+				percent: number;
+			};
+	  }
+	/**
+	 * The minimum/maximum numbers of how many creatures per spawned cluster. Vermin fish with this token in
+	 * combination with temperate ocean and river biome tokens will perform seasonal migrations.
+	 *
+	 * Defaults to 1:1 if not specified.
+	 *
+	 * Appears as `CLUSTER_NUMBER:1:1`
+	 */
+	| {
+			ClusterNumber: {
+				/**
+				 * The minimum number of creatures per spawned cluster
+				 */
+				min: number;
+				/**
+				 * The maximum number of creatures per spawned cluster
+				 */
+				max: number;
+			};
+	  }
+	/**
+	 * Copies another specified creature. This will override any definitions made before it; essentially, it makes this creature identical to the other one, which can then
+	 * be modified. Often used in combination with `[APPLY_CREATURE_VARIATION]` to import standard variations from a file. The vanilla giant animals and animal peoples are
+	 * examples of this token combination.
+	 *
+	 * Arguments:
+	 *
+	 * * `creature`: The identifier of the creature to copy
+	 *
+	 * Appears as `COPY_TAGS_FROM:SomeCreature`
+	 */
+	| {
+			CopyTagsFrom: {
+				/**
+				 * The identifier of the creature to copy
+				 */
+				creature: string;
+			};
+	  }
+	/**
+	 * Creatures active in their civilization's military will use this tile instead.
+	 *
+	 * Appears as `CREATURE_SOLDIER_TILE:123`
+	 */
+	| {
+			CreatureSoldierTile: {
+				/**
+				 * The character or tile number
+				 */
+				character: number;
+			};
+	  }
+	/**
+	 * The symbol of the creature in ASCII mode.
+	 *
+	 * Appears as `CREATURE_TILE:123`
+	 */
+	| {
+			CreatureTile: {
+				/**
+				 * The character or tile number
+				 */
+				character: number;
+			};
+	  }
+	/**
+	 * The color of the creature's tile.
+	 *
+	 * Arguments:
+	 *
+	 * * `foreground`: The foreground color
+	 * * `background`: The background color
+	 * * `brightness`: The brightness of the color
+	 *
+	 * Appears as `COLOR:0:0:0`
+	 */
+	| {
+			Color: {
+				/**
+				 * The foreground color
+				 */
+				foreground: number;
+				/**
+				 * The background color
+				 */
+				background: number;
+				/**
+				 * The brightness of the color
+				 */
+				brightness: number;
+			};
+	  }
+	/**
+	 * Adding this token to a creature prevents it from appearing in generated worlds (unless it's marked as always present for a particular
+	 * civilization). For example, adding it to dogs will lead to worlds being generated without dogs in them. Also removes the creature from the
+	 * object testing arena's spawn list. If combined with [Fanciful], artistic depictions of the creature will occur regardless. Used by centaurs,
+	 * chimeras and griffons in the vanilla game.
+	 *
+	 * Appears as `DOES_NOT_EXIST`
+	 */
+	| "DoesNotExist"
+	/**
+	 * Makes the creature appear as a large 3x3 wagon responsible for carrying trade goods, pulled by two `[WAGON_PULLER]` creatures and driven by a merchant.
+	 *
+	 * Appears as `EQUIPMENT_WAGON`
+	 */
+	| "EquipmentWagon"
+	/**
+	 * The creature is considered evil and will only show up in evil biomes. Civilizations with `[EntityToken::UseEvilAnimals]` can domesticate them
+	 * regardless of exotic status. Has no effect on cavern creatures except to restrict taming. A civilization with evil creatures can colonize evil areas.
+	 *
+	 * Appears as `EVIL`
+	 */
+	| "Evil"
+	/**
+	 * The creature is a thing of legend and known to all civilizations. Its materials cannot be requested or preferred. The tag also adds some art value modifiers.
+	 * Used by a number of creatures. Conflicts with `[CasteToken::CommonDomestic]`.
+	 */
+	| "Fanciful"
+	/**
+	 * Determines the chances of a creature appearing within its environment, with higher values resulting in more frequent appearance. Also affects the chance of a
+	 * creature being brought in a caravan for trading. The game effectively considers all creatures that can possibly appear and uses the FREQUENCY value as a weight
+	 *
+	 * For example, if there are three creatures with frequencies 10/25/50, the creature with [FREQUENCY:50] will appear approximately 58.8% of the time.
+	 *
+	 * Defaults to 50 if not specified. Not to be confused with `[PopulationRatio]`.
+	 *
+	 * Appears as `FREQUENCY:50`
+	 */
+	| {
+			Frequency: {
+				/**
+				 * The frequency of the creature, a number between 0 and 100 (inclusive)
+				 */
+				frequency: number;
+			};
+	  }
+	/**
+	 * Name of the creatures baby form. Applies to all castes but can be overridden by `[CasteToken::BabyName]`.
+	 *
+	 * Appears as `GENERAL_BABY_NAME:BabyName:BabyNames`
+	 */
+	| {
+			GeneralBabyName: {
+				/**
+				 * The name of the baby
+				 */
+				singular: string;
+				/**
+				 * The plural name of the baby
+				 */
+				plural: string;
+			};
+	  }
+	/**
+	 * Name of the creatures child form. Applies to all castes but can be overridden by `[CasteToken::ChildName]`.
+	 *
+	 * Appears as `GENERAL_CHILD_NAME:ChildName:ChildNames`
+	 */
+	| {
+			GeneralChildName: {
+				/**
+				 * The name of the child
+				 */
+				singular: string;
+				/**
+				 * The plural name of the child
+				 */
+				plural: string;
+			};
+	  }
+	/**
+	 * Found on procedurally generated creatures like forgotten beasts, titans, demons, angels, and night creatures. Cannot be specified in user-defined raws.
+	 *
+	 * Appears as `GENERATED`
+	 */
+	| "Generated"
+	/**
+	 * The color of the creature's glow tile.
+	 *
+	 * Arguments:
+	 *
+	 * * `foreground`: The foreground color
+	 * * `background`: The background color
+	 * * `brightness`: The brightness of the color
+	 *
+	 * Appears as `GLOWCOLOR:0:0:0`
+	 */
+	| {
+			GlowColor: {
+				/**
+				 * The foreground color
+				 */
+				foreground: number;
+				/**
+				 * The background color
+				 */
+				background: number;
+				/**
+				 * The brightness of the color
+				 */
+				brightness: number;
+			};
+	  }
+	/**
+	 * The creature's tile when it is glowing.
+	 *
+	 * Arguments:
+	 *
+	 * * `character`: The character or tile number
+	 *
+	 * Appears as `GLOWTILE:123`
+	 */
+	| {
+			GlowTile: {
+				/**
+				 * The character or tile number
+				 */
+				character: number;
+			};
+	  }
+	/**
+	 * Creature is considered good and will only show up in good biomes - unicorns, for example. Civilizations with `[EntityToken::UseGoodAnimals]` can
+	 * domesticate them regardless of exotic status. Has no effect on cavern creatures except to restrict taming. A civilization that has good
+	 * creatures can colonize good areas in world-gen.
+	 *
+	 * Appears as `GOOD`
+	 */
+	| "Good"
+	/**
+	 * When using tags from an existing creature, inserts new tags at the end of the creature.
+	 *
+	 * Appears as `GO_TO_END`
+	 */
+	| "GoToEnd"
+	/**
+	 * When using tags from an existing creature, inserts new tags at the beginning of the creature.
+	 *
+	 * Appears as `GO_TO_START`
+	 */
+	| "GoToStart"
+	/**
+	 * When using tags from an existing creature, inserts new tags after the specified tag.
+	 *
+	 * Arguments:
+	 *
+	 * * `tag`: The tag to insert after
+	 *
+	 * Appears as `GO_TO_TAG:TAG`
+	 */
+	| {
+			GoToTag: {
+				/**
+				 * The tag to insert after
+				 */
+				tag: string;
+			};
+	  }
+	/**
+	 * What product is harvested from beekeeping.
+	 *
+	 * Arguments:
+	 *
+	 * * `number`: The number of products harvested
+	 * * `time`: The time it takes before the next harvest
+	 * * `item tokens`: The item tokens that are harvested (some arbitrary list of items)
+	 *
+	 * Appears as `HARVEST_PRODUCT:1:1:ITEM_TOKENS`
+	 */
+	| {
+			HarvestProduct: {
+				/**
+				 * The number of products harvested
+				 */
+				number: number;
+				/**
+				 * The time it takes before the next harvest
+				 */
+				time: number;
+				/**
+				 * The item tokens that are harvested (some arbitrary list of items)
+				 */
+				item_tokens: string[];
+			};
+	  }
+	/**
+	 * This is the core requisite tag allowing the creature to spawn as a wild animal in the appropriate biomes. Requires specifying a [Biome] in which the creature will spawn.
+	 * Does not require specifying a frequency, population number, or cluster number.
+	 *
+	 * This tag stacks with `[CasteToken::Megabeast]`, `[CasteToken::SemiMegabeast]`, or `[CasteToken::NightCreatureHunter]`; if used with one of these tags, the creature will spawn
+	 * as both a boss and as a wild animal. This tag does not stack with `[CasteToken::FeatureBeast]` and if both are used the creature will not spawn. This tag is unaffected by
+	 * `[CasteToken::Demon]`.
+	 *
+	 * Appears as `LARGE_ROAMING`
+	 */
+	| "LargeRoaming"
+	/**
+	 * Allows you to play as a wild animal of this species in adventurer mode. Prevents trading of (tame) instances of this creature in caravans.
+	 *
+	 * Appears as `LOCAL_POPS_CONTROLLABLE`
+	 */
+	| "LocalPopsControllable"
+	/**
+	 * Wild animals of this species may occasionally join a civilization. Prevents trading of (tame) instances of this creature in caravans.
+	 *
+	 * Appears as `LOCAL_POPS_PRODUCE_HEROES`
+	 */
+	| "LocalPopsProduceHeroes"
+	/**
+	 * The creatures will scatter if they have this tag, or form tight packs if they don't.
+	 *
+	 * Appears as `LOOSE_CLUSTERS`
+	 */
+	| "LooseClusters"
+	/**
+	 * Marks if the creature is an actual real-life creature. Only used for age-names at present.
+	 */
+	| "Mundane"
+	/**
+	 * The generic name for any creature of this type - will be used when distinctions between caste are unimportant. For names for specific castes, use `[CASTE_NAME]` instead.
+	 * If left undefined, the creature will be labeled as "nothing" by the game.
+	 *
+	 * Appears as `NAME:Name:Names:NameAdj`
+	 */
+	| {
+			Name: {
+				/**
+				 * The name of the creature
+				 */
+				name: string;
+				/**
+				 * The plural name of the creature
+				 */
+				plural_name: string;
+				/**
+				 * The adjective form of the creature's name
+				 */
+				adjective: string;
+			};
+	  }
+	/**
+	 * Adds a material to selected materials. Used immediately after `[SELECT_MATERIAL]`.
+	 *
+	 * Appears as `PLUS_MATERIAL:Material`
+	 */
+	| {
+			PlusMaterial: {
+				/**
+				 * The material to add
+				 */
+				material: string;
+			};
+	  }
+	/**
+	 * The minimum/maximum numbers of how many of these creatures are present in each world map tile of the appropriate region. Defaults to 1:1 if not specified.
+	 *
+	 * Appears as `POPULATION_NUMBER:1:1`
+	 */
+	| {
+			PopulationNumber: {
+				/**
+				 * The minimum number of creatures per spawned cluster
+				 */
+				min: number;
+				/**
+				 * The maximum number of creatures per spawned cluster
+				 */
+				max: number;
+			};
+	  }
+	/**
+	 * Sets what other creatures prefer about this creature.
+	 *
+	 * "Urist likes dwarves for their beards."
+	 *
+	 * Multiple entries will be chosen from at random. Creatures lacking a PREFSTRING token will never appear under another's preferences.
+	 *
+	 * Appears as `PREFSTRING:PrefString`
+	 */
+	| {
+			PrefString: {
+				/**
+				 * The preference string
+				 */
+				pref_string: string;
+			};
+	  }
+	/**
+	 * The generic name for members of this profession, at the creature level. In order to give members of specific castes different names for professions,
+	 * use `[CASTE_PROFESSION_NAME]` instead.
+	 *
+	 * Appears as `PROFESSION_NAME:ProfessionId:ProfessionName:ProfessionNames`
+	 */
+	| {
+			ProfessionName: {
+				/**
+				 * The profession id
+				 */
+				id: string;
+				/**
+				 * The name of the profession
+				 */
+				name: string;
+				/**
+				 * The plural name of the profession
+				 */
+				plural_name: string;
+			};
+	  }
+	/**
+	 * Removes a material from the creature.
+	 *
+	 * Appears as `REMOVE_MATERIAL:Material`
+	 */
+	| {
+			RemoveMaterial: {
+				/**
+				 * The material to remove
+				 */
+				material: string;
+			};
+	  }
+	/**
+	 * Removes a tissue from the creature.
+	 *
+	 * Appears as `REMOVE_TISSUE:Tissue`
+	 */
+	| {
+			RemoveTissue: {
+				/**
+				 * The tissue to remove
+				 */
+				tissue: string;
+			};
+	  }
+	/**
+	 * The creature will only show up in "savage" biomes. Has no effect on cavern creatures. Cannot be combined with [GOOD] or [EVIL].
+	 *
+	 * Appears as `SAVAGE`
+	 */
+	| "Savage"
+	/**
+	 * Adds an additional previously defined caste to the selection. Used after `[SELECT_CASTE]`.
+	 *
+	 * Appears as `SELECT_ADDITIONAL_CASTE:Caste`
+	 */
+	| {
+			SelectAdditionalCaste: {
+				/**
+				 * The caste to add
+				 */
+				caste: string;
+			};
+	  }
+	/**
+	 * Selects a previously defined caste
+	 *
+	 * Appears as `SELECT_CASTE:Caste`
+	 */
+	| {
+			SelectCaste: {
+				/**
+				 * The caste to select
+				 */
+				caste: string;
+			};
+	  }
+	/**
+	 * Selects a locally defined material. Can be ALL.
+	 *
+	 * Appears as `SELECT_MATERIAL:Material`
+	 */
+	| {
+			SelectMaterial: {
+				/**
+				 * The material to select
+				 */
+				material: string;
+			};
+	  }
+	/**
+	 * Selects a tissue for editing.
+	 *
+	 * Appears as `SELECT_TISSUE:Tissue`
+	 */
+	| {
+			SelectTissue: {
+				/**
+				 * The tissue to select
+				 */
+				tissue: string;
+			};
+	  }
+	/**
+	 * Boasting speeches relating to killing this creature. Examples include `text_dwarf.txt` and `text_elf.txt` in `data\vanilla\vanilla_creatures\objects`.
+	 *
+	 * Appears as `SLAIN_CASTE:SomeSpeechSet`
+	 */
+	| {
+			SlainSpeech: {
+				/**
+				 * The speech set to use
+				 */
+				slain_speech: string;
+			};
+	  }
+	/**
+	 * Determines how keen a creature's sense of smell is - lower is better. At 10000, a creature cannot smell at all.
+	 *
+	 * Appears as `SMELL_TRIGGER:10000`
+	 */
+	| {
+			SmellTrigger: {
+				/**
+				 * The smell trigger
+				 */
+				smell_trigger: number;
+			};
+	  }
+	/**
+	 * If this creature is active in its civilization's military, it will blink between its default tile and this one.
+	 *
+	 * Appears as `SOLDIER_ALTTILE:SomeTile`
+	 */
+	| {
+			SoldierAltTile: {
+				/**
+				 * The tile to use
+				 */
+				tile: string;
+			};
+	  }
+	/**
+	 * Found on generated angels. This is the historical figure ID of the deity with which the angel is associated. Since HFIDs are not predictable before worldgen,
+	 * this isn't terribly usable in mods.
+	 *
+	 * Appears as `SOURCE_HFID:123`
+	 */
+	| {
+			SourceHfid: {
+				/**
+				 * The historical figure ID
+				 */
+				hfid: number;
+			};
+	  }
+	/**
+	 * Sets what religious spheres the creature is aligned to, for purposes of being worshipped via the [POWER] token. Also affects the layout of hidden fun stuff,
+	 * and the creature's name.
+	 *
+	 * Appears as `SPHERE:SomeSphere`
+	 */
+	| {
+			Sphere: {
+				/**
+				 * The sphere to use
+				 */
+				sphere: string;
+			};
+	  }
+	/**
+	 * Begins defining a tissue in the creature file. Follow this with standard tissue definition tokens to define the tissue properties.
+	 *
+	 * Arguments:
+	 *
+	 * * `name`: The name of the tissue
+	 *
+	 * Appears as `TISSUE:SomeTissue`
+	 */
+	| {
+			Tissue: {
+				/**
+				 * The name of the tissue
+				 */
+				name: string;
+			};
+	  }
+	/**
+	 * A large swarm of vermin can be disturbed, usually in adventurer mode.
+	 *
+	 * Appears as `TRIGGERABLE_GROUP:5:10`
+	 */
+	| {
+			TriggerableGroup: {
+				/**
+				 * The minimum number of vermin in the swarm
+				 */
+				min: number;
+				/**
+				 * The maximum number of vermin in the swarm
+				 */
+				max: number;
+			};
+	  }
+	/**
+	 * Creature will occur in every region with the correct biome. Does not apply to [EVIL]/[GOOD] tags.
+	 *
+	 * Appears as `UBIQUITOUS`
+	 */
+	| "Ubiquitous"
+	/**
+	 * Depth that the creature appears underground. Numbers can be from 0 to 5. 0 is actually 'above ground' and can be used if the creature is to appear both above and below ground.
+	 * Values from 1-3 are the respective cavern levels, 4 is the magma sea and 5 is the HFS. A single argument may be used instead of min and max. Demons use only 5:5;
+	 * user-defined creatures with both this depth and [FLIER] will take part in the initial wave from the HFS alongside generated demons, but without [FLIER] they will only spawn from
+	 * the map edges. Civilizations that can use underground plants or animals will only export (via the embark screen or caravans) things that are available at depth 1.
+	 *
+	 * Arguments:
+	 *
+	 * * `min`: The minimum depth
+	 * * `max`: The maximum depth
+	 *
+	 * Appears as `UNDERGROUND_DEPTH:1:3`
+	 */
+	| {
+			UndergroundDepth: {
+				/**
+				 * The minimum depth
+				 */
+				min: number;
+				/**
+				 * The maximum depth
+				 */
+				max: number;
+			};
+	  }
+	/**
+	 * Defines a new caste derived directly from a previous caste. The new caste inherits all properties of the old one. The effect of this tag is automatic if one has not yet defined any castes:
+	 * "Any caste-level tag that occurs before castes are explicitly declared is saved up and placed on any caste that is declared later, unless the caste is explicitly derived from another caste."
+	 *
+	 * "When DF detects duplicate tokens in the raws of the same object, a failsafe seems to kick in; it takes the bottom-most of the duplicates, and disregards the others. In the case of tokens
+	 * added by a mod, it prioritizes the duplicate in the mod." This means that if a tag is defined in the base-caste and redefined in the derived caste, the derived tag overwrites the base tag.
+	 *
+	 * Arguments:
+	 *
+	 * * `caste`: The name of the new caste
+	 * * `original_caste`: The name of the original caste to copy
+	 *
+	 * Appears as `USE_CASTE:SomeCaste:SomeOriginalCaste`
+	 */
+	| {
+			UseCaste: {
+				/**
+				 * The name of the new caste
+				 */
+				caste: string;
+				/**
+				 * The name of the original caste to copy
+				 */
+				original_caste: string;
+			};
+	  }
+	/**
+	 * Defines a new local creature material and populates it with all properties defined in the specified local creature material.
+	 *
+	 * Arguments:
+	 *
+	 * * `material`: The name of the new material
+	 * * `original_material`: The name of the original material to copy
+	 *
+	 * Appears as `USE_MATERIAL:SomeMaterial:SomeOriginalMaterial`
+	 */
+	| {
+			UseMaterial: {
+				/**
+				 * The name of the new material
+				 */
+				material: string;
+				/**
+				 * The name of the original material to copy
+				 */
+				original_material: string;
+			};
+	  }
+	/**
+	 * Defines a new local creature material and populates it with all properties defined in the specified template. There seems to be a limit of 200 materials per creature.
+	 *
+	 * Arguments:
+	 *
+	 * * `material`: The name of the new material
+	 * * `template`: The name of the template to copy
+	 *
+	 * Appears as `USE_MATERIAL_TEMPLATE:SomeMaterial:SomeTemplate`
+	 */
+	| {
+			UseMaterialTemplate: {
+				/**
+				 * The name of the new material
+				 */
+				material: string;
+				/**
+				 * The name of the template to copy
+				 */
+				template: string;
+			};
+	  }
+	/**
+	 * Defines a new local creature tissue and populates it with all properties defined in the local tissue specified in the second argument.
+	 *
+	 * Arguments:
+	 *
+	 * * `tissue`: The name of the new tissue
+	 * * `original_tissue`: The name of the original tissue to copy
+	 *
+	 * Appears as `USE_TISSUE:SomeTissue:SomeOriginalTissue`
+	 */
+	| {
+			UseTissue: {
+				/**
+				 * The name of the new tissue
+				 */
+				tissue: string;
+				/**
+				 * The name of the original tissue to copy
+				 */
+				original_tissue: string;
+			};
+	  }
+	/**
+	 * Loads a tissue template listed in `OBJECT:TISSUE_TEMPLATE` files, such as `tissue_template_default.txt`.
+	 *
+	 * Arguments:
+	 *
+	 * * `tissue`: The name of the new tissue
+	 * * `template`: The name of the template to copy
+	 *
+	 * Appears as `USE_TISSUE_TEMPLATE:SomeTissue:SomeTemplate`
+	 */
+	| {
+			UseTissueTemplate: {
+				/**
+				 * The name of the new tissue
+				 */
+				tissue: string;
+				/**
+				 * The name of the template to copy
+				 */
+				template: string;
+			};
+	  }
+	/**
+	 * Changes the language of the creature into unintelligible 'kobold-speak', which creatures of other species will be unable to understand. If a civilized creature has this and is not
+	 * part of a [SKULKING] civ, it will tend to start wars with all nearby civilizations and will be unable to make peace treaties due to 'inability to communicate'.
+	 *
+	 * Appears as `UTTERNANCES`
+	 */
+	| "Utterances"
+	/**
+	 * The vermin creature will attempt to eat exposed food. See `[PENETRATEPOWER]`. Distinct from `[VERMIN_ROTTER]`.
+	 *
+	 * Appears as `VERMIN_EATER`
+	 */
+	| "VerminEater"
+	/**
+	 * The vermin appears in water and will attempt to swim around.
+	 *
+	 * Appears as `VERMIN_FISH`
+	 */
+	| "VerminFish"
+	/**
+	 * The creature appears in "general" surface ground locations. Note that this doesn't stop the creature from flying if it can (most vermin birds have this tag).
+	 *
+	 * Appears as `VERMIN_GROUNDER`
+	 */
+	| "VerminGrounder"
+	/**
+	 * The vermin are attracted to rotting stuff and loose food left in the open and cause unhappy thoughts to dwarves who encounter them. Present on flies, knuckle worms,
+	 * acorn flies, and blood gnats. Speeds up decay?
+	 *
+	 * Appears as `VERMIN_ROTTER`
+	 */
+	| "VerminRotter"
+	/**
+	 * The creature randomly appears near dirt or mud, and may be uncovered by creatures that have the `[ROOT_AROUND]` interaction such as geese and chickens.
+	 * Dwarves will ignore the creature when given the "Capture live land animal" task.
+	 *
+	 * Appears as `VERMIN_SOIL`
+	 */
+	| "VerminSoil"
+	/**
+	 * The vermin will appear in a single tile cluster of many vermin, such as a colony of ants.
+	 *
+	 * Appears as `VERMIN_SOIL_COLONY`
+	 */
+	| "VerminSoilColony"
+	/**
+	 * An unknown tag.
+	 */
+	| "Unknown"
+	/**
+	 * Mates to breed
+	 */
+	| "MatesToBreed"
+	/**
+	 * Has two genders
+	 */
+	| "TwoGenders"
+	/**
+	 * All castes are alive
+	 */
+	| "AllCastesAlive"
+	/**
+	 * Is a small race
+	 */
+	| "SmallRace"
+	/**
+	 * Occurs as an entity
+	 */
+	| "OccursAsEntityRace"
+	/**
+	 * Equipment used
+	 */
+	| "Equipment";
+
+/**
+ * An enum representing a creature effect tag.
+ */
+export type CreatureEffectTag =
 	/**
 	 * Afflicts the targeted body part with intense pain. If no target is specified this applies to all body parts.
 	 */
@@ -5356,35 +5414,161 @@ export type CreatureEffectToken =
 	| "Unknown";
 
 /**
- * A creature variation.
+ * An enum representing a creature effect property tag.
  */
-export type CreatureVariation = {
+export type CreatureEffectPropertyTag =
 	/**
-	 * Common Raw file Things
+	 * The severity of the effect. Higher values appear to be worse, with SEV:1000 `CE_NECROSIS` causing a part to near-instantly become rotten.
 	 */
-	metadata?: Metadata | null;
-	identifier: string;
-	objectId: string;
+	| "Severity"
 	/**
-	 * Creature variations are basically just a set of simple tag actions which are applied to
-	 * the creature which is being modified. The tags are applied in order EXCEPT for the convert
-	 * tags which are applied in a reverse order.
+	 * The probability of the effect actually manifesting in the victim, as a percentage. 100 means always, 1 means a 1 in 100 chance.
 	 */
-	rules: CreatureVariationRule[];
+	| "Probability"
 	/**
-	 * A creature variation can define any number of arguments which can be used in the rules.
-	 * These arguments replace instances of `!ARGn` in the rules. Use `apply_arguments` to apply
-	 * a set of arguments to a creature variation (and get a very specific variation back). Use
-	 * `apply_to_creature` to apply the variation to a creature (it also takes arguments and will
-	 * apply them to the variation before applying the variation to the creature).
+	 * (Optional) Determines if the effect can be hindered by the target creature's disease resistance attribute.
+	 * Without this token, disease resistance is ignored. (yes, it's spelled incorrectly)
 	 */
-	argumentCount: string;
-};
+	| "Resistible"
+	/**
+	 * (Optional) This token presumably causes the severity of the effect to scale with the size of the creature compared
+	 * to the size of the dose of contagion they received, but has yet to be extensively tested.
+	 */
+	| "SizeDilutes"
+	/**
+	 * (Optional) As above, this token has yet to be tested but presumably delays the onset of an effect according to the size of the victim.
+	 */
+	| "SizeDelays"
+	/**
+	 * (Optional; overrides BP tokens) This tag causes an effect to ignore all BP tokens and then forces the game to attempt to apply the effect to
+	 * the limb that came into contact with the contagion - i.e. the part that was bitten by the creature injecting the syndrome material,
+	 * or the one that was splattered by a contact contagion. If an effect can not be applied to the contacted limb (such as `IMPAIR_FUNCTION` on a non-organ)
+	 * then this token makes the effect do nothing. This token also makes inhaled syndromes have no effect.
+	 */
+	| "Localized"
+	/**
+	 * (Optional) This effect only affects tissue layers with the VASCULAR token.
+	 */
+	| "VascularOnly"
+	/**
+	 * (Optional) This effect only affects tissue layers with the MUSCULAR token.
+	 */
+	| "MuscularOnly"
+	/**
+	 * (Optional; overridden by LOCALIZED) Specifies which body parts and tissues the effect is to be applied to. Not every effect requires a target!
+	 * For example, if you wanted to target the lungs of a creature, you would use `BP:BY_CATEGORY:LUNG:ALL`. The effect would act on all body parts
+	 * within the creature with the CATEGORY tag LUNG and affect all tissue layers. For another example, say you wanted to cause the skin to rot off a creature -
+	 * you could use `BP:BY_CATEGORY:ALL:SKIN`, targeting the SKIN tissue on all body parts. Multiple targets can be given in one effect by placing the BP tokens end to end.
+	 * This is one of the most powerful and useful aspects of the syndrome system, as it allows you to selectively target body parts relevant to the contagion,
+	 * like lungs for coal dust inhalation, or the eyes for exposure to an acid gas.
+	 */
+	| "BodyPart"
+	/**
+	 * `BY_CATEGORY:X` to target body parts with a matching `[CATEGORY:X]` body token (or `ALL` to affect everything)
+	 */
+	| "ByCategory"
+	/**
+	 * `BY_TYPE:X` to target body parts having a particular type (`UPPERBODY`, `LOWERBODY`, `HEAD`, `GRASP`, or `STANCE`)
+	 */
+	| "ByType"
+	/**
+	 * `BY_TOKEN:X` to target individual body parts by their ID as specified by the `[BP]` token of the body plan definition.
+	 */
+	| "ByToken"
+	/**
+	 * Determines the time after exposure, in ticks, when the effect starts. Required for all effects.
+	 */
+	| "Start"
+	/**
+	 * (Optional) Determines the time after exposure, in ticks, when the effect reaches its peak intensity.
+	 */
+	| "Peak"
+	/**
+	 * (Optional) Determines the time after exposure, in ticks, when the effect ends.
+	 */
+	| "End"
+	/**
+	 * (Optional) Multiplies the duration values of the effect by the specified amount in Fortress mode.
+	 */
+	| "DwfStretch"
+	/**
+	 * (Optional) Makes the effect begin immediately rather than ramping up.
+	 */
+	| "AbruptStart"
+	/**
+	 * (Optional) Makes the effect end immediately rather than ramping down.
+	 */
+	| "AbruptEnd"
+	/**
+	 * (Optional) Combination of `ABRUPT_START` and `ABRUPT_END`.
+	 */
+	| "Abrupt"
+	/**
+	 * (Optional) Can be hidden by a unit assuming a secret identity, such as a vampire.
+	 */
+	| "CanBeHidden"
+	/**
+	 * Unknown value for default.
+	 */
+	| "Unknown";
+
+/**
+ * An enum representing a creature variation tag.
+ */
+export type CreatureVariationTag =
+	/**
+	 * A tag to add a new tag to the creature.
+	 */
+	| "NewTag"
+	/**
+	 * A tag to add a tag to the creature.
+	 */
+	| "AddTag"
+	/**
+	 * A tag to remove a tag from the creature.
+	 */
+	| "RemoveTag"
+	/**
+	 * A tag to convert a tag to a new tag.
+	 */
+	| "ConvertTag"
+	/**
+	 * A tag to convert a tag to a new tag with specific token
+	 */
+	| "ConvertTagMaster"
+	/**
+	 * A tag to convert a tag to a new tag with specific target
+	 */
+	| "ConvertTagTarget"
+	/**
+	 * A tag to convert a tag to a new tag with specific replacement
+	 */
+	| "ConvertTagReplacement"
+	/**
+	 * Conditionally add a new tag to the creature.
+	 */
+	| "ConditionalNewTag"
+	/**
+	 * Conditionally add a tag to the creature.
+	 */
+	| "ConditionalAddTag"
+	/**
+	 * Conditionally remove a tag from the creature.
+	 */
+	| "ConditionalRemoveTag"
+	/**
+	 * Conditionally convert a tag to a new tag.
+	 */
+	| "ConditionalConvertTag"
+	/**
+	 * An unknown tag.
+	 */
+	| "Unknown";
 
 /**
  * A variation rule for a creature.
  */
-export type CreatureVariationRule =
+export type CreatureVariationRuleTag =
 	/**
 	 * An unknown rule.
 	 */
@@ -5551,131 +5735,9 @@ export type CreatureVariationRule =
 	  };
 
 /**
- * An enum representing a creature variation tag.
- */
-export type CVTag =
-	/**
-	 * A tag to add a new tag to the creature.
-	 */
-	| "NewTag"
-	/**
-	 * A tag to add a tag to the creature.
-	 */
-	| "AddTag"
-	/**
-	 * A tag to remove a tag from the creature.
-	 */
-	| "RemoveTag"
-	/**
-	 * A tag to convert a tag to a new tag.
-	 */
-	| "ConvertTag"
-	/**
-	 * A tag to convert a tag to a new tag with specific token
-	 */
-	| "ConvertTagMaster"
-	/**
-	 * A tag to convert a tag to a new tag with specific target
-	 */
-	| "ConvertTagTarget"
-	/**
-	 * A tag to convert a tag to a new tag with specific replacement
-	 */
-	| "ConvertTagReplacement"
-	/**
-	 * Conditionally add a new tag to the creature.
-	 */
-	| "ConditionalNewTag"
-	/**
-	 * Conditionally add a tag to the creature.
-	 */
-	| "ConditionalAddTag"
-	/**
-	 * Conditionally remove a tag from the creature.
-	 */
-	| "ConditionalRemoveTag"
-	/**
-	 * Conditionally convert a tag to a new tag.
-	 */
-	| "ConditionalConvertTag"
-	/**
-	 * An unknown tag.
-	 */
-	| "Unknown";
-
-/**
- * A struct representing an Entity object.
- */
-export type Entity = {
-	metadata?: Metadata | null;
-	identifier: string;
-	objectId: string;
-	tags: EntityToken[];
-	creature?: string | null;
-	translation?: string | null;
-	exclusiveStartBiome?: string | null;
-	biomeSupport?: [string, number][] | null;
-	settlementBiome?: string[] | null;
-	startBiome?: string[] | null;
-	likesSites?: string[] | null;
-	toleratesSites?: string[] | null;
-	worldConstructions?: string[] | null;
-	maxPopNumber?: number | null;
-	maxSitePopNumber?: number | null;
-	maxStartingCivNumber?: number | null;
-	permittedBuildings?: string[] | null;
-	permittedJobs?: string[] | null;
-	permittedReactions?: string[] | null;
-	currency?: [string, number][] | null;
-	artFacetModifier?: [string, number][] | null;
-	artImageElementModifier?: [string, number][] | null;
-	itemImprovementModifier?: [string, number][] | null;
-	selectSymbols?: [string, string][] | null;
-	subselectSymbols?: [string, string][] | null;
-	cullSymbols?: [string, string][] | null;
-	friendlyColor?: Color | null;
-	religion?: string | null;
-	religionSpheres?: string[] | null;
-	sphereAlignments?: string[] | null;
-	positions?: Position[] | null;
-	landHolderTrigger?: string | null;
-	siteVariablePositions?: string[] | null;
-	variablePositions?: string[] | null;
-	ethics?: [string, string][] | null;
-	values?: [string, number][] | null;
-	variableValues?: [string, number, number][] | null;
-	activeSeason?: string | null;
-	banditry?: number | null;
-	progressTriggerPopulation?: number | null;
-	progressTriggerProduction?: number | null;
-	progressTriggerTrade?: number | null;
-	progressTriggerPopulationSiege?: number | null;
-	progressTriggerProductionSiege?: number | null;
-	progressTriggerTradeSiege?: number | null;
-	scholars?: string[] | null;
-	ammo?: string[] | null;
-	armors?: [string, number][] | null;
-	diggers?: string[] | null;
-	gloves?: [string, number][] | null;
-	helms?: [string, number][] | null;
-	instrument?: string[] | null;
-	pants?: [string, number][] | null;
-	shields?: string[] | null;
-	shoes?: [string, number][] | null;
-	siegeAmmo?: string[] | null;
-	tool?: string[] | null;
-	toys?: string[] | null;
-	trapComponents?: string[] | null;
-	weapons?: string[] | null;
-	gemShape?: string[] | null;
-	stoneShape?: string[] | null;
-	sourceHfid?: number | null;
-};
-
-/**
  * Tokens that can be found in an entity raw file.
  */
-export type EntityToken =
+export type EntityTag =
 	/**
 	 * Allows adventure mode for entities with sites.
 	 */
@@ -6758,531 +6820,172 @@ export type EntityToken =
 	| "SelectEntity";
 
 /**
- * A struct representing a Graphic object.
+ * The class of environment that the stone appears in.
  */
-export type Graphic = {
-	metadata?: Metadata | null;
-	identifier: string;
-	objectId: string;
-	casteIdentifier?: string | null;
-	kind: GraphicType;
-	sprites?: SpriteGraphic[] | null;
-	layers?: [string, SpriteLayer[]][] | null;
-	growths?: [string, SpriteGraphic[]][] | null;
-	customExtensions?: CustomGraphicExtension[] | null;
-	tags?: string[] | null;
-};
+export type EnvironmentClassTag =
+	/**
+	 * Will appear in every stone.
+	 */
+	| "AllStone"
+	/**
+	 * Will appear in all igneous layers
+	 */
+	| "IgneousAll"
+	/**
+	 * Will appear in igneous extrusive layers
+	 */
+	| "IgneousExtrusive"
+	/**
+	 * Will appear in igneous intrusive layers
+	 */
+	| "IgneousIntrusive"
+	/**
+	 * Will appear in soil.
+	 */
+	| "Soil"
+	/**
+	 * Will appear in sand.
+	 */
+	| "SoilSand"
+	/**
+	 * Will appear in soil in the oceans.
+	 */
+	| "SoilOcean"
+	/**
+	 * Will appear in sedimentary layers.
+	 */
+	| "Sedimentary"
+	/**
+	 * Will appear in metamorphic layers.
+	 */
+	| "Metamorphic"
+	/**
+	 * Will appear in alluvial layers.
+	 */
+	| "Alluvial"
+	/**
+	 * Default value means parsing error.
+	 */
+	| "None";
 
 /**
- * A struct representing a sprite graphic.
+ * A material fuel type that can be set in a material definition.
  */
-export type SpriteGraphic = {
-	primaryCondition: Condition;
-	tilePageId: string;
-	offset: Dimensions;
-	color?: ColorModification | null;
-	largeImage?: boolean | null;
-	offset2?: Dimensions | null;
-	secondaryCondition?: Condition | null;
-	colorPalletSwap?: number | null;
-	targetIdentifier?: string | null;
-	extraDescriptor?: string | null;
-};
+export type FuelTypeTag =
+	/**
+	 * Charcoal or coal
+	 */
+	| "Charcoal"
+	/**
+	 * Coal coke
+	 */
+	| "Coke"
+	/**
+	 * No glass furnace fuel
+	 */
+	| "NoMaterialGloss"
+	/**
+	 * None is an invalid option, so its a hint that this is not set.
+	 */
+	| "None";
 
 /**
- * A struct representing a `SpriteLayer` object.
+ * An enum representing a gait modifier.
  */
-export type SpriteLayer = {
-	layerName: string;
-	tilePageId: string;
-	offset: Dimensions;
-	offset2?: Dimensions | null;
-	largeImage?: boolean | null;
-	conditions?: [Condition, string][] | null;
-};
+export type GaitModifierTag =
+	/**
+	 * Fat/muscle layers slow the movement (muscle-slowing counter-acted by strength bonus)
+	 * Makes `THICKENS_ON_ENERGY_STORAGE` and `THICKENS_ON_STRENGTH` tissue layers slow movement depending on how thick they are.
+	 * Adding the `STRENGTH` gait flag counteracts the impact of the latter layer.
+	 */
+	| "LayersSlow"
+	/**
+	 * Speeds/slows movement depending on the creature's Strength stat.
+	 */
+	| "Strength"
+	/**
+	 * Speeds/slows movement depending on the creature's Agility stat.
+	 */
+	| "Agility"
+	/**
+	 * Stealth slows movement by the specified percentage when the creature is sneaking.
+	 */
+	| {
+			StealthSlows: {
+				/**
+				 * The percentage slowed
+				 */
+				percentage: number;
+			};
+	  }
+	/**
+	 * No build up time
+	 */
+	| "NoBuildUp"
+	/**
+	 * Build up time. Only used if the gait has a build up time.
+	 */
+	| {
+			BuildUp: {
+				/**
+				 * The build up time indicates how long it will take for a creature using this gait to go from `<start speed>` to `<max speed>`.
+				 * For example, a value of 10 means that it should be able to reach the maximum speed by moving 10 tiles in a straight line over even terrain.
+				 */
+				time: number;
+				/**
+				 * The turning max indicates the maximum speed permissible when the creature suddenly changes its direction of motion.
+				 * The creature's speed will be reduced to `<max turning speed>` if traveling at a higher speed than this before turning.
+				 */
+				turning_max: number;
+				/**
+				 * The creature's speed when it starts moving using this gait
+				 */
+				start_speed: number;
+			};
+	  };
 
 /**
- * A struct representing a `TilePage` object.
+ * An enum representing a gait type.
  */
-export type TilePage = {
-	metadata?: Metadata | null;
-	identifier: string;
-	objectId: string;
-	file: string;
-	tileDim: Dimensions;
-	pageDim: Dimensions;
-};
-
-/**
- * The color modification of the tile
- */
-export type ColorModification =
+export type GaitTypeTag =
 	/**
-	 * The color is as is
+	 * Travel on foot/the ground
+	 * Used for moving normally over ground tiles.
 	 */
-	"asIs";
-
-/**
- * A condition that can be applied to a tile/entity
- */
-export type Condition =
+	| "Walk"
 	/**
-	 * No condition
+	 * Travel on foot/the ground
+	 * Used for moving over ground tiles whilst prone.
 	 */
-	| "none"
+	| "Crawl"
 	/**
-	 * The start of a condition
+	 * Climbing on walls, etc.
+	 * Used for moving whilst climbing.
 	 */
-	| "condition"
+	| "Climb"
 	/**
-	 * Default condition
+	 * Swimming in water/liquid
+	 * Used for moving through tiles containing water or magma at a depth of at least 4/7.
 	 */
-	| "default"
+	| "Swim"
 	/**
-	 * A condition of "being animated"
+	 * Flying through the air
+	 * Used for moving through open space.
 	 */
-	| "animated"
+	| "Fly"
 	/**
-	 * Condition of being a corpse
+	 * Other gait type which is unexpected, but we can still handle it
 	 */
-	| "corpse"
+	| { Other: string }
 	/**
-	 * Condition of being a child
+	 * Unknown gait type (unset)
 	 */
-	| "child"
-	/**
-	 * Condition of being a baby
-	 */
-	| "baby"
-	/**
-	 * Condition of being trained for hunting
-	 */
-	| "trainedHunter"
-	/**
-	 * Condition of being trained for war
-	 */
-	| "trainedWar"
-	/**
-	 * Condition of being a list icont
-	 */
-	| "listIcon"
-	/**
-	 * Condition of being a skeleton
-	 */
-	| "skeleton"
-	/**
-	 * Condition of being a skeleton with a skull
-	 */
-	| "skeletonWithSkull"
-	/**
-	 * Condition of being a zombie
-	 */
-	| "zombie"
-	/**
-	 * Condition of being a necromancer
-	 */
-	| "necromancer"
-	/**
-	 * Condition of being male
-	 */
-	| "male"
-	/**
-	 * Condition of being female
-	 */
-	| "female"
-	/**
-	 * Condition of being a vampire
-	 */
-	| "vampireCursed"
-	/**
-	 * Condition of being a ghoul
-	 */
-	| "ghoul"
-	/**
-	 * Condition of being a disturbed dead
-	 */
-	| "disturbedDead"
-	/**
-	 * Condition of being remains
-	 */
-	| "remains"
-	/**
-	 * Condition of being a vermin
-	 */
-	| "vermin"
-	/**
-	 * Condition of being a light vermin
-	 */
-	| "lightVermin"
-	/**
-	 * Condition of being a hive
-	 */
-	| "hive"
-	/**
-	 * Condition of being a small swarm
-	 */
-	| "swarmSmall"
-	/**
-	 * Condition of being a medium swarm
-	 */
-	| "swarmMedium"
-	/**
-	 * Condition of being a large swarm
-	 */
-	| "swarmLarge"
-	/**
-	 * Condition of being not an artifact
-	 */
-	| "notArtifact"
-	/**
-	 * Condition of being a crafted artifact
-	 */
-	| "craftedArtifact"
-	/**
-	 * Condition of being dyed
-	 */
-	| "dye"
-	/**
-	 * Condition of not being dyed
-	 */
-	| "notDyed"
-	/**
-	 * Condition of being a crop
-	 */
-	| "crop"
-	/**
-	 * Condition of being a seed
-	 */
-	| "seed"
-	/**
-	 * Condition of being a plant (picked)
-	 */
-	| "picked"
-	/**
-	 * Condition of being a shrub
-	 */
-	| "shrub"
-	/**
-	 * Condition of being a sapling
-	 */
-	| "sapling"
-	/**
-	 * Condition of being a crop sprout
-	 */
-	| "cropSprout"
-	/**
-	 * Condition of being a large crop
-	 */
-	| "cropL"
-	/**
-	 * Condition of being a medium crop
-	 */
-	| "cropM"
-	/**
-	 * Condition of being a small crop
-	 */
-	| "cropR"
-	/**
-	 * Condition of being a dead shrub
-	 */
-	| "shrubDead"
-	/**
-	 * Condition of not being a child
-	 */
-	| "notChild"
-	/**
-	 * Condition of being at least so many hauled
-	 */
-	| "haulCountMin"
-	/**
-	 * Condition of being at most so many hauled
-	 */
-	| "haulCountMax"
-	/**
-	 * Condition of being a worn item
-	 */
-	| "itemWorn"
-	/**
-	 * Condition of having a profession
-	 */
-	| "professionCategory"
-	/**
-	 * Condition of being a class
-	 */
-	| "class"
-	/**
-	 * Condition of being a syndrome class
-	 */
-	| "syndromeClass"
-	/**
-	 * Condition of being a caste
-	 */
-	| "caste"
-	/**
-	 * Condition of being a tissue layer
-	 */
-	| "tissueLayer"
-	/**
-	 * Condition of being a material flag
-	 */
-	| "materialFlag"
-	/**
-	 * Condition of being a material type
-	 */
-	| "materialType"
-	/**
-	 * Condition of being off if an item is present
-	 */
-	| "shutOffIfItemPresent"
-	/**
-	 * Condition of being a random part index
-	 */
-	| "randomPartIndex"
-	/**
-	 * Condition of being a ghost
-	 */
-	| "ghost"
-	/**
-	 * Condition of being a tissue that may have color
-	 */
-	| "tissueMayHaveColor"
-	/**
-	 * Condition of being a tissue that is at least so long
-	 */
-	| "tissueMinLength"
-	/**
-	 * Condition of being a tissue that is at most so long
-	 */
-	| "tissueMaxLength"
-	/**
-	 * Condition of being a tissue at least so curly
-	 */
-	| "tissueMinCurly"
-	/**
-	 * Condition of being a tissue at most so curly
-	 */
-	| "tissueMaxCurly"
-	/**
-	 * Condition of being a tissue that may have a shape
-	 */
-	| "tissueMayHaveShaping"
-	/**
-	 * Condition of being a tissue that is not shaped
-	 */
-	| "tissueNotShaped"
-	/**
-	 * Condition of being a swapped tissue
-	 */
-	| "tissueSwap"
-	/**
-	 * Condition of being a specific layer (start layer definition)
-	 */
-	| "layer"
-	/**
-	 * Condition of being a specific layer set of layers
-	 */
-	| "layerSet"
-	/**
-	 * Condition of being a specific layer group
-	 */
-	| "layerGroup"
-	/**
-	 * Condition of being a specific layer group set of layers
-	 */
-	| "endLayerGroup"
-	/**
-	 * Condition of being the upper body
-	 */
-	| "bodyUpper"
-	/**
-	 * Condition of being a copy of a template
-	 */
-	| "copyOfTemplate"
-	/**
-	 * Hammerman profession
-	 */
-	| "hammerman"
-	/**
-	 * Master Hammerman profession
-	 */
-	| "masterHammerman"
-	/**
-	 * Spearman profession
-	 */
-	| "spearman"
-	/**
-	 * Master Spearman profession
-	 */
-	| "masterSpearman"
-	/**
-	 * Wrestler profession
-	 */
-	| "wrestler"
-	/**
-	 * Master Wrestler profession
-	 */
-	| "masterWrestler"
-	/**
-	 * Axeman profession
-	 */
-	| "axeman"
-	/**
-	 * Master Axeman profession
-	 */
-	| "masterAxeman"
-	/**
-	 * Swordsman profession
-	 */
-	| "swordsman"
-	/**
-	 * Master Swordsman profession
-	 */
-	| "masterSwordsman"
-	/**
-	 * Maceman profession
-	 */
-	| "maceman"
-	/**
-	 * Master Maceman profession
-	 */
-	| "masterMaceman"
-	/**
-	 * Pikeman profession
-	 */
-	| "pikeman"
-	/**
-	 * Master Pikeman profession
-	 */
-	| "masterPikeman"
-	/**
-	 * Recruit profession
-	 */
-	| "recruit"
-	/**
-	 * Thief profession
-	 */
-	| "thief"
-	/**
-	 * Master Thief profession
-	 */
-	| "masterThief"
-	/**
-	 * Lasher profession
-	 */
-	| "lasher"
-	/**
-	 * Master Lasher profession
-	 */
-	| "masterLasher"
-	/**
-	 * Monster slayer profession
-	 */
-	| "monsterSlayer"
-	/**
-	 * Crossbowman profession
-	 */
-	| "crossbowman"
-	/**
-	 * Master Crossbowman profession
-	 */
-	| "masterCrossbowman"
-	/**
-	 * Bowman profession
-	 */
-	| "bowman"
-	/**
-	 * Master Bowman profession
-	 */
-	| "masterBowman"
-	/**
-	 * Blowgunman profession
-	 */
-	| "blowgunman"
-	/**
-	 * Master Blowgunman profession
-	 */
-	| "masterBlowgunman"
-	/**
-	 * Beat hunter profession
-	 */
-	| "beastHunter"
-	/**
-	 * Scout profession
-	 */
-	| "scout"
-	/**
-	 * Ranger profession
-	 */
-	| "ranger"
-	/**
-	 * Hunter profession
-	 */
-	| "hunter"
-	/**
-	 * Sage profession
-	 */
-	| "sage"
-	/**
-	 * Scholar profession
-	 */
-	| "scholar"
-	/**
-	 * Philosopher profession
-	 */
-	| "philosopher"
-	/**
-	 * Mathematician profession
-	 */
-	| "mathematician"
-	/**
-	 * Historian profession
-	 */
-	| "historian"
-	/**
-	 * Astronomer profession
-	 */
-	| "astronomer"
-	/**
-	 * Naturalist profession
-	 */
-	| "naturalist"
-	/**
-	 * Chemist profession
-	 */
-	| "chemist"
-	/**
-	 * Geographer profession
-	 */
-	| "geographer"
-	/**
-	 * Scribe profession
-	 */
-	| "scribe"
-	/**
-	 * Bookbinder profession
-	 */
-	| "bookbinder"
-	/**
-	 * Performer profession
-	 */
-	| "performer"
-	/**
-	 * Poet profession
-	 */
-	| "poet"
-	/**
-	 * Bard profession
-	 */
-	| "bard"
-	/**
-	 * Dancer profession
-	 */
-	| "dancer";
+	| "Unknown";
 
 /**
  * The graphic type of the tile
  */
-export type GraphicType =
+export type GraphicTypeTag =
 	/**
 	 * The tile is a creature
 	 */
@@ -7765,9 +7468,9 @@ export type GraphicType =
 	| "weaponUpright10B";
 
 /**
- * The growth token of the tile
+ * The growth tag of the tile
  */
-export type GrowthToken =
+export type GrowthTag =
 	/**
 	 * The tile is a fruit
 	 */
@@ -7794,137 +7497,9 @@ export type GrowthToken =
 	| "asIs";
 
 /**
- * The graphic of the tile
- */
-export type PlantGraphicTemplate =
-	/**
-	 * The standard leaves
-	 */
-	| "standardLeaves"
-	/**
-	 * The standard fruit 1
-	 */
-	| "standardFruit1"
-	/**
-	 * The standard fruit 2
-	 */
-	| "standardFruit2"
-	/**
-	 * The standard fruit 3
-	 */
-	| "standardFruit3"
-	/**
-	 * The standard fruit 4
-	 */
-	| "standardFruit4"
-	/**
-	 * The standard flowers 1
-	 */
-	| "standardFlowers1"
-	/**
-	 * The standard flowers 2
-	 */
-	| "standardFlowers2"
-	/**
-	 * The standard flowers 3
-	 */
-	| "standardFlowers3"
-	/**
-	 * The standard flowers 4
-	 */
-	| "standardFlowers4";
-
-/**
- * The tokens used to define the tile page
- */
-export type TilePageTag =
-	/**
-	 * The dimensions of the tile
-	 */
-	| "tileDim"
-	/**
-	 * The dimensions of the page
-	 */
-	| "pageDim"
-	/**
-	 * The file path
-	 */
-	| "file"
-	/**
-	 * An unknown token
-	 */
-	| "unknown";
-
-/**
- * The raw representation of an inorganic object.
- */
-export type Inorganic = {
-	identifier: string;
-	metadata?: Metadata | null;
-	objectId: string;
-	material: Material;
-	metalOreChance?: [string, number][] | null;
-	threadMetalChance?: [string, number][] | null;
-	environmentClass?: EnvironmentClass | null;
-	environmentInclusionType?: InclusionType | null;
-	environmentInclusionFrequency?: number | null;
-	environmentClassSpecific?: string[] | null;
-	tags?: InorganicToken[] | null;
-};
-
-/**
- * The class of environment that the stone appears in.
- */
-export type EnvironmentClass =
-	/**
-	 * Will appear in every stone.
-	 */
-	| "AllStone"
-	/**
-	 * Will appear in all igneous layers
-	 */
-	| "IgneousAll"
-	/**
-	 * Will appear in igneous extrusive layers
-	 */
-	| "IgneousExtrusive"
-	/**
-	 * Will appear in igneous intrusive layers
-	 */
-	| "IgneousIntrusive"
-	/**
-	 * Will appear in soil.
-	 */
-	| "Soil"
-	/**
-	 * Will appear in sand.
-	 */
-	| "SoilSand"
-	/**
-	 * Will appear in soil in the oceans.
-	 */
-	| "SoilOcean"
-	/**
-	 * Will appear in sedimentary layers.
-	 */
-	| "Sedimentary"
-	/**
-	 * Will appear in metamorphic layers.
-	 */
-	| "Metamorphic"
-	/**
-	 * Will appear in alluvial layers.
-	 */
-	| "Alluvial"
-	/**
-	 * Default value means parsing error.
-	 */
-	| "None";
-
-/**
  * The type of inclusion that the stone has.
  */
-export type InclusionType =
+export type InclusionTypeTag =
 	/**
 	 * Large ovoids that occupy their entire 48x48 embark tile. Microcline is an example. When mined, stone has a 25% yield (as with layer stones).
 	 */
@@ -7947,9 +7522,9 @@ export type InclusionType =
 	| "None";
 
 /**
- * Tokens that can be used in inorganic raws.
+ * Tags that can be used in inorganic raws.
  */
-export type InorganicToken =
+export type InorganicTag =
 	/**
 	 * Used on metals, causes the metal to be made into wafers instead of bars.
 	 */
@@ -8052,94 +7627,9 @@ export type InorganicToken =
 	| "Unknown";
 
 /**
- * A struct representing a material
- */
-export type Material = {
-	/**
-	 * The type of the material is also the trigger to start tracking a material
-	 */
-	materialType?: MaterialType | null;
-	/**
-	 * The material might have a name, but its more likely that there is only an identifier to
-	 * refer to another creature/plant/reaction, which are listed elsewhere.
-	 * If there is no name provided, then it is a special hardcoded case, e.g. magma or green glass.
-	 */
-	name?: string | null;
-	/**
-	 * For the coal tag, it specifies the type of fuel that can be used. It will never be None.
-	 */
-	fuelType?: FuelType | null;
-	/**
-	 * Linked creature identifier (and then `material_name` might be "skin", like for "`CREATURE_MAT:DWARF:SKIN`")
-	 */
-	creatureIdentifier?: string | null;
-	/**
-	 * Linked plant identifier (and then `material_name` might be "leaf", like for "`PLANT_MAT:BUSH_QUARRY:LEAF`")
-	 */
-	plantIdentifier?: string | null;
-	/**
-	 * If a material is defined within a creature itself, it will use `LOCAL_CREATURE_MAT` tag, which implies
-	 * that the material is only used by that creature. This is also true for plants and `LOCAL_PLANT_MAT`.
-	 */
-	isLocalMaterial?: boolean | null;
-	/**
-	 * Within a reaction, there can be special material definitions. Todo: Figure this out.
-	 */
-	reagentIdentifier?: string | null;
-	reactionProductIdentifier?: string | null;
-	/**
-	 * If material is defined from a template, we need a way to refer to that
-	 */
-	templateIdentifier?: string | null;
-	/**
-	 * Usage tags
-	 */
-	usage?: MaterialUsage[] | null;
-	value?: number | null;
-	color?: Color | null;
-	stateNames?: StateName | null;
-	stateAdjectives?: StateName | null;
-	stateColors?: StateName | null;
-	temperatures?: Temperatures | null;
-	/**
-	 * Catch-all for remaining tags we identify but don't do anything with... yet.
-	 */
-	properties?: string[] | null;
-	syndromes?: Syndrome[] | null;
-	mechanicalProperties?: MaterialMechanics | null;
-	liquidDensity?: number | null;
-	molarMass?: number | null;
-	buildColor?: Color | null;
-	displayColor?: Color | null;
-	tile?: Tile | null;
-	itemSymbol?: string | null;
-};
-
-/**
- * A material fuel type that can be set in a material definition.
- */
-export type FuelType =
-	/**
-	 * Charcoal or coal
-	 */
-	| "Charcoal"
-	/**
-	 * Coal coke
-	 */
-	| "Coke"
-	/**
-	 * No glass furnace fuel
-	 */
-	| "NoMaterialGloss"
-	/**
-	 * None is an invalid option, so its a hint that this is not set.
-	 */
-	| "None";
-
-/**
  * A material property that can be set in a material definition.
  */
-export type MaterialProperty =
+export type MaterialPropertyTag =
 	/**
 	 * Imports the properties of the specified preexisting material template.
 	 */
@@ -8495,7 +7985,7 @@ export type MaterialProperty =
 /**
  * A material state that can be set in a material definition.
  */
-export type MaterialState =
+export type MaterialStateTag =
 	/**
 	 * Solid state of the material
 	 */
@@ -8536,7 +8026,7 @@ export type MaterialState =
 /**
  * A material template
  */
-export type MaterialType =
+export type MaterialTypeTag =
 	/**
 	 * An inorganic material
 	 */
@@ -8649,7 +8139,7 @@ export type MaterialType =
 /**
  * A material usage that can be set in a material definition.
  */
-export type MaterialUsage =
+export type MaterialUsageTag =
 	/**
 	 * Lets the game know that an animal was likely killed in the production of this item.
 	 * Entities opposed to killing animals (Elves in vanilla) will refuse to accept these items in trade.
@@ -8962,54 +8452,97 @@ export type MaterialUsage =
 	| "Unknown";
 
 /**
- * A struct representing a material template
+ * A struct representing a modification to a creature
  */
-export type MaterialTemplate = {
-	identifier: string;
-	metadata?: Metadata | null;
-	objectId: string;
-	material: Material;
-};
-
-/**
- * A struct representing a plant
- */
-export type Plant = {
+export type ModificationTag =
 	/**
-	 * Common Raw file Things
+	 * `COPY_TAGS_FROM` tag
 	 */
-	metadata?: Metadata | null;
-	identifier: string;
-	objectId: string;
-	name: Name;
-	prefStrings?: string[] | null;
-	tags?: PlantTag[] | null;
+	| {
+			CopyTagsFrom: {
+				/**
+				 * The creature to copy tags from
+				 */
+				identifier: string;
+			};
+	  }
 	/**
-	 * Default [0, 0] (aboveground)
+	 * `APPLY_CREATURE_VARIATION` tag
 	 */
-	undergroundDepth?: [number, number] | null;
+	| {
+			ApplyCreatureVariation: {
+				/**
+				 * The creature to apply the variation from
+				 */
+				identifier: string;
+			};
+	  }
 	/**
-	 * Default frequency is 50
+	 * Follows `GO_TO_END` until `GO_TO_START` or object definition finishes
+	 *
+	 * When using tags from an existing creature, inserts new tags at the end of the creature.
 	 */
-	frequency?: number | null;
+	| {
+			AddToEnding: {
+				/**
+				 * The set of raws to add to the end of the object
+				 *
+				 * This should be the entire raw in order to apply.
+				 */
+				raws: string[];
+			};
+	  }
 	/**
-	 * List of biomes this plant can grow in
+	 * Follows `GO_TO_START` until `GO_TO_END` or object definition finishes
+	 *
+	 * When using tags from an existing creature, inserts new tags at the beginning of the creature.
 	 */
-	biomes?: Biome[] | null;
+	| {
+			AddToBeginning: {
+				/**
+				 * The set of raws to add to the beginning of the object
+				 *
+				 * This should be the entire raw in order to apply.
+				 */
+				raws: string[];
+			};
+	  }
 	/**
-	 * Growth Tokens define the growths of the plant (leaves, fruit, etc.)
+	 * `GO_TO_TAG:tag` raw instruction
+	 *
+	 * When using tags from an existing creature, inserts new tags before the specified tag.
 	 */
-	growths?: PlantGrowth[] | null;
+	| {
+			AddBeforeTag: {
+				/**
+				 * The tag to insert before
+				 *
+				 * Since we don't actually know the tag order after parsing, this will be ignored in parsing, and
+				 * instead will just apply the raws...
+				 */
+				tag: string;
+				/**
+				 * The set of raws to add before the tag
+				 *
+				 * This should be the entire raw in order to apply.
+				 */
+				raws: string[];
+			};
+	  }
 	/**
-	 * If plant is a tree, it will have details about the tree.
+	 * The main body of the object
 	 */
-	treeDetails?: Tree | null;
-	/**
-	 * If plant is a shrub, it will have details about the shrub.
-	 */
-	shrubDetails?: Shrub | null;
-	materials?: Material[] | null;
-};
+	| {
+			MainRawBody: {
+				/**
+				 * The set of raws that make up the object. This is usually defined first unless
+				 * its specified to be added to the end or beginning (or before a tag)
+				 *
+				 * This should be the entire raw in order to apply.
+				 */
+				raws: string[];
+			};
+	  };
 
 /**
  * The tags of a plant
@@ -9089,62 +8622,50 @@ export type PlantTag =
 	| "Unknown";
 
 /**
- * A struct representing a plant growth
+ * The graphic of the tile
  */
-export type PlantGrowth = {
+export type PlantGraphicTemplateTag =
 	/**
-	 * Plant growths are not given an identifier, since they are just supporting
-	 * data for the plant definition. They are defined instead by the type of growth.
+	 * The standard leaves
 	 */
-	growthType: GrowthType;
+	| "standardLeaves"
 	/**
-	 * The name of the growth. This is actually defined with `GROWTH_NAME` key in the raws.
+	 * The standard fruit 1
 	 */
-	name: SingPlurName;
+	| "standardFruit1"
 	/**
-	 * The item grown by this growth. This is actually defined with `GROWTH_ITEM` key in the raws.
-	 * This is a string until we make a proper item structure. Technically there are 2 arguments:
-	 * 1. item token, 2: material token. Generally the item type should be `PLANT_GROWTH:NONE`.
+	 * The standard fruit 2
 	 */
-	item: string;
+	| "standardFruit2"
 	/**
-	 * Specifies on which part of the plant this growth grows. This is defined with `GROWTH_HOST_TILE` key.
-	 * This can be unused, like in the case of crops where the plant is the growth (I think?).
+	 * The standard fruit 3
 	 */
-	hostTiles?: PlantPart[] | null;
+	| "standardFruit3"
 	/**
-	 * Controls the height on the trunk above which the growth begins to appear.
-	 * The first value is the percent of the trunk height where the growth begins appearing:
-	 * 0 will cause it along the entire trunk (above the first tile), 100 will cause it to appear
-	 * at the topmost trunk tile. Can be larger than 100 to cause it to appear above the trunk.
-	 * The second value must be -1, but might be intended to control whether it starts height counting
-	 * from the bottom or top.
+	 * The standard fruit 4
 	 */
-	trunkHeightPercentage?: [number, number] | null;
+	| "standardFruit4"
 	/**
-	 * Currently has no effect.
+	 * The standard flowers 1
 	 */
-	density?: number | null;
+	| "standardFlowers1"
 	/**
-	 * Specifies the appearance of the growth. This is defined with `GROWTH_PRINT` key.
-	 * This is a string until we make a proper print structure.
+	 * The standard flowers 2
 	 */
-	print?: string | null;
+	| "standardFlowers2"
 	/**
-	 * Specifies at which part of the year the growth appears. Default is all year round.
-	 * Minimum: 0, Maximum: `402_200`. This is defined with `GROWTH_TIMING` key.
+	 * The standard flowers 3
 	 */
-	timing?: [number, number] | null;
+	| "standardFlowers3"
 	/**
-	 * Where we gather some of the growth's tags.
+	 * The standard flowers 4
 	 */
-	tags?: GrowthTag[] | null;
-};
+	| "standardFlowers4";
 
 /**
  * The growth tag of a plant
  */
-export type GrowthTag =
+export type PlantGrowthTag =
 	/**
 	 * The beginning of a growth tag
 	 */
@@ -9197,7 +8718,7 @@ export type GrowthTag =
 /**
  * The types of growths
  */
-export type GrowthType =
+export type PlantGrowthTypeTag =
 	/**
 	 * The growth is a leaf
 	 */
@@ -9258,7 +8779,7 @@ export type GrowthType =
 /**
  * Parts of a plant
  */
-export type PlantPart =
+export type PlantPartTag =
 	/**
 	 * Twigs
 	 */
@@ -9305,51 +8826,9 @@ export type PlantPart =
 	| "Unknown";
 
 /**
- * Represents a position in the government of an entity
- */
-export type Position = {
-	identifier: string;
-	allowedClasses?: string[] | null;
-	allowedCreatures?: string[] | null;
-	appointedBy?: string | null;
-	color?: Color | null;
-	commander?: string | null;
-	demandMax?: number | null;
-	executionSkill?: string | null;
-	gender?: string | null;
-	landHolder?: number | null;
-	landName?: string | null;
-	mandateMax?: number | null;
-	name?: SingPlurName | null;
-	nameMale?: SingPlurName | null;
-	nameFemale?: SingPlurName | null;
-	number?: number | null;
-	precedence?: number | null;
-	rejectedClasses?: string[] | null;
-	rejectedCreatures?: string[] | null;
-	replacedBy?: string | null;
-	requiredBedroom?: number | null;
-	requiredBoxes?: number | null;
-	requiredCabinets?: number | null;
-	requiredDining?: number | null;
-	requiredOffice?: number | null;
-	requiredRacks?: number | null;
-	requiredStands?: number | null;
-	requiredTomb?: number | null;
-	requiresPopulation?: number | null;
-	responsibilities?: string[] | null;
-	spouse?: SingPlurName | null;
-	spouseFemale?: SingPlurName | null;
-	spouseMale?: SingPlurName | null;
-	squad?: string | null;
-	succession?: string | null;
-	tags: PositionToken[];
-};
-
-/**
  * Represents a position token
  */
-export type PositionToken =
+export type PositionTag =
 	/**
 	 * The position holder is not subjected to the economy. Less than relevant right now.
 	 */
@@ -9698,151 +9177,9 @@ export type PositionToken =
 	| "Unknown";
 
 /**
- * A struct representing a seed material
- */
-export type SeedMaterial = {
-	name: SingPlurName;
-	color: Color;
-	material: string;
-};
-
-/**
- * A struct representing a creature selection
- */
-export type SelectCreature = {
-	metadata?: Metadata | null;
-	identifier: string;
-	objectId: string;
-	tags: string[];
-};
-
-/**
- * The rules for selecting a creature
- */
-export type SelectRules =
-	/**
-	 * Selects a previously defined caste
-	 */
-	| { selectCaste: string }
-	/**
-	 * Selects a locally defined material. Can be ALL.
-	 */
-	| { selectMaterial: string }
-	/**
-	 * Selects a tissue for editing.
-	 */
-	| { selectTissue: string }
-	/**
-	 * Adds an additional previously defined caste to the selection. Used after `[SELECT_CASTE]`.
-	 */
-	| { selectAdditionalCaste: string };
-
-/**
- * A shrub in the raws.
- */
-export type Shrub = {
-	/**
-	 * Allows the plant to grow in farm plots during the given season.
-	 * If the plant is a surface plant, allows it to grow in the wild during this season; wild surface plants without
-	 * this token will disappear at the beginning of the season. Underground plants grow wild in all seasons, regardless
-	 * of their season tokens.
-	 * Default: empty (plant will not grow in farm plots)
-	 */
-	growingSeason?: SeasonToken[] | null;
-	/**
-	 * How long the plant takes to grow to harvest in a farm plot. Unit hundreds of ticks.
-	 * There are 1008 GROWDUR units in a season. Defaults to 300.
-	 */
-	growDuration?: number | null;
-	/**
-	 * Has no known effect. Previously set the value of the harvested plant.
-	 */
-	value?: number | null;
-	/**
-	 * The tile used when the plant is harvested whole, or is ready to be picked from a farm plot. May either be a cp437
-	 * tile number, or a character between single quotes. See character table. Defaults to 231 (τ).
-	 */
-	pickedTile?: number | null;
-	/**
-	 * The tile used when a plant harvested whole has wilted. Defaults to 169 (⌐).
-	 */
-	deadPickedTile?: number | null;
-	/**
-	 * The tile used to represent this plant when it is wild, alive, and has no growths. Defaults to 34 (").
-	 */
-	shrubTile?: number | null;
-	/**
-	 * The tile used to represent this plant when it is dead in the wild. Defaults to 34 (").
-	 */
-	deadShrubTile?: number | null;
-	/**
-	 * The maximum stack size collected when gathered via herbalism (possibly also from farm plots?). Defaults to 5.
-	 */
-	clusterSize?: number | null;
-	/**
-	 * The color of the plant when it has been picked whole, or when it is ready for harvest in a farm plot. Defaults to 2:0:0 (dark green).
-	 */
-	pickedColor?: Color | null;
-	/**
-	 * The color of the plant when it has been picked whole, but has wilted. Defaults to 0:0:1 (dark gray).
-	 */
-	deadPickedColor?: Color | null;
-	/**
-	 * The color of the plant when it is alive, wild, and has no growths. Defaults to 2:0:0 (dark green).
-	 */
-	shrubColor?: Color | null;
-	/**
-	 * The color of the plant when it is dead in the wild. Defaults to 6:0:0 (brown).
-	 */
-	deadShrubColor?: Color | null;
-	/**
-	 * The shrub will drown once the water on its tile reaches this level. Defaults to 4.
-	 */
-	shrubDrownLevel?: number | null;
-	/**
-	 * Names a drink made from the plant, allowing it to be used in entity resources.
-	 * Previously also permitted brewing the plant into alcohol made of this material.
-	 * Now, a `MATERIAL_REACTION_PRODUCT` of type `DRINK_MAT` should be used on the proper plant material.
-	 */
-	drink?: string | null;
-	/**
-	 * Permits milling the plant at a quern or millstone into a powder made of this material and allows its use in entity resources.
-	 * Said material should have `[POWDER_MISC_PLANT]` to permit proper stockpiling. This token makes the whole plant harvestable regardless
-	 * of which material is designated for milling.
-	 * For plants with millable growths, use only `MATERIAL_REACTION_PRODUCT` or `ITEM_REACTION_PRODUCT` tokens to define the milling products.
-	 */
-	mill?: string | null;
-	/**
-	 * Permits processing the plant at a farmer's workshop to yield threads made of this material and allows its use in entity resources.
-	 * Said material should have `[THREAD_PLANT]` to permit proper stockpiling.
-	 */
-	thread?: string | null;
-	/**
-	 * Causes the plant to yield plantable seeds made of this material and having these properties.
-	 * Said material should have `[SEED_MAT]` to permit proper stockpiling.
-	 */
-	seed?: SeedMaterial | null;
-	/**
-	 * Permits processing the plant into a vial at a still to yield extract made of this material.
-	 * Said material should have `[EXTRACT_STORAGE:FLASK]`.
-	 */
-	extractStillVial?: string | null;
-	/**
-	 * Permits processing the plant into a vial at a farmer's workshop to yield extract made of this material.
-	 * Said material should have `[EXTRACT_STORAGE:VIAL]`.
-	 */
-	extractVial?: string | null;
-	/**
-	 * Permits processing the plant into a barrel at a farmer's workshop to yield extract made of this material.
-	 * Said material should have `[EXTRACT_STORAGE:BARREL]`.
-	 */
-	extractBarrel?: string | null;
-};
-
-/**
  * The tokens for the seasons
  */
-export type SeasonToken =
+export type SeasonTag =
 	/**
 	 * The spring season
 	 */
@@ -9865,9 +9202,30 @@ export type SeasonToken =
 	| "Unknown";
 
 /**
+ * The rules for selecting a creature
+ */
+export type SelectCreatureRuleTag =
+	/**
+	 * Selects a previously defined caste
+	 */
+	| { SelectCaste: string }
+	/**
+	 * Selects a locally defined material. Can be ALL.
+	 */
+	| { SelectMaterial: string }
+	/**
+	 * Selects a tissue for editing.
+	 */
+	| { SelectTissue: string }
+	/**
+	 * Adds an additional previously defined caste to the selection. Used after `[SELECT_CASTE]`.
+	 */
+	| { SelectAdditionalCaste: string };
+
+/**
  * The tokens for the shrubs
  */
-export type ShrubToken =
+export type ShrubTag =
 	/**
 	 * The spring season
 	 */
@@ -9966,32 +9324,9 @@ export type ShrubToken =
 	| "Unknown";
 
 /**
- * A struct representing a syndrome
- */
-export type Syndrome = {
-	/**
-	 * Seen the `[SYN_IDENTIFIER:INEBRIATION]` tag in `material_templates.txt`
-	 */
-	identifier?: string | null;
-	name?: string | null;
-	affectedClasses?: string[] | null;
-	immuneClasses?: string[] | null;
-	affectedCreatures?: [string, string][] | null;
-	immuneCreatures?: [string, string][] | null;
-	classes?: string[] | null;
-	/**
-	 * Seen the `[SYN_CONCENTRATION_ADDED:100:1000]` tag in `material_templates.txt`
-	 * default is 0:0
-	 */
-	concentrationAdded?: [number, number] | null;
-	tags?: SyndromeToken[] | null;
-	conditions?: string[] | null;
-};
-
-/**
  * Represents the tokens that can be used in a syndrome definition.
  */
-export type SyndromeToken =
+export type SyndromeTag =
 	/**
 	 * Used to specify the name of the syndrome as it appears in-game. Names don't have to be unique;
 	 * It's perfectly acceptable to have multiple syndromes with identical names.
@@ -10102,150 +9437,30 @@ export type SyndromeToken =
 	| "Unknown";
 
 /**
- * A struct representing a tree.
+ * The tokens used to define the tile page
  */
-export type Tree = {
+export type TilePageTag =
 	/**
-	 * Tree will yield logs made of that material. Instead, if it's `[TREE:NONE]`, no logs will result.
-	 * Materials are typically found in other raws..
+	 * The dimensions of the tile
 	 */
-	material: string;
+	| "tileDim"
 	/**
-	 * What the trunk of the tree is named
+	 * The dimensions of the page
 	 */
-	trunkName?: Name | null;
+	| "pageDim"
 	/**
-	 * The maximum z-level height of the trunk, starting from +2 z-levels above the ground.
-	 * Valid values: 1-8
-	 * Default: 1
+	 * The file path
 	 */
-	maxTrunkHeight?: number | null;
+	| "file"
 	/**
-	 * Upper limit of trunk thickness, in tiles. Has a geometric effect on log yield.
-	 * Valid values: 1-3
-	 * Default: 1
+	 * An unknown token
 	 */
-	maxTrunkDiameter?: number | null;
-	/**
-	 * The number of years the trunk takes to grow one z-level upward. Default: 1
-	 */
-	trunkPeriod?: number | null;
-	/**
-	 * The number of years the trunk takes to grow one tile wider. Default: 1
-	 */
-	trunkWidthPeriod?: number | null;
-	/**
-	 * What thin branches of the tree are named.
-	 */
-	branchName?: Name | null;
-	/**
-	 * How dense the branches grow on this tree.
-	 */
-	branchDensity?: number | null;
-	/**
-	 * The radius to which branches can reach. Appears to never reach further than seven tiles from the centre.
-	 * Does not depend on the trunk branching amount or where trunks are.
-	 * The values used in the game go from 0-3. Higher values than that can cause crashes.
-	 */
-	branchRadius?: number | null;
-	/**
-	 * What thick branches of the tree are named.
-	 */
-	heavyBranchesName?: Name | null;
-	/**
-	 * Similar to `BRANCH_DENSITY` for thick branches. Default: 0
-	 */
-	heavyBranchDensity?: number | null;
-	/**
-	 * Similar as `BRANCH_DENSITY` for thick branches. Values outside 0-3 can cause crashes. Default: 0
-	 */
-	heavyBranchRadius?: number | null;
-	/**
-	 * How much the trunk branches out. 0 makes the trunk straight (default)
-	 */
-	trunkBranching?: number | null;
-	/**
-	 * What the roots of the tree are named.
-	 */
-	rootName?: Name | null;
-	/**
-	 * Density of the root growth. Defaults to 0.
-	 */
-	rootDensity?: number | null;
-	/**
-	 * How wide the roots reach out. Defaults to 0.
-	 */
-	rootRadius?: number | null;
-	/**
-	 * What the twigs of the tree are named.
-	 */
-	twigsName?: Name | null;
-	/**
-	 * Where twigs appear, defaults to `[SideBranches, AboveBranches]`
-	 */
-	twigsPlacement?: TwigPlacement[] | null;
-	/**
-	 * What this mushroom-cap is called. Only makes sense with `TREE_HAS_MUSHROOM_CAP`.
-	 */
-	capName?: Name | null;
-	/**
-	 * Similar to the other PERIOD tags, influences the rate of the mushroom cap growth. Only makes sense with `TREE_HAS_MUSHROOM_CAP`. Default: 1
-	 */
-	capPeriod?: number | null;
-	/**
-	 * The radius of a mushroom cap. Only makes sense with `TREE_HAS_MUSHROOM_CAP`. Default: 0
-	 */
-	capRadius?: number | null;
-	/**
-	 * The tile used for trees of this type on the world map. Defaults to 24 (↑).
-	 */
-	treeTile?: string | null;
-	/**
-	 * The tile used for (un)dead trees and deciduous trees (generally in winter) of this type. Defaults to 198 (╞).
-	 */
-	deadTreeTile?: string | null;
-	/**
-	 * The tile used for saplings of this tree. Defaults to 231 (τ).
-	 */
-	saplingTile?: string | null;
-	/**
-	 * The tile used for dead saplings of this tree. Defaults to 231 (τ).
-	 */
-	deadSaplingTile?: string | null;
-	/**
-	 * The color of the tree on the map. Defaults to 2:0:0 (dark green).
-	 */
-	treeColor?: Color | null;
-	/**
-	 * The color of the tree on the map when (un)dead. Defaults to 0:0:1 (dark gray).
-	 */
-	deadTreeColor?: Color | null;
-	/**
-	 * The color of saplings of this tree. Defaults to 2:0:0 (dark green).
-	 */
-	saplingColor?: Color | null;
-	/**
-	 * The color of dead saplings of this tree. Defaults to 0:0:1 (dark gray).
-	 */
-	deadSaplingColor?: Color | null;
-	/**
-	 * The sapling of this tree will drown once the water on its tile reaches this level. Defaults to 4.
-	 */
-	saplingDrownLevel?: number | null;
-	/**
-	 * The water depth at which this tree will drown. Exact behavior is unknown. Defaults to 7.
-	 */
-	treeDrownLevel?: number | null;
-	/**
-	 * Token tags for the tree.
-	 */
-	tags?: TreeToken[] | null;
-};
+	| "unknown";
 
 /**
  * The tokens for the tree parser
  */
-export type TreeToken =
+export type TreeTag =
 	/**
 	 * A tree
 	 */
@@ -10422,7 +9637,7 @@ export type TreeToken =
 /**
  * The placement of twigs on a tree
  */
-export type TwigPlacement =
+export type TwigPlacementTag =
 	/**
 	 * Twigs are placed on the side of the tree
 	 */
@@ -10465,179 +9680,375 @@ export type TwigPlacement =
 	| "Unknown";
 
 /**
- * An unprocessed raw object
+ * A struct representing a body size in the format `years:days:size_cm3`
  */
-export type UnprocessedRaw = {
+export type BodySize = { years: number; days: number; sizeCm3: number };
+
+/**
+ * A struct representing a creature caste.
+ */
+export type Caste = {
+	identifier: string;
+	tags?: CasteTag[] | null;
+	description?: string | null;
+	babyName?: Name | null;
+	casteName?: Name | null;
+	childName?: Name | null;
 	/**
-	 * The raw type of the object. This is to tell us what to parse it into.
+	 * Default \[0,0\]
 	 */
-	rawType: ObjectType;
+	clutchSize?: [number, number] | null;
 	/**
-	 * The modifications to apply to the object.
-	 *
-	 * Allows us to handle parsing advanced things like
-	 *
-	 * * `COPY_TAGS_FROM` tag
-	 * * `APPLY_CREATURE_VARIATION` tag
-	 * * `GO_TO_TAG:tag` raw instruction
-	 * * `GO_TO_END` and `GO_TO_START` raw instructions
-	 * * (and includes the raws themselves under `MainRawBody`)
-	 *
-	 * So when the raws are parsed from this into the actual object, we can apply these modifications
-	 * in order to get the final object.
+	 * Default \[0,0\]
 	 */
-	modifications: Modification[];
+	litterSize?: [number, number] | null;
 	/**
-	 * Metadata to be passed on to the final object
+	 * Default \[0,0\]
 	 */
-	metadata: Metadata;
+	maxAge?: [number, number] | null;
+	baby?: number | null;
+	child?: number | null;
+	difficulty?: number | null;
+	eggSize?: number | null;
+	grassTrample?: number | null;
+	grazer?: number | null;
+	lowLightVision?: number | null;
+	petValue?: number | null;
+	popRatio?: number | null;
+	changeBodySizePercentage?: number | null;
+	creatureClass?: string[] | null;
+	bodySize?: BodySize[] | null;
+	milkable?: Milkable | null;
+	tile?: Tile | null;
 	/**
-	 * Identifier of the object
+	 * The gaits by which the creature can move.
+	 */
+	gaits?: Gait[] | null;
+};
+
+/**
+ * A struct representing a color in the format "foreground:background:brightness".
+ */
+export type Color = {
+	foreground: number;
+	background: number;
+	brightness: number;
+};
+
+/**
+ * The `Creature` struct represents a creature in a Dwarf Fortress, with the properties
+ * that can be set in the raws. Not all the raws are represented here, only the ones that
+ * are currently supported by the library.
+ *
+ * Some items like `CREATURE_VARIATION` and `CREATURE_VARIATION_CASTE` are saved in their raw
+ * format. `SELECT_CREATURE` is saved here as a sub-creature object with all the properties
+ * from that raw. This is because the `SELECT_CREATURE` raws are used to create new creatures
+ * based on the properties of the creature they are applied to. But right now the application
+ * of those changes is not applied, in order to preserve the original creature. So instead,
+ * they are saved and can be applied later (at the consumer's discretion).
+ */
+export type Creature = {
+	/**
+	 * The `metadata` field is of type `RawMetadata` and is used to provide additional information
+	 * about the raws the `Creature` is found in.
+	 */
+	metadata?: Metadata | null;
+	/**
+	 * The `identifier` field is a string that represents the identifier of the creature. It is used
+	 * to uniquely identify the creature (however it is not guaranteed to be unique across object types
+	 * or all raws parsed, *especially* if you are parsing multiple versions of the same raws).
 	 */
 	identifier: string;
+	/**
+	 * The `castes` field is a vector of `Caste` objects. Each `Caste` object represents a caste of the
+	 * creature. For example, a creature may have a `MALE` and `FEMALE` caste. Each `Caste` object has
+	 * its own properties, such as `name`, `description`, `body`, `flags`, etc.
+	 *
+	 * A lot of the properties of the `Creature` object are actually properties of a special `Caste`, `ALL`.
+	 */
+	castes: Caste[];
+	/**
+	 * Any tags that are not parsed into their own fields are stored in the `tags` field.
+	 */
+	tags?: CreatureTag[] | null;
+	/**
+	 * The biomes that this creature can be found in
+	 */
+	biomes?: BiomeTag[] | null;
+	/**
+	 * Pref strings are things that make dwarves (or others?) like or dislike the creature.
+	 */
+	prefStrings?: string[] | null;
+	/**
+	 * The tile that represents the creature in the game (classic mode)
+	 */
+	tile?: Tile | null;
+	/**
+	 * Determines the chances of a creature appearing within its environment, with higher values resulting in more frequent appearance.
+	 *
+	 * Also affects the chance of a creature being brought in a caravan for trading. The game effectively considers all creatures that
+	 * can possibly appear and uses the FREQUENCY value as a weight - for example, if there are three creatures with frequencies 10/25/50,
+	 * the creature with `[FREQUENCY:50]` will appear approximately 58.8% of the time.
+	 *
+	 * Defaults to 50 if not specified.
+	 *
+	 * Minimum value is 0, maximum value is 100.
+	 *
+	 * Note: not to be confused with `[POP_RATIO]`.
+	 */
+	frequency?: number | null;
+	/**
+	 * The minimum/maximum numbers of how many creatures per spawned cluster. Vermin fish with this token in combination with
+	 * temperate ocean and river biome tokens will perform seasonal migrations.
+	 *
+	 * Defaults to [1,1] if not specified.
+	 */
+	clusterNumber?: [number, number] | null;
+	/**
+	 * The minimum/maximum numbers of how many of these creatures are present in each world map tile of the appropriate region.
+	 *
+	 * Defaults to [1,1] if not specified.
+	 */
+	populationNumber?: [number, number] | null;
+	/**
+	 * Depth that the creature appears underground. Numbers can be from 0 to 5. 0 is actually 'above ground' and can be used if the
+	 * creature is to appear both above and below ground. Values from 1-3 are the respective cavern levels, 4 is the magma sea and
+	 * 5 is the HFS.
+	 *
+	 * A single argument may be used instead of min and max.
+	 *
+	 * Civilizations that can use underground plants or animals will only export (via the embark screen or caravans) things that are available at depth 1.
+	 *
+	 * Default [0, 0] (aboveground)
+	 */
+	undergroundDepth?: [number, number] | null;
+	/**
+	 * Like `[BABYNAME]`, but applied regardless of caste.
+	 */
+	generalBabyName?: Name | null;
+	/**
+	 * Like `[CHILDNAME]`, but applied regardless of caste.
+	 */
+	generalChildName?: Name | null;
+	/**
+	 * The generic name for any creature of this type - will be used when distinctions between caste are unimportant. For names for specific castes,
+	 * use `[CASTE_NAME]` instead. If left undefined, the creature will be labeled as "nothing" by the game.
+	 */
+	name: Name;
+	/**
+	 * Copies another specified creature. This will override any definitions made before it; essentially, it makes this creature identical to the other one,
+	 * which can then be modified. Often used in combination with `[APPLY_CREATURE_VARIATION]` to import standard variations from a file.
+	 *
+	 * The vanilla giant animals and animal peoples are examples of this token combination.
+	 */
+	copyTagsFrom?: string | null;
+	/**
+	 * Applies the specified creature variation.
+	 *
+	 * These are stored "in the raw", i.e. how they appear in the raws. They are not handled until the end of the parsing process.
+	 */
+	applyCreatureVariation?: string[] | null;
+	/**
+	 * A generated field that is used to uniquely identify this object. It is generated from the `metadata`, `identifier`, and `ObjectType`.
+	 *
+	 * This field is always serialized.
+	 */
+	objectId: string;
+	/**
+	 * Various `SELECT_CREATUR` modifications.
+	 */
+	selectCreatureVariation?: SelectCreature[] | null;
 };
 
 /**
- * A struct representing a modification to a creature
+ * A creature effect.
  */
-export type Modification =
-	/**
-	 * `COPY_TAGS_FROM` tag
-	 */
-	| {
-			copyTagsFrom: {
-				/**
-				 * The creature to copy tags from
-				 */
-				identifier: string;
-			};
-	  }
-	/**
-	 * `APPLY_CREATURE_VARIATION` tag
-	 */
-	| {
-			applyCreatureVariation: {
-				/**
-				 * The creature to apply the variation from
-				 */
-				identifier: string;
-			};
-	  }
-	/**
-	 * Follows `GO_TO_END` until `GO_TO_START` or object definition finishes
-	 *
-	 * When using tags from an existing creature, inserts new tags at the end of the creature.
-	 */
-	| {
-			addToEnding: {
-				/**
-				 * The set of raws to add to the end of the object
-				 *
-				 * This should be the entire raw in order to apply.
-				 */
-				raws: string[];
-			};
-	  }
-	/**
-	 * Follows `GO_TO_START` until `GO_TO_END` or object definition finishes
-	 *
-	 * When using tags from an existing creature, inserts new tags at the beginning of the creature.
-	 */
-	| {
-			addToBeginning: {
-				/**
-				 * The set of raws to add to the beginning of the object
-				 *
-				 * This should be the entire raw in order to apply.
-				 */
-				raws: string[];
-			};
-	  }
-	/**
-	 * `GO_TO_TAG:tag` raw instruction
-	 *
-	 * When using tags from an existing creature, inserts new tags before the specified tag.
-	 */
-	| {
-			addBeforeTag: {
-				/**
-				 * The tag to insert before
-				 *
-				 * Since we don't actually know the tag order after parsing, this will be ignored in parsing, and
-				 * instead will just apply the raws...
-				 */
-				tag: string;
-				/**
-				 * The set of raws to add before the tag
-				 *
-				 * This should be the entire raw in order to apply.
-				 */
-				raws: string[];
-			};
-	  }
-	/**
-	 * The main body of the object
-	 */
-	| {
-			mainRawBody: {
-				/**
-				 * The set of raws that make up the object. This is usually defined first unless
-				 * its specified to be added to the end or beginning (or before a tag)
-				 *
-				 * This should be the entire raw in order to apply.
-				 */
-				raws: string[];
-			};
-	  };
-
-/**
- * Represents the specific yield, fracture, and elasticity of a material for the various
- * types of mechanical stress.
- */
-export type MaterialMechanics = {
-	impact?: MechanicalProperties | null;
-	compressive?: MechanicalProperties | null;
-	tensile?: MechanicalProperties | null;
-	torsion?: MechanicalProperties | null;
-	shear?: MechanicalProperties | null;
-	bending?: MechanicalProperties | null;
-	maxEdge?: number | null;
-	solidDensity?: number | null;
+export type CreatureEffect = {
+	severity: number;
+	probability: number;
+	affectedBodyPartsByCategory?: string[] | null;
+	affectedBodyPartsByType?: string[] | null;
+	affectedBodyPartsByToken?: string[] | null;
+	tags?: CreatureEffectPropertyTag[] | null;
+	start: number;
+	peak: number;
+	end: number;
+	dwfStretch?: number | null;
 };
 
 /**
- * The `RawMetadata` struct represents metadata about a raw module in Rust, including its name,
- * version, file path, identifier, object type, module location, and visibility status.
- *
- * Properties:
- *
- * * `module_name`: The name of the raw module the raw is from.
- * * `module_version`: The version of the raw module the raw is from.
- * * `raw_file_path`: The `raw_file_path` property is a string that represents the path to the file
- * containing the raw data. It specifies the location of the file on the file system.
- * * `raw_identifier`: The raw identifier is a unique identifier for the raw data. It is typically
- * found at the top of the raw text file and is used to identify and reference the specific raw data.
- * * `object_type`: The `object_type` property represents the type of the raw data. It could be a
- * creature, plant, or any other type specified in the raw text file.
- * * `raw_module_location`: The `raw_module_location` property represents the location of the owning
- * raw module. It can have one of the following values:
- *
- * - `RawModuleLocation::InstalledMods`: The raw module is located in the `installed_mods` folder.
- * - `RawModuleLocation::Mods`: The raw module is located in the `mods` folder.
- * - `RawModuleLocation::Vanilla`: The raw module is located in the `vanilla` folder.
- *
- * * `hidden`: The `hidden` property is a boolean value that indicates whether the raw metadata should
- * be hidden or not when exporting. By default, it is set to `true`, meaning that the raw metadata will
- * be hidden unless specified in the `ParsingOptions` struct.
+ * A creature variation.
  */
-export type Metadata = {
-	moduleObjectId: string;
-	moduleName: string;
-	moduleVersion: string;
-	rawFilePath: string;
-	rawIdentifier: string;
-	objectType: ObjectType;
-	rawModuleLocation: RawModuleLocation;
+export type CreatureVariation = {
+	/**
+	 * Common Raw file Things
+	 */
+	metadata?: Metadata | null;
+	identifier: string;
+	objectId: string;
+	/**
+	 * Creature variations are basically just a set of simple tag actions which are applied to
+	 * the creature which is being modified. The tags are applied in order EXCEPT for the convert
+	 * tags which are applied in a reverse order.
+	 */
+	rules: CreatureVariationRuleTag[];
+	/**
+	 * A creature variation can define any number of arguments which can be used in the rules.
+	 * These arguments replace instances of `!ARGn` in the rules. Use `apply_arguments` to apply
+	 * a set of arguments to a creature variation (and get a very specific variation back). Use
+	 * `apply_to_creature` to apply the variation to a creature (it also takes arguments and will
+	 * apply them to the variation before applying the variation to the creature).
+	 */
+	argumentCount: string;
+};
+
+/**
+ * A custom graphic extension.
+ */
+export type CustomGraphicExtension = {
+	extensionType: GraphicTypeTag;
+	tilePageId?: string | null;
+	value1?: number | null;
+	value2?: number | null;
+};
+
+/**
+ * A struct representing a Dimensions object.
+ */
+export type Dimensions = { x: number; y: number };
+
+/**
+ * A struct representing an Entity object.
+ */
+export type Entity = {
+	metadata?: Metadata | null;
+	identifier: string;
+	objectId: string;
+	tags: EntityTag[];
+	creature?: string | null;
+	translation?: string | null;
+	exclusiveStartBiome?: string | null;
+	biomeSupport?: [string, number][] | null;
+	settlementBiome?: string[] | null;
+	startBiome?: string[] | null;
+	likesSites?: string[] | null;
+	toleratesSites?: string[] | null;
+	worldConstructions?: string[] | null;
+	maxPopNumber?: number | null;
+	maxSitePopNumber?: number | null;
+	maxStartingCivNumber?: number | null;
+	permittedBuildings?: string[] | null;
+	permittedJobs?: string[] | null;
+	permittedReactions?: string[] | null;
+	currency?: [string, number][] | null;
+	artFacetModifier?: [string, number][] | null;
+	artImageElementModifier?: [string, number][] | null;
+	itemImprovementModifier?: [string, number][] | null;
+	selectSymbols?: [string, string][] | null;
+	subselectSymbols?: [string, string][] | null;
+	cullSymbols?: [string, string][] | null;
+	friendlyColor?: Color | null;
+	religion?: string | null;
+	religionSpheres?: string[] | null;
+	sphereAlignments?: string[] | null;
+	positions?: Position[] | null;
+	landHolderTrigger?: string | null;
+	siteVariablePositions?: string[] | null;
+	variablePositions?: string[] | null;
+	ethics?: [string, string][] | null;
+	values?: [string, number][] | null;
+	variableValues?: [string, number, number][] | null;
+	activeSeason?: string | null;
+	banditry?: number | null;
+	progressTriggerPopulation?: number | null;
+	progressTriggerProduction?: number | null;
+	progressTriggerTrade?: number | null;
+	progressTriggerPopulationSiege?: number | null;
+	progressTriggerProductionSiege?: number | null;
+	progressTriggerTradeSiege?: number | null;
+	scholars?: string[] | null;
+	ammo?: string[] | null;
+	armors?: [string, number][] | null;
+	diggers?: string[] | null;
+	gloves?: [string, number][] | null;
+	helms?: [string, number][] | null;
+	instrument?: string[] | null;
+	pants?: [string, number][] | null;
+	shields?: string[] | null;
+	shoes?: [string, number][] | null;
+	siegeAmmo?: string[] | null;
+	tool?: string[] | null;
+	toys?: string[] | null;
+	trapComponents?: string[] | null;
+	weapons?: string[] | null;
+	gemShape?: string[] | null;
+	stoneShape?: string[] | null;
+	sourceHfid?: number | null;
+};
+
+/**
+ * Gaits are a way to describe how a creature moves. Defined in the raws with:
+ *
+ * "GAIT:type:name:full speed:build up time:turning max:start speed:energy use"
+ *
+ * * use `NO_BUILD_UP` if you jump immediately to full speed
+ *
+ * these optional flags go at the end:
+ *
+ * * `LAYERS_SLOW` - fat/muscle layers slow the movement (muscle-slowing counter-acted by strength bonus)
+ * * `STRENGTH` - strength attribute can speed/slow movement
+ * * `AGILITY` - agility attribute can speed/slow movement
+ * * `STEALTH_SLOWS:<n>` - n is percentage slowed
+ * * it would be interesting to allow quirky attributes (like mental stats), but they aren't supported yet
+ *
+ * Examples:
+ *
+ * `[CV_NEW_TAG:GAIT:WALK:Sprint:!ARG4:10:3:!ARG2:50:LAYERS_SLOW:STRENGTH:AGILITY:STEALTH_SLOWS:50]`
+ * `[CV_NEW_TAG:GAIT:WALK:Run:!ARG3:5:3:!ARG2:10:LAYERS_SLOW:STRENGTH:AGILITY:STEALTH_SLOWS:20]`
+ * `[CV_NEW_TAG:GAIT:WALK:Jog:!ARG2:NO_BUILD_UP:5:LAYERS_SLOW:STRENGTH:AGILITY:STEALTH_SLOWS:10]`
+ * `[CV_NEW_TAG:GAIT:WALK:Walk:!ARG1:NO_BUILD_UP:0]`
+ * `[CV_NEW_TAG:GAIT:WALK:Stroll:!ARG5:NO_BUILD_UP:0]`
+ * `[CV_NEW_TAG:GAIT:WALK:Creep:!ARG6:NO_BUILD_UP:0]`
+ */
+export type Gait = {
+	/**
+	 * The type of gait
+	 */
+	gaitType: GaitTypeTag;
+	/**
+	 * The name of the gait
+	 */
+	name: string;
+	/**
+	 * The maximum speed achievable by a creature using this gait.
+	 */
+	maxSpeed: number;
+	/**
+	 * The energy use of the gait
+	 */
+	energyUse: number;
+	/**
+	 * The gait modifiers
+	 *
+	 * These are optional, and may be empty.
+	 */
+	modifiers: GaitModifierTag[];
+};
+
+/**
+ * A struct representing a Graphic object.
+ */
+export type Graphic = {
+	metadata?: Metadata | null;
+	identifier: string;
+	objectId: string;
+	casteIdentifier?: string | null;
+	kind: GraphicTypeTag;
+	sprites?: SpriteGraphic[] | null;
+	layers?: [string, SpriteLayer[]][] | null;
+	growths?: [string, SpriteGraphic[]][] | null;
+	customExtensions?: CustomGraphicExtension[] | null;
+	tags?: string[] | null;
 };
 
 /**
@@ -10663,6 +10074,420 @@ export type InfoFile = {
 };
 
 /**
+ * The raw representation of an inorganic object.
+ */
+export type Inorganic = {
+	identifier: string;
+	metadata?: Metadata | null;
+	objectId: string;
+	material: Material;
+	metalOreChance?: [string, number][] | null;
+	threadMetalChance?: [string, number][] | null;
+	environmentClass?: EnvironmentClassTag | null;
+	environmentInclusionType?: InclusionTypeTag | null;
+	environmentInclusionFrequency?: number | null;
+	environmentClassSpecific?: string[] | null;
+	tags?: InorganicTag[] | null;
+};
+
+/**
+ * A struct representing a material
+ */
+export type Material = {
+	/**
+	 * The type of the material is also the trigger to start tracking a material
+	 */
+	materialType?: MaterialTypeTag | null;
+	/**
+	 * The material might have a name, but its more likely that there is only an identifier to
+	 * refer to another creature/plant/reaction, which are listed elsewhere.
+	 * If there is no name provided, then it is a special hardcoded case, e.g. magma or green glass.
+	 */
+	name?: string | null;
+	/**
+	 * For the coal tag, it specifies the type of fuel that can be used. It will never be None.
+	 */
+	fuelType?: FuelTypeTag | null;
+	/**
+	 * Linked creature identifier (and then `material_name` might be "skin", like for "`CREATURE_MAT:DWARF:SKIN`")
+	 */
+	creatureIdentifier?: string | null;
+	/**
+	 * Linked plant identifier (and then `material_name` might be "leaf", like for "`PLANT_MAT:BUSH_QUARRY:LEAF`")
+	 */
+	plantIdentifier?: string | null;
+	/**
+	 * If a material is defined within a creature itself, it will use `LOCAL_CREATURE_MAT` tag, which implies
+	 * that the material is only used by that creature. This is also true for plants and `LOCAL_PLANT_MAT`.
+	 */
+	isLocalMaterial?: boolean | null;
+	/**
+	 * Within a reaction, there can be special material definitions. Todo: Figure this out.
+	 */
+	reagentIdentifier?: string | null;
+	reactionProductIdentifier?: string | null;
+	/**
+	 * If material is defined from a template, we need a way to refer to that
+	 */
+	templateIdentifier?: string | null;
+	/**
+	 * Usage tags
+	 */
+	usage?: MaterialUsageTag[] | null;
+	value?: number | null;
+	color?: Color | null;
+	stateNames?: StateName | null;
+	stateAdjectives?: StateName | null;
+	stateColors?: StateName | null;
+	temperatures?: Temperatures | null;
+	/**
+	 * Catch-all for remaining tags we identify but don't do anything with... yet.
+	 */
+	properties?: string[] | null;
+	syndromes?: Syndrome[] | null;
+	mechanicalProperties?: MaterialMechanics | null;
+	liquidDensity?: number | null;
+	molarMass?: number | null;
+	buildColor?: Color | null;
+	displayColor?: Color | null;
+	tile?: Tile | null;
+	itemSymbol?: string | null;
+};
+
+/**
+ * Represents the specific yield, fracture, and elasticity of a material for the various
+ * types of mechanical stress.
+ */
+export type MaterialMechanics = {
+	impact?: MechanicalProperties | null;
+	compressive?: MechanicalProperties | null;
+	tensile?: MechanicalProperties | null;
+	torsion?: MechanicalProperties | null;
+	shear?: MechanicalProperties | null;
+	bending?: MechanicalProperties | null;
+	maxEdge?: number | null;
+	solidDensity?: number | null;
+};
+
+/**
+ * A struct representing a material template
+ */
+export type MaterialTemplate = {
+	identifier: string;
+	metadata?: Metadata | null;
+	objectId: string;
+	material: Material;
+};
+
+/**
+ * Represents the mechanical properties of a material via the yield, fracture, and elasticity
+ */
+export type MechanicalProperties = {
+	yield: number;
+	fracture: number;
+	elasticity: number;
+};
+
+/**
+ * How often a creature can be milked and what material it produces
+ */
+export type Milkable = { material: string; frequency: number };
+
+/**
+ * A name with a singular, plural, and adjective form
+ */
+export type Name = {
+	singular: string;
+	plural: string;
+	adjective: string | null;
+};
+
+/**
+ * A struct representing a plant
+ */
+export type Plant = {
+	/**
+	 * Common Raw file Things
+	 */
+	metadata?: Metadata | null;
+	identifier: string;
+	objectId: string;
+	name: Name;
+	prefStrings?: string[] | null;
+	tags?: PlantTag[] | null;
+	/**
+	 * Default [0, 0] (aboveground)
+	 */
+	undergroundDepth?: [number, number] | null;
+	/**
+	 * Default frequency is 50
+	 */
+	frequency?: number | null;
+	/**
+	 * List of biomes this plant can grow in
+	 */
+	biomes?: BiomeTag[] | null;
+	/**
+	 * Growth Tokens define the growths of the plant (leaves, fruit, etc.)
+	 */
+	growths?: PlantGrowth[] | null;
+	/**
+	 * If plant is a tree, it will have details about the tree.
+	 */
+	treeDetails?: Tree | null;
+	/**
+	 * If plant is a shrub, it will have details about the shrub.
+	 */
+	shrubDetails?: Shrub | null;
+	materials?: Material[] | null;
+};
+
+/**
+ * A struct representing a plant growth
+ */
+export type PlantGrowth = {
+	/**
+	 * Plant growths are not given an identifier, since they are just supporting
+	 * data for the plant definition. They are defined instead by the type of growth.
+	 */
+	growthType: PlantGrowthTypeTag;
+	/**
+	 * The name of the growth. This is actually defined with `GROWTH_NAME` key in the raws.
+	 */
+	name: Name;
+	/**
+	 * The item grown by this growth. This is actually defined with `GROWTH_ITEM` key in the raws.
+	 * This is a string until we make a proper item structure. Technically there are 2 arguments:
+	 * 1. item token, 2: material token. Generally the item type should be `PLANT_GROWTH:NONE`.
+	 */
+	item: string;
+	/**
+	 * Specifies on which part of the plant this growth grows. This is defined with `GROWTH_HOST_TILE` key.
+	 * This can be unused, like in the case of crops where the plant is the growth (I think?).
+	 */
+	hostTiles?: PlantPartTag[] | null;
+	/**
+	 * Controls the height on the trunk above which the growth begins to appear.
+	 * The first value is the percent of the trunk height where the growth begins appearing:
+	 * 0 will cause it along the entire trunk (above the first tile), 100 will cause it to appear
+	 * at the topmost trunk tile. Can be larger than 100 to cause it to appear above the trunk.
+	 * The second value must be -1, but might be intended to control whether it starts height counting
+	 * from the bottom or top.
+	 */
+	trunkHeightPercentage?: [number, number] | null;
+	/**
+	 * Currently has no effect.
+	 */
+	density?: number | null;
+	/**
+	 * Specifies the appearance of the growth. This is defined with `GROWTH_PRINT` key.
+	 * This is a string until we make a proper print structure.
+	 */
+	print?: string | null;
+	/**
+	 * Specifies at which part of the year the growth appears. Default is all year round.
+	 * Minimum: 0, Maximum: `402_200`. This is defined with `GROWTH_TIMING` key.
+	 */
+	timing?: [number, number] | null;
+	/**
+	 * Where we gather some of the growth's tags.
+	 */
+	tags?: PlantGrowthTag[] | null;
+};
+
+/**
+ * Represents a position in the government of an entity
+ */
+export type Position = {
+	identifier: string;
+	allowedClasses?: string[] | null;
+	allowedCreatures?: string[] | null;
+	appointedBy?: string | null;
+	color?: Color | null;
+	commander?: string | null;
+	demandMax?: number | null;
+	executionSkill?: string | null;
+	gender?: string | null;
+	landHolder?: number | null;
+	landName?: string | null;
+	mandateMax?: number | null;
+	name?: Name | null;
+	nameMale?: Name | null;
+	nameFemale?: Name | null;
+	number?: number | null;
+	precedence?: number | null;
+	rejectedClasses?: string[] | null;
+	rejectedCreatures?: string[] | null;
+	replacedBy?: string | null;
+	requiredBedroom?: number | null;
+	requiredBoxes?: number | null;
+	requiredCabinets?: number | null;
+	requiredDining?: number | null;
+	requiredOffice?: number | null;
+	requiredRacks?: number | null;
+	requiredStands?: number | null;
+	requiredTomb?: number | null;
+	requiresPopulation?: number | null;
+	responsibilities?: string[] | null;
+	spouse?: Name | null;
+	spouseFemale?: Name | null;
+	spouseMale?: Name | null;
+	squad?: string | null;
+	succession?: string | null;
+	tags: PositionTag[];
+};
+
+/**
+ * A struct representing a seed material
+ */
+export type SeedMaterial = { name: Name; color: Color; material: string };
+
+/**
+ * A struct representing a creature selection
+ */
+export type SelectCreature = {
+	metadata?: Metadata | null;
+	identifier: string;
+	objectId: string;
+	tags: string[];
+};
+
+/**
+ * A shrub in the raws.
+ */
+export type Shrub = {
+	/**
+	 * Allows the plant to grow in farm plots during the given season.
+	 * If the plant is a surface plant, allows it to grow in the wild during this season; wild surface plants without
+	 * this token will disappear at the beginning of the season. Underground plants grow wild in all seasons, regardless
+	 * of their season tokens.
+	 * Default: empty (plant will not grow in farm plots)
+	 */
+	growingSeason?: SeasonTag[] | null;
+	/**
+	 * How long the plant takes to grow to harvest in a farm plot. Unit hundreds of ticks.
+	 * There are 1008 GROWDUR units in a season. Defaults to 300.
+	 */
+	growDuration?: number | null;
+	/**
+	 * Has no known effect. Previously set the value of the harvested plant.
+	 */
+	value?: number | null;
+	/**
+	 * The tile used when the plant is harvested whole, or is ready to be picked from a farm plot. May either be a cp437
+	 * tile number, or a character between single quotes. See character table. Defaults to 231 (τ).
+	 */
+	pickedTile?: number | null;
+	/**
+	 * The tile used when a plant harvested whole has wilted. Defaults to 169 (⌐).
+	 */
+	deadPickedTile?: number | null;
+	/**
+	 * The tile used to represent this plant when it is wild, alive, and has no growths. Defaults to 34 (").
+	 */
+	shrubTile?: number | null;
+	/**
+	 * The tile used to represent this plant when it is dead in the wild. Defaults to 34 (").
+	 */
+	deadShrubTile?: number | null;
+	/**
+	 * The maximum stack size collected when gathered via herbalism (possibly also from farm plots?). Defaults to 5.
+	 */
+	clusterSize?: number | null;
+	/**
+	 * The color of the plant when it has been picked whole, or when it is ready for harvest in a farm plot. Defaults to 2:0:0 (dark green).
+	 */
+	pickedColor?: Color | null;
+	/**
+	 * The color of the plant when it has been picked whole, but has wilted. Defaults to 0:0:1 (dark gray).
+	 */
+	deadPickedColor?: Color | null;
+	/**
+	 * The color of the plant when it is alive, wild, and has no growths. Defaults to 2:0:0 (dark green).
+	 */
+	shrubColor?: Color | null;
+	/**
+	 * The color of the plant when it is dead in the wild. Defaults to 6:0:0 (brown).
+	 */
+	deadShrubColor?: Color | null;
+	/**
+	 * The shrub will drown once the water on its tile reaches this level. Defaults to 4.
+	 */
+	shrubDrownLevel?: number | null;
+	/**
+	 * Names a drink made from the plant, allowing it to be used in entity resources.
+	 * Previously also permitted brewing the plant into alcohol made of this material.
+	 * Now, a `MATERIAL_REACTION_PRODUCT` of type `DRINK_MAT` should be used on the proper plant material.
+	 */
+	drink?: string | null;
+	/**
+	 * Permits milling the plant at a quern or millstone into a powder made of this material and allows its use in entity resources.
+	 * Said material should have `[POWDER_MISC_PLANT]` to permit proper stockpiling. This token makes the whole plant harvestable regardless
+	 * of which material is designated for milling.
+	 * For plants with millable growths, use only `MATERIAL_REACTION_PRODUCT` or `ITEM_REACTION_PRODUCT` tokens to define the milling products.
+	 */
+	mill?: string | null;
+	/**
+	 * Permits processing the plant at a farmer's workshop to yield threads made of this material and allows its use in entity resources.
+	 * Said material should have `[THREAD_PLANT]` to permit proper stockpiling.
+	 */
+	thread?: string | null;
+	/**
+	 * Causes the plant to yield plantable seeds made of this material and having these properties.
+	 * Said material should have `[SEED_MAT]` to permit proper stockpiling.
+	 */
+	seed?: SeedMaterial | null;
+	/**
+	 * Permits processing the plant into a vial at a still to yield extract made of this material.
+	 * Said material should have `[EXTRACT_STORAGE:FLASK]`.
+	 */
+	extractStillVial?: string | null;
+	/**
+	 * Permits processing the plant into a vial at a farmer's workshop to yield extract made of this material.
+	 * Said material should have `[EXTRACT_STORAGE:VIAL]`.
+	 */
+	extractVial?: string | null;
+	/**
+	 * Permits processing the plant into a barrel at a farmer's workshop to yield extract made of this material.
+	 * Said material should have `[EXTRACT_STORAGE:BARREL]`.
+	 */
+	extractBarrel?: string | null;
+};
+
+/**
+ * A struct representing a sprite graphic.
+ */
+export type SpriteGraphic = {
+	primaryCondition: ConditionTag;
+	tilePageId: string;
+	offset: Dimensions;
+	color?: ColorModificationTag | null;
+	largeImage?: boolean | null;
+	offset2?: Dimensions | null;
+	secondaryCondition?: ConditionTag | null;
+	colorPalletSwap?: number | null;
+	targetIdentifier?: string | null;
+	extraDescriptor?: string | null;
+};
+
+/**
+ * A struct representing a `SpriteLayer` object.
+ */
+export type SpriteLayer = {
+	layerName: string;
+	tilePageId: string;
+	offset: Dimensions;
+	offset2?: Dimensions | null;
+	largeImage?: boolean | null;
+	conditions?: [ConditionTag, string][] | null;
+};
+
+/**
+ * Represents the name of a materials 3 states (solid, liquid, gas)
+ */
+export type StateName = { solid: string; liquid: string; gas: string };
+
+/**
  * The additional data specific to the steam workshop
  */
 export type SteamData = {
@@ -10676,31 +10501,239 @@ export type SteamData = {
 };
 
 /**
- * Represents the name of a materials 3 states (solid, liquid, gas)
+ * A struct representing a syndrome
  */
-export type StateName = { solid: string; liquid: string; gas: string };
-
-/**
- * Represents the mechanical properties of a material via the yield, fracture, and elasticity
- */
-export type MechanicalProperties = {
-	yield: number;
-	fracture: number;
-	elasticity: number;
+export type Syndrome = {
+	/**
+	 * Seen the `[SYN_IDENTIFIER:INEBRIATION]` tag in `material_templates.txt`
+	 */
+	identifier?: string | null;
+	name?: string | null;
+	affectedClasses?: string[] | null;
+	immuneClasses?: string[] | null;
+	affectedCreatures?: [string, string][] | null;
+	immuneCreatures?: [string, string][] | null;
+	classes?: string[] | null;
+	/**
+	 * Seen the `[SYN_CONCENTRATION_ADDED:100:1000]` tag in `material_templates.txt`
+	 * default is 0:0
+	 */
+	concentrationAdded?: [number, number] | null;
+	tags?: SyndromeTag[] | null;
+	conditions?: string[] | null;
 };
 
 /**
- * A name with a singular, plural, and adjective form
+ * The temperature properties of a material
  */
-export type Name = { singular: string; plural: string; adjective: string };
+export type Temperatures = {
+	/**
+	 * This determines how long it takes the material to heat up or cool down.
+	 * A material with a high specific heat capacity will hold more heat and affect its surroundings more
+	 * before cooling down or heating up to equilibrium. The input for this token is not temperature,
+	 * but rather the specific heat capacity of the material.
+	 */
+	specificHeat?: number | null;
+	/**
+	 * This is the temperature at which the material will catch fire.
+	 */
+	ignitionPoint?: number | null;
+	/**
+	 * This is the temperature at which a liquid material will freeze, or a solid material will melt.
+	 * In Dwarf Fortress the melting point and freezing point coincide exactly; this is contrary to many
+	 * real-life materials, which can be supercooled.
+	 */
+	meltingPoint?: number | null;
+	/**
+	 * This is the temperature at which the material will boil or condense. Water boils at 10180 °U
+	 */
+	boilingPoint?: number | null;
+	/**
+	 * This is the temperature above which the material will begin to take heat damage.
+	 * Burning items without a heat damage point (or with an exceptionally high one) will take damage very slowly,
+	 * causing them to burn for a very long time (9 months and 16.8 days) before disappearing.
+	 */
+	heatDamagePoint?: number | null;
+	/**
+	 * This is the temperature below which the material will begin to take frost damage.
+	 */
+	coldDamagePoint?: number | null;
+	/**
+	 * A material's temperature can be forced to always be a certain value via the `MAT_FIXED_TEMP`
+	 * material definition token. The only standard material which uses this is nether-cap wood,
+	 * whose temperature is always at the melting point of water. If a material's temperature is fixed
+	 * to between its cold damage point and its heat damage point, then items made from that material
+	 * will never suffer cold/heat damage. This makes nether-caps fire-safe and magma-safe despite being a type of wood.
+	 */
+	materialFixedTemperature?: number | null;
+};
 
 /**
- * The name of a raw object with only singular and plural forms
+ * Representation of a character tile (literally a single character) that is used in DF Classic
  */
-export type SingPlurName = { singular: string; plural: string };
+export type Tile = {
+	character: string;
+	altCharacter?: string | null;
+	color?: Color | null;
+	glowCharacter?: string | null;
+	glowColor?: Color | null;
+};
 
 /**
- * The object types that can be parsed by the parser.
+ * A struct representing a `TilePage` object.
+ */
+export type TilePage = {
+	metadata?: Metadata | null;
+	identifier: string;
+	objectId: string;
+	file: string;
+	tileDim: Dimensions;
+	pageDim: Dimensions;
+};
+
+/**
+ * A struct representing a tree.
+ */
+export type Tree = {
+	/**
+	 * Tree will yield logs made of that material. Instead, if it's `[TREE:NONE]`, no logs will result.
+	 * Materials are typically found in other raws..
+	 */
+	material: string;
+	/**
+	 * What the trunk of the tree is named
+	 */
+	trunkName?: Name | null;
+	/**
+	 * The maximum z-level height of the trunk, starting from +2 z-levels above the ground.
+	 * Valid values: 1-8
+	 * Default: 1
+	 */
+	maxTrunkHeight?: number | null;
+	/**
+	 * Upper limit of trunk thickness, in tiles. Has a geometric effect on log yield.
+	 * Valid values: 1-3
+	 * Default: 1
+	 */
+	maxTrunkDiameter?: number | null;
+	/**
+	 * The number of years the trunk takes to grow one z-level upward. Default: 1
+	 */
+	trunkPeriod?: number | null;
+	/**
+	 * The number of years the trunk takes to grow one tile wider. Default: 1
+	 */
+	trunkWidthPeriod?: number | null;
+	/**
+	 * What thin branches of the tree are named.
+	 */
+	branchName?: Name | null;
+	/**
+	 * How dense the branches grow on this tree.
+	 */
+	branchDensity?: number | null;
+	/**
+	 * The radius to which branches can reach. Appears to never reach further than seven tiles from the centre.
+	 * Does not depend on the trunk branching amount or where trunks are.
+	 * The values used in the game go from 0-3. Higher values than that can cause crashes.
+	 */
+	branchRadius?: number | null;
+	/**
+	 * What thick branches of the tree are named.
+	 */
+	heavyBranchesName?: Name | null;
+	/**
+	 * Similar to `BRANCH_DENSITY` for thick branches. Default: 0
+	 */
+	heavyBranchDensity?: number | null;
+	/**
+	 * Similar as `BRANCH_DENSITY` for thick branches. Values outside 0-3 can cause crashes. Default: 0
+	 */
+	heavyBranchRadius?: number | null;
+	/**
+	 * How much the trunk branches out. 0 makes the trunk straight (default)
+	 */
+	trunkBranching?: number | null;
+	/**
+	 * What the roots of the tree are named.
+	 */
+	rootName?: Name | null;
+	/**
+	 * Density of the root growth. Defaults to 0.
+	 */
+	rootDensity?: number | null;
+	/**
+	 * How wide the roots reach out. Defaults to 0.
+	 */
+	rootRadius?: number | null;
+	/**
+	 * What the twigs of the tree are named.
+	 */
+	twigsName?: Name | null;
+	/**
+	 * Where twigs appear, defaults to `[SideBranches, AboveBranches]`
+	 */
+	twigsPlacement?: TwigPlacementTag[] | null;
+	/**
+	 * What this mushroom-cap is called. Only makes sense with `TREE_HAS_MUSHROOM_CAP`.
+	 */
+	capName?: Name | null;
+	/**
+	 * Similar to the other PERIOD tags, influences the rate of the mushroom cap growth. Only makes sense with `TREE_HAS_MUSHROOM_CAP`. Default: 1
+	 */
+	capPeriod?: number | null;
+	/**
+	 * The radius of a mushroom cap. Only makes sense with `TREE_HAS_MUSHROOM_CAP`. Default: 0
+	 */
+	capRadius?: number | null;
+	/**
+	 * The tile used for trees of this type on the world map. Defaults to 24 (↑).
+	 */
+	treeTile?: string | null;
+	/**
+	 * The tile used for (un)dead trees and deciduous trees (generally in winter) of this type. Defaults to 198 (╞).
+	 */
+	deadTreeTile?: string | null;
+	/**
+	 * The tile used for saplings of this tree. Defaults to 231 (τ).
+	 */
+	saplingTile?: string | null;
+	/**
+	 * The tile used for dead saplings of this tree. Defaults to 231 (τ).
+	 */
+	deadSaplingTile?: string | null;
+	/**
+	 * The color of the tree on the map. Defaults to 2:0:0 (dark green).
+	 */
+	treeColor?: Color | null;
+	/**
+	 * The color of the tree on the map when (un)dead. Defaults to 0:0:1 (dark gray).
+	 */
+	deadTreeColor?: Color | null;
+	/**
+	 * The color of saplings of this tree. Defaults to 2:0:0 (dark green).
+	 */
+	saplingColor?: Color | null;
+	/**
+	 * The color of dead saplings of this tree. Defaults to 0:0:1 (dark gray).
+	 */
+	deadSaplingColor?: Color | null;
+	/**
+	 * The sapling of this tree will drown once the water on its tile reaches this level. Defaults to 4.
+	 */
+	saplingDrownLevel?: number | null;
+	/**
+	 * The water depth at which this tree will drown. Exact behavior is unknown. Defaults to 7.
+	 */
+	treeDrownLevel?: number | null;
+	/**
+	 * Token tags for the tree.
+	 */
+	tags?: TreeTag[] | null;
+};
+
+/**
+ * The various types of objects that are within the raw files.
  */
 export type ObjectType =
 	/**
@@ -10877,122 +10910,6 @@ export type ObjectType =
 	| "CreatureCaste";
 
 /**
- * Raws are part of modules since 50.xx. Raw modules are loaded from 3 common locations:
- * `{df_directory}/data/vanilla`, `{df_directory}/mods`, and `{df_directory/data/installed_mods}`
- */
-export type RawModuleLocation =
-	/**
-	 * The "installed" mods directory
-	 */
-	| "InstalledMods"
-	/**
-	 * The "downloaded" mods directory
-	 */
-	| "Mods"
-	/**
-	 * The vanilla data file location
-	 */
-	| "Vanilla"
-	/**
-	 * An unknown location
-	 */
-	| "Unknown"
-	/**
-	 * Used for handling legends exported files
-	 */
-	| "LegendsExport";
-
-/**
- * A struct representing a body size in the format `years:days:size_cm3`
- */
-export type BodySize = { years: number; days: number; sizeCm3: number };
-
-/**
- * A struct representing a color in the format "foreground:background:brightness".
- */
-export type Color = {
-	foreground: number;
-	background: number;
-	brightness: number;
-};
-
-/**
- * How often a creature can be milked and what material it produces
- */
-export type Milkable = { material: string; frequency: number };
-
-/**
- * The temperature properties of a material
- */
-export type Temperatures = {
-	/**
-	 * This determines how long it takes the material to heat up or cool down.
-	 * A material with a high specific heat capacity will hold more heat and affect its surroundings more
-	 * before cooling down or heating up to equilibrium. The input for this token is not temperature,
-	 * but rather the specific heat capacity of the material.
-	 */
-	specificHeat?: number | null;
-	/**
-	 * This is the temperature at which the material will catch fire.
-	 */
-	ignitionPoint?: number | null;
-	/**
-	 * This is the temperature at which a liquid material will freeze, or a solid material will melt.
-	 * In Dwarf Fortress the melting point and freezing point coincide exactly; this is contrary to many
-	 * real-life materials, which can be supercooled.
-	 */
-	meltingPoint?: number | null;
-	/**
-	 * This is the temperature at which the material will boil or condense. Water boils at 10180 °U
-	 */
-	boilingPoint?: number | null;
-	/**
-	 * This is the temperature above which the material will begin to take heat damage.
-	 * Burning items without a heat damage point (or with an exceptionally high one) will take damage very slowly,
-	 * causing them to burn for a very long time (9 months and 16.8 days) before disappearing.
-	 */
-	heatDamagePoint?: number | null;
-	/**
-	 * This is the temperature below which the material will begin to take frost damage.
-	 */
-	coldDamagePoint?: number | null;
-	/**
-	 * A material's temperature can be forced to always be a certain value via the `MAT_FIXED_TEMP`
-	 * material definition token. The only standard material which uses this is nether-cap wood,
-	 * whose temperature is always at the melting point of water. If a material's temperature is fixed
-	 * to between its cold damage point and its heat damage point, then items made from that material
-	 * will never suffer cold/heat damage. This makes nether-caps fire-safe and magma-safe despite being a type of wood.
-	 */
-	materialFixedTemperature?: number | null;
-};
-
-/**
- * Representation of a character tile (literally a single character) that is used in DF Classic
- */
-export type Tile = {
-	character: string;
-	altCharacter?: string | null;
-	color?: Color | null;
-	glowCharacter?: string | null;
-	glowColor?: Color | null;
-};
-
-/**
- * A struct representing a Dimensions object.
- */
-export type Dimensions = { x: number; y: number };
-
-/**
- * A custom graphic extension.
- */
-export type CustomGraphicExtension = {
-	extensionType: GraphicType;
-	tilePageId?: string | null;
-	value1?: number | null;
-	value2?: number | null;
-};
-
-/**
  * # Parsing Options
  *
  * Specify what to parse and where to parse it from.
@@ -11011,7 +10928,8 @@ export type CustomGraphicExtension = {
  *
  * ```rust
  * use std::path::PathBuf;
- * use dfraw_json_parser::{ParserOptions, RawObject, ObjectType, RawModuleLocation};
+ * use dfraw_parser::metadata::{ParserOptions, ObjectType, RawModuleLocation};
+ * use dfraw_parser::traits::RawObject;
  *
  * let mut options = ParserOptions::new("path/to/dwarf_fortress");
  * options.add_location_to_parse(RawModuleLocation::Vanilla);
@@ -11131,3 +11049,84 @@ export type ParserOptions = {
 	 */
 	logSummary: boolean;
 };
+
+/**
+ * Raws are part of modules since 50.xx. Raw modules are loaded from 3 common locations:
+ * `{df_directory}/data/vanilla`, `{df_directory}/mods`, and `{df_directory/data/installed_mods}`
+ */
+export type RawModuleLocation =
+	/**
+	 * The "installed" mods directory
+	 */
+	| "InstalledMods"
+	/**
+	 * The "downloaded" mods directory
+	 */
+	| "Mods"
+	/**
+	 * The vanilla data file location
+	 */
+	| "Vanilla"
+	/**
+	 * An unknown location
+	 */
+	| "Unknown"
+	/**
+	 * Used for handling legends exported files
+	 */
+	| "LegendsExport";
+
+/**
+ * The `RawMetadata` struct represents metadata about a raw module in Rust, including its name,
+ * version, file path, identifier, object type, module location, and visibility status.
+ *
+ * Properties:
+ *
+ * * `module_name`: The name of the raw module the raw is from.
+ * * `module_version`: The version of the raw module the raw is from.
+ * * `raw_file_path`: The `raw_file_path` property is a string that represents the path to the file
+ * containing the raw data. It specifies the location of the file on the file system.
+ * * `raw_identifier`: The raw identifier is a unique identifier for the raw data. It is typically
+ * found at the top of the raw text file and is used to identify and reference the specific raw data.
+ * * `object_type`: The `object_type` property represents the type of the raw data. It could be a
+ * creature, plant, or any other type specified in the raw text file.
+ * * `raw_module_location`: The `raw_module_location` property represents the location of the owning
+ * raw module. It can have one of the following values:
+ *
+ * - `RawModuleLocation::InstalledMods`: The raw module is located in the `installed_mods` folder.
+ * - `RawModuleLocation::Mods`: The raw module is located in the `mods` folder.
+ * - `RawModuleLocation::Vanilla`: The raw module is located in the `vanilla` folder.
+ *
+ * * `hidden`: The `hidden` property is a boolean value that indicates whether the raw metadata should
+ * be hidden or not when exporting. By default, it is set to `true`, meaning that the raw metadata will
+ * be hidden unless specified in the `ParsingOptions` struct.
+ */
+export type Metadata = {
+	moduleObjectId: string;
+	moduleName: string;
+	moduleVersion: string;
+	rawFilePath: string;
+	rawIdentifier: string;
+	objectType: ObjectType;
+	rawModuleLocation: RawModuleLocation;
+};
+
+/**
+ * The `Complexity` enum is used to determine how a token is parsed.
+ *
+ * A token can have no arguments, a single argument, or multiple arguments. This corresponds to the
+ * `None`, `Simple`, and `Complex` variants, respectively.
+ */
+export type TagComplexity =
+	/**
+	 * The token affects raws by itself with no arguments
+	 */
+	| "None"
+	/**
+	 * The token affects raws and requires a single argument
+	 */
+	| "Simple"
+	/**
+	 * The token affects raws and requires multiple arguments
+	 */
+	| "Complex";

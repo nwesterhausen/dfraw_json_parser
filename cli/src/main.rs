@@ -435,7 +435,7 @@ pub fn main() -> Result<(), lexopt::Error> {
     }
 
     // Parse the raws
-    let result = parse::parse(&options).map_err(|e| {
+    let result = parse(&options).map_err(|e| {
         lexopt::Error::Custom(Box::new(std::io::Error::new(
             std::io::ErrorKind::Other,
             format!("Failed to parse raws: {e:?}"),

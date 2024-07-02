@@ -133,7 +133,7 @@ impl Tile {
     /// # Example
     ///
     /// ```
-    /// use dfraw_json_parser::parser::Tile;
+    /// use dfraw_parser::Tile;
     ///
     /// let tile = Tile::default().with_character("a");
     /// ```

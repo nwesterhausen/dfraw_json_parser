@@ -1,4 +1,4 @@
-use dfraw_parser::metadata::RawModuleLocation;
+use dfraw_parser::metadata::{ObjectType, RawModuleLocation};
 
 use super::{Details, Payload, Task};
 
@@ -142,10 +142,7 @@ impl ProgressHelper {
     /// # Parameters
     ///
     /// * `summary` - A map of object types to the number of objects parsed.
-    pub(crate) fn send_summary(
-        &self,
-        summary: &std::collections::HashMap<crate::ObjectType, usize>,
-    ) {
+    pub(crate) fn send_summary(&self, summary: &std::collections::HashMap<ObjectType, usize>) {
         use tauri::Manager;
 
         self.tauri_window
