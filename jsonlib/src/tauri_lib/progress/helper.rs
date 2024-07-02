@@ -1,4 +1,4 @@
-use crate::RawModuleLocation;
+use dfraw_parser::metadata::RawModuleLocation;
 
 use super::{Details, Payload, Task};
 

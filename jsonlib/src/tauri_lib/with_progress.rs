@@ -1,11 +1,6 @@
 #[cfg(feature = "tauri")]
 use super::ProgressHelper;
 
-use crate::{
-    creature_variation::CreatureVariation, legends_export, parser, tauri_lib::ProgressTask,
-    unprocessed_raw::UnprocessedRaw, util, ModuleInfoFile, ParseResult, ParserError, ParserOptions,
-    RawModuleLocation, RawObject,
-};
 use std::path::{Path, PathBuf};
 use tracing::{debug, info};
 use walkdir::DirEntry;
@@ -35,7 +30,10 @@ pub(crate) fn parse(
     progress_helper: &mut ProgressHelper,
 ) -> Result<crate::ParseResult, crate::ParserError> {
     // Guard against invalid paths (validate the options)
-    let options = util::validate_options(options)?;
+
+    use dfraw_parser::utilities::validate_options;
+
+    let options = validate_options(options)?;
 
     let mut results = ParseResult {
         raws: Vec::new(),

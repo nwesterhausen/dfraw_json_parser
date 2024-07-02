@@ -1,7 +1,7 @@
 use serde::{Deserialize, Serialize};
 use specta::Type;
 
-use crate::RawModuleLocation;
+use dfraw_parser::metadata::RawModuleLocation;
 
 /// Details about the current file being parsed, specifically where and what it is.
 #[derive(Serialize, Deserialize, Debug, Clone, Default, Type)]
