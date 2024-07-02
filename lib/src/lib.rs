@@ -16,3 +16,5 @@ pub mod utilities;
 
 pub use error::Parser as ParserError;
 pub use parsed_definitions::*;
+pub use parser::*;
+pub use utilities::build_search_string;

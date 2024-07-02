@@ -65,7 +65,7 @@ pub fn parse_legends_export<P: AsRef<Path>>(
     );
 
     let mut reader = Reader::from_str(&file_str);
-    reader.trim_text(true);
+    reader.config_mut().trim_text(true);
 
     let mut current_tag = Current::None;
     let mut parent_tag = Parent::None;

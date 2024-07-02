@@ -30,7 +30,7 @@ use crate::{
     regex::VARIATION_ARGUMENT_RE,
     select_creature::SelectCreature,
     tile_page::TilePage,
-    traits::{CreatureVariationRequirements, RawObject},
+    traits::{searchable::get_search_string, CreatureVariationRequirements, RawObject, Searchable},
     ParserError,
 };
 
@@ -1252,5 +1252,5 @@ pub fn singularly_apply_creature_variation(
 ///
 /// The function `build_search_string` returns a `String` value.
 pub fn build_search_string(raw_object: &dyn Searchable) -> String {
-    crate::parser::get_search_string(raw_object)
+    get_search_string(raw_object)
 }

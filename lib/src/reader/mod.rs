@@ -7,6 +7,5 @@ pub mod unprocessed_raw;
 pub use header::read_raw_file_type;
 pub use parsable_types::PARSABLE_OBJECT_TYPES;
 pub use parse_file::parse_raw_file;
-pub use parse_file::parse_raw_file_with_info;
 pub use parse_result::FileParseResult;
 pub use unprocessed_raw::UnprocessedRaw;
