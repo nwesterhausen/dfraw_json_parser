@@ -5,6 +5,7 @@ mod error;
 mod legends_export;
 mod parsed_definitions;
 mod parser;
+mod reader;
 
 pub mod constants;
 pub mod metadata;
