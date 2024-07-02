@@ -1,18 +1,11 @@
 use std::{
-    collections::HashMap,
     fs::File,
-    hash::BuildHasher,
     io::{BufWriter, Write},
-    path::{Path, PathBuf},
+    path::Path,
 };
 
-use tracing::{debug, error, info, warn};
-use walkdir::WalkDir;
-
-use crate::{
-    parser::{creature::Creature, select_creature::SelectCreature, ObjectType, RawObject},
-    ParserError, ParserOptions,
-};
+use dfraw_parser::traits::RawObject;
+use tracing::{error, info, warn};
 
 /// Save a vector of parsed raw objects to a file in JSON format.
 ///
