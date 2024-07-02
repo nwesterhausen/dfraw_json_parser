@@ -516,8 +516,8 @@ impl TagOperations for CasteTag {
                 );
                     return None;
                 }
-                let id = values[0].to_string();
-                let args = values[1..]
+                let id = (*values.first().unwrap_or(&"")).to_string();
+                let args = (*values.get(1..).unwrap_or_default())
                     .iter()
                     .map(std::string::ToString::to_string)
                     .collect::<Vec<String>>();
@@ -534,8 +534,8 @@ impl TagOperations for CasteTag {
                 );
                     return None;
                 }
-                let name = values[0].to_string();
-                let body_part = values[1..].join(":").to_string();
+                let name = (*values.first().unwrap_or(&"")).to_string();
+                let body_part = (*values.get(1..).unwrap_or_default()).join(":").to_string();
                 Some(CasteTag::Attack { name, body_part })
             }
             CasteTag::AttackTrigger { .. } => {
@@ -549,19 +549,19 @@ impl TagOperations for CasteTag {
                 );
                     return None;
                 }
-                let Ok(population) = values[0].parse::<u32>() else {
+                let Ok(population) = (*values.first().unwrap_or(&"")).parse::<u32>() else {
                     tracing::warn!(
                         "parse_complex_token: Cannot parse AttackTrigger: population: {values:?}"
                     );
                     return None;
                 };
-                let Ok(exported_wealth) = values[1].parse::<u32>() else {
+                let Ok(exported_wealth) = (*values.get(1).unwrap_or(&"")).parse::<u32>() else {
                     tracing::warn!(
                     "parse_complex_token: Cannot parse AttackTrigger: exported wealth: {values:?}"
                 );
                     return None;
                 };
-                let Ok(created_wealth) = values[2].parse::<u32>() else {
+                let Ok(created_wealth) = (*values.get(2).unwrap_or(&"")).parse::<u32>() else {
                     tracing::warn!(
                     "parse_complex_token: Cannot parse AttackTrigger: created wealth: {values:?}"
                 );
@@ -582,8 +582,8 @@ impl TagOperations for CasteTag {
                 );
                     return None;
                 }
-                let singular = values[0].to_string();
-                let plural = values[1..].join(":").to_string();
+                let singular = (*values.first().unwrap_or(&"")).to_string();
+                let plural = (*values.get(1..).unwrap_or_default()).join(":").to_string();
                 Some(CasteTag::BabyName { singular, plural })
             }
             CasteTag::Blood { .. } => {
@@ -594,8 +594,8 @@ impl TagOperations for CasteTag {
                 );
                     return None;
                 }
-                let material = values[0].to_string();
-                let state = values[1..].join(":").to_string();
+                let material = (*values.first().unwrap_or(&"")).to_string();
+                let state = (*values.get(1..).unwrap_or_default()).join(":").to_string();
                 Some(CasteTag::Blood { material, state })
             }
             CasteTag::Body { .. } => {
@@ -616,44 +616,44 @@ impl TagOperations for CasteTag {
                     return None;
                 }
                 // Parse first argument as `String`
-                let attribute = values[0].to_string();
-                let Ok(lowest) = values[1].parse::<i32>() else {
+                let attribute = (*values.first().unwrap_or(&"")).to_string();
+                let Ok(lowest) = (*values.get(1).unwrap_or(&"")).parse::<i32>() else {
                     tracing::warn!(
                     "parse_complex_token: Cannot parse mental attribute range: lowest: {values:?}"
                 );
                     return None;
                 };
-                let Ok(lower) = values[2].parse::<i32>() else {
+                let Ok(lower) = (*values.get(2).unwrap_or(&"")).parse::<i32>() else {
                     tracing::warn!(
                     "parse_complex_token: Cannot parse mental attribute range: lower: {values:?}"
                 );
                     return None;
                 };
-                let Ok(lower_median) = values[3].parse::<i32>() else {
+                let Ok(lower_median) = (*values.get(3).unwrap_or(&"")).parse::<i32>() else {
                     tracing::warn!(
                     "parse_complex_token: Cannot parse mental attribute range: lower medium: {values:?}"
                 );
                     return None;
                 };
-                let Ok(median) = values[4].parse::<i32>() else {
+                let Ok(median) = (*values.get(4).unwrap_or(&"")).parse::<i32>() else {
                     tracing::warn!(
                     "parse_complex_token: Cannot parse mental attribute range: medium: {values:?}"
                 );
                     return None;
                 };
-                let Ok(upper_median) = values[5].parse::<i32>() else {
+                let Ok(upper_median) = (*values.get(5).unwrap_or(&"")).parse::<i32>() else {
                     tracing::warn!(
                     "parse_complex_token: Cannot parse mental attribute range: upper medium: {values:?}"
                 );
                     return None;
                 };
-                let Ok(upper) = values[6].parse::<i32>() else {
+                let Ok(upper) = (*values.get(6).unwrap_or(&"")).parse::<i32>() else {
                     tracing::warn!(
                     "parse_complex_token: Cannot parse mental attribute range: upper: {values:?}"
                 );
                     return None;
                 };
-                let Ok(highest) = values[7].parse::<i32>() else {
+                let Ok(highest) = (*values.get(7).unwrap_or(&"")).parse::<i32>() else {
                     tracing::warn!(
                     "parse_complex_token: Cannot parse mental attribute range: highest: {values:?}"
                 );
@@ -683,44 +683,44 @@ impl TagOperations for CasteTag {
                     return None;
                 }
                 // Parse first argument as `String`
-                let quality = values[0].to_string();
-                let Ok(lowest) = values[1].parse::<i32>() else {
+                let quality = (*values.first().unwrap_or(&"")).to_string();
+                let Ok(lowest) = (*values.get(1).unwrap_or(&"")).parse::<i32>() else {
                     tracing::warn!(
                     "parse_complex_token: Cannot parse mental attribute range: lowest: {values:?}"
                 );
                     return None;
                 };
-                let Ok(lower) = values[2].parse::<i32>() else {
+                let Ok(lower) = (*values.get(2).unwrap_or(&"")).parse::<i32>() else {
                     tracing::warn!(
                     "parse_complex_token: Cannot parse mental attribute range: lower: {values:?}"
                 );
                     return None;
                 };
-                let Ok(lower_median) = values[3].parse::<i32>() else {
+                let Ok(lower_median) = (*values.get(3).unwrap_or(&"")).parse::<i32>() else {
                     tracing::warn!(
                     "parse_complex_token: Cannot parse mental attribute range: lower medium: {values:?}"
                 );
                     return None;
                 };
-                let Ok(median) = values[4].parse::<i32>() else {
+                let Ok(median) = (*values.get(4).unwrap_or(&"")).parse::<i32>() else {
                     tracing::warn!(
                     "parse_complex_token: Cannot parse mental attribute range: medium: {values:?}"
                 );
                     return None;
                 };
-                let Ok(upper_median) = values[5].parse::<i32>() else {
+                let Ok(upper_median) = (*values.get(5).unwrap_or(&"")).parse::<i32>() else {
                     tracing::warn!(
                     "parse_complex_token: Cannot parse mental attribute range: upper medium: {values:?}"
                 );
                     return None;
                 };
-                let Ok(upper) = values[6].parse::<i32>() else {
+                let Ok(upper) = (*values.get(6).unwrap_or(&"")).parse::<i32>() else {
                     tracing::warn!(
                     "parse_complex_token: Cannot parse mental attribute range: upper: {values:?}"
                 );
                     return None;
                 };
-                let Ok(highest) = values[7].parse::<i32>() else {
+                let Ok(highest) = (*values.get(7).unwrap_or(&"")).parse::<i32>() else {
                     tracing::warn!(
                     "parse_complex_token: Cannot parse mental attribute range: highest: {values:?}"
                 );
@@ -740,8 +740,8 @@ impl TagOperations for CasteTag {
                 })
             }
             CasteTag::BodyDetailPlan { .. } => {
-                let body_plan = values[0].to_string();
-                let arguments = values[1..]
+                let body_plan = (*values.first().unwrap_or(&"")).to_string();
+                let arguments = (*values.get(1..).unwrap_or_default())
                     .iter()
                     .map(std::string::ToString::to_string)
                     .collect::<Vec<String>>();
@@ -760,15 +760,15 @@ impl TagOperations for CasteTag {
                 );
                     return None;
                 }
-                let Ok(year) = values[0].parse::<u32>() else {
+                let Ok(year) = (*values.first().unwrap_or(&"")).parse::<u32>() else {
                     tracing::warn!("parse_complex_token: Cannot parse body size: year: {values:?}");
                     return None;
                 };
-                let Ok(days) = values[1].parse::<u32>() else {
+                let Ok(days) = (*values.get(1).unwrap_or(&"")).parse::<u32>() else {
                     tracing::warn!("parse_complex_token: Cannot parse body size: days: {values:?}");
                     return None;
                 };
-                let Ok(size) = values[2].parse::<u32>() else {
+                let Ok(size) = (*values.get(2).unwrap_or(&"")).parse::<u32>() else {
                     tracing::warn!("parse_complex_token: Cannot parse body size: size: {values:?}");
                     return None;
                 };
@@ -783,8 +783,8 @@ impl TagOperations for CasteTag {
                 );
                     return None;
                 }
-                let singular = values[0].to_string();
-                let plural = values[1..].join(":").to_string();
+                let singular = (*values.first().unwrap_or(&"")).to_string();
+                let plural = (*values.get(1..).unwrap_or_default()).join(":").to_string();
                 Some(CasteTag::ChildName { singular, plural })
             }
             CasteTag::ClutchSize { .. } => {
@@ -797,13 +797,13 @@ impl TagOperations for CasteTag {
                 );
                     return None;
                 }
-                let Ok(min) = values[0].parse::<u32>() else {
+                let Ok(min) = (*values.first().unwrap_or(&"")).parse::<u32>() else {
                     tracing::warn!(
                         "parse_complex_token: Cannot parse clutch size: min: {values:?}"
                     );
                     return None;
                 };
-                let Ok(max) = values[1].parse::<u32>() else {
+                let Ok(max) = (*values.get(1).unwrap_or(&"")).parse::<u32>() else {
                     tracing::warn!(
                         "parse_complex_token: Cannot parse clutch size: max: {values:?}"
                     );
@@ -820,19 +820,19 @@ impl TagOperations for CasteTag {
                 );
                     return None;
                 }
-                let Ok(foreground) = values[0].parse::<u32>() else {
+                let Ok(foreground) = (*values.first().unwrap_or(&"")).parse::<u32>() else {
                     tracing::warn!(
                         "parse_complex_token: Cannot parse color: foreground: {values:?}"
                     );
                     return None;
                 };
-                let Ok(background) = values[1].parse::<u32>() else {
+                let Ok(background) = (*values.get(1).unwrap_or(&"")).parse::<u32>() else {
                     tracing::warn!(
                         "parse_complex_token: Cannot parse color: background: {values:?}"
                     );
                     return None;
                 };
-                let Ok(brightness) = values[2].parse::<u32>() else {
+                let Ok(brightness) = (*values.get(2).unwrap_or(&"")).parse::<u32>() else {
                     tracing::warn!(
                         "parse_complex_token: Cannot parse color: brightness: {values:?}"
                     );
@@ -853,14 +853,16 @@ impl TagOperations for CasteTag {
                     return None;
                 }
                 // Take the last `String` as the `state` and the rest as the `material`
-                let state = values[values.len() - 1].to_string();
-                let material = values[..values.len() - 1].join(":").to_string();
+                let state = (*values.last().unwrap_or(&"")).to_string();
+                let material = (*values.get(..values.len() - 1).unwrap_or_default())
+                    .join(":")
+                    .to_string();
                 Some(CasteTag::EggMaterial { material, state })
             }
             CasteTag::ExtraButcherObject { .. } => {
                 // `String` and `Vec<String>`
-                let object_type = values[0].to_string();
-                let arguments = values[1..]
+                let object_type = (*values.first().unwrap_or(&"")).to_string();
+                let arguments = (*values.get(1..).unwrap_or_default())
                     .iter()
                     .map(std::string::ToString::to_string)
                     .collect::<Vec<String>>();
@@ -878,8 +880,8 @@ impl TagOperations for CasteTag {
                     return None;
                 }
                 // Two strings
-                let item = values[0].to_string();
-                let material = values[1..].join(":").to_string();
+                let item = (*values.first().unwrap_or(&"")).to_string();
+                let material = (*values.get(1..).unwrap_or_default()).join(":").to_string();
                 Some(CasteTag::ExtraButcherObjectItem { item, material })
             }
             CasteTag::GeneralMaterialForceMultiplier { .. } => {
@@ -891,13 +893,13 @@ impl TagOperations for CasteTag {
                     return None;
                 }
                 // Two `u32`s
-                let Ok(value_a) = values[0].parse::<u32>() else {
+                let Ok(value_a) = (*values.first().unwrap_or(&"")).parse::<u32>() else {
                     tracing::warn!(
                     "parse_complex_token: Cannot parse general material force multiplier: {values:?}"
                 );
                     return None;
                 };
-                let Ok(value_b) = values[1].parse::<u32>() else {
+                let Ok(value_b) = (*values.get(1).unwrap_or(&"")).parse::<u32>() else {
                     tracing::warn!(
                     "parse_complex_token: Cannot parse general material force multiplier: {values:?}"
                 );
@@ -915,19 +917,19 @@ impl TagOperations for CasteTag {
                 );
                     return None;
                 }
-                let Ok(foreground) = values[0].parse::<u32>() else {
+                let Ok(foreground) = (*values.first().unwrap_or(&"")).parse::<u32>() else {
                     tracing::warn!(
                         "parse_complex_token: Cannot parse glow color: foreground: {values:?}"
                     );
                     return None;
                 };
-                let Ok(background) = values[1].parse::<u32>() else {
+                let Ok(background) = (*values.get(1).unwrap_or(&"")).parse::<u32>() else {
                     tracing::warn!(
                         "parse_complex_token: Cannot parse glow color: background: {values:?}"
                     );
                     return None;
                 };
-                let Ok(brightness) = values[2].parse::<u32>() else {
+                let Ok(brightness) = (*values.get(2).unwrap_or(&"")).parse::<u32>() else {
                     tracing::warn!(
                         "parse_complex_token: Cannot parse glow color: brightness: {values:?}"
                     );
@@ -948,8 +950,8 @@ impl TagOperations for CasteTag {
                     return None;
                 }
                 // Two strings
-                let vermin_creature = values[0].to_string();
-                let vermin_caste = values[1..].join(":").to_string();
+                let vermin_creature = (*values.first().unwrap_or(&"")).to_string();
+                let vermin_caste = (*values.get(1..).unwrap_or_default()).join(":").to_string();
                 Some(CasteTag::GobbleVerminCreature {
                     vermin_creature,
                     vermin_caste,
@@ -964,8 +966,8 @@ impl TagOperations for CasteTag {
             }
             CasteTag::ItemCorpse { .. } => {
                 // Two strings
-                let item = values[0].to_string();
-                let material = values[1..].join(":").to_string();
+                let item = (*values.first().unwrap_or(&"")).to_string();
+                let material = (*values.get(1..).unwrap_or_default()).join(":").to_string();
                 Some(CasteTag::ItemCorpse { item, material })
             }
             CasteTag::Lair { .. } => {
@@ -977,8 +979,8 @@ impl TagOperations for CasteTag {
                     return None;
                 }
                 // `String` and `u32`
-                let lair = values[0].to_string();
-                let Ok(probability) = values[1].parse::<u32>() else {
+                let lair = (*values.first().unwrap_or(&"")).to_string();
+                let Ok(probability) = (*values.get(1).unwrap_or(&"")).parse::<u32>() else {
                     tracing::warn!("parse_complex_token: Cannot parse lair proability: {values:?}");
                     return None;
                 };
@@ -986,8 +988,8 @@ impl TagOperations for CasteTag {
             }
             CasteTag::LaysUnusualEggs { .. } => {
                 // Two strings
-                let item = values[0].to_string();
-                let material = values[1..].join(":").to_string();
+                let item = (*values.first().unwrap_or(&"")).to_string();
+                let material = (*values.get(1..).unwrap_or_default()).join(":").to_string();
                 Some(CasteTag::LaysUnusualEggs { item, material })
             }
             CasteTag::Ligaments { .. } => {
@@ -1000,14 +1002,16 @@ impl TagOperations for CasteTag {
                     return None;
                 }
                 // Grab `healing_rate` from the end of `value`
-                let Ok(healing_rate) = values[values.len() - 1].parse() else {
+                let Ok(healing_rate) = (*values.last().unwrap_or(&"")).parse() else {
                     tracing::warn!(
                         "parse_complex_token: Cannot parse ligaments: healing rate: {values:?}"
                     );
                     return None;
                 };
                 // The rest of the arguments are the `material`
-                let material = values[..values.len() - 1].join(":").to_string();
+                let material = (*values.get(..values.len() - 1).unwrap_or_default())
+                    .join(":")
+                    .to_string();
                 Some(CasteTag::Ligaments {
                     material,
                     healing_rate,
@@ -1015,13 +1019,13 @@ impl TagOperations for CasteTag {
             }
             CasteTag::LitterSize { .. } => {
                 // Two `u32`s
-                let Ok(min) = values[0].parse::<u32>() else {
+                let Ok(min) = (*values.first().unwrap_or(&"")).parse::<u32>() else {
                     tracing::warn!(
                         "parse_complex_token: Cannot parse litter size: min: {values:?}"
                     );
                     return None;
                 };
-                let Ok(max) = values[1].parse::<u32>() else {
+                let Ok(max) = (*values.get(1).unwrap_or(&"")).parse::<u32>() else {
                     tracing::warn!(
                         "parse_complex_token: Cannot parse litter size: max: {values:?}"
                     );
@@ -1030,17 +1034,17 @@ impl TagOperations for CasteTag {
                 Some(CasteTag::LitterSize { min, max })
             }
             CasteTag::MannerismFingers { .. } => {
-                let finger = values[0].to_string();
-                let fingers = values[1..].join(":").to_string();
+                let finger = (*values.first().unwrap_or(&"")).to_string();
+                let fingers = (*values.get(1..).unwrap_or_default()).join(":").to_string();
                 Some(CasteTag::MannerismFingers { finger, fingers })
             }
             CasteTag::MaxAge { .. } => {
                 // Two `u32`s
-                let Ok(min) = values[0].parse::<u32>() else {
+                let Ok(min) = (*values.first().unwrap_or(&"")).parse::<u32>() else {
                     tracing::warn!("parse_complex_token: Cannot parse max age: min: {values:?}");
                     return None;
                 };
-                let Ok(max) = values[1].parse::<u32>() else {
+                let Ok(max) = (*values.get(1).unwrap_or(&"")).parse::<u32>() else {
                     tracing::warn!("parse_complex_token: Cannot parse max age: max: {values:?}");
                     return None;
                 };
@@ -1054,8 +1058,8 @@ impl TagOperations for CasteTag {
                 );
                     return None;
                 }
-                let attribute = values[0].to_string();
-                let Ok(percentage) = values[1].parse::<u32>() else {
+                let attribute = (*values.first().unwrap_or(&"")).to_string();
+                let Ok(percentage) = (*values.get(1).unwrap_or(&"")).parse::<u32>() else {
                     tracing::warn!(
                     "parse_complex_token: Cannot parse mental attribute cap percentage: {values:?}"
                 );
@@ -1077,44 +1081,44 @@ impl TagOperations for CasteTag {
                     return None;
                 }
                 // Parse first argument as `String`
-                let attribute = values[0].to_string();
-                let Ok(lowest) = values[1].parse::<u32>() else {
+                let attribute = (*values.first().unwrap_or(&"")).to_string();
+                let Ok(lowest) = (*values.get(1).unwrap_or(&"")).parse::<u32>() else {
                     tracing::warn!(
                     "parse_complex_token: Cannot parse mental attribute range: lowest: {values:?}"
                 );
                     return None;
                 };
-                let Ok(lower) = values[2].parse::<u32>() else {
+                let Ok(lower) = (*values.get(2).unwrap_or(&"")).parse::<u32>() else {
                     tracing::warn!(
                     "parse_complex_token: Cannot parse mental attribute range: lower: {values:?}"
                 );
                     return None;
                 };
-                let Ok(lower_median) = values[3].parse::<u32>() else {
+                let Ok(lower_median) = (*values.get(3).unwrap_or(&"")).parse::<u32>() else {
                     tracing::warn!(
                     "parse_complex_token: Cannot parse mental attribute range: lower medium: {values:?}"
                 );
                     return None;
                 };
-                let Ok(median) = values[4].parse::<u32>() else {
+                let Ok(median) = (*values.get(4).unwrap_or(&"")).parse::<u32>() else {
                     tracing::warn!(
                     "parse_complex_token: Cannot parse mental attribute range: medium: {values:?}"
                 );
                     return None;
                 };
-                let Ok(upper_median) = values[5].parse::<u32>() else {
+                let Ok(upper_median) = (*values.get(5).unwrap_or(&"")).parse::<u32>() else {
                     tracing::warn!(
                     "parse_complex_token: Cannot parse mental attribute range: upper medium: {values:?}"
                 );
                     return None;
                 };
-                let Ok(upper) = values[6].parse::<u32>() else {
+                let Ok(upper) = (*values.get(6).unwrap_or(&"")).parse::<u32>() else {
                     tracing::warn!(
                     "parse_complex_token: Cannot parse mental attribute range: upper: {values:?}"
                 );
                     return None;
                 };
-                let Ok(highest) = values[7].parse::<u32>() else {
+                let Ok(highest) = (*values.get(7).unwrap_or(&"")).parse::<u32>() else {
                     tracing::warn!(
                     "parse_complex_token: Cannot parse mental attribute range: highest: {values:?}"
                 );
@@ -1144,26 +1148,26 @@ impl TagOperations for CasteTag {
                     return None;
                 }
                 // Parse first argument as `String`
-                let attribute = values[0].to_string();
-                let Ok(improvement_cost) = values[1].parse::<u32>() else {
+                let attribute = (*values.first().unwrap_or(&"")).to_string();
+                let Ok(improvement_cost) = (*values.get(1).unwrap_or(&"")).parse::<u32>() else {
                     tracing::warn!(
                     "parse_complex_token: Cannot parse mental attribute rate: improvement cost: {values:?}"
                 );
                     return None;
                 };
-                let Ok(decay_rate_unused) = values[2].parse::<u32>() else {
+                let Ok(decay_rate_unused) = (*values.get(2).unwrap_or(&"")).parse::<u32>() else {
                     tracing::warn!(
                     "parse_complex_token: Cannot parse mental attribute rate: decay rate unused: {values:?}"
                 );
                     return None;
                 };
-                let Ok(decay_rate_rusty) = values[3].parse::<u32>() else {
+                let Ok(decay_rate_rusty) = (*values.get(3).unwrap_or(&"")).parse::<u32>() else {
                     tracing::warn!(
                     "parse_complex_token: Cannot parse mental attribute rate: decay rate rusty: {values:?}"
                 );
                     return None;
                 };
-                let Ok(decay_rate_demotion) = values[4].parse::<u32>() else {
+                let Ok(decay_rate_demotion) = (*values.get(4).unwrap_or(&"")).parse::<u32>() else {
                     tracing::warn!(
                     "parse_complex_token: Cannot parse mental attribute rate: decay rate demotion: {values:?}"
                 );
@@ -1188,14 +1192,16 @@ impl TagOperations for CasteTag {
                     return None;
                 }
                 // Frequency is the last argument, parsed as `u32`
-                let Ok(frequency) = values[values.len() - 1].parse::<u32>() else {
+                let Ok(frequency) = (*values.last().unwrap_or(&"")).parse::<u32>() else {
                     tracing::warn!(
                         "parse_complex_token: Cannot parse milkable: frequency: {values:?}"
                     );
                     return None;
                 };
                 // Material is the rest of the arguments, joined as a `String`
-                let material = values[..values.len() - 1].join(":").to_string();
+                let material = (*values.get(..values.len() - 1).unwrap_or_default())
+                    .join(":")
+                    .to_string();
                 Some(CasteTag::Milkable {
                     material,
                     frequency,
@@ -1210,9 +1216,9 @@ impl TagOperations for CasteTag {
                     );
                     return None;
                 }
-                let singular = values[0].to_string();
-                let plural = values[1].to_string();
-                let adjective = values[2..].join(":").to_string();
+                let singular = (*values.first().unwrap_or(&"")).to_string();
+                let plural = (*values.get(1).unwrap_or(&"")).to_string();
+                let adjective = (*values.get(2..).unwrap_or_default()).join(":").to_string();
                 Some(CasteTag::Name {
                     singular,
                     plural,
@@ -1221,14 +1227,16 @@ impl TagOperations for CasteTag {
             }
             CasteTag::NaturalSkill { .. } => {
                 // Grab `level` from the end of `value`
-                let Ok(level) = values[values.len() - 1].parse() else {
+                let Ok(level) = (*values.last().unwrap_or(&"")).parse() else {
                     tracing::warn!(
                         "parse_complex_token: Cannot parse natural skill: level: {values:?}"
                     );
                     return None;
                 };
                 // The rest of the arguments are the `skill`
-                let skill = values[..values.len() - 1].join(":").to_string();
+                let skill = (*values.get(..values.len() - 1).unwrap_or_default())
+                    .join(":")
+                    .to_string();
                 Some(CasteTag::NaturalSkill { skill, level })
             }
             CasteTag::Personality { .. } => {
@@ -1242,20 +1250,20 @@ impl TagOperations for CasteTag {
                     return None;
                 }
                 // Parse first argument as `String`
-                let personality_trait = values[0].to_string();
-                let Ok(low) = values[1].parse::<u32>() else {
+                let personality_trait = (*values.first().unwrap_or(&"")).to_string();
+                let Ok(low) = (*values.get(1).unwrap_or(&"")).parse::<u32>() else {
                     tracing::warn!(
                         "parse_complex_token: Cannot parse personality: low: {values:?}"
                     );
                     return None;
                 };
-                let Ok(median) = values[2].parse::<u32>() else {
+                let Ok(median) = (*values.get(2).unwrap_or(&"")).parse::<u32>() else {
                     tracing::warn!(
                         "parse_complex_token: Cannot parse personality: median: {values:?}"
                     );
                     return None;
                 };
-                let Ok(high) = values[3].parse::<u32>() else {
+                let Ok(high) = (*values.get(3).unwrap_or(&"")).parse::<u32>() else {
                     tracing::warn!(
                         "parse_complex_token: Cannot parse personality: high: {values:?}"
                     );
@@ -1279,8 +1287,8 @@ impl TagOperations for CasteTag {
                     return None;
                 }
                 // Parse first argument as `String`
-                let attribute = values[0].to_string();
-                let Ok(percentage) = values[1].parse::<u32>() else {
+                let attribute = (*values.first().unwrap_or(&"")).to_string();
+                let Ok(percentage) = (*values.get(1).unwrap_or(&"")).parse::<u32>() else {
                     tracing::warn!(
                     "parse_complex_token: Cannot parse physical attribute cap percentage: {values:?}"
                 );
@@ -1302,44 +1310,44 @@ impl TagOperations for CasteTag {
                     return None;
                 }
                 // Parse first argument as `String`
-                let attribute = values[0].to_string();
-                let Ok(lowest) = values[1].parse::<u32>() else {
+                let attribute = (*values.first().unwrap_or(&"")).to_string();
+                let Ok(lowest) = (*values.get(1).unwrap_or(&"")).parse::<u32>() else {
                     tracing::warn!(
                     "parse_complex_token: Cannot parse physical attribute range: lowest: {values:?}"
                 );
                     return None;
                 };
-                let Ok(lower) = values[2].parse::<u32>() else {
+                let Ok(lower) = (*values.get(2).unwrap_or(&"")).parse::<u32>() else {
                     tracing::warn!(
                     "parse_complex_token: Cannot parse physical attribute range: lower: {values:?}"
                 );
                     return None;
                 };
-                let Ok(lower_median) = values[3].parse::<u32>() else {
+                let Ok(lower_median) = (*values.get(3).unwrap_or(&"")).parse::<u32>() else {
                     tracing::warn!(
                     "parse_complex_token: Cannot parse physical attribute range: lower medium: {values:?}"
                 );
                     return None;
                 };
-                let Ok(median) = values[4].parse::<u32>() else {
+                let Ok(median) = (*values.get(4).unwrap_or(&"")).parse::<u32>() else {
                     tracing::warn!(
                     "parse_complex_token: Cannot parse physical attribute range: medium: {values:?}"
                 );
                     return None;
                 };
-                let Ok(upper_median) = values[5].parse::<u32>() else {
+                let Ok(upper_median) = (*values.get(5).unwrap_or(&"")).parse::<u32>() else {
                     tracing::warn!(
                     "parse_complex_token: Cannot parse physical attribute range: upper medium: {values:?}"
                 );
                     return None;
                 };
-                let Ok(upper) = values[6].parse::<u32>() else {
+                let Ok(upper) = (*values.get(6).unwrap_or(&"")).parse::<u32>() else {
                     tracing::warn!(
                     "parse_complex_token: Cannot parse physical attribute range: upper: {values:?}"
                 );
                     return None;
                 };
-                let Ok(highest) = values[7].parse::<u32>() else {
+                let Ok(highest) = (*values.get(7).unwrap_or(&"")).parse::<u32>() else {
                     tracing::warn!(
                     "parse_complex_token: Cannot parse physical attribute range: highest: {values:?}"
                 );
@@ -1369,26 +1377,26 @@ impl TagOperations for CasteTag {
                     return None;
                 }
                 // Parse first argument as `String`
-                let attribute = values[0].to_string();
-                let Ok(improvement_cost) = values[1].parse::<u32>() else {
+                let attribute = (*values.first().unwrap_or(&"")).to_string();
+                let Ok(improvement_cost) = (*values.get(1).unwrap_or(&"")).parse::<u32>() else {
                     tracing::warn!(
                     "parse_complex_token: Cannot parse physical attribute rate: improvement cost: {values:?}"
                 );
                     return None;
                 };
-                let Ok(decay_rate_unused) = values[2].parse::<u32>() else {
+                let Ok(decay_rate_unused) = (*values.get(2).unwrap_or(&"")).parse::<u32>() else {
                     tracing::warn!(
                     "parse_complex_token: Cannot parse physical attribute rate: decay rate unused: {values:?}"
                 );
                     return None;
                 };
-                let Ok(decay_rate_rusty) = values[3].parse::<u32>() else {
+                let Ok(decay_rate_rusty) = (*values.get(3).unwrap_or(&"")).parse::<u32>() else {
                     tracing::warn!(
                     "parse_complex_token: Cannot parse physical attribute rate: decay rate rusty: {values:?}"
                 );
                     return None;
                 };
-                let Ok(decay_rate_demotion) = values[4].parse::<u32>() else {
+                let Ok(decay_rate_demotion) = (*values.get(4).unwrap_or(&"")).parse::<u32>() else {
                     tracing::warn!(
                     "parse_complex_token: Cannot parse physical attribute rate: decay rate demotion: {values:?}"
                 );
@@ -1412,9 +1420,9 @@ impl TagOperations for CasteTag {
                 );
                     return None;
                 }
-                let profession = values[0].to_string();
-                let singular = values[1].to_string();
-                let plural = values[2].to_string();
+                let profession = (*values.first().unwrap_or(&"")).to_string();
+                let singular = (*values.get(1).unwrap_or(&"")).to_string();
+                let plural = (*values.get(2).unwrap_or(&"")).to_string();
                 Some(CasteTag::ProfessionName {
                     profession,
                     singular,
@@ -1423,9 +1431,11 @@ impl TagOperations for CasteTag {
             }
             CasteTag::Pus { .. } => {
                 // Grab `material_state` from the end
-                let material_state = values[values.len() - 1].to_string();
+                let material_state = (*values.last().unwrap_or(&"")).to_string();
                 // Set `material` to `simple_value` + the remains of `value`
-                let material = values[..values.len() - 1].join(":").to_string();
+                let material = (*values.get(..values.len() - 1).unwrap_or_default())
+                    .join(":")
+                    .to_string();
                 Some(CasteTag::Pus {
                     material,
                     material_state,
@@ -1443,14 +1453,16 @@ impl TagOperations for CasteTag {
                     return None;
                 }
                 // `relative_size` is the last argument, parsed as `u32`
-                let Ok(relative_size) = values[values.len() - 1].parse::<u32>() else {
+                let Ok(relative_size) = (*values.last().unwrap_or(&"")).parse::<u32>() else {
                     tracing::warn!(
                         "parse_complex_token: Cannot parse RelativeSize: relative size: {values:?}"
                     );
                     return None;
                 };
-                let body_part_selector = values[0].to_string();
-                let body_part = values[1..values.len() - 1].join(":").to_string();
+                let body_part_selector = (*values.first().unwrap_or(&"")).to_string();
+                let body_part = (*values.get(1..values.len() - 1).unwrap_or_default())
+                    .join(":")
+                    .to_string();
                 Some(CasteTag::RelativeSize {
                     body_part_selector,
                     body_part,
@@ -1468,8 +1480,8 @@ impl TagOperations for CasteTag {
                 );
                     return None;
                 }
-                let singular = values[0].to_string();
-                let plural = values[1..].join(":").to_string();
+                let singular = (*values.first().unwrap_or(&"")).to_string();
+                let plural = (*values.get(1..).unwrap_or_default()).join(":").to_string();
                 Some(CasteTag::Remains { singular, plural })
             }
             CasteTag::RetractIntoBodyPart { .. } => {
@@ -1483,14 +1495,17 @@ impl TagOperations for CasteTag {
                     return None;
                 }
                 // We grab the strings from the end first
-                let third_person_cancel = values[values.len() - 1].to_string();
-                let second_person_cancel = values[values.len() - 2].to_string();
-                let third_person = values[values.len() - 3].to_string();
-                let second_person = values[values.len() - 4].to_string();
+                let third_person_cancel = (*values.last().unwrap_or(&"")).to_string();
+                let second_person_cancel =
+                    (*values.get(values.len() - 2).unwrap_or(&"")).to_string();
+                let third_person = (*values.get(values.len() - 3).unwrap_or(&"")).to_string();
+                let second_person = (*values.get(values.len() - 4).unwrap_or(&"")).to_string();
                 // Then the body_part_selector
-                let body_part_selector = values[0].to_string();
+                let body_part_selector = (*values.first().unwrap_or(&"")).to_string();
                 // And finally the body_part
-                let body_part = values[1..values.len() - 4].join(":").to_string();
+                let body_part = (*values.get(1..values.len() - 4).unwrap_or_default())
+                    .join(":")
+                    .to_string();
                 Some(CasteTag::RetractIntoBodyPart {
                     body_part_selector,
                     body_part,
@@ -1509,10 +1524,12 @@ impl TagOperations for CasteTag {
                 );
                     return None;
                 }
-                let third_person_verb = values[values.len() - 1].to_string();
-                let second_person_verb = values[values.len() - 2].to_string();
-                let body_part_selector = values[0].to_string();
-                let body_part = values[1..values.len() - 2].join(":").to_string();
+                let third_person_verb = (*values.last().unwrap_or(&"")).to_string();
+                let second_person_verb = (*values.get(values.len() - 2).unwrap_or(&"")).to_string();
+                let body_part_selector = (*values.first().unwrap_or(&"")).to_string();
+                let body_part = (*values.get(1..values.len() - 2).unwrap_or_default())
+                    .join(":")
+                    .to_string();
                 Some(CasteTag::RootAround {
                     body_part_selector,
                     body_part,
@@ -1529,13 +1546,15 @@ impl TagOperations for CasteTag {
                 );
                     return None;
                 }
-                let material_token = values[0].to_string();
-                let material_state = values[0].to_string();
-                let body_part_selector = values[0].to_string();
+                let material_token = (*values.first().unwrap_or(&"")).to_string();
+                let material_state = (*values.first().unwrap_or(&"")).to_string();
+                let body_part_selector = (*values.first().unwrap_or(&"")).to_string();
                 // Grab from the end
-                let trigger = values[values.len() - 1].to_string();
-                let tissue_layer = values[values.len() - 2].to_string();
-                let body_part = values[1..values.len() - 2].join(":").to_string();
+                let trigger = (*values.last().unwrap_or(&"")).to_string();
+                let tissue_layer = (*values.get(values.len() - 2).unwrap_or(&"")).to_string();
+                let body_part = (*values.get(1..values.len() - 2).unwrap_or_default())
+                    .join(":")
+                    .to_string();
                 Some(CasteTag::Secretion {
                     material_token,
                     material_state,
@@ -1554,21 +1573,21 @@ impl TagOperations for CasteTag {
                 );
                     return None;
                 }
-                let creature_class = values[0].to_string();
-                let tile = values[1].to_string();
-                let Ok(foreground) = values[2].parse::<u32>() else {
+                let creature_class = (*values.first().unwrap_or(&"")).to_string();
+                let tile = (*values.get(1).unwrap_or(&"")).to_string();
+                let Ok(foreground) = (*values.get(2).unwrap_or(&"")).parse::<u32>() else {
                     tracing::warn!(
                     "parse_complex_token: Cannot parse SenseCreatureClass: foreground: {values:?}"
                 );
                     return None;
                 };
-                let Ok(background) = values[3].parse::<u32>() else {
+                let Ok(background) = (*values.get(3).unwrap_or(&"")).parse::<u32>() else {
                     tracing::warn!(
                     "parse_complex_token: Cannot parse SenseCreatureClass: background: {values:?}"
                 );
                     return None;
                 };
-                let Ok(brightness) = values[4].parse::<u32>() else {
+                let Ok(brightness) = (*values.get(4).unwrap_or(&"")).parse::<u32>() else {
                     tracing::warn!(
                     "parse_complex_token: Cannot parse SenseCreatureClass: brightness: {values:?}"
                 );
@@ -1594,8 +1613,8 @@ impl TagOperations for CasteTag {
                     return None;
                 }
                 // Parse first argument as `String`
-                let body_part_selector = values[0].to_string();
-                let body_part = values[1..].join(":").to_string();
+                let body_part_selector = (*values.first().unwrap_or(&"")).to_string();
+                let body_part = (*values.get(1..).unwrap_or_default()).join(":").to_string();
                 Some(CasteTag::SetBodyPartGroup {
                     body_part_selector,
                     body_part,
@@ -1611,25 +1630,25 @@ impl TagOperations for CasteTag {
                 );
                     return None;
                 }
-                let Ok(improvement_rate) = values[0].parse::<u32>() else {
+                let Ok(improvement_rate) = (*values.first().unwrap_or(&"")).parse::<u32>() else {
                     tracing::warn!(
                     "parse_complex_token: Cannot parse skill rates: improvement rate: {values:?}"
                 );
                     return None;
                 };
-                let Ok(decay_rate_unused) = values[1].parse::<u32>() else {
+                let Ok(decay_rate_unused) = (*values.get(1).unwrap_or(&"")).parse::<u32>() else {
                     tracing::warn!(
                     "parse_complex_token: Cannot parse skill rates: decay rate unused: {values:?}"
                 );
                     return None;
                 };
-                let Ok(decay_rate_rusty) = values[2].parse::<u32>() else {
+                let Ok(decay_rate_rusty) = (*values.get(2).unwrap_or(&"")).parse::<u32>() else {
                     tracing::warn!(
                     "parse_complex_token: Cannot parse skill rates: decay rate rusty: {values:?}"
                 );
                     return None;
                 };
-                let Ok(decay_rate_demotion) = values[3].parse::<u32>() else {
+                let Ok(decay_rate_demotion) = (*values.get(3).unwrap_or(&"")).parse::<u32>() else {
                     tracing::warn!(
                     "parse_complex_token: Cannot parse skill rates: decay rate demotion: {values:?}"
                 );
@@ -1652,19 +1671,19 @@ impl TagOperations for CasteTag {
                 );
                     return None;
                 }
-                let Ok(decay_rate_unused) = values[0].parse::<u32>() else {
+                let Ok(decay_rate_unused) = (*values.first().unwrap_or(&"")).parse::<u32>() else {
                     tracing::warn!(
                     "parse_complex_token: Cannot parse skill rust rates: decay rate unused: {values:?}"
                 );
                     return None;
                 };
-                let Ok(decay_rate_rusty) = values[1].parse::<u32>() else {
+                let Ok(decay_rate_rusty) = (*values.get(1).unwrap_or(&"")).parse::<u32>() else {
                     tracing::warn!(
                     "parse_complex_token: Cannot parse skill rust rates: decay rate rusty: {values:?}"
                 );
                     return None;
                 };
-                let Ok(decay_rate_demotion) = values[2].parse::<u32>() else {
+                let Ok(decay_rate_demotion) = (*values.get(2).unwrap_or(&"")).parse::<u32>() else {
                     tracing::warn!(
                     "parse_complex_token: Cannot parse skill rust rates: decay rate demotion: {values:?}"
                 );
@@ -1687,14 +1706,14 @@ impl TagOperations for CasteTag {
                     return None;
                 }
                 let requires_breathing = values.len() == 7;
-                let sound_type = values[0].to_string();
-                let Ok(sound_range) = values[1].parse::<u32>() else {
+                let sound_type = (*values.first().unwrap_or(&"")).to_string();
+                let Ok(sound_range) = (*values.get(1).unwrap_or(&"")).parse::<u32>() else {
                     tracing::warn!(
                         "parse_complex_token: Cannot parse sound: sound range: {values:?}"
                     );
                     return None;
                 };
-                let Ok(sound_interval) = values[2].parse::<u32>() else {
+                let Ok(sound_interval) = (*values.get(2).unwrap_or(&"")).parse::<u32>() else {
                     tracing::warn!(
                         "parse_complex_token: Cannot parse sound: sound interval: {values:?}"
                     );
@@ -1705,9 +1724,9 @@ impl TagOperations for CasteTag {
                     // Remove the breathing value
                     breathing_bump = 1;
                 }
-                let third_person = values[3 + breathing_bump].to_string();
-                let first_person = values[4 + breathing_bump].to_string();
-                let out_of_sight = values[5 + breathing_bump].to_string();
+                let third_person = (*values.get(3 + breathing_bump).unwrap_or(&"")).to_string();
+                let first_person = (*values.get(4 + breathing_bump).unwrap_or(&"")).to_string();
+                let out_of_sight = (*values.get(5 + breathing_bump).unwrap_or(&"")).to_string();
                 Some(CasteTag::Sound {
                     sound_type,
                     sound_range,
@@ -1719,13 +1738,13 @@ impl TagOperations for CasteTag {
                 })
             }
             CasteTag::SpecificFood { .. } => {
-                let Some(food_type) = OBJECT_TOKEN_MAP.get(values[0]) else {
+                let Some(food_type) = OBJECT_TOKEN_MAP.get(*values.first().unwrap_or(&"")) else {
                     tracing::warn!(
                         "parse_complex_token: Cannot parse SpecificFood: object type: {values:?}"
                     );
                     return None;
                 };
-                let identifier = values[1..].join(":").to_string();
+                let identifier = (*values.get(1..).unwrap_or_default()).join(":").to_string();
                 Some(CasteTag::SpecificFood {
                     food_type: food_type.clone(),
                     identifier,
@@ -1741,8 +1760,8 @@ impl TagOperations for CasteTag {
                 );
                     return None;
                 }
-                let syndrome = values[0].to_string();
-                let Ok(percentage) = values[1].parse::<u32>() else {
+                let syndrome = (*values.first().unwrap_or(&"")).to_string();
+                let Ok(percentage) = (*values.get(1).unwrap_or(&"")).parse::<u32>() else {
                     tracing::warn!(
                     "parse_complex_token: Cannot parse syndrome dilution factor: percentage: {values:?}"
                 );
@@ -1757,24 +1776,26 @@ impl TagOperations for CasteTag {
                 // `material_state` is a `String` and is at the end of `value`
                 // `material` is `simple_value` + the remains of `value`
                 // Grab `healing_rate` from the end of `value`
-                let Ok(healing_rate) = values[values.len() - 1].parse::<u32>() else {
+                let Ok(healing_rate) = (*values.last().unwrap_or(&"")).parse::<u32>() else {
                     tracing::warn!(
                         "parse_complex_token: Cannot parse tendons: healing rate: {values:?}"
                     );
                     return None;
                 };
                 // Set `material` to `simple_value` + the remains of `value`
-                let material = values[..values.len() - 1].join(":").to_string();
+                let material = (*values.get(..values.len() - 1).unwrap_or_default())
+                    .join(":")
+                    .to_string();
                 Some(CasteTag::Tendons {
                     material,
                     healing_rate,
                 })
             }
             CasteTag::TissueLayer { .. } => {
-                let body_part_selector = values[0].to_string();
-                let body_part = values[1].to_string();
-                let tissue = values[2].to_string();
-                let location = values[3..].join(":").to_string();
+                let body_part_selector = (*values.first().unwrap_or(&"")).to_string();
+                let body_part = (*values.get(1).unwrap_or(&"")).to_string();
+                let tissue = (*values.get(2).unwrap_or(&"")).to_string();
+                let location = (*values.get(3..).unwrap_or_default()).join(":").to_string();
                 Some(CasteTag::TissueLayer {
                     body_part_selector,
                     body_part,
@@ -1783,9 +1804,9 @@ impl TagOperations for CasteTag {
                 })
             }
             CasteTag::TissueLayerUnder { .. } => {
-                let body_part_selector = values[0].to_string();
-                let body_part = values[1].to_string();
-                let tissue = values[2..].join(":").to_string();
+                let body_part_selector = (*values.first().unwrap_or(&"")).to_string();
+                let body_part = (*values.get(1).unwrap_or(&"")).to_string();
+                let tissue = (*values.get(2..).unwrap_or_default()).join(":").to_string();
                 Some(CasteTag::TissueLayerUnder {
                     body_part_selector,
                     body_part,
@@ -1793,15 +1814,15 @@ impl TagOperations for CasteTag {
                 })
             }
             CasteTag::VerminBite { .. } => {
-                let Ok(chance) = values[0].parse::<u32>() else {
+                let Ok(chance) = (*values.first().unwrap_or(&"")).parse::<u32>() else {
                     tracing::warn!(
                         "parse_complex_token: Cannot parse vermin bite: chance: {values:?}"
                     );
                     return None;
                 };
-                let verb = values[1].to_string();
-                let material = values[2].to_string();
-                let material_state = values[3..].join(":").to_string();
+                let verb = (*values.get(1).unwrap_or(&"")).to_string();
+                let material = (*values.get(2).unwrap_or(&"")).to_string();
+                let material_state = (*values.get(3..).unwrap_or_default()).join(":").to_string();
                 Some(CasteTag::VerminBite {
                     chance,
                     verb,
@@ -1810,13 +1831,13 @@ impl TagOperations for CasteTag {
                 })
             }
             CasteTag::VisionArc { .. } => {
-                let Ok(binocular) = values[0].parse::<u32>() else {
+                let Ok(binocular) = (*values.first().unwrap_or(&"")).parse::<u32>() else {
                     tracing::warn!(
                         "parse_complex_token: Cannot parse vision arc: binocular: {values:?}"
                     );
                     return None;
                 };
-                let Ok(non_binocular) = values[1].parse::<u32>() else {
+                let Ok(non_binocular) = (*values.get(1).unwrap_or(&"")).parse::<u32>() else {
                     tracing::warn!(
                         "parse_complex_token: Cannot parse vision arc: non binocular: {values:?}"
                     );

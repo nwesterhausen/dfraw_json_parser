@@ -23,7 +23,10 @@ use crate::{
     creature_variation::CreatureVariation,
     entity::Entity,
     graphic::Graphic,
+    inorganic::Inorganic,
+    material_template::MaterialTemplate,
     metadata::{ObjectType, ParserOptions, RawMetadata},
+    plant::Plant,
     regex::VARIATION_ARGUMENT_RE,
     select_creature::SelectCreature,
     tile_page::TilePage,
@@ -408,6 +411,7 @@ pub fn validate_options(options: &ParserOptions) -> Result<ParserOptions, Parser
 /// Returns:
 ///
 /// a vector of `DFCreature` objects.
+#[must_use]
 pub fn get_only_creatures_from_raws(all_raws: &[Box<dyn RawObject>]) -> Vec<Creature> {
     all_raws
         .iter()
@@ -427,6 +431,7 @@ pub fn get_only_creatures_from_raws(all_raws: &[Box<dyn RawObject>]) -> Vec<Crea
 /// Returns:
 ///
 /// a vector of `SelectCreature` objects.
+#[must_use]
 pub fn get_only_select_creatures_from_raws(all_raws: &[Box<dyn RawObject>]) -> Vec<SelectCreature> {
     all_raws
         .iter()
@@ -508,6 +513,7 @@ pub fn try_get_file<P: AsRef<Path>>(file_path: &P) -> Result<File, ParserError> 
 ///
 /// A `HashMap<ObjectType, usize>` where the key is the object type and the value is the number of
 /// objects of that type.
+#[must_use]
 pub fn summarize_raws(raws: &[Box<dyn RawObject>]) -> HashMap<ObjectType, usize> {
     let mut summary: std::collections::HashMap<ObjectType, usize> =
         std::collections::HashMap::new();

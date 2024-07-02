@@ -859,9 +859,9 @@ Self::TriggerableGroup { .. } |
                     tracing::warn!("parse_complex_token: not enough arguments for CreatureTag::ApplyCreatureVariation {}/2", values.len());
                     return None;
                 }
-                let id = values[0].to_string();
-                let args = values[1..]
-                    .into_iter()
+                let id = (*values.first().unwrap_or(&"")).to_string();
+                let args = (*values.get(1..).unwrap_or_default())
+                    .iter()
                     .map(std::string::ToString::to_string)
                     .collect();
                 Some(CreatureTag::ApplyCreatureVariation { id, args })
@@ -875,11 +875,11 @@ Self::TriggerableGroup { .. } |
                 );
                     return None;
                 }
-                let Ok(min) = values[0].parse::<u32>() else {
+                let Ok(min) = (*values.first().unwrap_or(&"")).parse::<u32>() else {
                     tracing::warn!("parse_complex_token: CreatureTag::ClusterNumber failed to parse min value: {values:?}");
                     return None;
                 };
-                let Ok(max) = values[1].parse::<u32>() else {
+                let Ok(max) = (*values.get(1).unwrap_or(&"")).parse::<u32>() else {
                     tracing::warn!("parse_complex_token: CreatureTag::ClusterNumber failed to parse max value: {values:?}");
                     return None;
                 };
@@ -894,15 +894,15 @@ Self::TriggerableGroup { .. } |
                     );
                     return None;
                 }
-                let Ok(foreground) = values[0].parse::<u32>() else {
+                let Ok(foreground) = (*values.first().unwrap_or(&"")).parse::<u32>() else {
                     tracing::warn!("parse_complex_token: CreatureTag::Color failed to parse foreground value: {values:?}");
                     return None;
                 };
-                let Ok(background) = values[1].parse::<u32>() else {
+                let Ok(background) = (*values.get(1).unwrap_or(&"")).parse::<u32>() else {
                     tracing::warn!("parse_complex_token: CreatureTag::Color failed to parse background value: {values:?}");
                     return None;
                 };
-                let Ok(brightness) = values[2].parse::<u32>() else {
+                let Ok(brightness) = (*values.get(2).unwrap_or(&"")).parse::<u32>() else {
                     tracing::warn!("parse_complex_token: CreatureTag::Color failed to parse brightness value: {values:?}");
                     return None;
                 };
@@ -921,15 +921,15 @@ Self::TriggerableGroup { .. } |
                     );
                     return None;
                 }
-                let Ok(foreground) = values[0].parse::<u32>() else {
+                let Ok(foreground) = (*values.first().unwrap_or(&"")).parse::<u32>() else {
                     tracing::warn!("parse_complex_token: CreatureTag::GlowColor failed to parse foreground value: {values:?}");
                     return None;
                 };
-                let Ok(background) = values[1].parse::<u32>() else {
+                let Ok(background) = (*values.get(1).unwrap_or(&"")).parse::<u32>() else {
                     tracing::warn!("parse_complex_token: CreatureTag::GlowColor failed to parse background value: {values:?}");
                     return None;
                 };
-                let Ok(brightness) = values[2].parse::<u32>() else {
+                let Ok(brightness) = (*values.get(2).unwrap_or(&"")).parse::<u32>() else {
                     tracing::warn!("parse_complex_token: CreatureTag::GlowColor failed to parse brightness value: {values:?}");
                     return None;
                 };
@@ -948,8 +948,8 @@ Self::TriggerableGroup { .. } |
                 );
                     return None;
                 }
-                let singular = values[0].to_string();
-                let plural = values[1..].join(":").to_string();
+                let singular = (*values.first().unwrap_or(&"")).to_string();
+                let plural = (*values.get(1..).unwrap_or_default()).join(":").to_string();
                 Some(CreatureTag::GeneralBabyName { singular, plural })
             }
             CreatureTag::GeneralChildName { .. } => {
@@ -961,8 +961,8 @@ Self::TriggerableGroup { .. } |
                 );
                     return None;
                 }
-                let singular = values[0].to_string();
-                let plural = values[1..].join(":").to_string();
+                let singular = (*values.first().unwrap_or(&"")).to_string();
+                let plural = (*values.get(1..).unwrap_or_default()).join(":").to_string();
                 Some(CreatureTag::GeneralChildName { singular, plural })
             }
             CreatureTag::HarvestProduct { .. } => {
@@ -974,11 +974,11 @@ Self::TriggerableGroup { .. } |
                 );
                     return None;
                 }
-                let Ok(number) = values[0].parse::<u32>() else {
+                let Ok(number) = (*values.first().unwrap_or(&"")).parse::<u32>() else {
                     tracing::warn!("parse_complex_token: CreatureTag::HarvestProduct failed to parse number value: {values:?}");
                     return None;
                 };
-                let Ok(time) = values[1].parse::<u32>() else {
+                let Ok(time) = (*values.get(1).unwrap_or(&"")).parse::<u32>() else {
                     tracing::warn!("parse_complex_token: CreatureTag::HarvestProduct failed to parse time value: {values:?}");
                     return None;
                 };
@@ -1001,9 +1001,9 @@ Self::TriggerableGroup { .. } |
                     );
                     return None;
                 }
-                let name = values[0].to_string();
-                let plural_name = values[1].to_string();
-                let adjective = values[2..].join(":").to_string();
+                let name = (*values.first().unwrap_or(&"")).to_string();
+                let plural_name = (*values.get(1).unwrap_or(&"")).to_string();
+                let adjective = (*values.get(2..).unwrap_or_default()).join(":").to_string();
                 Some(CreatureTag::Name {
                     name,
                     plural_name,
@@ -1019,11 +1019,11 @@ Self::TriggerableGroup { .. } |
                 );
                     return None;
                 }
-                let Ok(min) = values[0].parse::<u32>() else {
+                let Ok(min) = (*values.first().unwrap_or(&"")).parse::<u32>() else {
                     tracing::warn!("parse_complex_token: CreatureTag::PopulationNumber failed to parse min value: {values:?}");
                     return None;
                 };
-                let Ok(max) = values[1].parse::<u32>() else {
+                let Ok(max) = (*values.get(1).unwrap_or(&"")).parse::<u32>() else {
                     tracing::warn!("parse_complex_token: CreatureTag::PopulationNumber failed to parse max value: {values:?}");
                     return None;
                 };
@@ -1038,9 +1038,9 @@ Self::TriggerableGroup { .. } |
                 );
                     return None;
                 }
-                let id = values[0].to_string();
-                let name = values[1].to_string();
-                let plural_name = values[2..].join(":").to_string();
+                let id = (*values.first().unwrap_or(&"")).to_string();
+                let name = (*values.get(1).unwrap_or(&"")).to_string();
+                let plural_name = (*values.get(2..).unwrap_or_default()).join(":").to_string();
                 Some(CreatureTag::ProfessionName {
                     id,
                     name,
@@ -1056,11 +1056,11 @@ Self::TriggerableGroup { .. } |
                 );
                     return None;
                 }
-                let Ok(min) = values[0].parse::<u32>() else {
+                let Ok(min) = (*values.first().unwrap_or(&"")).parse::<u32>() else {
                     tracing::warn!("parse_complex_token: CreatureTag::TriggerableGroup failed to parse min value: {values:?}");
                     return None;
                 };
-                let Ok(max) = values[1].parse::<u32>() else {
+                let Ok(max) = (*values.get(1).unwrap_or(&"")).parse::<u32>() else {
                     tracing::warn!("parse_complex_token: CreatureTag::TriggerableGroup failed to parse max value: {values:?}");
                     return None;
                 };
@@ -1075,11 +1075,11 @@ Self::TriggerableGroup { .. } |
                 );
                     return None;
                 }
-                let Ok(min) = values[0].parse::<u32>() else {
+                let Ok(min) = (*values.first().unwrap_or(&"")).parse::<u32>() else {
                     tracing::warn!("parse_complex_token: CreatureTag::UndergroundDepth failed to parse min value: {values:?}");
                     return None;
                 };
-                let Ok(max) = values[1].parse::<u32>() else {
+                let Ok(max) = (*values.get(1).unwrap_or(&"")).parse::<u32>() else {
                     tracing::warn!("parse_complex_token: CreatureTag::UndergroundDepth failed to parse max value: {values:?}");
                     return None;
                 };
@@ -1094,8 +1094,8 @@ Self::TriggerableGroup { .. } |
                     );
                     return None;
                 }
-                let caste = values[0].to_string();
-                let original_caste = values[1..].join(":").to_string();
+                let caste = (*values.first().unwrap_or(&"")).to_string();
+                let original_caste = (*values.get(1..).unwrap_or_default()).join(":").to_string();
                 Some(CreatureTag::UseCaste {
                     caste,
                     original_caste,
@@ -1110,8 +1110,9 @@ Self::TriggerableGroup { .. } |
                 );
                     return None;
                 }
-                let material = values[0].to_string();
-                let original_material = values[1..].join(":").to_string();
+                let material = (*values.first().unwrap_or(&"")).to_string();
+                let original_material =
+                    (*values.get(1..).unwrap_or_default()).join(":").to_string();
                 Some(CreatureTag::UseMaterial {
                     material,
                     original_material,
@@ -1126,8 +1127,8 @@ Self::TriggerableGroup { .. } |
                 );
                     return None;
                 }
-                let material = values[0].to_string();
-                let template = values[1..].join(":").to_string();
+                let material = (*values.first().unwrap_or(&"")).to_string();
+                let template = (*values.get(1..).unwrap_or_default()).join(":").to_string();
                 Some(CreatureTag::UseMaterialTemplate { material, template })
             }
             CreatureTag::UseTissue { .. } => {
@@ -1139,8 +1140,8 @@ Self::TriggerableGroup { .. } |
                     );
                     return None;
                 }
-                let tissue = values[0].to_string();
-                let original_tissue = values[1..].join(":").to_string();
+                let tissue = (*values.first().unwrap_or(&"")).to_string();
+                let original_tissue = (*values.get(1..).unwrap_or_default()).join(":").to_string();
                 Some(CreatureTag::UseTissue {
                     tissue,
                     original_tissue,
@@ -1155,8 +1156,8 @@ Self::TriggerableGroup { .. } |
                 );
                     return None;
                 }
-                let tissue = values[0].to_string();
-                let template = values[1..].join(":").to_string();
+                let tissue = (*values.first().unwrap_or(&"")).to_string();
+                let template = (*values.get(1..).unwrap_or_default()).join(":").to_string();
                 Some(CreatureTag::UseTissueTemplate { tissue, template })
             }
             _ => {

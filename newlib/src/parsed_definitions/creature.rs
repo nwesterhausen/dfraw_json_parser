@@ -604,8 +604,10 @@ impl Creature {
         let mut cleaned = self.clone();
 
         // Set the metadata to None if it is hidden
-        if cleaned.metadata.is_some() && cleaned.metadata.as_ref().unwrap().is_hidden() {
-            cleaned.metadata = None;
+        if let Some(metadata) = &cleaned.metadata {
+            if metadata.is_hidden() {
+                cleaned.metadata = None;
+            }
         }
 
         // Remove any empty lists

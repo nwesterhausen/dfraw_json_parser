@@ -167,3 +167,17 @@ pub const fn is_zero_u8(value: Option<u8>) -> bool {
     }
     true
 }
+/// This is only used for serialize
+pub const fn is_one_u32(value: Option<u32>) -> bool {
+    if let Some(value) = value {
+        return value == 1;
+    }
+    true
+}
+/// This is only used for serialize
+pub const fn is_one_u8(value: Option<u8>) -> bool {
+    if let Some(value) = value {
+        return value == 1;
+    }
+    true
+}
