@@ -65,8 +65,6 @@ for the steam workshop if it is a mod downloaded from the steam workshop.
 #![warn(clippy::pedantic)]
 #![allow(clippy::must_use_candidate)]
 
-use dfraw_parser::metadata::ParserOptions;
-
 pub use dfraw_parser::*;
 
 #[cfg(feature = "tauri")]
@@ -129,7 +127,7 @@ pub use tauri_lib::ProgressTask;
 /// Other errors which are returned from the called functions within this function are not propagated, because the
 /// only "full" blocker is if the Dwarf Fortress directory is invalid.
 pub fn parse_with_tauri_emit(
-    options: &ParserOptions,
+    options: &metadata::ParserOptions,
     window: tauri::Window,
 ) -> Result<ParseResult, ParserError> {
     let mut progress_helper = tauri_lib::ProgressHelper::with_tauri_window(window);
