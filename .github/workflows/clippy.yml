@@ -15,11 +15,11 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Harden Runner
-        uses: step-security/harden-runner@f086349bfa2bd1361f7909c78558e816508cdc10 # v2.8.0
+        uses: step-security/harden-runner@0d381219ddf674d61a7572ddd19d7941e271515c # v2.9.0
         with:
           egress-policy: audit
 
-      - uses: actions/checkout@a5ac7e51b41094c92402da3b24376905380afc29 # v4.1.6
+      - uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 # v4.1.7
       - name: Install dependencies (for 'tauri' flag)
         # You can remove libayatana-appindicator3-dev if you don't use the system tray feature.
         run: |
@@ -37,7 +37,7 @@ jobs:
               libsoup-3.0 \
               webkit2gtk-4.1
       - name: Run sccache-cache
-        uses: mozilla-actions/sccache-action@2e7f9ec7921547d4b46598398ca573513895d0bd # 0.0.4
+        uses: mozilla-actions/sccache-action@89e9040de88b577a072e3760aaf59f585da083af # 0.0.5
       - uses: dtolnay/rust-toolchain@d8352f6b1d2e870bc5716e7a6d9b65c4cc244a1a # master
         with:
           targets: x86_64-unknown-linux-gnu
@@ -61,11 +61,11 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Harden Runner
-        uses: step-security/harden-runner@f086349bfa2bd1361f7909c78558e816508cdc10 # v2.8.0
+        uses: step-security/harden-runner@0d381219ddf674d61a7572ddd19d7941e271515c # v2.9.0
         with:
           egress-policy: audit
 
-      - uses: actions/checkout@a5ac7e51b41094c92402da3b24376905380afc29 # v4.1.6
+      - uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 # v4.1.7
       - name: Install dependencies (for 'tauri' flag)
         # You can remove libayatana-appindicator3-dev if you don't use the system tray feature.
         run: |
@@ -83,7 +83,7 @@ jobs:
               libsoup-3.0 \
               webkit2gtk-4.1
       - name: Run sccache-cache
-        uses: mozilla-actions/sccache-action@2e7f9ec7921547d4b46598398ca573513895d0bd # 0.0.4
+        uses: mozilla-actions/sccache-action@89e9040de88b577a072e3760aaf59f585da083af # 0.0.5
       - uses: dtolnay/rust-toolchain@d8352f6b1d2e870bc5716e7a6d9b65c4cc244a1a # master
         with:
           targets: x86_64-unknown-linux-gnu
@@ -105,7 +105,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Harden Runner
-        uses: step-security/harden-runner@f086349bfa2bd1361f7909c78558e816508cdc10 # v2.8.0
+        uses: step-security/harden-runner@0d381219ddf674d61a7572ddd19d7941e271515c # v2.9.0
         with:
           egress-policy: audit
 
@@ -121,9 +121,9 @@ jobs:
           wget -O vanilla-raws.zip https://build-deps.ci.nwest.one/dwarffortress/vanilla_${{ vars.DF_VERSION }}.zip
           unzip -d /home/runner/vanilla-raws vanilla-raws.zip
 
-      - uses: actions/checkout@a5ac7e51b41094c92402da3b24376905380afc29 # v4.1.6
+      - uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 # v4.1.7
       - name: Run sccache-cache
-        uses: mozilla-actions/sccache-action@2e7f9ec7921547d4b46598398ca573513895d0bd # 0.0.4
+        uses: mozilla-actions/sccache-action@89e9040de88b577a072e3760aaf59f585da083af # 0.0.5
       - uses: dtolnay/rust-toolchain@d8352f6b1d2e870bc5716e7a6d9b65c4cc244a1a # master
         with:
           toolchain: stable
